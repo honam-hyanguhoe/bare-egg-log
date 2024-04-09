@@ -1,0 +1,12 @@
+package org.egglog.api.groupboard.model.entity;
+
+import lombok.Builder;
+import lombok.Data;
+
+@Data
+@Builder(toBuilder = true)
+public class VoteContent {
+    private Long voteContentId;
+    private Long voteId;
+    private String voteContent;
+}

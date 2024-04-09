@@ -1,0 +1,71 @@
+pipeline {
+    agent any
+    environment {
+        REPO = "s10-final/S10P31C204"
+    }
+    stages {
+        stage('Checkout Main Repo') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Move .env File') {
+            steps {
+                script{
+                    sh 'cp ../environments/back/.env api/.env'
+                    sh "mkdir -p api/src/main/resources"
+                    // find 명령어를 사용하여 .yml 파일을  찾고, 각 파일에 대해 cp 명령어를 실행
+                    sh "cp ../environments/back/egg-log-service.yml api/src/main/resources/application.yml"
+                }
+            }
+        }
+        stage('Setup Environment') {
+            steps {
+                script{
+                    sh "chmod +x ./api/gradlew"
+                }
+            }
+        }
+        stage("Build & Run") {
+            steps {
+                dir("api"){
+                    script {
+                        try {
+                            sh "docker-compose -p api-project build"
+                            sh "docker-compose -p api-project up -d"
+                        }catch (Exception e) {
+                            sh "docker stop api"
+                            sh "docker-compose -p api-project build"
+                            sh "docker-compose -p api-project up -d"
+                        }
+                    }
+                }
+            }
+        }
+        stage('Prune old images'){
+            steps{
+                script{
+                    sh "yes | docker system prune --filter until=1h"
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                def Author_ID = sh(script: "git show -s --pretty=%an", returnStdout: true).trim()
+                def Author_Name = sh(script: "git show -s --pretty=%ae", returnStdout: true).trim()
+                mattermostSend (color: currentBuild.currentResult=='SUCCESS'?'good':'danger',
+                        message: "빌드 ${currentBuild.currentResult}: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${Author_ID}(${Author_Name})\n(<${env.BUILD_URL}|Details>)",
+                        endpoint: 'https://meeting.ssafy.com/hooks/8656byf6wbn3mdns9ym35suhze',
+                        channel: 'Jenkins'
+                )
+                slackSend (color: currentBuild.currentResult=='SUCCESS'?'good':'danger',
+                        message: "빌드 ${currentBuild.currentResult}: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${Author_ID}(${Author_Name})\n(<${env.BUILD_URL}|Details>)",
+                        channel: '#Jenkins',
+                )
+            }
+        }
+    }
+}
+

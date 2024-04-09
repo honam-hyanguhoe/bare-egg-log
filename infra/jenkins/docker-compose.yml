@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  jenkins:
+    container_name: jenkins
+    image: 54.180.55.106:5000/jenkins
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jenkins:/var/jenkins_home
+    ports:
+      - "8080:8080"
+    networks:
+      - egg-log-net
+    command: sh -c "chown root:docker /var/run/docker.sock"
+
+networks:
+  egg-log-net:
+
+volumes:
+  jenkins:

@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  nginx:
+    container_name: nginx
+    image: 54.180.55.106:5000/nginx
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    #    볼륨 매핑은 젠킨스 워크스페이스 기준
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - jenkins-project_egg-log-net
+
+networks:
+  jenkins-project_egg-log-net:
+    external: true
