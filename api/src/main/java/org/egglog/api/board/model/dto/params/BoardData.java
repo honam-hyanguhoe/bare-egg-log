@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Data;
+import org.egglog.api.board.model.entity.BoardType;
 
 @Data
 @Builder
@@ -16,7 +17,7 @@ public class BoardData {
 
     private Long groupId;
 
-    private String boardType;
+    private BoardType boardType;
 
     private String pictureOne;
 

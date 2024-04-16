@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatus;
 public enum BoardErrorCode {
     NO_EXIST_BOARD("존재하지 않는 게시글입니다.", HttpStatus.BAD_REQUEST),
     NO_EXIST_VOTE("존재하지 않는 투표입니다.", HttpStatus.BAD_REQUEST),
-    NO_EXIST_VOTE_CONTENT("존재하지 않는 투표 내용입니다.", HttpStatus.BAD_REQUEST),
-    NO_ANONYMOUS_VOTE_USER("아직 투표자가 없거나, 익명 투표입니다.", HttpStatus.BAD_REQUEST),
     TRANSACTION_ERROR("트랜잭션에 실패했습니다.",HttpStatus.INTERNAL_SERVER_ERROR),
     DATABASE_CONNECTION_FAILED("데이터베이스 연결에 실패했습니다.",HttpStatus.INTERNAL_SERVER_ERROR),
     UNKNOWN_ERROR("미등록 에러가 발생했습니다.",HttpStatus.INTERNAL_SERVER_ERROR);

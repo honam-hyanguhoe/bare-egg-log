@@ -7,4 +7,5 @@ public enum BoardType {
      * 부서 커뮤니티
      */
     ALL, HOSPITAL, DEPARTMENT
+
 }
