@@ -9,6 +9,8 @@ import lombok.Data;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CommentModifyForm {
+
     private String commentContent;
+
     private Long commentId;
 }

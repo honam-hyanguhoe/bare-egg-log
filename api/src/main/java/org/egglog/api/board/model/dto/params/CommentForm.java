@@ -16,5 +16,5 @@ public class CommentForm {
 
     private Long commentLevel;
 
-    private int commentGroup;
+    private int commentDepth;
 }

@@ -212,10 +212,14 @@ public class BoardServiceImpl implements BoardService {
      */
     @Override
     public BoardOutputSpec getBoard(Long boardId, Long userId) {
+        Users user = userQueryRepository.findById(userId).orElseThrow(
+                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
+        );
+
         BoardOutputSpec boardOutputSpec = null;
         BoardHit boardHit = BoardHit.builder()
                 .id(boardId)
-                .userId(userId)
+                .user(user)
                 .build();
         try {
             boardMapper.registHit(boardHit);

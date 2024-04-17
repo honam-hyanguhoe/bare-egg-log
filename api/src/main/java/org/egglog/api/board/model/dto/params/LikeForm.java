@@ -7,5 +7,6 @@ import lombok.Data;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class LikeForm {
+
     private Long boardId;
 }

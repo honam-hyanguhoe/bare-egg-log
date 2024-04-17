@@ -12,5 +12,4 @@ public class BoardForm {
 
     private BoardData boardData;
 
-    private VoteData voteData;
 }
