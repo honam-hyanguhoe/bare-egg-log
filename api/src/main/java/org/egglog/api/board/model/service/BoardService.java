@@ -16,21 +16,9 @@ public interface BoardService {
 
     void modifyBoard(BoardModifyForm boardModifyForm, Long userId);
 
-    void registVote(VoteData voteData, Long boardId);
-
-    void vote(VoteForm voteForm, Long userId);
-
-    void unVote(VoteForm voteForm, Long userId);
-
     Map<String, Object> getBoardDataAll(Long boardId, Long userId);
 
     BoardOutputSpec getBoard(Long boardId, Long userId);
-
-    VoteOutputSpec getVote(Long boardId, Long userId);
-
-    List<VoteContentOutputSpec> getVoteContent(Long voteId, Long userId);
-
-    List<VoteUserOutputSpec> getVoteUser(Long voteId);
 
     void registLike(LikeForm likeForm, Long userId);
 

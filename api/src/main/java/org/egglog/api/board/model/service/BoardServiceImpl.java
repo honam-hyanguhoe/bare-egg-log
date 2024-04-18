@@ -9,8 +9,11 @@ import org.egglog.api.board.exception.BoardException;
 import org.egglog.api.board.model.dto.params.*;
 import org.egglog.api.board.model.dto.response.*;
 import org.egglog.api.board.model.entity.*;
-import org.egglog.api.board.repository.BoardJpaRepository;
-import org.egglog.api.board.repository.BoardQueryRepository;
+import org.egglog.api.board.repository.*;
+import org.egglog.api.hospital.exception.HospitalErrorCode;
+import org.egglog.api.hospital.exception.HospitalException;
+import org.egglog.api.hospital.model.entity.Hospital;
+import org.egglog.api.hospital.model.repository.HospitalQueryRepository;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.Users;
@@ -19,9 +22,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -34,16 +35,21 @@ public class BoardServiceImpl implements BoardService {
 
     private final UserQueryRepository userQueryRepository;
 
+    private final CommentQueryRepository commentQueryRepository;
+
+    private final HospitalQueryRepository hospitalQueryRepository;
+
+    private final BoardLikeJpaRepository boardLikeJpaRepository;
+
+    private final BoardHitJpaRepository boardHitJpaRepository;
+
+
     /**
-     * 그룹 게시판의 게시글을 가져오는 메서드<br/>
-     * [로직]<br/>
-     * - boardListForm : 리스트의 시작 번호, 불러올 총 리스트 갯수, 검색 단어, 해당 그룹<br/>
-     * - userId: 내가 공감(좋아요)한 글인지 확인<br/>
+     * 게시판 글 목록
      *
      * @param boardListForm
      * @param userId
      * @return
-     * @author 김수린
      */
     @Override
     public List<BoardListOutputSpec> getBoardList(BoardListForm boardListForm, Long userId) {
@@ -51,13 +57,41 @@ public class BoardServiceImpl implements BoardService {
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
         List<Board> boardList = null;
-        List<BoardListOutputSpec> boardListOutputSpecList = null;
+        List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
 
         try {
-            boardList = boardQueryRepository.findBoardList(boardListForm.getLastBoardId());
-            for (Board board : boardList) {
+            boardList = boardQueryRepository.findBoardList(boardListForm.getGroupId(), boardListForm.getLastBoardId());
 
+            for (Board board : boardList) {
+                Long commentCnt = commentQueryRepository.getCommentCount(board.getId());
+                Long likeCnt = boardQueryRepository.getLikeCount(board.getId());
+                Long hitCnt = boardQueryRepository.getHitCount(board.getId());
+                boolean isUserLiked = false;  //좋아요 누른 여부
+                boolean isUserHit = false;  //조회 여부
+
+                //사용자가 이미 본 게시물인지
+                if (isNotHit(userId, board.getId())) {
+                    isUserHit = true;
+                }
+                //사용자가 이미 좋아요를 눌렀는지
+                if (isNotLiked(userId, board.getId())) {
+                    isUserLiked = true;
+                }
+                BoardListOutputSpec boardListOutputSpec = BoardListOutputSpec.builder()
+                        .boardId(board.getId())
+                        .boardTitle(board.getTitle())
+                        .boardContent(board.getContent())
+                        .boardCreatedAt(board.getCreatedAt())
+                        .hit(hitCnt)
+                        .commentCount(commentCnt)
+                        .boardLikeCount(likeCnt)
+                        .doLiked(isUserLiked)  //좋아요 여부
+                        .doHit(isUserHit)  //조회 여부
+                        .build();
+
+                boardListOutputSpecList.add(boardListOutputSpec);
             }
+
         } catch (DataAccessException e) {
             throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
         } catch (Exception e) {
@@ -66,6 +100,10 @@ public class BoardServiceImpl implements BoardService {
         }
         return boardListOutputSpecList;
     }
+
+//    public void getUserBoardLike(Long userId) {
+//
+//    }
 
     /**
      * 게시판 작성을 위한 메서드<br/>
@@ -85,21 +123,38 @@ public class BoardServiceImpl implements BoardService {
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
 
-        BoardData boardData = boardForm.getBoardData();
-        Board board = Board
-                .builder()
-                .title(boardData.getBoardSubject())
-                .content(boardData.getBoardContent())
-                .id(boardData.getGroupId())
-                .boardType(boardData.getBoardType())
-                .pictureOne(boardData.getPictureOne())
-                .pictureTwo(boardData.getPictureTwo())
-                .pictureThree(boardData.getPictureThree())
-                .pictureFour(boardData.getPictureFour())
+        Board board = Board.builder()
+                .title(boardForm.getBoardTitle())
+                .content(boardForm.getBoardContent())
+                .pictureOne(boardForm.getPictureOne())
+                .pictureTwo(boardForm.getPictureTwo())
+                .pictureThree(boardForm.getPictureThree())
+                .pictureFour(boardForm.getPictureFour())
                 .user(user)
                 .build();
+
+        if (boardForm.getGroupId() == null && boardForm.getHospitalId() == null) {
+            board.setBoardType(BoardType.ALL);
+
+        } else if (boardForm.getGroupId() != null && boardForm.getHospitalId() == null) {
+//            Group group = groupQueryRepository.findById(boardForm.getGroupId()).orElseThrow(
+//                    () -> new GroupException(GroupErrorCode.NOT_FOUND)
+//            );
+            board.setBoardType(BoardType.GROUP);
+//            board.setGroup(group);
+
+        } else if (boardForm.getGroupId() == null && boardForm.getHospitalId() != null) {
+            Hospital hospital = hospitalQueryRepository.findById(boardForm.getHospitalId()).orElseThrow(
+                    () -> new HospitalException(HospitalErrorCode.NOT_FOUND)
+            );
+            board.setBoardType(BoardType.HOSPITAL);
+            board.setHospital(hospital);
+        } else {
+            throw new BoardException(BoardErrorCode.NO_EXIST_CATEGORY);  //존재하지 않는 게시판 카테코리입니다.
+        }
+
         try {
-            boardJpaRepository.save(board);
+            boardJpaRepository.save(board);  //저장
 
         } catch (PersistenceException e) {
             throw new BoardException(BoardErrorCode.TRANSACTION_ERROR);
@@ -111,6 +166,28 @@ public class BoardServiceImpl implements BoardService {
         }
     }
 
+    /**
+     * 사용자가 이미 좋아요를 눌렀는지
+     * 
+     * @param userId
+     * @param boardId
+     * @return
+     */
+    private boolean isNotLiked(Long userId, Long boardId) {
+        return boardQueryRepository.getUserBoardLike(boardId, userId).isEmpty();
+    }
+
+    /**
+     * 사용자가 이미 본 게시물인지
+     *
+     * @param userId
+     * @param boardId
+     * @return
+     */
+    private boolean isNotHit(Long userId, Long boardId) {
+        return boardQueryRepository.getUserBoardHit(boardId, userId).isEmpty();
+    }
+    
     /**
      * 게시판 삭제 메서드<br/>
      * [로직]<br/>
@@ -230,7 +307,10 @@ public class BoardServiceImpl implements BoardService {
                 .user(user)
                 .build();
         try {
-            boardMapper.registHit(boardHit);
+            //로그인한 유저가 아직 조회하지 않았다면
+            if (isNotHit(userId, boardId)) {
+                boardHitJpaRepository.save(boardHit);  //조회수 테이블에 저장
+            }
             boardOutputSpec = boardMapper.getBoard(boardId, userId);
         } catch (DataAccessException e) {
             throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
@@ -302,4 +382,6 @@ public class BoardServiceImpl implements BoardService {
             throw new BoardException(BoardErrorCode.UNKNOWN_ERROR);
         }
     }
+
+
 }
