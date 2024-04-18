@@ -10,11 +10,11 @@ import lombok.Data;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class BoardListForm {
 
+    private Long hospitalId;
+
     private Long groupId;
 
-    private int start;
-
-    private int size;
-
     private String searchWord;
+
+    private Long lastBoardId;
 }

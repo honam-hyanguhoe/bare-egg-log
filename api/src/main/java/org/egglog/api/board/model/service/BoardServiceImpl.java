@@ -47,9 +47,17 @@ public class BoardServiceImpl implements BoardService {
      */
     @Override
     public List<BoardListOutputSpec> getBoardList(BoardListForm boardListForm, Long userId) {
+        Users user = userQueryRepository.findById(userId).orElseThrow(
+                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
+        );
+        List<Board> boardList = null;
         List<BoardListOutputSpec> boardListOutputSpecList = null;
+
         try {
-            boardListOutputSpecList = boardMapper.getBoardList(boardListForm, userId);
+            boardList = boardQueryRepository.findBoardList(boardListForm.getLastBoardId());
+            for (Board board : boardList) {
+
+            }
         } catch (DataAccessException e) {
             throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
         } catch (Exception e) {
