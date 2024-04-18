@@ -1,4 +1,4 @@
-package org.egglog.api.global.util;
+package org.egglog.utility.utils;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

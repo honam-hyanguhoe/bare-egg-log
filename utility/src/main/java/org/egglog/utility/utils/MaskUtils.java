@@ -1,4 +1,4 @@
-package org.egglog.api.global.util;
+package org.egglog.utility.utils;
 
 import lombok.NoArgsConstructor;
 

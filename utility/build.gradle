@@ -1,0 +1,75 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.2.4'
+	id 'io.spring.dependency-management' version '1.1.4'
+	id 'maven-publish'
+	id 'io.github.gradle-nexus.publish-plugin' version '2.0.0-rc-2'
+}
+
+group = 'org.egg-log'
+
+java {
+	sourceCompatibility = '17'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+bootJar.enabled = false // 실행가능한 아카이브로 main-class 가 있는 모듈인경우
+jar.enabled = true // PLAIN 으로 생성 실행이 불가능한 일반 아카이브
+
+repositories {
+	mavenCentral()
+	maven {
+		credentials(PasswordCredentials){
+			username = "${nexusUsername}"
+			password = "${nexusPassword}"
+		}
+		url "${nexusUrl}/egg-log-group/"
+		allowInsecureProtocol true
+	}
+}
+
+jar {
+	archiveFileName = "${project.name}-${version}.jar"
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication){
+			groupId group
+			artifactId project.name
+			version version
+			artifact("build/libs/$project.name-$version" + ".jar") {
+				extension 'jar'
+			}
+		}
+	}
+	repositories {
+		maven {
+			credentials(PasswordCredentials) {
+				username = "${nexusUsername}"
+				password = "${nexusPassword}"
+			}
+			def releasesRepoUrl = "${nexusUrl}/egg-log-release"
+			def snapshotsRepoUrl = "${nexusUrl}/egg-log-snapshot"
+			url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+			allowInsecureProtocol true
+		}
+	}
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

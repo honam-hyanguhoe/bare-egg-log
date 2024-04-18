@@ -1,7 +1,6 @@
 package org.egglog.api.board.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.egglog.api.global.util.MessageUtils;
 import org.egglog.api.board.model.dto.params.CommentForm;
 import org.egglog.api.board.model.dto.params.CommentModifyForm;
 import org.springframework.http.ResponseEntity;

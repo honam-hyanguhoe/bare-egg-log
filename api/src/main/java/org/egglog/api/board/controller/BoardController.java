@@ -2,7 +2,6 @@ package org.egglog.api.board.controller;
 
 
 import lombok.RequiredArgsConstructor;
-import org.egglog.api.global.util.MessageUtils;
 import org.egglog.api.board.model.dto.params.*;
 import org.egglog.api.board.model.service.BoardService;
 import org.springframework.http.ResponseEntity;
