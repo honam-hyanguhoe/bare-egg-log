@@ -2,11 +2,12 @@ package org.egglog.api.board.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.egglog.utility.exception.ErrorFormat;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
-public enum BoardErrorCode {
+public enum BoardErrorCode implements ErrorFormat {
     NO_EXIST_BOARD("존재하지 않는 게시글입니다.", HttpStatus.BAD_REQUEST),
     NO_EXIST_CATEGORY("존재하지 않는 게시판 카테코리입니다.", HttpStatus.BAD_REQUEST),
     TRANSACTION_ERROR("트랜잭션에 실패했습니다.",HttpStatus.INTERNAL_SERVER_ERROR),

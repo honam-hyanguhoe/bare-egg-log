@@ -13,7 +13,17 @@ java {
 
 repositories {
     mavenCentral()
+    maven {
+        credentials(PasswordCredentials) {
+            username = "${nexusUsername}"
+            password = "${nexusPassword}"
+        }
+        url "${nexusUrl}/egg-log-group/"
+        allowInsecureProtocol true
+        // 가능한 경우 allowInsecureProtocol 제거하고 HTTPS 사용
+    }
 }
+
 
 ext {
     set('springCloudVersion', "2023.0.1")

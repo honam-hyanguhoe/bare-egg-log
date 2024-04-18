@@ -1,6 +1,6 @@
-package org.egglog.api.global.util;
+package org.egglog.utility.utils;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
@@ -9,7 +9,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 @Data
 @Builder
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MessageUtils<T> {
     private final DataHeader dataHeader;
     private final T dataBody;
@@ -34,6 +34,20 @@ public class MessageUtils<T> {
                 .build();
     }
 
+    public static MessageUtils success(SuccessType successType) {
+        DataHeader successHeader=DataHeader.noContentSuccess();
+
+        if(successType == SuccessType.CREATE){
+            successHeader = DataHeader.noContentCreateSuccess();
+        }else if(successType == SuccessType.DELETE){
+            successHeader = DataHeader.noContentDeleteSuccess();
+        }
+
+        return MessageUtils.builder()
+                .dataHeader(successHeader)
+                .build();
+    }
+
     public static <T> MessageUtils<T> fail(String resultCode, String resultMessage) {
         return MessageUtils.<T>builder()
                 .dataHeader(DataHeader.fail(resultCode, resultMessage))
@@ -45,12 +59,26 @@ public class MessageUtils<T> {
     @NoArgsConstructor
     @Builder
     @Getter
-    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     private static class DataHeader {
 
         private int successCode;
         private String resultCode;
         private String resultMessage;
+
+        private static DataHeader noContentDeleteSuccess() {
+            return DataHeader.builder()
+                    .successCode(0)
+                    .resultCode(NO_CONTENT.toString())
+                    .build();
+        }
+
+        private static DataHeader noContentCreateSuccess() {
+            return DataHeader.builder()
+                    .successCode(0)
+                    .resultCode(NO_CONTENT.toString())
+                    .build();
+        }
 
         private static DataHeader noContentSuccess() {
             return DataHeader.builder()

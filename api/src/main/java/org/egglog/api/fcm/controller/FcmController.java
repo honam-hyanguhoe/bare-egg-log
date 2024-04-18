@@ -2,7 +2,7 @@ package org.egglog.api.fcm.controller;
 import lombok.RequiredArgsConstructor;
 import org.egglog.api.fcm.model.dto.FcmMessage;
 import org.egglog.api.fcm.model.service.FcmService;
-import org.egglog.api.global.util.MessageUtils;
+import org.egglog.utility.utils.MessageUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
