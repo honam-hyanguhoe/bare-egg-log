@@ -168,7 +168,7 @@ public class BoardServiceImpl implements BoardService {
 
     /**
      * 사용자가 이미 좋아요를 눌렀는지
-     * 
+     *
      * @param userId
      * @param boardId
      * @return
@@ -187,7 +187,7 @@ public class BoardServiceImpl implements BoardService {
     private boolean isNotHit(Long userId, Long boardId) {
         return boardQueryRepository.getUserBoardHit(boardId, userId).isEmpty();
     }
-    
+
     /**
      * 게시판 삭제 메서드<br/>
      * [로직]<br/>
@@ -307,18 +307,56 @@ public class BoardServiceImpl implements BoardService {
                 .user(user)
                 .build();
         try {
+            boolean isUserLiked = false;  //좋아요 누른 여부
+            boolean isUserHit = false;  //조회 여부
+
             //로그인한 유저가 아직 조회하지 않았다면
             if (isNotHit(userId, boardId)) {
                 boardHitJpaRepository.save(boardHit);  //조회수 테이블에 저장
+                isUserHit = true;
             }
-            boardOutputSpec = boardMapper.getBoard(boardId, userId);
+            Board findBoard = boardQueryRepository.findById(boardId).orElseThrow(
+                    () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
+            );
+            Long commentCnt = commentQueryRepository.getCommentCount(findBoard.getId());
+            Long likeCnt = boardQueryRepository.getLikeCount(findBoard.getId());
+            Long hitCnt = boardQueryRepository.getHitCount(findBoard.getId());
+
+            //사용자가 이미 좋아요를 눌렀는지
+            if (isNotLiked(userId, findBoard.getId())) {
+                isUserLiked = true;
+            }
+
+            boardOutputSpec = BoardOutputSpec.builder()
+                    .boardId(boardId)
+                    .boardTitle(findBoard.getTitle())
+                    .boardContent(findBoard.getContent())
+                    .boardCreatedAt(findBoard.getCreatedAt())
+                    .pictureOne(findBoard.getPictureOne())
+                    .pictureTwo(findBoard.getPictureTwo())
+                    .pictureThree(findBoard.getPictureThree())
+                    .pictureFour(findBoard.getPictureFour())
+                    .hit(hitCnt)
+                    .groupId(findBoard.getGroup().getGroupId())
+                    .userId(user.getId())
+                    .userName(user.getUserName())
+                    .profileImgUrl(user.getProfileImgUrl())
+                    .commentCount(commentCnt)
+                    .boardLikeCount(likeCnt)
+                    .hospitalName(findBoard.getHospital().getHospitalName())
+                    .doLiked(isUserLiked)
+                    .doHit(isUserHit)
+                    .build();
+
         } catch (DataAccessException e) {
             throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
         } catch (Exception e) {
             e.printStackTrace();
             throw new BoardException(BoardErrorCode.UNKNOWN_ERROR);
         }
-        if (boardOutputSpec == null) throw new BoardException(BoardErrorCode.NO_EXIST_BOARD);
+        if (boardOutputSpec == null)
+            throw new BoardException(BoardErrorCode.NO_EXIST_BOARD);
+
         return boardOutputSpec;
     }
 
@@ -338,13 +376,22 @@ public class BoardServiceImpl implements BoardService {
         Users user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
+        Board board = boardQueryRepository.findById(likeForm.getBoardId()).orElseThrow(
+                () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
+        );
 
-        BoardLike boardLike = BoardLike.builder()
-                .id(likeForm.getBoardId())
-                .user(user)
-                .build();
         try {
-            boardMapper.registLike(boardLike);
+            //아직 좋아요 안눌렀다면
+            if (isNotLiked(userId, likeForm.getBoardId())) {
+                BoardLike boardLike = BoardLike.builder()
+                        .id(likeForm.getBoardId())
+                        .board(board)
+                        .user(user)
+                        .build();
+
+                boardLikeJpaRepository.save(boardLike);
+            }
+
         } catch (DataAccessException e) {
             throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
         } catch (Exception e) {
@@ -374,7 +421,12 @@ public class BoardServiceImpl implements BoardService {
                 .user(user)
                 .build();
         try {
-            boardMapper.deleteLike(boardLike);
+
+            if (!isNotLiked(userId, likeForm.getBoardId())) {
+//                BoardLike boardLike = boardLikeQueryRepository.findById().
+
+                boardLikeJpaRepository.delete(boardLike);
+            }
         } catch (DataAccessException e) {
             throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
         } catch (Exception e) {
