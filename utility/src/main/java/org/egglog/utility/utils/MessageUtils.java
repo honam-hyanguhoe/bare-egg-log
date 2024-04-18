@@ -34,6 +34,20 @@ public class MessageUtils<T> {
                 .build();
     }
 
+    public static MessageUtils success(SuccessType successType) {
+        DataHeader successHeader=DataHeader.noContentSuccess();
+
+        if(successType == SuccessType.CREATE){
+            successHeader = DataHeader.noContentCreateSuccess();
+        }else if(successType == SuccessType.DELETE){
+            successHeader = DataHeader.noContentDeleteSuccess();
+        }
+
+        return MessageUtils.builder()
+                .dataHeader(successHeader)
+                .build();
+    }
+
     public static <T> MessageUtils<T> fail(String resultCode, String resultMessage) {
         return MessageUtils.<T>builder()
                 .dataHeader(DataHeader.fail(resultCode, resultMessage))
@@ -51,6 +65,20 @@ public class MessageUtils<T> {
         private int successCode;
         private String resultCode;
         private String resultMessage;
+
+        private static DataHeader noContentDeleteSuccess() {
+            return DataHeader.builder()
+                    .successCode(0)
+                    .resultCode(NO_CONTENT.toString())
+                    .build();
+        }
+
+        private static DataHeader noContentCreateSuccess() {
+            return DataHeader.builder()
+                    .successCode(0)
+                    .resultCode(NO_CONTENT.toString())
+                    .build();
+        }
 
         private static DataHeader noContentSuccess() {
             return DataHeader.builder()
