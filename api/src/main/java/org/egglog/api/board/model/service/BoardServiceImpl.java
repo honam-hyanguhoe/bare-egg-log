@@ -383,6 +383,7 @@ public class BoardServiceImpl implements BoardService {
                     .hospitalName(board.getHospital().getHospitalName())
                     .doLiked(isUserLiked)
                     .doHit(isUserHit)
+                    .isAuth(user.getIsAuth())   //인증 여부
                     .comments(commentList)
                     .build();
 

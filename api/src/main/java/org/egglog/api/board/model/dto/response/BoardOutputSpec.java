@@ -51,6 +51,8 @@ public class BoardOutputSpec {
 
     private boolean doHit;          // 조회 여부
 
+    private Boolean isAuth;     // 인증 여부
+
     private List<CommentListOutputSpec> comments;    //댓글
 
 }

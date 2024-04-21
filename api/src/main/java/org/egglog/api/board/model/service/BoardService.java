@@ -16,7 +16,6 @@ public interface BoardService {
 
     List<BoardListOutputSpec> getBoardList(BoardListForm boardListForm, Long userId);
 
-    @Transactional
     void registBoard(BoardForm boardForm, Long userId);
 
     void deleteBoard(Long boardId, Long userId);
