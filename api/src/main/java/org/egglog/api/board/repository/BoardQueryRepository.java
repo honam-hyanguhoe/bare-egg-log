@@ -32,12 +32,21 @@ public class BoardQueryRepository {
     public List<Board> findBoardHotList(Long groupId, Long hospitalId) {
         BooleanBuilder builder = new BooleanBuilder();
 
+        if (groupId == null && hospitalId == null) {
+            // 둘 다 null인 경우 특정 로직 처리
+            builder.and(board.group.id.isNull())
+                    .and(board.hospital.id.isNull());
+        } else {
+            if (groupId != null) {
+                builder.and(board.group.id.eq(groupId));
+            }
+            if (hospitalId != null) {
+                builder.and(board.hospital.id.eq(hospitalId));
+            }
+        }
         return jpaQueryFactory
                 .selectFrom(board)
-                .where(
-                        board.group.id.eq(groupId),
-                        board.hospital.id.eq(hospitalId)
-                )
+                .where(builder)
                 .orderBy(board.id.desc())
                 .limit(2)
                 .fetch();
