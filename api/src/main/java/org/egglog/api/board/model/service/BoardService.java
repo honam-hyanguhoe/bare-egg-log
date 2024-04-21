@@ -11,6 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 public interface BoardService {
+
+    List<BoardListOutputSpec> getBoardHotList(Long hospitalId, Long groupId, Long userId);
+
     List<BoardListOutputSpec> getBoardList(BoardListForm boardListForm, Long userId);
 
     @Transactional

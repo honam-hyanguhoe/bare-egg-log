@@ -22,11 +22,13 @@ public class Comment {
     @Column(name = "comment_content")
     private String content;  //내용
 
-    @Column(name = "comment_level")
-    private Long level;  //댓글 레벨
+    @Column(name = "parent_id")
+    private Long parentId;  //부모 댓글
 
-    @Column(name = "comment_group")
+    @Column(name = "comment_depth")
     private int depth;  //댓글 깊이
+
+    private String tempNickname;    //익명 닉네임
 
     @Column(name = "comment_created_at")
     private LocalDateTime createdAt;  //작성일

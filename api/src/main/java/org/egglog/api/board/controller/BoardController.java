@@ -17,7 +17,9 @@ public class BoardController {
 
     @GetMapping("/hot")
     public ResponseEntity<?> getBoardHotList(@RequestParam("hospital_id") Long hospitalId, @RequestParam("group_id") Long groupId) {
-
+//        TODO @AuthenticationPrincipal User user
+        Long userId = 1L;
+        return ResponseEntity.ok().body(MessageUtils.success(boardService.getBoardHotList(hospitalId, groupId, userId)));
     }
 
 
@@ -48,7 +50,7 @@ public class BoardController {
     public ResponseEntity<?> getBoard(@PathVariable Long boardId) {
 //        TODO @AuthenticationPrincipal User user
         Long userId = 1L;
-        return ResponseEntity.ok().body(MessageUtils.success(boardService.getBoardDataAll(boardId, userId)));
+        return ResponseEntity.ok().body(MessageUtils.success(boardService.getBoard(boardId, userId)));
     }
 
     @DeleteMapping("/{boardId}")
@@ -59,17 +61,12 @@ public class BoardController {
         return ResponseEntity.ok().body(MessageUtils.success());
     }
 
-    @PatchMapping("/modify")
+    @PatchMapping("")
     public ResponseEntity<?> modifyBoard(@RequestBody BoardModifyForm boardModifyForm) {
 //        TODO @AuthenticationPrincipal User user
         Long userId = 1L;
         boardService.modifyBoard(boardModifyForm, userId);
         return ResponseEntity.ok().body(MessageUtils.success());
-    }
-
-    @GetMapping("/vote/user/{voteId}")
-    public ResponseEntity<?> getVoteUser(@PathVariable Long voteId) {
-        return ResponseEntity.ok().body(MessageUtils.success(boardService.getVoteUser(voteId)));
     }
 
     @PostMapping("/like")

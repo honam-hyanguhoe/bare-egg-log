@@ -24,6 +24,8 @@ public class BoardForm {
 
     private String pictureFour;
 
+    private String tempNickname;  //익명 닉네임
+
     private Long groupId;  //그룹 아이디
     
     private Long hospitalId;  //병원 아이디

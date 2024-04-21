@@ -27,6 +27,8 @@ public class BoardDocument {
     @Field(type = FieldType.Text, name = "content")
     private String content;     //내용
 
+    private String tempNickname;    //익명 닉네임
+
     private Long groupId;    //그룹 아이디
 
     private Long hospitalId;  //병원 아이디
@@ -39,6 +41,7 @@ public class BoardDocument {
                 .id(board.getId())
                 .title(board.getTitle())
                 .content(board.getContent())
+                .tempNickname(board.getTempNickname())
                 .hospitalId(board.getHospital().getId())
                 .groupId(board.getGroup().getGroupId())
                 .createdAt(board.getCreatedAt())

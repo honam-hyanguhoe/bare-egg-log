@@ -49,6 +49,8 @@ public class BoardServiceImpl implements BoardService {
 
     private final SearchRepository searchRepository;    //검색 레포지토리
 
+    private final CommentService commentService;
+
     /**
      * 게시판 글 목록
      *
@@ -61,7 +63,6 @@ public class BoardServiceImpl implements BoardService {
         Users user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
-        List<Board> boardList = null;
         List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
         int size = 10;
 
@@ -88,11 +89,13 @@ public class BoardServiceImpl implements BoardService {
                         .boardTitle(board.getTitle())
                         .boardContent(board.getContent())
                         .boardCreatedAt(board.getCreatedAt())
+                        .tempNickname(board.getTempNickname())
                         .hit(hitCnt)
                         .commentCount(commentCnt)
-                        .boardLikeCount(likeCnt)
+                        .likeCount(likeCnt)
                         .doLiked(isUserLiked)  //좋아요 여부
                         .doHit(isUserHit)  //조회 여부
+                        .isAuth(user.getIsAuth())   //인증 여부
                         .build();
 
                 boardListOutputSpecList.add(boardListOutputSpec);
@@ -115,20 +118,67 @@ public class BoardServiceImpl implements BoardService {
      * @param userId
      * @return
      */
-    public List<BoardListOutputSpec> getBoarHotList(Long hospitalId, Long groupId, Long userId) {
+    public List<BoardListOutputSpec> getBoardHotList(Long hospitalId, Long groupId, Long userId) {
+        Users user = userQueryRepository.findById(userId).orElseThrow(
+                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
+        );
+
+        List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
+
+        try {
+            List<Board> boardHotList = boardQueryRepository.findBoardHotList(groupId, hospitalId);
+            for (Board board : boardHotList) {
+                Long commentCnt = commentQueryRepository.getCommentCount(board.getId());
+                Long likeCnt = boardQueryRepository.getLikeCount(board.getId());
+                Long hitCnt = boardQueryRepository.getHitCount(board.getId());
+
+                boolean isUserLiked = false;  //좋아요 누른 여부
+                boolean isUserHit = false;  //조회 여부
+
+                //사용자가 이미 본 게시물인지
+                if (!isNotHit(userId, board.getId())) { //아직 안봤다면 true
+                    isUserHit = true;
+                }
+                //사용자가 이미 좋아요를 눌렀는지
+                if (!isNotLiked(userId, board.getId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
+                    isUserLiked = true;
+                }
+
+                BoardListOutputSpec boardListOutputSpec = BoardListOutputSpec.builder()
+                        .boardId(board.getId())
+                        .boardTitle(board.getTitle())
+                        .boardContent(board.getContent())
+                        .boardCreatedAt(board.getCreatedAt())
+                        .tempNickname(board.getTempNickname())
+                        .hit(hitCnt)
+                        .commentCount(commentCnt)
+                        .likeCount(likeCnt)
+                        .doLiked(isUserLiked)
+                        .doHit(isUserHit)
+                        .isAuth(user.getIsAuth())   //인증 여부
+                        .build();
+
+                boardListOutputSpecList.add(boardListOutputSpec);
+            }
+        } catch (DataAccessException e) {
+            throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BoardException(BoardErrorCode.UNKNOWN_ERROR);
+        }
+
+        return boardListOutputSpecList;
 
     }
 
     /**
      * 게시판 작성을 위한 메서드<br/>
      * [로직]<br/>
-     * - boardForm에는 board 관련 정보를 담고 있는 객체와, 게시판 타입에 따라 투표/켈린더 정보를 담고 있는 객체 존재<br/>
-     * - 이를 분리해 BoardData를 Board객체로 변경<br/>
-     * - vote 타입이라면 vote 정보 insert 등록
+     * - boardForm에는 board 관련 정보를 담고 있는 객체<br/>
+     * - boardForm를 Board객체로 변경<br/>
      *
      * @param boardForm
      * @param userId
-     * @author 김수린
      */
     @Override
     @Transactional
@@ -144,13 +194,16 @@ public class BoardServiceImpl implements BoardService {
                 .pictureTwo(boardForm.getPictureTwo())
                 .pictureThree(boardForm.getPictureThree())
                 .pictureFour(boardForm.getPictureFour())
+                .tempNickname(boardForm.getTempNickname())
                 .user(user)
                 .build();
 
+        // 전체 게시판
         if (boardForm.getGroupId() == null && boardForm.getHospitalId() == null) {
             board.setBoardType(BoardType.ALL);
 
         } else if (boardForm.getGroupId() != null && boardForm.getHospitalId() == null) {
+            //그룹 게시판
 //            Group group = groupQueryRepository.findById(boardForm.getGroupId()).orElseThrow(
 //                    () -> new GroupException(GroupErrorCode.NOT_FOUND)
 //            );
@@ -158,6 +211,7 @@ public class BoardServiceImpl implements BoardService {
 //            board.setGroup(group);
 
         } else if (boardForm.getGroupId() == null && boardForm.getHospitalId() != null) {
+            // 병원 게시판
             Hospital hospital = hospitalQueryRepository.findById(boardForm.getHospitalId()).orElseThrow(
                     () -> new HospitalException(HospitalErrorCode.NOT_FOUND)
             );
@@ -203,7 +257,6 @@ public class BoardServiceImpl implements BoardService {
     private boolean isNotHit(Long userId, Long boardId) {
         return boardQueryRepository.getUserBoardHit(boardId, userId).isEmpty();
     }
-
     /**
      * 게시판 삭제 메서드<br/>
      * [로직]<br/>
@@ -211,7 +264,6 @@ public class BoardServiceImpl implements BoardService {
      *
      * @param boardId
      * @param userId
-     * @author 김수린
      */
     @Override
     public void deleteBoard(Long boardId, Long userId) {
@@ -236,32 +288,27 @@ public class BoardServiceImpl implements BoardService {
     /**
      * 게시판 수정 메서드<br/>
      * [로직]<br/>
-     * - BoardModifyForm를 Board 객체로 변경<br/>
-     * - userId로 유효성 검증
      *
      * @param boardModifyForm
      * @param userId
-     * @author 김수린
      */
     @Override
+    @Transactional
     public void modifyBoard(BoardModifyForm boardModifyForm, Long userId) {
         Users user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
+        Board board = boardQueryRepository.findById(boardModifyForm.getBoardId()).orElseThrow(
+                () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
+        );
 
-        Board board = Board
-                .builder()
-                .id(boardModifyForm.getBoardId())
-                .title(boardModifyForm.getBoardSubject())
-                .content(boardModifyForm.getBoardContent())
-                .pictureOne(boardModifyForm.getPictureOne())
-                .pictureTwo(boardModifyForm.getPictureTwo())
-                .pictureThree(boardModifyForm.getPictureThree())
-                .pictureFour(boardModifyForm.getPictureFour())
-                .user(user)
-                .build();
         try {
-            boardJpaRepository.save(board);
+            board.setTitle(boardModifyForm.getBoardContent());
+            board.setContent(boardModifyForm.getBoardContent());
+            board.setPictureOne(boardModifyForm.getPictureOne());
+            board.setPictureTwo(boardModifyForm.getPictureTwo());
+            board.setPictureThree(boardModifyForm.getPictureThree());
+            board.setPictureFour(boardModifyForm.getPictureFour());
 
         } catch (DataAccessException e) {
             throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
@@ -281,20 +328,24 @@ public class BoardServiceImpl implements BoardService {
      * @param boardId
      * @param userId
      * @return
-     * @author 김수린
      */
     @Override
     public BoardOutputSpec getBoard(Long boardId, Long userId) {
         Users user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
-
+        Board board = boardQueryRepository.findById(boardId).orElseThrow(
+                () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
+        );
         BoardOutputSpec boardOutputSpec = null;
-        BoardHit boardHit = BoardHit.builder()
-                .id(boardId)
-                .user(user)
-                .build();
+
         try {
+            BoardHit boardHit = BoardHit.builder()
+                    .id(boardId)
+                    .user(user)
+                    .board(board)
+                    .build();
+
             boolean isUserLiked = false;  //좋아요 누른 여부
             boolean isUserHit = false;  //조회 여부
 
@@ -303,37 +354,36 @@ public class BoardServiceImpl implements BoardService {
                 boardHitJpaRepository.save(boardHit);  //조회수 테이블에 저장
                 isUserHit = true;
             }
-            Board findBoard = boardQueryRepository.findById(boardId).orElseThrow(
-                    () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
-            );
-            Long commentCnt = commentQueryRepository.getCommentCount(findBoard.getId());
-            Long likeCnt = boardQueryRepository.getLikeCount(findBoard.getId());
-            Long hitCnt = boardQueryRepository.getHitCount(findBoard.getId());
+            Long commentCnt = commentQueryRepository.getCommentCount(board.getId());
+            Long likeCnt = boardQueryRepository.getLikeCount(board.getId());
+            Long hitCnt = boardQueryRepository.getHitCount(board.getId());
 
             //사용자가 이미 좋아요를 눌렀는지
-            if (isNotLiked(userId, findBoard.getId())) {
+            if (!isNotLiked(userId, board.getId())) {
                 isUserLiked = true;
             }
+            List<CommentListOutputSpec> commentList = commentService.getCommentList(boardId);
 
             boardOutputSpec = BoardOutputSpec.builder()
                     .boardId(boardId)
-                    .boardTitle(findBoard.getTitle())
-                    .boardContent(findBoard.getContent())
-                    .boardCreatedAt(findBoard.getCreatedAt())
-                    .pictureOne(findBoard.getPictureOne())
-                    .pictureTwo(findBoard.getPictureTwo())
-                    .pictureThree(findBoard.getPictureThree())
-                    .pictureFour(findBoard.getPictureFour())
+                    .boardTitle(board.getTitle())
+                    .boardContent(board.getContent())
+                    .boardCreatedAt(board.getCreatedAt())
+                    .pictureOne(board.getPictureOne())
+                    .pictureTwo(board.getPictureTwo())
+                    .pictureThree(board.getPictureThree())
+                    .pictureFour(board.getPictureFour())
                     .hit(hitCnt)
-                    .groupId(findBoard.getGroup().getGroupId())
+                    .groupId(board.getGroup().getGroupId())
                     .userId(user.getId())
-                    .userName(user.getUserName())
+                    .tempNickname(board.getTempNickname())
                     .profileImgUrl(user.getProfileImgUrl())
                     .commentCount(commentCnt)
                     .boardLikeCount(likeCnt)
-                    .hospitalName(findBoard.getHospital().getHospitalName())
+                    .hospitalName(board.getHospital().getHospitalName())
                     .doLiked(isUserLiked)
                     .doHit(isUserHit)
+                    .comments(commentList)
                     .build();
 
         } catch (DataAccessException e) {
@@ -357,7 +407,6 @@ public class BoardServiceImpl implements BoardService {
      *
      * @param likeForm
      * @param userId
-     * @author 김수린
      */
     @Override
     public void registLike(LikeForm likeForm, Long userId) {
@@ -396,7 +445,6 @@ public class BoardServiceImpl implements BoardService {
      *
      * @param likeForm
      * @param userId
-     * @author 김수린
      */
     @Override
     public void deleteLike(LikeForm likeForm, Long userId) {

@@ -38,6 +38,8 @@ public class Board {
 
     private String pictureFour;
 
+    private String tempNickname; //익명 닉네임
+
     @Enumerated(EnumType.STRING)
     private BoardType boardType; //ALL, HOSPITAL, GROUP
 

@@ -2,12 +2,14 @@ package org.egglog.api.board.model.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class BoardListOutputSpec {
@@ -20,14 +22,20 @@ public class BoardListOutputSpec {
 
     private LocalDateTime boardCreatedAt;  // 게시판 작성 시간
 
+    private String tempNickname;
+
     private Long hit;               // 게시판 조회수
 
     private Long commentCount;      // 댓글 갯수
 
-    private Long boardLikeCount;    // 좋아요 수
+    private Long likeCount;    // 좋아요 수
+
+    private String pictureOne;  // 첫번째 사진
 
     private boolean doLiked;        // 좋아요 여부
 
     private boolean doHit;          // 조회 여부
+    
+    private Boolean isAuth;     // 인증 여부
 
 }

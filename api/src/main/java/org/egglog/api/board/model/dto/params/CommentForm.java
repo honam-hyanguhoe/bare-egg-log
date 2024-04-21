@@ -16,7 +16,10 @@ public class CommentForm {
 
     private String commentContent;
 
-    private Long commentLevel;
+    private Long parentId;
 
     private int commentDepth;
+
+    private String tempNickname;
+
 }

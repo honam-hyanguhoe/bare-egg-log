@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -36,11 +37,11 @@ public class BoardOutputSpec {
 
     private Long userId;            // 유저 id
 
-    private String userName;        // 유저 이름
+    private String tempNickname;       // 익명 닉네임
 
     private String profileImgUrl;   // 유저 프로필 사진
 
-    private Long commentCount;      // 댓글 갯수
+    private Long commentCount;      // 댓글 개수
 
     private Long boardLikeCount;    // 좋아요 수
 
@@ -49,5 +50,7 @@ public class BoardOutputSpec {
     private boolean doLiked;        // 좋아요 여부
 
     private boolean doHit;          // 조회 여부
+
+    private List<CommentListOutputSpec> comments;    //댓글
 
 }
