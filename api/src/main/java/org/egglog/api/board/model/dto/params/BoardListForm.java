@@ -12,11 +12,11 @@ import lombok.*;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class BoardListForm {
 
-    private Long hospitalId;
+    private Long hospitalId;    //병원 아이디
 
-    private Long groupId;
+    private Long groupId;   //그룹 아이디
 
-    private String searchWord;
+    private String searchWord;  //검색어
 
-    private Long lastBoardId;
+    private Long lastBoardId;   //마지막 게시물 번호
 }

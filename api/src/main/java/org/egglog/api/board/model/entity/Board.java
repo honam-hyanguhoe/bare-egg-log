@@ -39,7 +39,7 @@ public class Board {
     private String pictureFour;
 
     @Enumerated(EnumType.STRING)
-    private BoardType boardType; //ALL, HOSPITAL, DEPARTMENT
+    private BoardType boardType; //ALL, HOSPITAL, GROUP
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")

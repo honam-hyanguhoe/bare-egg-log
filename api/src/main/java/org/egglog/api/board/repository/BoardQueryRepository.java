@@ -1,5 +1,6 @@
 package org.egglog.api.board.repository;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -28,35 +29,41 @@ public class BoardQueryRepository {
                 .fetchOne());
     }
 
-    public List<Board> findBoardList(Long groupId, Long lastBoardId) {
+    public List<Board> findBoardHotList(Long groupId, Long hospitalId) {
+        BooleanBuilder builder = new BooleanBuilder();
+
         return jpaQueryFactory
                 .selectFrom(board)
-                .leftJoin(board)
                 .where(
-                        ltBoardId(lastBoardId),
-                        board.group.id.eq(groupId)
+                        board.group.id.eq(groupId),
+                        board.hospital.id.eq(hospitalId)
                 )
                 .orderBy(board.id.desc())
+                .limit(2)
                 .fetch();
     }
 
-    // id < 첫 번째 조회에서는 파라미터를 사용하지 않기 위한 동적 쿼리
-    private BooleanExpression ltBoardId(Long lastBoardId) {
-        if (lastBoardId == null) {
-            return null;    // BooleanExpression 자리에 null이 반환되면 조건문에서 자동을 제외된다.
-        }
-        return board.id.lt(lastBoardId);
-    }
+//    public List<Board> findBoardList(Long groupId, Long lastBoardId, int size) {
+//        return jpaQueryFactory
+//                .selectFrom(board)
+//                .leftJoin(board)
+//                .where(
+//                        ltBoardId(lastBoardId),
+//                        board.group.id.eq(groupId)
+//                )
+//                .orderBy(board.id.desc())
+//                .limit(size)
+//                .fetch();
+//    }
+//
+//    // id < 첫 번째 조회에서는 파라미터를 사용하지 않기 위한 동적 쿼리
+//    private BooleanExpression ltBoardId(Long lastBoardId) {
+//        if (lastBoardId == null) {
+//            return null;    // BooleanExpression 자리에 null이 반환되면 조건문에서 자동을 제외된다.
+//        }
+//        return board.id.lt(lastBoardId);
+//    }
 
-    /**
-     * 조회수 증가
-     *
-     * @param boardId
-     * @param userId
-     */
-    public void updateViewCount(Long boardId, Long userId) {
-
-    }
 
     /**
      * 조회수

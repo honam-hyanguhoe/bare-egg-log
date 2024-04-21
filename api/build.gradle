@@ -31,6 +31,7 @@ ext {
 
 dependencies {
     implementation 'org.egg-log:utility:1.0.1'
+    implementation 'org.springframework.data:spring-data-elasticsearch'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-mail'

@@ -10,6 +10,8 @@ import org.egglog.api.board.model.dto.params.*;
 import org.egglog.api.board.model.dto.response.*;
 import org.egglog.api.board.model.entity.*;
 import org.egglog.api.board.repository.*;
+import org.egglog.api.board.search.domain.document.BoardDocument;
+import org.egglog.api.board.search.repository.SearchRepository;
 import org.egglog.api.hospital.exception.HospitalErrorCode;
 import org.egglog.api.hospital.exception.HospitalException;
 import org.egglog.api.hospital.model.entity.Hospital;
@@ -41,8 +43,11 @@ public class BoardServiceImpl implements BoardService {
 
     private final BoardLikeJpaRepository boardLikeJpaRepository;
 
+    private final BoardLikeQueryRepository boardLikeQueryRepository;
+
     private final BoardHitJpaRepository boardHitJpaRepository;
 
+    private final SearchRepository searchRepository;    //검색 레포지토리
 
     /**
      * 게시판 글 목록
@@ -58,11 +63,12 @@ public class BoardServiceImpl implements BoardService {
         );
         List<Board> boardList = null;
         List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
+        int size = 10;
 
         try {
-            boardList = boardQueryRepository.findBoardList(boardListForm.getGroupId(), boardListForm.getLastBoardId());
+            List<BoardDocument> boardDocuments = searchRepository.searchBoard(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getLastBoardId(), size);
 
-            for (Board board : boardList) {
+            for (BoardDocument board : boardDocuments) {
                 Long commentCnt = commentQueryRepository.getCommentCount(board.getId());
                 Long likeCnt = boardQueryRepository.getLikeCount(board.getId());
                 Long hitCnt = boardQueryRepository.getHitCount(board.getId());
@@ -70,11 +76,11 @@ public class BoardServiceImpl implements BoardService {
                 boolean isUserHit = false;  //조회 여부
 
                 //사용자가 이미 본 게시물인지
-                if (isNotHit(userId, board.getId())) {
+                if (!isNotHit(userId, board.getId())) { //아직 안봤다면 true
                     isUserHit = true;
                 }
                 //사용자가 이미 좋아요를 눌렀는지
-                if (isNotLiked(userId, board.getId())) {
+                if (!isNotLiked(userId, board.getId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
                     isUserLiked = true;
                 }
                 BoardListOutputSpec boardListOutputSpec = BoardListOutputSpec.builder()
@@ -101,9 +107,17 @@ public class BoardServiceImpl implements BoardService {
         return boardListOutputSpecList;
     }
 
-//    public void getUserBoardLike(Long userId) {
-//
-//    }
+    /**
+     * 급상승 게시물 조회
+     *
+     * @param hospitalId
+     * @param groupId
+     * @param userId
+     * @return
+     */
+    public List<BoardListOutputSpec> getBoarHotList(Long hospitalId, Long groupId, Long userId) {
+
+    }
 
     /**
      * 게시판 작성을 위한 메서드<br/>
@@ -149,12 +163,14 @@ public class BoardServiceImpl implements BoardService {
             );
             board.setBoardType(BoardType.HOSPITAL);
             board.setHospital(hospital);
+
         } else {
             throw new BoardException(BoardErrorCode.NO_EXIST_CATEGORY);  //존재하지 않는 게시판 카테코리입니다.
         }
 
         try {
             boardJpaRepository.save(board);  //저장
+            searchRepository.save(BoardDocument.from(board));   // ES에 저장
 
         } catch (PersistenceException e) {
             throw new BoardException(BoardErrorCode.TRANSACTION_ERROR);
@@ -255,34 +271,6 @@ public class BoardServiceImpl implements BoardService {
         }
     }
 
-
-    /**
-     * Board에 대한 상세정보를 가져오는 메서드<br/>
-     * - Board 타입에 따른 추가 정보 존재 가능성 존재<br/>
-     * [로직]<br/>
-     * - boardId를 토대로 boardData를 가져온다.<br/>
-     * - userId를 함께 넘겨 내가 좋아요한 글인지 등을 확인한다.<br/>
-     * - type이 vote라면 boardId를 토대로 vote 정보를 가져온다.<br/>
-     * - vote정보를 가져오며 voteId 역시 가져오고 이를 토대로 content를 가져온다.
-     *
-     * @param boardId
-     * @param userId
-     * @return
-     * @author 김수린
-     */
-    @Override
-    @Transactional
-    public Map<String, Object> getBoardDataAll(Long boardId, Long userId) {
-        Map<String, Object> result = new HashMap<>();
-        BoardOutputSpec boardOutputSpec = getBoard(boardId, userId);
-        result.put("board_data", boardOutputSpec);
-        if (boardOutputSpec.getBoardType().equals("VOTE")) {
-            VoteOutputSpec voteOutputSpec = getVote(boardId, userId);
-            result.put("vote_data", voteOutputSpec);
-            result.put("vote_content_data", getVoteContent(voteOutputSpec.getVoteId(), userId));
-        }
-        return result;
-    }
 
     /**
      * Board 정보를 가져올 메서드<br/>
@@ -416,16 +404,15 @@ public class BoardServiceImpl implements BoardService {
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
 
-        BoardLike boardLike = BoardLike.builder()
-                .id(likeForm.getBoardId())
-                .user(user)
-                .build();
+        Board board = boardQueryRepository.findById(likeForm.getBoardId()).orElseThrow(
+                () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
+        );
+
         try {
-
+            //이미 좋아요를 눌렀다면
             if (!isNotLiked(userId, likeForm.getBoardId())) {
-//                BoardLike boardLike = boardLikeQueryRepository.findById().
-
-                boardLikeJpaRepository.delete(boardLike);
+                Optional<BoardLike> boardLike = boardLikeQueryRepository.getBoardLikeByBoardId(likeForm.getBoardId());
+                boardLikeJpaRepository.delete(boardLike.get());
             }
         } catch (DataAccessException e) {
             throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
