@@ -34,13 +34,13 @@
   <img src="https://img.shields.io/badge/kotlin-3178C6?style=flat-square&logo=kotlin&logoColor=white"/> <img src="https://img.shields.io/badge/Spring boot-6DB33F?style=flat-square&logo=Spring boot&logoColor=white"/>
 
 * **Database and Caching**<br/>
-  <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=MySQL&logoColor=white"/> <img src="https://img.shields.io/badge/redis-DC382D?style=flat-square&logo=redis&logoColor=white"/> <img src="https://img.shields.io/badge/elasticsearch-DC382D?style=flat-square&logo=elasticsearch&logoColor=white"/>
+  <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=MySQL&logoColor=white"/> <img src="https://img.shields.io/badge/redis-DC382D?style=flat-square&logo=redis&logoColor=white"/> <img src="https://img.shields.io/badge/elasticsearch-005571?style=flat-square&logo=elasticsearch&logoColor=white"/>
 
 * **logging**<br/>
-  <img src="https://img.shields.io/badge/elasticsearch-DC382D?style=flat-square&logo=elasticsearch&logoColor=white"/> <img src="https://img.shields.io/badge/kibana-DC382D?style=flat-square&logo=kibana&logoColor=white"/> <img src="https://img.shields.io/badge/logstash-DC382D?style=flat-square&logo=logstash&logoColor=white"/> <img src="https://img.shields.io/badge/promethus-DC382D?style=flat-square&logo=promethus&logoColor=white"/> <img src="https://img.shields.io/badge/grafana-DC382D?style=flat-square&logo=grafana&logoColor=white"/>
+  <img src="https://img.shields.io/badge/elasticsearch-005571?style=flat-square&logo=elasticsearch&logoColor=white"/> <img src="https://img.shields.io/badge/kibana-005571?style=flat-square&logo=kibana&logoColor=white"/> <img src="https://img.shields.io/badge/logstash-005571?style=flat-square&logo=logstash&logoColor=white"/>
 
 * **monitoring**<br/>
-  <img src="https://img.shields.io/badge/promethus-DC382D?style=flat-square&logo=prometheus&logoColor=white"/> <img src="https://img.shields.io/badge/grafana-DC382D?style=flat-square&logo=grafana&logoColor=white"/>
+  <img src="https://img.shields.io/badge/promethus-E6522C?style=flat-square&logo=prometheus&logoColor=white"/> <img src="https://img.shields.io/badge/grafana-F46800?style=flat-square&logo=grafana&logoColor=white"/>
 
 * **Development and Deployment Tools**<br/>
   <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=Docker&logoColor=white"/> <img src="https://img.shields.io/badge/Jenkins-D24939?style=flat-square&logo=jenkins&logoColor=white"/> <img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white"/> <img src="https://img.shields.io/badge/Github-181717?style=flat-square&logo=github&logoColor=white"/>
