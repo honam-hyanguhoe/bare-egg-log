@@ -13,6 +13,7 @@ import org.egglog.utility.utils.MessageUtils;
 import org.egglog.utility.utils.SuccessType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.egglog.api.user.model.entity.Users;
 
 import java.util.List;
 
@@ -25,8 +26,12 @@ public class GroupController {
     private final GroupService groupService;
 
     @DeleteMapping("/{group_id}")
-    public ResponseEntity deleteGroup(@PathVariable("group_id") Long groupId){
-        groupService.deleteGroup(groupId);
+    public ResponseEntity deleteGroup(
+            @PathVariable("group_id") Long groupId
+//            TODO @AuthenticationPrincipal User user
+    ){
+        Long userId=1L;
+        groupService.deleteGroup(groupId,userId);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
     }
     //TODO kafka 적용해 이벤트 큐에 파싱 요청 송신하는 형태로 작성할 것
@@ -79,6 +84,7 @@ public class GroupController {
         GroupDto group = groupService.retrieveGroup(groupId,userId);
         return ResponseEntity.ok().body(MessageUtils.success(group));
     }
+    //TODO 수정 데이터 확인용 전송
     @PatchMapping("/{group_id}")
     public ResponseEntity updateGroup(
             @PathVariable("group_id") Long groupId,
@@ -95,8 +101,8 @@ public class GroupController {
             @PathVariable("member_id") Long memberId
 //            TODO @AuthenticationPrincipal User user
     ){
-        Long userId=1L;
-        groupService.updateGroupMember(groupId, memberId, userId);
+        Users user=null;
+        groupService.updateGroupMember(groupId, memberId, user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.NO_CONTENT));
     }
     @DeleteMapping("/exit/{group_id}")

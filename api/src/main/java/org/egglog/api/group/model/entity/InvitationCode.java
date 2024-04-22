@@ -17,11 +17,13 @@ public class InvitationCode{
     private String code;
     @Indexed
     private Long groupId;
-    public static InvitationCode create(final Long groupId)  {
+    private String password;
+    public static InvitationCode create(final Long groupId, final String password)  {
         String code = RandomStringUtils.generateRandomMixChar(10);
         return InvitationCode.builder()
                 .code(code)
                 .groupId(groupId)
+                .password(password)
                 .build();
     }
 

@@ -7,6 +7,7 @@ import org.egglog.api.group.model.entity.GroupMember;
 import org.springframework.stereotype.Repository;
 
 import static org.egglog.api.group.model.entity.QGroupMember.groupMember;
+import static org.egglog.api.user.model.entity.QUsers.users;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,10 +24,17 @@ public class GroupMemberQueryRepository{
                 .where(groupMember.groupId.eq(groupId).and(groupMember.isAdmin.isFalse()))
                 .fetch());
     }
-    public Optional<List<GroupMember>> findGroupBossMemberByGroupId(Long groupId) {
+    public Optional<GroupMember> findGroupBossMemberByGroupId(Long groupId) {
         return Optional.ofNullable(jpaQueryFactory
                 .selectFrom(groupMember)
                 .where(groupMember.groupId.eq(groupId).and(groupMember.isAdmin.isTrue()))
-                .fetch());
+                .fetchOne());
+    }
+    public Optional<GroupMember> findGroupMemberByGroupIdAndUserId(Long groupId, Long userId){
+        return Optional.ofNullable(jpaQueryFactory
+                .selectFrom(groupMember)
+                .where(groupMember.groupId.eq(groupId).and(groupMember.user.id.eq(userId)))
+                .fetchOne()
+        );
     }
 }

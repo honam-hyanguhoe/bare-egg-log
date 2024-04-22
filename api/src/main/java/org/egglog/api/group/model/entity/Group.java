@@ -2,6 +2,10 @@ package org.egglog.api.group.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.egglog.api.group.model.repository.GroupMemberQueryRepository;
+import org.egglog.api.group.model.service.GroupMemberService;
+import org.egglog.api.group.model.service.GroupMemberServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -23,11 +27,6 @@ public class Group {
     @Column(name = "group_name",length = 100, nullable = false)
     private String groupName;
 
-    @Transient
-    private GroupMember bossMember;
-
-    @Transient
-    private List<GroupMember> memberList;
-
-
+    @Column(name = "group_password",nullable = false)
+    private String password;
 }
