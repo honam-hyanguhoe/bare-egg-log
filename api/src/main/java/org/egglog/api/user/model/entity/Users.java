@@ -3,9 +3,13 @@ package org.egglog.api.user.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.egglog.api.hospital.model.entity.Hospital;
 import org.egglog.api.user.model.entity.enums.AuthProvider;
 import org.egglog.api.user.model.entity.enums.UserRole;
 import org.egglog.api.user.model.entity.enums.UserStatus;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -20,6 +24,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@EntityListeners(AuditingEntityListener.class)
 public class Users {
 
     @Id
@@ -27,45 +32,49 @@ public class Users {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 254)
+    @Column(nullable = false, unique = true, length = 254, name = "user_email")
     private String email;
 
-    @Column(length = 255)
+    @Column(length = 255, name = "user_password")
     private String password;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 50, name = "user_name")
     private String userName;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AuthProvider provider;
 
-    @Column(nullable = false, length = 100)
-    private String hospitalName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hospital_id")
+    private Hospital hospital;
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 30, name = "emp_no")
     private String empNo;
 
-    @Column(length = 2000)
+    @Column(length = 2000, name = "profile_img_url")
     private String profileImgUrl;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private UserRole role;
+    @Column(nullable = false, name = "role")
+    private UserRole userRole;
 
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private UserStatus status;
+    @Column(nullable = false, name = "status")
+    private UserStatus userStatus;
 
-
-    @Column(nullable = false)
+    @CreatedDate
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false, name = "created_at")
     private LocalDateTime createdAt;
 
-
-    @Column(nullable = false)
+    @LastModifiedDate
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false, name = "updated_at")
     private LocalDateTime updatedAt;
 
-
+    @Column(name = "is_hospital_auth")
+    private Boolean isHospitalAuth;
 }
 
