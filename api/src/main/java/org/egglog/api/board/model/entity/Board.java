@@ -3,6 +3,7 @@ package org.egglog.api.board.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.egglog.api.group.model.entity.Group;
+import org.egglog.api.hospital.model.entity.Hospital;
 import org.egglog.api.user.model.entity.Users;
 
 import java.time.LocalDateTime;
@@ -37,8 +38,10 @@ public class Board {
 
     private String pictureFour;
 
+    private String tempNickname; //익명 닉네임
+
     @Enumerated(EnumType.STRING)
-    private BoardType boardType; //ALL, HOSPITAL, DEPARTMENT
+    private BoardType boardType; //ALL, HOSPITAL, GROUP
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
@@ -47,4 +50,8 @@ public class Board {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private Users user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hospital_id")
+    private Hospital hospital;
 }

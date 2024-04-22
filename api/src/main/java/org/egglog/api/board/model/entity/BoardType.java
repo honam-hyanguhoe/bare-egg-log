@@ -4,8 +4,8 @@ public enum BoardType {
     /**
      * 전체 커뮤니티
      * 병원 커뮤니티
-     * 부서 커뮤니티
+     * 그룹 커뮤니티
      */
-    ALL, HOSPITAL, DEPARTMENT
+    ALL, HOSPITAL, GROUP
 
 }

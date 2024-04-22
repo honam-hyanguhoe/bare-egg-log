@@ -2,10 +2,12 @@ package org.egglog.api.board.model.dto.params;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CommentForm {
@@ -14,7 +16,10 @@ public class CommentForm {
 
     private String commentContent;
 
-    private Long commentLevel;
+    private Long parentId;
 
     private int commentDepth;
+
+    private String tempNickname;
+
 }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-import static ;import static org.egglog.api.user.model.entity.QUsers.users;
+import static org.egglog.api.user.model.entity.QUsers.users;
 
 @Repository
 @RequiredArgsConstructor

@@ -1,26 +1,44 @@
-package org.egglog.api.board.controller;
 
+package org.egglog.api.board.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.egglog.api.board.model.dto.params.*;
 import org.egglog.api.board.model.service.BoardService;
+import org.egglog.utility.utils.MessageUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequiredArgsConstructor
 @RestController
-@RequestMapping("/v1/group/board")
+@RequiredArgsConstructor
+@RequestMapping("/v1/boards")
 public class BoardController {
+
     private final BoardService boardService;
 
-    @PostMapping("/list")
-    public ResponseEntity<?> getBoardList(@RequestBody BoardListForm boardListForm) {
+    @GetMapping("/hot")
+    public ResponseEntity<?> getBoardHotList(@RequestParam("hospital_id") Long hospitalId, @RequestParam("group_id") Long groupId) {
 //        TODO @AuthenticationPrincipal User user
+        Long userId = 1L;
+        return ResponseEntity.ok().body(MessageUtils.success(boardService.getBoardHotList(hospitalId, groupId, userId)));
+    }
+
+
+    @GetMapping("")
+    public ResponseEntity<?> getBoardList(@RequestParam("hospital_id") Long hospitalId, @RequestParam("group_id") Long groupId,
+                                          @RequestParam("search_word") String searchWord, @RequestParam("last_board_id") Long lastBoardId) {
+//        TODO @AuthenticationPrincipal User user
+        BoardListForm boardListForm = BoardListForm.builder()
+                .hospitalId(hospitalId)
+                .groupId(groupId)
+                .searchWord(searchWord)
+                .lastBoardId(lastBoardId)
+                .build();
+
         Long userId = 1L;
         return ResponseEntity.ok().body(MessageUtils.success(boardService.getBoardList(boardListForm, userId)));
     }
 
-    @PostMapping("/regist")
+    @PostMapping("")
     public ResponseEntity<?> registBoard(@RequestBody BoardForm boardForm) {
 //        TODO @AuthenticationPrincipal User user
         Long userId = 1L;
@@ -28,27 +46,11 @@ public class BoardController {
         return ResponseEntity.ok().body(MessageUtils.success());
     }
 
-    @PostMapping("/vote")
-    public ResponseEntity<?> vote(@RequestBody VoteForm voteForm) {
-//        TODO @AuthenticationPrincipal User user
-        Long userId = 1L;
-        boardService.vote(voteForm, userId);
-        return ResponseEntity.ok().body(MessageUtils.success());
-    }
-
-    @DeleteMapping("/unvote")
-    public ResponseEntity<?> unVote(@RequestBody VoteForm voteForm) {
-//        TODO @AuthenticationPrincipal User user
-        Long userId = 1L;
-        boardService.unVote(voteForm, userId);
-        return ResponseEntity.ok().body(MessageUtils.success());
-    }
-
     @GetMapping("/{boardId}")
     public ResponseEntity<?> getBoard(@PathVariable Long boardId) {
 //        TODO @AuthenticationPrincipal User user
         Long userId = 1L;
-        return ResponseEntity.ok().body(MessageUtils.success(boardService.getBoardDataAll(boardId, userId)));
+        return ResponseEntity.ok().body(MessageUtils.success(boardService.getBoard(boardId, userId)));
     }
 
     @DeleteMapping("/{boardId}")
@@ -59,17 +61,12 @@ public class BoardController {
         return ResponseEntity.ok().body(MessageUtils.success());
     }
 
-    @PatchMapping("/modify")
+    @PatchMapping("")
     public ResponseEntity<?> modifyBoard(@RequestBody BoardModifyForm boardModifyForm) {
 //        TODO @AuthenticationPrincipal User user
         Long userId = 1L;
         boardService.modifyBoard(boardModifyForm, userId);
         return ResponseEntity.ok().body(MessageUtils.success());
-    }
-
-    @GetMapping("/vote/user/{voteId}")
-    public ResponseEntity<?> getVoteUser(@PathVariable Long voteId) {
-        return ResponseEntity.ok().body(MessageUtils.success(boardService.getVoteUser(voteId)));
     }
 
     @PostMapping("/like")
