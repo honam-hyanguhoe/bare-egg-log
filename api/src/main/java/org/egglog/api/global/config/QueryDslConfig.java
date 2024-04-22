@@ -1,4 +1,4 @@
-package org.egglog.api.config;
+package org.egglog.api.global.config;
 
 
 import com.querydsl.jpa.impl.JPAQueryFactory;

@@ -95,7 +95,7 @@ public class BoardServiceImpl implements BoardService {
                         .likeCount(likeCnt)
                         .doLiked(isUserLiked)  //좋아요 여부
                         .doHit(isUserHit)  //조회 여부
-                        .isAuth(user.getIsAuth())   //인증 여부
+//                        .isAuth(user.getIsAuth())   //인증 여부
                         .build();
 
                 boardListOutputSpecList.add(boardListOutputSpec);
@@ -155,7 +155,7 @@ public class BoardServiceImpl implements BoardService {
                         .likeCount(likeCnt)
                         .doLiked(isUserLiked)
                         .doHit(isUserHit)
-                        .isAuth(user.getIsAuth())   //인증 여부
+//                        .isAuth(user.getIsAuth())   //인증 여부
                         .build();
 
                 boardListOutputSpecList.add(boardListOutputSpec);
@@ -383,7 +383,7 @@ public class BoardServiceImpl implements BoardService {
                     .hospitalName(board.getHospital().getHospitalName())
                     .doLiked(isUserLiked)
                     .doHit(isUserHit)
-                    .isAuth(user.getIsAuth())   //인증 여부
+//                    .isAuth(user.getIsAuth())   //인증 여부
                     .comments(commentList)
                     .build();
 
