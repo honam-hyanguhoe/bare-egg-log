@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import com.org.egglog.client.ui.theme.ClientTheme
 import com.org.egglog.client.ui.theme.Typography
 import com.org.egglog.client.ui.atoms.icons.Icon
+import com.org.egglog.client.ui.atoms.imageLoader.UrlImageLoader
 import com.org.egglog.client.utils.Notification
 
 class MainActivity : ComponentActivity() {
@@ -87,6 +88,7 @@ fun OnboardingScreen(
             Icon(Notification, modifier = Modifier.size(25.dp))
         }
         Image(painter = painterResource(id = R.drawable.bottom_logo), contentDescription = null)
+        UrlImageLoader(imageUrl = "https://picsum.photos/300")
     }
 }
 
