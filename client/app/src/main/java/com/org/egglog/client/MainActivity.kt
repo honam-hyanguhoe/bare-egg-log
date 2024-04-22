@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import com.org.egglog.client.ui.theme.ClientTheme
 import com.org.egglog.client.ui.theme.Typography
 import com.org.egglog.client.ui.atoms.icons.Icon
+import com.org.egglog.client.ui.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.client.ui.atoms.imageLoader.UrlImageLoader
 import com.org.egglog.client.utils.Notification
 
@@ -88,7 +89,8 @@ fun OnboardingScreen(
             Icon(Notification, modifier = Modifier.size(25.dp))
         }
         Image(painter = painterResource(id = R.drawable.bottom_logo), contentDescription = null)
-        UrlImageLoader(imageUrl = "https://picsum.photos/300")
+        UrlImageLoader(imageUrl = "https://picsum.photos/300", modifier = Modifier.size(300.dp))
+        LocalImageLoader(imageUrl = R.drawable.off)
     }
 }
 
@@ -162,10 +164,10 @@ private fun CardContent(name: String) {
     }
 }
 
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    name = "DefaultPreviewDark"
-)
+//@Preview(
+//    uiMode = Configuration.UI_MODE_NIGHT_YES,
+//    name = "DefaultPreviewDark"
+//)
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_NO,
     name = "DefaultPreviewLight"
@@ -175,4 +177,34 @@ fun MyAppPreview() {
     ClientTheme {
         MyApp(Modifier.fillMaxSize())
     }
+}
+
+@Preview
+@Composable
+fun TestPreview() {
+    // A variable to store the image URL
+//    var imageUrl by remember { mutableStateOf("") }
+//
+//    Column(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .padding(all = 16.dp),
+//        verticalArrangement = Arrangement.SpaceEvenly,
+//        horizontalAlignment = Alignment.CenterHorizontally
+//    ) {
+//        Image( // The Image component to load the image with the Coil library
+//            painter = rememberAsyncImagePainter(model = imageUrl),
+//            contentDescription = null,
+//            modifier = Modifier.size(500.dp, 400.dp)
+//        )
+//
+//        Button(
+//            onClick = {
+//                imageUrl = "https://picsum.photos/200/300"
+//            }
+//        ) {
+//            Text("Load Image")
+//        }
+//    }
+    UrlImageLoader(imageUrl = "https://picsum.photos/300", modifier = Modifier.size(300.dp))
 }
