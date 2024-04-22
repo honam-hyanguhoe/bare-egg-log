@@ -45,8 +45,8 @@ public class GroupController {
             @RequestBody InvitationAcceptForm acceptForm
 //            TODO @AuthenticationPrincipal User user){
     ){
-        Long userId=1L;
-        groupService.acceptInvitation(acceptForm,userId);
+        Users user=null;
+        groupService.acceptInvitation(acceptForm,user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.NO_CONTENT));
     }
     @GetMapping("/invitaion/{group_id}")
@@ -54,8 +54,8 @@ public class GroupController {
             @PathVariable("group_id") Long groupId
 //            TODO @AuthenticationPrincipal User user
     ){
-        Long userId=1L;
-        String inviteCode = groupService.getOrGenerateInvitation(groupId,userId);
+        Users user=null;
+        String inviteCode = groupService.getOrGenerateInvitation(groupId,user);
         return ResponseEntity.ok().body(MessageUtils.success(inviteCode));
     }
     @DeleteMapping("/{group_id}/{member_id}")
@@ -64,24 +64,24 @@ public class GroupController {
             @PathVariable("member_id") Long memberId
 //            TODO @AuthenticationPrincipal User user
     ){
-        Long userId=1L;
-        groupService.deleteGroupMember(groupId,memberId,userId);
+        Users user=null;
+        groupService.deleteGroupMember(groupId,memberId,user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
     }
     @GetMapping("/list")
     public ResponseEntity getGroupList(
 //            TODO @AuthenticationPrincipal User user
     ){
-        Long userId=1L;
-        List<GroupMemberDto> groupMemberList = groupService.getGroupList(userId);
+        Users user=null;
+        List<GroupMemberDto> groupMemberList = groupService.getGroupList(user);
         return ResponseEntity.ok().body(MessageUtils.success(groupMemberList));
     }
     @GetMapping("/{group_id}")
     public ResponseEntity retrieveGroup(@PathVariable("group_id") Long groupId
 //            TODO @AuthenticationPrincipal User user
     ){
-        Long userId=1L;
-        GroupDto group = groupService.retrieveGroup(groupId,userId);
+        Users user=null;
+        GroupDto group = groupService.retrieveGroup(groupId,user);
         return ResponseEntity.ok().body(MessageUtils.success(group));
     }
     //TODO 수정 데이터 확인용 전송
@@ -110,8 +110,8 @@ public class GroupController {
             @PathVariable("group_id") Long groupId
 //            TODO @AuthenticationPrincipal User user
     ){
-        Long userId=1L;
-        groupService.exitGroup(groupId,userId);
+        Users user=null;
+        groupService.exitGroup(groupId,user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
     }
     @PostMapping("/")
