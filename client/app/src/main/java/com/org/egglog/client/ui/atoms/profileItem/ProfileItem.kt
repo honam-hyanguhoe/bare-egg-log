@@ -78,7 +78,7 @@ fun ProfileItem(profile: Profile, type: String)  {
 
             // 소속, 시간
             Text(
-                    text = if (itemType == "post") "${profile.hospital} · ${profile.createdAt}" else "${profile.hospital}",
+                    text = if (itemType == "post" && profile.createdAt != null) "${profile.hospital} · ${profile.createdAt}" else "${profile.hospital}",
                     color = com.org.egglog.client.ui.theme.Gray500,
                     style = Typography.labelMedium.copy(fontSize = 10.sp)
             )
@@ -94,7 +94,7 @@ fun Preview() {
             val profile = Profile("익명의 구운란1", "전남대병원", true,"1시간 전")
             ProfileItem(profile = profile, type = "post")
 
-            val profile2 = Profile("익명의 구운란1", "전남대병원", false,"1시간 전")
+            val profile2 = Profile("익명의 구운란1", "전남대병원", false)
             ProfileItem(profile = profile2, type = "post")
 
             val profile3 = Profile("익명의 구운란1", "전남대병원 응급의학과")
