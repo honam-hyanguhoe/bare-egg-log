@@ -11,7 +11,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,6 +27,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Label
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -44,6 +48,7 @@ import com.org.egglog.client.ui.theme.Typography
 import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.ui.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.client.ui.atoms.imageLoader.UrlImageLoader
+import com.org.egglog.client.ui.atoms.labels.Labels
 import com.org.egglog.client.utils.Notification
 
 class MainActivity : ComponentActivity() {
@@ -91,6 +96,27 @@ fun OnboardingScreen(
         Image(painter = painterResource(id = R.drawable.bottom_logo), contentDescription = null)
         UrlImageLoader(imageUrl = "https://picsum.photos/300", modifier = Modifier.size(300.dp))
         LocalImageLoader(imageUrl = R.drawable.off)
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Labels(text = "Day",size = "big")
+            Labels(text = "Eve",size = "big")
+            Labels(text = "Night",size = "big")
+            Labels(text = "교육",size = "big")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Labels(text = "Eve")
+            Labels(text = "Off")
+            Labels(text = "Night")
+            Labels(text = "Eve")
+            Labels(text = "보건")
+            Labels(text = "휴가")
+            Labels(text= "None")
+        }
+
+
     }
 }
 
@@ -124,18 +150,18 @@ private fun CardContent(name: String) {
 
     Row(
         modifier = Modifier
-            .padding(12.dp)
-            .animateContentSize(
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessLow
+                .padding(12.dp)
+                .animateContentSize(
+                        animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                        )
                 )
-            )
     ) {
         Column(
             modifier = Modifier
-                .weight(1f)
-                .padding(12.dp)
+                    .weight(1f)
+                    .padding(12.dp)
         ) {
             Text(text = "Hello, ")
             Text(
