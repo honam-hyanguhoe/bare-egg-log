@@ -2,13 +2,13 @@ package org.egglog.api.user.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.egglog.api.user.model.entity.QUsers;
-import org.egglog.api.user.model.entity.Users;
+import org.egglog.api.user.model.entity.User;
+import org.egglog.api.user.model.entity.QUser;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-import static org.egglog.api.user.model.entity.QUsers.users;
+import static org.egglog.api.user.model.entity.QUser.user;
 
 @Repository
 @RequiredArgsConstructor
@@ -16,20 +16,26 @@ public class UserQueryRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public Optional<Users> findById(Long userId) {
+    public Optional<User> findById(Long userId) {
         return Optional.ofNullable(jpaQueryFactory
-                .selectFrom(users)
-                .where(users.id.eq(userId))
+                .selectFrom(user)
+                .where(user.id.eq(userId))
                 .fetchOne());
     }
 
-    public Optional<Users> findByIdWithHospital(Long userId) {
+    public Optional<User> findByIdWithHospital(Long userId) {
         return Optional.ofNullable(jpaQueryFactory
-                .selectFrom(users)
-                .leftJoin(users.hospital).fetchJoin()
-                .where(users.id.eq(userId))
+                .selectFrom(user)
+                .leftJoin(user.hospital).fetchJoin()
+                .where(user.id.eq(userId))
                 .fetchOne());
     }
-
+    public Optional<User> findByEmailWithHospital(String email) {
+        return Optional.ofNullable(jpaQueryFactory
+                .selectFrom(user)
+                .leftJoin(user.hospital).fetchJoin()
+                .where(user.email.eq(email))
+                .fetchOne());
+    }
 
 }

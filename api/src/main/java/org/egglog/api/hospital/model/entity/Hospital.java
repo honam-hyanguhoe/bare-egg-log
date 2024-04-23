@@ -3,7 +3,7 @@ package org.egglog.api.hospital.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.egglog.api.hospital.model.dto.response.UserHospitalResponse;
-import org.egglog.api.user.model.entity.Users;
+import org.egglog.api.user.model.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +52,7 @@ public class Hospital {
     private String lng;  //경도
 
     @OneToMany(mappedBy = "hospital")
-    private List<Users> users = new ArrayList<>();
+    private List<User> users = new ArrayList<>();
 
     public UserHospitalResponse toUserHospitalResponse(){
         return UserHospitalResponse.builder()

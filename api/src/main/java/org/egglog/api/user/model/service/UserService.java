@@ -11,7 +11,7 @@ import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.dto.request.UpdateUserHospitalRequest;
 import org.egglog.api.user.model.dto.request.UpdateUserRequest;
 import org.egglog.api.user.model.dto.response.UserResponse;
-import org.egglog.api.user.model.entity.Users;
+import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.repository.UserJpaRepository;
 import org.egglog.api.user.repository.UserQueryRepository;
 import org.springframework.stereotype.Service;
@@ -40,7 +40,7 @@ public class UserService {
      * @author 김형민
      */
     @Transactional
-    public UserResponse updateUser(Users loginUser, UpdateUserRequest request){
+    public UserResponse updateUser(User loginUser, UpdateUserRequest request){
         return userJpaRepository.save(loginUser.updateUserInfo(request.getUserName(), request.getProfileImgUrl()))
                 .toResponse();
     }
@@ -53,7 +53,7 @@ public class UserService {
      * @author 김형민
      */
     @Transactional
-    public UserResponse updateUserHospital(Users loginUser, UpdateUserHospitalRequest request){
+    public UserResponse updateUserHospital(User loginUser, UpdateUserHospitalRequest request){
         Hospital hospital = hospitalJpaRepository.findById(request.getHospitalId())
                 .orElseThrow(() -> new HospitalException(HospitalErrorCode.NOT_FOUND));
         return userJpaRepository.save(loginUser.updateHospitalInfo(hospital, request.getEmpNo()))
@@ -67,7 +67,7 @@ public class UserService {
      * @author 김형민
      */
     @Transactional
-    public UserResponse deleteUser(Users loginUser){
+    public UserResponse deleteUser(User loginUser){
         return userJpaRepository.save(loginUser.deleteUser()).toResponse();
     }
 }
