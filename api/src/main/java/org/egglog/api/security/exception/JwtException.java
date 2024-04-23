@@ -2,13 +2,13 @@ package org.egglog.api.security.exception;
 
 
 import lombok.Getter;
+import org.egglog.utility.exception.BaseException;
+import org.egglog.utility.exception.ErrorFormat;
 
 @Getter
-public class JwtException extends RuntimeException{
+public class JwtException extends BaseException {
 
-    private final JwtErrorCode errorCode;
-    public JwtException(JwtErrorCode errorCode){
-        super(errorCode.getMessage());
-        this.errorCode = errorCode;
+    public JwtException(ErrorFormat errorCode) {
+        super(errorCode);
     }
 }

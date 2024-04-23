@@ -5,12 +5,14 @@ import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+
 @Getter
 @AllArgsConstructor
 @Builder
-@RedisHash(value = "certificationNumber", timeToLive = 60 * 3 )
-public class CertificationNumber {
+@RedisHash(value = "blackList", timeToLive = 86400)
+public class UnsafeToken {
     @Id
-    private String email;
-    private String number;
+    private String accessToken;
+
+    private String refreshToken;
 }

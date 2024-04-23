@@ -1,17 +1,16 @@
-package org.egglog.api.security.model.dto.request;
+package org.egglog.api.user.model.dto.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 @Builder
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class RefreshTokenRequest {
-    private String refreshToken;
+public class UpdateUserRequest {
+    private String userName;
+    private String profileImgUrl;
 }

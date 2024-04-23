@@ -10,4 +10,7 @@ import org.springframework.stereotype.Component;
 public class JwtProperties {
     private String access;
     private String refresh;
+    private Long accesstime;
+    private Long refreshtime;
 }
+
