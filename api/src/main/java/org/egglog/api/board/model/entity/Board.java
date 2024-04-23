@@ -40,6 +40,8 @@ public class Board {
 
     private String tempNickname; //익명 닉네임
 
+    private Long viewCount;  //조회수
+
     @Enumerated(EnumType.STRING)
     private BoardType boardType; //ALL, HOSPITAL, GROUP
 

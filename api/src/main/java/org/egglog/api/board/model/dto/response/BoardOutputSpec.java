@@ -43,13 +43,13 @@ public class BoardOutputSpec {
 
     private Long commentCount;      // 댓글 개수
 
+    private Long viewCount;     //조회수
+
     private Long boardLikeCount;    // 좋아요 수
 
     private String hospitalName;    // 사용자 병원명
 
     private boolean doLiked;        // 좋아요 여부
-
-    private boolean doHit;          // 조회 여부
 
     private Boolean isAuth;     // 인증 여부
 
