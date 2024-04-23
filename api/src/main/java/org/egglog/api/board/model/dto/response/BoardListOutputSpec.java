@@ -24,7 +24,7 @@ public class BoardListOutputSpec {
 
     private String tempNickname;
 
-    private Long hit;               // 게시판 조회수
+    private Long viewCount;         // 게시판 조회수
 
     private Long commentCount;      // 댓글 갯수
 
@@ -33,8 +33,6 @@ public class BoardListOutputSpec {
     private String pictureOne;  // 첫번째 사진
 
     private boolean doLiked;        // 좋아요 여부
-
-    private boolean doHit;          // 조회 여부
     
     private Boolean isAuth;     // 인증 여부
 

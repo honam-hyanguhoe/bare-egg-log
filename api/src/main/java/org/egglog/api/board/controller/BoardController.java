@@ -15,11 +15,12 @@ public class BoardController {
 
     private final BoardService boardService;
 
+
     @GetMapping("/hot")
-    public ResponseEntity<?> getBoardHotList(@RequestParam("hospital_id") Long hospitalId, @RequestParam("group_id") Long groupId) {
+    public ResponseEntity<?> getHotBoardList(@RequestParam("hospital_id") Long hospitalId, @RequestParam("group_id") Long groupId) {
 //        TODO @AuthenticationPrincipal User user
         Long userId = 1L;
-        return ResponseEntity.ok().body(MessageUtils.success(boardService.getBoardHotList(hospitalId, groupId, userId)));
+        return ResponseEntity.ok().body(MessageUtils.success(boardService.getHotBoardList(hospitalId, groupId, userId)));
     }
 
 
