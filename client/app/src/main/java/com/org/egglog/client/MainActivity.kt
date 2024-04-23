@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
@@ -35,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -53,7 +56,7 @@ import com.org.egglog.client.ui.atoms.imageLoader.UrlImageLoader
 import com.org.egglog.client.utils.MessageUtil
 import com.org.egglog.client.utils.widthPercent
 import com.org.egglog.client.ui.atoms.labels.Labels
-import com.org.egglog.client.utils.Notification
+import com.org.egglog.client.ui.atoms.menus.ScrollableMenus
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,13 +82,21 @@ fun MyApp(modifier: Modifier = Modifier) {
     }
 }
 
+
 @Composable
 fun OnboardingScreen(
     onContinueClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val scrollState = rememberScrollState()
+    val groupOptions = listOf("그룹 설정", "그룹원 설정", "그룹 나가기")
+    val communityOptions = listOf("통합", "엑록병원", "호남향우회")
+    var selectedMenuItem by remember { mutableStateOf<String?>(null) }
+
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -102,6 +113,9 @@ fun OnboardingScreen(
         ResultCard(message = MessageUtil.APPLY)
         ResultCard(message = MessageUtil.REGISTER)
         ResultCard(message = MessageUtil.NO_SEARCH_RESULT)
+
+        ScrollableMenus(options = groupOptions, selectedOption = selectedMenuItem, onSelect = {selectedMenuItem = it} )
+
         Image(painter = painterResource(id = R.drawable.bottom_logo), contentDescription = null)
         UrlImageLoader(imageUrl = "https://picsum.photos/300", modifier = Modifier.size(320.widthPercent(LocalContext.current).dp))
         LocalImageLoader(imageUrl = R.drawable.off)
@@ -125,6 +139,8 @@ fun OnboardingScreen(
             Labels(text= "None")
         }
 
+
+
     }
 }
 
@@ -146,7 +162,9 @@ private fun Greeting(name: String, modifier: Modifier = Modifier) {
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primary
         ),
-        modifier = modifier.size(320.dp).padding(vertical = 4.widthPercent(LocalContext.current).dp, horizontal = 8.dp)
+        modifier = modifier
+            .size(320.dp)
+            .padding(vertical = 4.widthPercent(LocalContext.current).dp, horizontal = 8.dp)
     ) {
         CardContent(name)
     }
@@ -158,18 +176,18 @@ private fun CardContent(name: String) {
 
     Row(
         modifier = Modifier
-                .padding(12.dp)
-                .animateContentSize(
-                        animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
-                        )
+            .padding(12.dp)
+            .animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessLow
                 )
+            )
     ) {
         Column(
             modifier = Modifier
-                    .weight(1f)
-                    .padding(12.dp)
+                .weight(1f)
+                .padding(12.dp)
         ) {
             Text(text = "Hello, ")
             Text(
