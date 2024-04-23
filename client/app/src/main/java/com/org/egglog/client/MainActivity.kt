@@ -55,6 +55,7 @@ import com.org.egglog.client.ui.atoms.buttons.HalfMiddleButton
 import com.org.egglog.client.ui.atoms.buttons.HalfThinButton
 import com.org.egglog.client.ui.atoms.buttons.MiddleButton
 import com.org.egglog.client.ui.atoms.buttons.ProfileButton
+import com.org.egglog.client.ui.atoms.buttons.SettingButton
 import com.org.egglog.client.ui.atoms.buttons.ThinButton
 import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.ui.theme.ClientTheme
@@ -64,6 +65,9 @@ import com.org.egglog.client.ui.atoms.imageLoader.UrlImageLoader
 import com.org.egglog.client.utils.widthPercent
 import com.org.egglog.client.ui.theme.*
 import com.org.egglog.client.utils.AddBox
+import com.org.egglog.client.utils.Logout
+import com.org.egglog.client.utils.MySetting
+import com.org.egglog.client.utils.User
 
 
 class MainActivity : ComponentActivity() {
@@ -296,25 +300,23 @@ fun ButtonTest(modifier: Modifier = Modifier) {
                 )
             }
 
-//            AuthButton(onClick = {Log.d("test: ", "clicked!!!")}, type = "kakao")
-//            AuthButton(onClick = {Log.d("test: ", "clicked!!!")}, type = "naver")
-//            AuthButton(onClick = {Log.d("test: ", "clicked!!!")}, type = "google")
-            GroupButton(onClick = {Log.d("test: ", "clicked!!!")}, groupMaster = "김다희", groupName = "호남향우회", memberCnt = 1, groupImage = 1, groupId = 1)
-            ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, profileImgUrl = "https://picsum.photos/300", isMine = true, isSelected = true, userId = 1, userName = "김호남")
-            ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, profileImgUrl = "https://picsum.photos/300", isMine = false, isSelected = true, userId = 1, userName = "김호남")
-            val stroke = Stroke(width = 2f,
-                pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
-            )
-            Box(
-                Modifier
-                    .size(250.dp,60.dp)
-                    .drawBehind {
-                        drawRoundRect(color = Error200, style = stroke)
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(textAlign = TextAlign.Center,text = "Tap here to introduce yourseft")
+            Row {
+                AuthButton(onClick = {Log.d("test: ", "clicked!!!")}, type = "kakao")
+                AuthButton(onClick = {Log.d("test: ", "clicked!!!")}, type = "naver")
+                AuthButton(onClick = {Log.d("test: ", "clicked!!!")}, type = "google")
             }
+
+            GroupButton(onClick = {Log.d("test: ", "clicked!!!")}, groupMaster = "김다희", groupName = "호남향우회", memberCnt = 1, groupImage = 1, groupId = 1)
+
+            Row {
+                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, profileImgUrl = "https://picsum.photos/300", isMine = true, isSelected = true, userId = 1, userName = "김호남")
+                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, profileImgUrl = "https://picsum.photos/300", isMine = true, isSelected = false, userId = 1, userName = "김호남")
+                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, profileImgUrl = "https://picsum.photos/300", isMine = false, isSelected = true, userId = 1, userName = "김호남")
+                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, profileImgUrl = "https://picsum.photos/300", isMine = false, isSelected = false, userId = 1, userName = "김호남")
+            }
+
+            SettingButton(onClick = {Log.d("test: ", "clicked!!!")}, text =  "내 정보 설정", color = NaturalBlack, icon = MySetting)
+            SettingButton(onClick = {Log.d("test: ", "clicked!!!")}, text =  "로그아웃", color = Error500, icon = Logout)
         }
     }
 }
