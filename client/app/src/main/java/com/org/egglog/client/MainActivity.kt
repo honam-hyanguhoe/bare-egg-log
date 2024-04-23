@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -34,6 +35,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -41,10 +43,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.org.egglog.client.ui.theme.ClientTheme
 import com.org.egglog.client.ui.theme.Typography
-import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.ui.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.client.ui.atoms.imageLoader.UrlImageLoader
-import com.org.egglog.client.utils.Notification
+import com.org.egglog.client.utils.widthPercent
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,14 +83,14 @@ fun OnboardingScreen(
     ) {
         Text("Welcome to the Basics Codelab!")
         Button(
-            modifier = Modifier.padding(vertical = 24.dp),
+            modifier = Modifier.width(320.widthPercent(LocalContext.current).dp),
             onClick = onContinueClicked
         ) {
-//            Text("Continue")
-            Icon(Notification, modifier = Modifier.size(25.dp))
+            Text("${320.widthPercent(LocalContext.current).dp}")
+//            Icon(Notification, modifier = Modifier.size(25.dp))
         }
         Image(painter = painterResource(id = R.drawable.bottom_logo), contentDescription = null)
-        UrlImageLoader(imageUrl = "https://picsum.photos/300", modifier = Modifier.size(300.dp))
+        UrlImageLoader(imageUrl = "https://picsum.photos/300", modifier = Modifier.size(320.widthPercent(LocalContext.current).dp))
         LocalImageLoader(imageUrl = R.drawable.off)
     }
 }
@@ -112,7 +113,7 @@ private fun Greeting(name: String, modifier: Modifier = Modifier) {
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primary
         ),
-        modifier = modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+        modifier = modifier.size(320.dp).padding(vertical = 4.widthPercent(LocalContext.current).dp, horizontal = 8.dp)
     ) {
         CardContent(name)
     }
@@ -177,34 +178,4 @@ fun MyAppPreview() {
     ClientTheme {
         MyApp(Modifier.fillMaxSize())
     }
-}
-
-@Preview
-@Composable
-fun TestPreview() {
-    // A variable to store the image URL
-//    var imageUrl by remember { mutableStateOf("") }
-//
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(all = 16.dp),
-//        verticalArrangement = Arrangement.SpaceEvenly,
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        Image( // The Image component to load the image with the Coil library
-//            painter = rememberAsyncImagePainter(model = imageUrl),
-//            contentDescription = null,
-//            modifier = Modifier.size(500.dp, 400.dp)
-//        )
-//
-//        Button(
-//            onClick = {
-//                imageUrl = "https://picsum.photos/200/300"
-//            }
-//        ) {
-//            Text("Load Image")
-//        }
-//    }
-    UrlImageLoader(imageUrl = "https://picsum.photos/300", modifier = Modifier.size(300.dp))
 }
