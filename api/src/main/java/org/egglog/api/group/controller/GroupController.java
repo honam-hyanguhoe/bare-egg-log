@@ -1,108 +1,126 @@
-//package org.egglog.api.group.controller;
-//
-//import lombok.RequiredArgsConstructor;
-//import lombok.extern.slf4j.Slf4j;
-//import org.egglog.api.global.util.MessageUtils;
-//import org.egglog.api.group.model.dto.OutputSpec.GroupDutyRegistExcel;
-//import org.egglog.api.group.model.dto.OutputSpec.GroupInvitationOutputSpec;
-//import org.egglog.api.group.model.dto.OutputSpec.GroupOutputSpec;
-//import org.egglog.api.group.model.dto.form.*;
-//import org.egglog.api.group.model.service.GroupService;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.web.bind.annotation.*;
-//
-//import java.util.List;
-//
-//@RestController
-//@RequestMapping("/v1/group")
-//@RequiredArgsConstructor
-//@Slf4j
-//public class GroupController {
-//    private final GroupService groupService;
-//
-//    @PostMapping("/invitation")
-//    ResponseEntity generateInvitationCode(@RequestBody GroupInvitationForm groupInvitationForm){
-//        log.debug(groupInvitationForm.toString());
-//        GroupInvitationOutputSpec invitationCode= GroupInvitationOutputSpec.builder()
-//                .invitationCode(groupService.generateInvitation(groupInvitationForm))
-//                .build();
-//        return ResponseEntity.ok().body(MessageUtils.success(invitationCode));
-//    }
-//    @PostMapping("/invitation/accept")
-//    ResponseEntity acceptInvitation(@RequestBody InvitationAcceptForm invitationAcceptForm){
-//        log.debug(invitationAcceptForm.toString());
-//        Long userId=2L;
-//        InvitationAcceptOutputSpec groupName=groupService.acceptInvitation(invitationAcceptForm.getInvitationCode(),userId);
-//        return ResponseEntity.ok().body(MessageUtils.success(groupName));
-//    }
-//
-//    @GetMapping("/retrieve/{groupId}")
-//    ResponseEntity findGroup(@PathVariable Long groupId){
-//        Long userId=1L;
-//        GroupRetrieveForm groupRetrieveForm= GroupRetrieveForm.builder()
-//                .groupId(groupId)
-//                .userId(userId)
-//                .build();
-//        log.debug(groupRetrieveForm.toString());
-//        GroupOutputSpec group=groupService.findGroup(groupRetrieveForm,userId);
-//        return ResponseEntity.ok().body(
-//                MessageUtils.success(group));
-//    }
-//    @GetMapping("/list")
-//    ResponseEntity findGroupList(){
-//        Long userId=1L;
-//        List<GroupOutputSpec> groupList=groupService.findGroupListByUserId(userId);
-//        return ResponseEntity.ok().body(MessageUtils.success(groupList));
-//    }
-//    @PostMapping("/regist")
-//    ResponseEntity regist(@RequestBody GroupRegistForm groupRegistForm) {
-////    ResponseEntity<Message> register(@RequestBody GroupRegistForm groupRegistForm,
-////                                     @AuthenticationPrincipal User user) {
-//        log.debug(groupRegistForm.toString());
-//        Long userId=1L;
-//        groupService.registGroup(groupRegistForm,userId);
-//        return ResponseEntity.ok().body(MessageUtils.success());
-//    }
-//
-//    @DeleteMapping("/delete/{groupId}")
-//    ResponseEntity<MessageUtils> delete(@PathVariable Long groupId){
-//        log.debug(groupId.toString());
-//        Long userId=1L;
-//        groupService.deleteGroup(groupId,userId);
-//        return ResponseEntity.ok().body(MessageUtils.success());
-//    }
-//
-//    @PatchMapping("/modify/member")
-//    ResponseEntity modifyMember(@RequestBody GroupModifyMemberForm groupModifyMemberForm){
-//        log.debug(groupModifyMemberForm.toString());
-//        Long userId=1l;
-//        groupService.modifyGroupMember(groupModifyMemberForm,userId);
-//        return ResponseEntity.ok().body(MessageUtils.success());
-//    }
-//    @DeleteMapping("/delete/member")
-//    ResponseEntity deleteMember(@RequestBody GroupMemberDeleteForm groupMemberDeleteForm){
-//        log.debug(groupMemberDeleteForm.toString());
-//        Long userId=1l;
-//        groupService.deleteGroupMember(groupMemberDeleteForm,userId);
-//        return ResponseEntity.ok().body(MessageUtils.success());
-//    }
-//
-//
-//    @PatchMapping("/modify")
-//    ResponseEntity modify(@RequestBody GroupModifyForm groupModifyForm){
-//        log.debug(groupModifyForm.toString());
-//        Long userId=1l;
-//        groupService.modifyGroup(groupModifyForm,userId);
-//        return ResponseEntity.ok().body(MessageUtils.success());
-//    }
-//
-//    @PostMapping("/regist/duty")
-//    ResponseEntity registDuty(@RequestBody GroupDutyRegistRequestForm groupDutyRegistForm){
-//        log.debug(groupDutyRegistForm.toString());
-//        Long userId=1l;
-//        GroupDutyRegistExcel groupDutyRegistExcel=groupService.registDuty(groupDutyRegistForm,userId);
-//        return ResponseEntity.ok().body(
-//                MessageUtils.success(groupDutyRegistExcel)
-//        );
-//    }
-//}
+package org.egglog.api.group.controller;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.egglog.api.group.model.dto.request.GroupForm;
+import org.egglog.api.group.model.dto.request.GroupUpdateForm;
+import org.egglog.api.group.model.dto.request.InvitationAcceptForm;
+import org.egglog.api.group.model.dto.response.GroupDto;
+import org.egglog.api.group.model.dto.response.GroupMemberDto;
+import org.egglog.api.group.model.service.GroupService;
+import org.egglog.utility.utils.MessageUtils;
+import org.egglog.utility.utils.SuccessType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.egglog.api.user.model.entity.Users;
+
+import java.util.List;
+
+
+@RestController
+@RequestMapping("/v1/groups")
+@RequiredArgsConstructor
+@Slf4j
+public class GroupController {
+    private final GroupService groupService;
+
+    @DeleteMapping("/{group_id}")
+    public ResponseEntity deleteGroup(
+            @PathVariable("group_id") Long groupId
+//            TODO @AuthenticationPrincipal User user
+    ){
+        Long userId=1L;
+        groupService.deleteGroup(groupId,userId);
+        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
+    }
+    //TODO kafka 적용해 이벤트 큐에 파싱 요청 송신하는 형태로 작성할 것
+    @PostMapping("/duty")
+    public ResponseEntity generateGroupDuty(){
+        Long userId=1L;
+        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
+    }
+    @PostMapping("/invitation/accept")
+    public ResponseEntity acceptInvitaion(
+            @RequestBody InvitationAcceptForm acceptForm
+//            TODO @AuthenticationPrincipal User user){
+    ){
+        Users user=null;
+        groupService.acceptInvitation(acceptForm,user);
+        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.NO_CONTENT));
+    }
+    @GetMapping("/invitaion/{group_id}")
+    public ResponseEntity getInvitation(
+            @PathVariable("group_id") Long groupId
+//            TODO @AuthenticationPrincipal User user
+    ){
+        Users user=null;
+        String inviteCode = groupService.getOrGenerateInvitation(groupId,user);
+        return ResponseEntity.ok().body(MessageUtils.success(inviteCode));
+    }
+    @DeleteMapping("/{group_id}/{member_id}")
+    public ResponseEntity deleteGroupMember(
+            @PathVariable("group_id") Long groupId,
+            @PathVariable("member_id") Long memberId
+//            TODO @AuthenticationPrincipal User user
+    ){
+        Users user=null;
+        groupService.deleteGroupMember(groupId,memberId,user);
+        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
+    }
+    @GetMapping("/list")
+    public ResponseEntity getGroupList(
+//            TODO @AuthenticationPrincipal User user
+    ){
+        Users user=null;
+        List<GroupMemberDto> groupMemberList = groupService.getGroupList(user);
+        return ResponseEntity.ok().body(MessageUtils.success(groupMemberList));
+    }
+    @GetMapping("/{group_id}")
+    public ResponseEntity retrieveGroup(@PathVariable("group_id") Long groupId
+//            TODO @AuthenticationPrincipal User user
+    ){
+        Users user=null;
+        GroupDto group = groupService.retrieveGroup(groupId,user);
+        return ResponseEntity.ok().body(MessageUtils.success(group));
+    }
+    //TODO 수정 데이터 확인용 전송
+    @PatchMapping("/{group_id}")
+    public ResponseEntity updateGroup(
+            @PathVariable("group_id") Long groupId,
+            @RequestBody GroupUpdateForm groupUpdateForm
+//            TODO @AuthenticationPrincipal User user
+    ){
+        Long userId=1L;
+        groupService.updateGroup(groupId,groupUpdateForm,userId);
+        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.NO_CONTENT));
+    }
+    @PatchMapping("/{group_id}/{member_id}")
+    public ResponseEntity updateGroupMember(
+            @PathVariable("group_id") Long groupId,
+            @PathVariable("member_id") Long memberId
+//            TODO @AuthenticationPrincipal User user
+    ){
+        Users user=null;
+        groupService.updateGroupMember(groupId, memberId, user);
+        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.NO_CONTENT));
+    }
+    @DeleteMapping("/exit/{group_id}")
+    public ResponseEntity exitGroup(
+            @PathVariable("group_id") Long groupId
+//            TODO @AuthenticationPrincipal User user
+    ){
+        Users user=null;
+        groupService.exitGroup(groupId,user);
+        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
+    }
+    @PostMapping("/")
+    public ResponseEntity generateGroup(
+            @RequestBody GroupForm groupForm
+//            TODO @AuthenticationPrincipal User user
+    ){
+        Long userId=1L;
+        groupService.generateGroup(groupForm,userId);
+        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
+    }
+}

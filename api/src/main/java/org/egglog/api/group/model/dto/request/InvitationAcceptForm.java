@@ -1,4 +1,4 @@
-package org.egglog.api.group.model.dto.form;
+package org.egglog.api.group.model.dto.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -8,8 +8,7 @@ import lombok.Data;
 @Data
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class GroupRegistMemberForm {
-    //정보가 수정될 수 있어서 dto를 modify form과 분리함
-    Long groupId;
-    Long groupUserId;
+public class InvitationAcceptForm {
+    private String invitationCode;
+    private String password;
 }

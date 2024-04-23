@@ -29,6 +29,12 @@ public class MonthUtils {
         );
     }
 
+    /**
+     * 연, 월 데이터를 입력받아 해당하는 달의
+     * @param year
+     * @param month
+     * @return
+     */
     public static Month getDates(int year, int month){
         LocalDate calendarDay=LocalDate.of(year,month,1);
         return Month.builder()
