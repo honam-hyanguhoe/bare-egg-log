@@ -39,6 +39,7 @@ import com.org.egglog.client.ui.atoms.buttons.SettingButton
 import com.org.egglog.client.ui.atoms.buttons.ThinButton
 import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.ui.atoms.inputs.MultiInput
+import com.org.egglog.client.ui.atoms.inputs.PassInput
 import com.org.egglog.client.ui.atoms.inputs.SingleInput
 import com.org.egglog.client.ui.theme.ClientTheme
 import com.org.egglog.client.ui.theme.Typography
@@ -145,6 +146,7 @@ fun InputTest(modifier: Modifier = Modifier) {
                 focusManager = focusManager,
                 placeholder = "사번 입력"
             )
+            PassInput()
         }
     }
 }
