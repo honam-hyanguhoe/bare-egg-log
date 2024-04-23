@@ -47,7 +47,6 @@ public class CommentServiceImpl implements CommentService {
      *
      * @param boardId
      * @return
-     * @author 김수린
      */
     @Override
     @Transactional
@@ -115,7 +114,6 @@ public class CommentServiceImpl implements CommentService {
      *
      * @param commentForm
      * @param userId
-     * @author 김수린
      */
     @Override
     public void registComment(CommentForm commentForm, Long userId) {
@@ -155,7 +153,6 @@ public class CommentServiceImpl implements CommentService {
      *
      * @param commentId
      * @param userId
-     * @author 김수린
      */
     @Override
     public void deleteComment(Long commentId, Long userId) {

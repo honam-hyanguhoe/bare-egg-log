@@ -12,6 +12,7 @@ import org.egglog.api.board.model.entity.*;
 import org.egglog.api.board.repository.*;
 import org.egglog.api.board.search.domain.document.BoardDocument;
 import org.egglog.api.board.search.repository.SearchRepository;
+import org.egglog.api.global.util.RedisViewCountUtil;
 import org.egglog.api.hospital.exception.HospitalErrorCode;
 import org.egglog.api.hospital.exception.HospitalException;
 import org.egglog.api.hospital.model.entity.Hospital;
@@ -21,35 +22,44 @@ import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.Users;
 import org.egglog.api.user.repository.UserQueryRepository;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService {
 
-    private final BoardJpaRepository boardJpaRepository;
-
-    private final BoardQueryRepository boardQueryRepository;
-
+    //사용자
     private final UserQueryRepository userQueryRepository;
 
-    private final CommentQueryRepository commentQueryRepository;
+    //게시판
+    private final BoardJpaRepository boardJpaRepository;
+    private final BoardQueryRepository boardQueryRepository;
 
-    private final HospitalQueryRepository hospitalQueryRepository;
-
+    //좋아요
     private final BoardLikeJpaRepository boardLikeJpaRepository;
-
     private final BoardLikeQueryRepository boardLikeQueryRepository;
 
-    private final BoardHitJpaRepository boardHitJpaRepository;
+    //댓글
+    private final CommentQueryRepository commentQueryRepository;
+    private final CommentJpaRepository commentJpaRepository;
 
-    private final SearchRepository searchRepository;    //검색 레포지토리
+    //병원
+    private final HospitalQueryRepository hospitalQueryRepository;
+
+    //검색
+    private final SearchRepository searchRepository;
 
     private final CommentService commentService;
+
+    private final RedisViewCountUtil redisViewCountUtil;    //조회수
+
+    private final StringRedisTemplate redisTemplate;    //급상승 게시물 
 
     /**
      * 게시판 글 목록
@@ -72,14 +82,11 @@ public class BoardServiceImpl implements BoardService {
             for (BoardDocument board : boardDocuments) {
                 Long commentCnt = commentQueryRepository.getCommentCount(board.getId());
                 Long likeCnt = boardQueryRepository.getLikeCount(board.getId());
-                Long hitCnt = boardQueryRepository.getHitCount(board.getId());
-                boolean isUserLiked = false;  //좋아요 누른 여부
-                boolean isUserHit = false;  //조회 여부
+                long viewCount = redisViewCountUtil.getViewCount(String.valueOf(board.getId())); //하루 동안의 조회수
+                Long hitCnt = viewCount + board.getViewCount();
 
-                //사용자가 이미 본 게시물인지
-                if (!isNotHit(userId, board.getId())) { //아직 안봤다면 true
-                    isUserHit = true;
-                }
+                boolean isUserLiked = false;  //좋아요 누른 여부
+
                 //사용자가 이미 좋아요를 눌렀는지
                 if (!isNotLiked(userId, board.getId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
                     isUserLiked = true;
@@ -90,12 +97,11 @@ public class BoardServiceImpl implements BoardService {
                         .boardContent(board.getContent())
                         .boardCreatedAt(board.getCreatedAt())
                         .tempNickname(board.getTempNickname())
-                        .hit(hitCnt)
+                        .viewCount(hitCnt)
                         .commentCount(commentCnt)
                         .likeCount(likeCnt)
                         .doLiked(isUserLiked)  //좋아요 여부
-                        .doHit(isUserHit)  //조회 여부
-                        .isAuth(user.getIsAuth())   //인증 여부
+//                        .isAuth(user.getIsAuth())   //인증 여부
                         .build();
 
                 boardListOutputSpecList.add(boardListOutputSpec);
@@ -107,6 +113,7 @@ public class BoardServiceImpl implements BoardService {
             e.printStackTrace();
             throw new BoardException(BoardErrorCode.UNKNOWN_ERROR);
         }
+        
         return boardListOutputSpecList;
     }
 
@@ -118,7 +125,7 @@ public class BoardServiceImpl implements BoardService {
      * @param userId
      * @return
      */
-    public List<BoardListOutputSpec> getBoardHotList(Long hospitalId, Long groupId, Long userId) {
+    public List<BoardListOutputSpec> getHotBoardList(Long hospitalId, Long groupId, Long userId) {
         Users user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
@@ -126,40 +133,47 @@ public class BoardServiceImpl implements BoardService {
         List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
 
         try {
-            List<Board> boardHotList = boardQueryRepository.findBoardHotList(groupId, hospitalId);
-            for (Board board : boardHotList) {
-                Long commentCnt = commentQueryRepository.getCommentCount(board.getId());
-                Long likeCnt = boardQueryRepository.getLikeCount(board.getId());
-                Long hitCnt = boardQueryRepository.getHitCount(board.getId());
+            String boardIds = redisTemplate.opsForValue().get("hotBoards");
+            if (boardIds != null && !boardIds.isEmpty()) {
+                List<Long> ids = Arrays.stream(boardIds.replace("[", "").replace("]", "").split(","))
+                        .map(String::trim)
+                        .map(Long::parseLong)
+                        .toList();
 
-                boolean isUserLiked = false;  //좋아요 누른 여부
-                boolean isUserHit = false;  //조회 여부
+                for (Long boardId : ids) {
+                    Board board = boardQueryRepository.findById(boardId).orElseThrow(
+                            () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
+                    );
 
-                //사용자가 이미 본 게시물인지
-                if (!isNotHit(userId, board.getId())) { //아직 안봤다면 true
-                    isUserHit = true;
-                }
-                //사용자가 이미 좋아요를 눌렀는지
-                if (!isNotLiked(userId, board.getId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
-                    isUserLiked = true;
-                }
+                    Long commentCnt = commentQueryRepository.getCommentCount(board.getId());
+                    Long likeCnt = boardQueryRepository.getLikeCount(board.getId());
+                    long viewCount = redisViewCountUtil.getViewCount(String.valueOf(boardId)); //하루 동안의 조회수
+                    Long hitCnt = viewCount + board.getViewCount();
 
-                BoardListOutputSpec boardListOutputSpec = BoardListOutputSpec.builder()
+                    boolean isUserLiked = false;  //좋아요 누른 여부
+
+                    //사용자가 이미 좋아요를 눌렀는지
+                    if (!isNotLiked(userId, board.getId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
+                        isUserLiked = true;
+                    }
+                    
+                    BoardListOutputSpec boardListOutputSpec = BoardListOutputSpec.builder()
                         .boardId(board.getId())
                         .boardTitle(board.getTitle())
                         .boardContent(board.getContent())
                         .boardCreatedAt(board.getCreatedAt())
                         .tempNickname(board.getTempNickname())
-                        .hit(hitCnt)
+                        .viewCount(hitCnt)
                         .commentCount(commentCnt)
                         .likeCount(likeCnt)
                         .doLiked(isUserLiked)
-                        .doHit(isUserHit)
-                        .isAuth(user.getIsAuth())   //인증 여부
+//                        .isAuth(user.getIsAuth())   //인증 여부
                         .build();
 
-                boardListOutputSpecList.add(boardListOutputSpec);
+                    boardListOutputSpecList.add(boardListOutputSpec);
+                }
             }
+
         } catch (DataAccessException e) {
             throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
         } catch (Exception e) {
@@ -170,6 +184,56 @@ public class BoardServiceImpl implements BoardService {
         return boardListOutputSpecList;
 
     }
+
+//    public List<BoardListOutputSpec> getBoardHotList(Long hospitalId, Long groupId, Long userId) {
+//        Users user = userQueryRepository.findById(userId).orElseThrow(
+//                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
+//        );
+//
+//        List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
+//
+//        try {
+//            List<Board> boardHotList = boardQueryRepository.findBoardHotList(groupId, hospitalId);
+//
+//            for (Board board : boardHotList) {
+//                Long commentCnt = commentQueryRepository.getCommentCount(board.getId());
+//                Long likeCnt = boardQueryRepository.getLikeCount(board.getId());
+//                long viewCount = redisViewCountUtil.getViewCount(String.valueOf(board.getId())); //하루 동안의 조회수
+//                Long hitCnt = viewCount + board.getViewCount();     // DB + redis
+//
+//                boolean isUserLiked = false;  //좋아요 누른 여부
+//                boolean isUserHit = false;  //조회 여부
+//
+//                //사용자가 이미 좋아요를 눌렀는지
+//                if (!isNotLiked(userId, board.getId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
+//                    isUserLiked = true;
+//                }
+//
+//                BoardListOutputSpec boardListOutputSpec = BoardListOutputSpec.builder()
+//                        .boardId(board.getId())
+//                        .boardTitle(board.getTitle())
+//                        .boardContent(board.getContent())
+//                        .boardCreatedAt(board.getCreatedAt())
+//                        .tempNickname(board.getTempNickname())
+//                        .viewCount(hitCnt)
+//                        .commentCount(commentCnt)
+//                        .likeCount(likeCnt)
+//                        .doLiked(isUserLiked)
+////                        .isAuth(user.getIsAuth())   //인증 여부
+//                        .build();
+//
+//                boardListOutputSpecList.add(boardListOutputSpec);
+//            }
+//        } catch (DataAccessException e) {
+//            throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            throw new BoardException(BoardErrorCode.UNKNOWN_ERROR);
+//        }
+//
+//        return boardListOutputSpecList;
+//
+//    }
 
     /**
      * 게시판 작성을 위한 메서드<br/>
@@ -247,16 +311,7 @@ public class BoardServiceImpl implements BoardService {
         return boardQueryRepository.getUserBoardLike(boardId, userId).isEmpty();
     }
 
-    /**
-     * 사용자가 이미 본 게시물인지
-     *
-     * @param userId
-     * @param boardId
-     * @return
-     */
-    private boolean isNotHit(Long userId, Long boardId) {
-        return boardQueryRepository.getUserBoardHit(boardId, userId).isEmpty();
-    }
+
     /**
      * 게시판 삭제 메서드<br/>
      * [로직]<br/>
@@ -275,7 +330,13 @@ public class BoardServiceImpl implements BoardService {
         );
 
         try {
-            boardJpaRepository.delete(board); //삭제
+            //작성자가 같다면
+            if (board.getUser().getId().equals(userId)) {
+                List<Comment> commentListByBoardId = commentQueryRepository.getCommentListByBoardId(boardId);
+                commentJpaRepository.deleteAll(commentListByBoardId);
+                boardJpaRepository.delete(board); //삭제
+
+            }
 
         } catch (DataAccessException e) {
             throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
@@ -340,23 +401,17 @@ public class BoardServiceImpl implements BoardService {
         BoardOutputSpec boardOutputSpec = null;
 
         try {
-            BoardHit boardHit = BoardHit.builder()
-                    .id(boardId)
-                    .user(user)
-                    .board(board)
-                    .build();
-
             boolean isUserLiked = false;  //좋아요 누른 여부
-            boolean isUserHit = false;  //조회 여부
 
-            //로그인한 유저가 아직 조회하지 않았다면
-            if (isNotHit(userId, boardId)) {
-                boardHitJpaRepository.save(boardHit);  //조회수 테이블에 저장
-                isUserHit = true;
+            //조회수 증가해도 되는지 검증
+            if (redisViewCountUtil.checkAndIncrementViewCount(String.valueOf(boardId), String.valueOf(userId))) {
+                redisViewCountUtil.incrementViewCount(String.valueOf(boardId));
             }
+            long viewCount = redisViewCountUtil.getViewCount(String.valueOf(boardId)); //하루 동안의 조회수
+
             Long commentCnt = commentQueryRepository.getCommentCount(board.getId());
             Long likeCnt = boardQueryRepository.getLikeCount(board.getId());
-            Long hitCnt = boardQueryRepository.getHitCount(board.getId());
+            Long hitCnt = viewCount + board.getViewCount();     // DB + redis
 
             //사용자가 이미 좋아요를 눌렀는지
             if (!isNotLiked(userId, board.getId())) {
@@ -373,8 +428,8 @@ public class BoardServiceImpl implements BoardService {
                     .pictureTwo(board.getPictureTwo())
                     .pictureThree(board.getPictureThree())
                     .pictureFour(board.getPictureFour())
-                    .hit(hitCnt)
-                    .groupId(board.getGroup().getGroupId())
+                    .viewCount(hitCnt)
+                    .groupId(board.getGroup().getId())
                     .userId(user.getId())
                     .tempNickname(board.getTempNickname())
                     .profileImgUrl(user.getProfileImgUrl())
@@ -382,8 +437,7 @@ public class BoardServiceImpl implements BoardService {
                     .boardLikeCount(likeCnt)
                     .hospitalName(board.getHospital().getHospitalName())
                     .doLiked(isUserLiked)
-                    .doHit(isUserHit)
-                    .isAuth(user.getIsAuth())   //인증 여부
+//                    .isAuth(user.getIsAuth())   //인증 여부
                     .comments(commentList)
                     .build();
 
