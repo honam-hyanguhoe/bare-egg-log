@@ -25,16 +25,6 @@ import java.util.List;
 public class GroupController {
     private final GroupService groupService;
 
-    @DeleteMapping("/{group_id}")
-    public ResponseEntity deleteGroup(
-            @PathVariable("group_id") Long groupId
-//            TODO @AuthenticationPrincipal User user
-    ){
-        Long userId=1L;
-        groupService.deleteGroup(groupId,userId);
-        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
-    }
-
     //TODO kafka 적용해 이벤트 큐에 파싱 요청 송신하는 형태로 작성할 것
     @PostMapping("/duty")
     public ResponseEntity generateGroupDuty(){

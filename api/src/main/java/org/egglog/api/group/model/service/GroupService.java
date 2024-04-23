@@ -17,6 +17,7 @@ import org.egglog.api.user.model.entity.Users;
 import org.egglog.utility.utils.RandomStringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,25 +31,6 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupInvitationRepository groupInvitationRepository;
 
-    /**
-     * 그룹 삭제 메서드
-     * @param groupId
-     */
-    public void deleteGroup(Long groupId, Long userId) {
-        GroupMember boss = groupMemberService.getGroupMember(groupId,userId);
-        //만약 그룹장이 아니라면
-        if(!boss.getIsAdmin()){
-            // 권한이 없는 사용자의 요청입니다.
-            throw new GroupException(GroupErrorCode.GROUP_ROLE_NOT_MATCH);
-        }
-        try {
-            //group id로 그룹 삭제
-            groupRepository.deleteById(groupId);
-        }catch (Exception e){
-            //트랜잭션 실패
-            throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
-        }
-    }
 
     /**
      * 초대수락 메서드
@@ -165,6 +147,7 @@ public class GroupService {
      * @param groupUpdateForm
      * @param userId
      */
+    @Transactional
     public GroupSimpleDto updateGroup(Long groupId, GroupUpdateForm groupUpdateForm, Long userId) {
         GroupMember user = groupMemberService.getGroupMember(groupId,userId);
         //그룹장이 아니라면 수정 권한이 없음
@@ -179,6 +162,11 @@ public class GroupService {
             }
             if(groupUpdateForm.getNewPassword()!=null){
                 group.setPassword(passwordEncoder.encode(groupUpdateForm.getNewPassword()));
+                InvitationCode invitationCode = groupInvitationRepository.findInvitationCodeByGroupId(groupId).orElse(null);
+                if(invitationCode!=null){
+                    invitationCode.setPassword(group.getPassword());
+                    groupInvitationRepository.save(invitationCode);
+                }
             }
             groupRepository.save(group);
         }catch (Exception e){
@@ -232,6 +220,9 @@ public class GroupService {
             //혼자가 아니라면 탈퇴 권한 없음
             if(count==1){
                 groupMemberService.deleteGroupMember(userInfo);
+                //더이상 남은 사용자가 없으니 그룹 삭제
+                Group group = groupRepository.findById(groupId).orElseThrow(()->new GroupException(GroupErrorCode.NOT_FOUND));
+                groupRepository.delete(group);
             }else{
                 throw new GroupException(GroupErrorCode.GROUP_ROLE_NOT_MATCH);
             }
