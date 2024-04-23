@@ -23,5 +23,13 @@ public class UserQueryRepository {
                 .fetchOne());
     }
 
+    public Optional<Users> findByIdWithHospital(Long userId) {
+        return Optional.ofNullable(jpaQueryFactory
+                .selectFrom(users)
+                .leftJoin(users.hospital).fetchJoin()
+                .where(users.id.eq(userId))
+                .fetchOne());
+    }
+
 
 }

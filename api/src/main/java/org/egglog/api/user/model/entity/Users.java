@@ -4,6 +4,9 @@ package org.egglog.api.user.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.egglog.api.hospital.model.entity.Hospital;
+import org.egglog.api.user.model.dto.request.UpdateUserHospitalRequest;
+import org.egglog.api.user.model.dto.request.UpdateUserRequest;
+import org.egglog.api.user.model.dto.response.UserResponse;
 import org.egglog.api.user.model.entity.enums.AuthProvider;
 import org.egglog.api.user.model.entity.enums.UserRole;
 import org.egglog.api.user.model.entity.enums.UserStatus;
@@ -64,17 +67,74 @@ public class Users {
     @Column(nullable = false, name = "status")
     private UserStatus userStatus;
 
-    @CreatedDate
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false, name = "created_at")
     private LocalDateTime createdAt;
 
-    @LastModifiedDate
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false, name = "updated_at")
     private LocalDateTime updatedAt;
 
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false, name = "login_at")
+    private LocalDateTime loginAt;
+
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false, name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     @Column(name = "is_hospital_auth")
     private Boolean isHospitalAuth;
+
+    public Users doLogin(){
+        this.loginAt = LocalDateTime.now();
+        return this;
+    }
+
+    public Users deleteUser(){
+        this.userName = "탈퇴회원";
+        this.empNo = null;
+//        this.profileImgUrl = null;
+        this.hospital = null;
+        this.isHospitalAuth = false;
+        this.userStatus = UserStatus.DELETED;
+        this.deletedAt = LocalDateTime.now();
+        return this;
+    }
+
+    public Users updateUserInfo(String updateUserName, String updateProfileImgUrl){
+        this.userName = updateUserName;
+        this.profileImgUrl = updateProfileImgUrl;
+        this.updatedAt = LocalDateTime.now();
+        return this;
+    }
+
+    public Users updateHospitalInfo(Hospital updateHospital, String updateEmpNo){
+        this.hospital = updateHospital;
+        this.empNo = updateEmpNo;
+        this.updatedAt = LocalDateTime.now();
+        return this;
+    }
+
+    public UserResponse toResponse(){
+        return UserResponse.builder()
+                .id(this.id)
+                .email(this.email)
+                .userName(this.userName)
+                .hospital(this.hospital.toUserHospitalResponse())
+                .userRole(this.userRole)
+                .profileImgUrl(this.profileImgUrl)
+                .empNo(this.empNo)
+                .userStatus(this.userStatus)
+                .isHospitalAuth(this.isHospitalAuth)
+                .updatedAt(this.updatedAt)
+                .createdAt(this.createdAt)
+                .loginAt(this.loginAt)
+                .build();
+    }
 }
 
