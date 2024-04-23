@@ -2,12 +2,8 @@ package org.egglog.api.group.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.egglog.api.group.model.repository.GroupMemberQueryRepository;
-import org.egglog.api.group.model.service.GroupMemberService;
-import org.egglog.api.group.model.service.GroupMemberServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
+import org.checkerframework.checker.units.qual.C;
+import org.egglog.api.group.model.dto.response.GroupSimpleDto;
 
 @Entity
 @Getter
@@ -29,4 +25,14 @@ public class Group {
 
     @Column(name = "group_password",nullable = false)
     private String password;
+
+    @Column(name = "group_admin", nullable = false)
+    private String admin;
+
+    public GroupSimpleDto toSimpleDto(){
+        GroupSimpleDto simpleDto = new GroupSimpleDto();
+        simpleDto.setGroupId(this.id);
+        simpleDto.setGroupName(this.groupName);
+        return simpleDto;
+    }
 }
