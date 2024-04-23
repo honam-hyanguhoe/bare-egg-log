@@ -45,10 +45,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.org.egglog.client.ui.atoms.cards.ResultCard
 import com.org.egglog.client.ui.theme.ClientTheme
 import com.org.egglog.client.ui.theme.Typography
 import com.org.egglog.client.ui.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.client.ui.atoms.imageLoader.UrlImageLoader
+import com.org.egglog.client.utils.MessageUtil
 import com.org.egglog.client.utils.widthPercent
 import com.org.egglog.client.ui.atoms.labels.Labels
 import com.org.egglog.client.utils.Notification
@@ -95,6 +97,11 @@ fun OnboardingScreen(
             Text("${320.widthPercent(LocalContext.current).dp}")
 //            Icon(Notification, modifier = Modifier.size(25.dp))
         }
+        LocalImageLoader(imageUrl = R.drawable.off)
+        ResultCard(message = MessageUtil.APPROVE)
+        ResultCard(message = MessageUtil.APPLY)
+        ResultCard(message = MessageUtil.REGISTER)
+        ResultCard(message = MessageUtil.NO_SEARCH_RESULT)
         Image(painter = painterResource(id = R.drawable.bottom_logo), contentDescription = null)
         UrlImageLoader(imageUrl = "https://picsum.photos/300", modifier = Modifier.size(320.widthPercent(LocalContext.current).dp))
         LocalImageLoader(imageUrl = R.drawable.off)
@@ -117,7 +124,6 @@ fun OnboardingScreen(
             Labels(text = "휴가")
             Labels(text= "None")
         }
-
 
     }
 }
