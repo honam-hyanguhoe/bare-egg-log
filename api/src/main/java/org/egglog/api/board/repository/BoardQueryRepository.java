@@ -41,7 +41,7 @@ public class BoardQueryRepository {
 
     /**
      * 급상승 게시판<br>
-     * [로직] 좋아요 + 댓글 상위 2개 게시물
+     * [로직] 좋아요 + 조회수 상위 2개 게시물 (하루 범위 )
      *
      * @param groupId
      * @param hospitalId
@@ -84,23 +84,6 @@ public class BoardQueryRepository {
 
 
     /**
-     * 조회수
-     *
-     * @param boardId
-     * @return
-     */
-    public Long getHitCount(Long boardId) {
-        Long count = jpaQueryFactory
-                .select(boardHit.count())
-                .from(boardHit)
-                .where(boardHit.board.id.eq(boardId))
-                .fetchOne();
-
-        return count;
-    }
-
-
-    /**
      * 좋아요 개수
      *
      * @param boardId
@@ -127,16 +110,6 @@ public class BoardQueryRepository {
 
     }
 
-    public Optional<BoardHit> getUserBoardHit(Long boardId, Long userId) {
-        return Optional.ofNullable(jpaQueryFactory
-                .selectFrom(boardHit)
-                .where(
-                        boardHit.user.id.eq(userId),
-                        boardHit.board.id.eq(boardId)
-                )
-                .fetchOne());
-
-    }
 
 
 }

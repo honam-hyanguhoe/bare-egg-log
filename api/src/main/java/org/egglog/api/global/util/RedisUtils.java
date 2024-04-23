@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -39,5 +40,10 @@ public class RedisUtils {
 
     public void deleteData(String key){
         redisTemplate.delete(key);
+    }
+
+    public void set(String key, Object o, int minutes) {
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer(o.getClass()));
+        redisTemplate.opsForValue().set(key, o, minutes, TimeUnit.MINUTES);
     }
 }
