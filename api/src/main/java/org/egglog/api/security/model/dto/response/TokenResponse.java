@@ -1,20 +1,16 @@
 package org.egglog.api.security.model.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.*;
-
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
-@Setter
+@Builder
 @AllArgsConstructor
-@Builder @ToString
-@JsonInclude(NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class GeneratedToken {
-    private int status;
+public class TokenResponse {
     private String accessToken;
     private String refreshToken;
 }
