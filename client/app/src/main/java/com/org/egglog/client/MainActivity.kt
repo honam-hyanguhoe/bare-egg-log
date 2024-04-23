@@ -58,10 +58,12 @@ import com.org.egglog.client.ui.atoms.buttons.ProfileButton
 import com.org.egglog.client.ui.atoms.buttons.SettingButton
 import com.org.egglog.client.ui.atoms.buttons.ThinButton
 import com.org.egglog.client.ui.atoms.icons.Icon
+import com.org.egglog.client.ui.atoms.cards.ResultCard
 import com.org.egglog.client.ui.theme.ClientTheme
 import com.org.egglog.client.ui.theme.Typography
 import com.org.egglog.client.ui.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.client.ui.atoms.imageLoader.UrlImageLoader
+import com.org.egglog.client.utils.MessageUtil
 import com.org.egglog.client.utils.widthPercent
 import com.org.egglog.client.ui.theme.*
 import com.org.egglog.client.utils.AddBox
@@ -113,9 +115,33 @@ fun OnboardingScreen(
             Text("${320.widthPercent(LocalContext.current).dp}")
 //            Icon(Notification, modifier = Modifier.size(25.dp))
         }
+        LocalImageLoader(imageUrl = R.drawable.off)
+        ResultCard(message = MessageUtil.APPROVE)
+        ResultCard(message = MessageUtil.APPLY)
+        ResultCard(message = MessageUtil.REGISTER)
+        ResultCard(message = MessageUtil.NO_SEARCH_RESULT)
         Image(painter = painterResource(id = R.drawable.bottom_logo), contentDescription = null)
         UrlImageLoader(imageUrl = "https://picsum.photos/300", modifier = Modifier.size(320.widthPercent(LocalContext.current).dp))
         LocalImageLoader(imageUrl = R.drawable.off)
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Labels(text = "Day",size = "big")
+            Labels(text = "Eve",size = "big")
+            Labels(text = "Night",size = "big")
+            Labels(text = "교육",size = "big")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Labels(text = "Eve")
+            Labels(text = "Off")
+            Labels(text = "Night")
+            Labels(text = "Eve")
+            Labels(text = "보건")
+            Labels(text = "휴가")
+            Labels(text= "None")
+        }
     }
 }
 

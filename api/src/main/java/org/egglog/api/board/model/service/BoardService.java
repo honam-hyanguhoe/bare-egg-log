@@ -6,13 +6,12 @@ import org.egglog.api.board.model.dto.params.BoardModifyForm;
 import org.egglog.api.board.model.dto.params.LikeForm;
 import org.egglog.api.board.model.dto.response.BoardListOutputSpec;
 import org.egglog.api.board.model.dto.response.BoardOutputSpec;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 public interface BoardService {
 
-    List<BoardListOutputSpec> getBoardHotList(Long hospitalId, Long groupId, Long userId);
+    List<BoardListOutputSpec> getHotBoardList(Long hospitalId, Long groupId, Long userId);
 
     List<BoardListOutputSpec> getBoardList(BoardListForm boardListForm, Long userId);
 

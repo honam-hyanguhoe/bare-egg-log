@@ -22,6 +22,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.org.egglog.client.ui.theme.ClientTheme
 import com.org.egglog.client.ui.theme.Typography
+import com.org.egglog.client.utils.heightPercent
+import com.org.egglog.client.utils.widthPercent
 
 @Composable
 fun Labels(text: String, size: String? = null, onClick: (()->Unit)? = null) {
@@ -38,29 +40,14 @@ fun Labels(text: String, size: String? = null, onClick: (()->Unit)? = null) {
         else -> com.org.egglog.client.ui.theme.None
     }
 
-    var textStyle = if (size == "big") {
-        Typography.labelLarge
-    } else {
-        Typography.labelMedium
+    var textStyle = when(size) {
+        "big" -> Typography.labelLarge
+        else -> Typography.labelMedium
     }
 
-    val width = if (size == "big") {
-        80.dp
-    } else {
-        46.dp
-    }
-
-    val height = if (size == "big") {
-        34.dp
-    } else {
-        18.dp
-    }
-
-    val border = if (size == "big") {
-        50.dp
-    } else {
-        4.dp
-    }
+    val width = if (size == "big") 70.widthPercent(LocalContext.current).dp else 42.widthPercent(LocalContext.current).dp
+    val height = if (size == "big") 30.heightPercent(LocalContext.current).dp else 18.heightPercent(LocalContext.current).dp
+    val border = if (size == "big") 50.widthPercent(LocalContext.current).dp else 4.widthPercent(LocalContext.current).dp
 
     Box(modifier = Modifier
             .background(color, RoundedCornerShape(border))
