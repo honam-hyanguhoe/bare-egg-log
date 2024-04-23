@@ -1,12 +1,11 @@
 package org.egglog.api.group.exception;
 
 import lombok.Getter;
+import org.egglog.utility.exception.BaseException;
 
 @Getter
-public class GroupException extends RuntimeException{
-    private final GroupErrorCode errorCode;
+public class GroupException extends BaseException {
     public GroupException(GroupErrorCode errorCode){
-        super(errorCode.getMessage());
-        this.errorCode = errorCode;
+        super(errorCode);
     }
 }

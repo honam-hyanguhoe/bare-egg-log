@@ -4,8 +4,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 
 @Data
 @Builder
@@ -76,7 +75,7 @@ public class MessageUtils<T> {
         private static DataHeader noContentCreateSuccess() {
             return DataHeader.builder()
                     .successCode(0)
-                    .resultCode(NO_CONTENT.toString())
+                    .resultCode(CREATED.toString())
                     .build();
         }
 
