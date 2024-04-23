@@ -28,7 +28,6 @@ import com.org.egglog.client.ui.theme.Typography
 import com.org.egglog.client.utils.MoreVert
 
 
-
 @Composable
 fun ScrollableMenus( options : List<String>, selectedOption : String?, onSelect : (String) -> Unit ) {
     var expanded by remember { mutableStateOf(false) }
@@ -62,6 +61,7 @@ fun ScrollableMenus( options : List<String>, selectedOption : String?, onSelect 
                         println("$selectedOption click")
                         selectedMenuItem = selectedOption
                         onSelect(selectedOption)
+                        expanded = false
                     },
                 )
             }
