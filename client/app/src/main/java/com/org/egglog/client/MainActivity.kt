@@ -73,6 +73,10 @@ import com.org.egglog.client.ui.theme.Typography
 import com.org.egglog.client.ui.atoms.labels.Labels
 import com.org.egglog.client.ui.atoms.menus.ScrollableMenus
 import com.org.egglog.client.ui.atoms.toggle.Toggle
+import com.org.egglog.client.ui.atoms.wheelPicker.DateTimePicker
+import com.org.egglog.client.ui.atoms.wheelPicker.TimePicker
+import com.org.egglog.client.ui.molecules.agreeListItem.AgreeListItem
+import com.org.egglog.client.ui.organisms.agreeList.AgreeList
 import com.org.egglog.client.utils.widthPercent
 import com.org.egglog.client.ui.theme.*
 import com.org.egglog.client.utils.AddBox
@@ -103,6 +107,13 @@ fun MyAppPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyApp(modifier: Modifier = Modifier) {
+//    LabelTest()
+//    ButtonTest()
+//    ToggleTest()
+//    InputTest()
+//    CheckBoxTest()
+//    TimePickerTest()
+//    AgreeListTest()
     var showBottomSheet by remember { mutableStateOf<Boolean>(false) }
 
     fun dismissSheet() {
@@ -128,6 +139,7 @@ fun BottomSheetContent() {
     Text(text = "BottomSheetContent 테스트")
     Spacer(modifier = Modifier.height(180.dp))
 }
+
 
 @Composable
 fun LabelTest(modifier: Modifier = Modifier) {
@@ -185,6 +197,16 @@ fun ToggleTest(modifier: Modifier = Modifier) {
                 onCheckedChange = { checkedState.value = it }
             )
         }
+    }
+}
+
+@Composable
+fun AgreeListTest(modifier: Modifier = Modifier) {
+    val (ageChecked, setAgeClick) = remember { mutableStateOf(false) }
+    val (agreeChecked, setAgreeClick) = remember { mutableStateOf(false) }
+    val (infoChecked, setInfoClick) = remember { mutableStateOf(false) }
+    Surface(modifier, color = MaterialTheme.colorScheme.background) {
+        AgreeList(ageChecked, setAgeClick, agreeChecked, setAgreeClick, infoChecked, setInfoClick)
     }
 }
 
