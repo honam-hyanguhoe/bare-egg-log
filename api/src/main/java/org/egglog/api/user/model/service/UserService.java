@@ -12,8 +12,8 @@ import org.egglog.api.user.model.dto.request.UpdateUserHospitalRequest;
 import org.egglog.api.user.model.dto.request.UpdateUserRequest;
 import org.egglog.api.user.model.dto.response.UserResponse;
 import org.egglog.api.user.model.entity.User;
-import org.egglog.api.user.repository.UserJpaRepository;
-import org.egglog.api.user.repository.UserQueryRepository;
+import org.egglog.api.user.model.repository.UserJpaRepository;
+import org.egglog.api.user.model.repository.UserQueryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,6 +1,5 @@
 package org.egglog.api.security.controller;
 
-import co.elastic.clients.elasticsearch.indices.RefreshRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.security.model.service.AuthService;

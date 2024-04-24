@@ -11,15 +11,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.security.exception.JwtErrorCode;
 import org.egglog.api.security.exception.JwtException;
 import org.egglog.api.security.model.entity.Token;
-import org.egglog.api.security.model.entity.UnsafeToken;
 import org.egglog.api.security.model.repository.RefreshTokenRepository;
 import org.egglog.api.security.model.repository.UnsafeTokenRepository;
 import org.egglog.api.security.util.JwtUtils;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
-import org.egglog.api.user.repository.UserJpaRepository;
-import org.egglog.api.user.repository.UserQueryRepository;
+import org.egglog.api.user.model.repository.UserJpaRepository;
+import org.egglog.api.user.model.repository.UserQueryRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -27,7 +26,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
