@@ -11,9 +11,6 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 
 @Configuration
 @RequiredArgsConstructor
-@EnableElasticsearchRepositories(basePackages = {
-        "org.egglog.api.search.repository"
-})
 public class ElasticsearchConfig extends ReactiveElasticsearchConfiguration {
 
     @Value("${spring.elasticsearch.rest.uris}")
