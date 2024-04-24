@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.security.config.JwtProperties;
 import org.egglog.api.security.exception.JwtErrorCode;
 import org.egglog.api.security.exception.JwtException;
-import org.egglog.api.security.model.repository.UnsafeTokenRepository;
+import org.egglog.api.security.repository.redis.UnsafeTokenRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
