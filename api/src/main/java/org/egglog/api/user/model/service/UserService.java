@@ -32,6 +32,7 @@ public class UserService {
                 .toResponse();
     }
 
+
     /**
      * 유저 정보 업데이트
      * @param loginUser 로그인 유저

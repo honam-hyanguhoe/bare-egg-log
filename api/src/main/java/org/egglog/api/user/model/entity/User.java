@@ -45,7 +45,7 @@ public class User implements UserDetails {
     private String password;
 
     @Column(nullable = false, length = 50, name = "user_name")
-    private String userName;
+    private String name;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -99,7 +99,7 @@ public class User implements UserDetails {
     }
 
     public User deleteUser(){
-        this.userName = "탈퇴회원";
+        this.name = "탈퇴회원";
         this.empNo = null;
 //        this.profileImgUrl = null;
         this.hospital = null;
@@ -110,7 +110,7 @@ public class User implements UserDetails {
     }
 
     public User updateUserInfo(String updateUserName, String updateProfileImgUrl){
-        this.userName = updateUserName;
+        this.name = updateUserName;
         this.profileImgUrl = updateProfileImgUrl;
         this.updatedAt = LocalDateTime.now();
         return this;
@@ -127,7 +127,7 @@ public class User implements UserDetails {
         return UserResponse.builder()
                 .id(this.id)
                 .email(this.email)
-                .userName(this.userName)
+                .userName(this.name)
                 .hospital(this.hospital.toUserHospitalResponse())
                 .userRole(this.userRole)
                 .profileImgUrl(this.profileImgUrl)
@@ -186,7 +186,7 @@ public class User implements UserDetails {
         AuthProvider provider = (AuthProvider) map.get("provider");
 
         if (email != null) user.setEmail(email);
-        if (name != null) user.setUserName(name);
+        if (name != null) user.setName(name);
         if (picture != null) user.setProfileImgUrl(picture);
         if (provider != null) user.setProvider(provider);
         user.setUserStatus(UserStatus.ACTIVE);
