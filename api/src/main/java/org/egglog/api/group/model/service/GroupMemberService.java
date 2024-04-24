@@ -1,12 +1,10 @@
 package org.egglog.api.group.model.service;
 
 import lombok.RequiredArgsConstructor;
-import org.egglog.api.group.exception.GroupException;
 import org.egglog.api.group.exception.GroupMemberErrorCode;
 import org.egglog.api.group.exception.GroupMemberException;
 import org.egglog.api.group.model.entity.GroupMember;
-import org.egglog.api.group.model.repository.GroupMemberRepository;
-import org.egglog.api.group.model.repository.GroupMemberCustomQueryImpl;
+import org.egglog.api.group.repository.GroupMemberRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

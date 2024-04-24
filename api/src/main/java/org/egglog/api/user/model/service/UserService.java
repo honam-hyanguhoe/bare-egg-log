@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.hospital.exception.HospitalErrorCode;
 import org.egglog.api.hospital.exception.HospitalException;
 import org.egglog.api.hospital.model.entity.Hospital;
-import org.egglog.api.hospital.model.repository.HospitalJpaRepository;
+import org.egglog.api.hospital.repository.HospitalJpaRepository;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.dto.request.JoinUserRequest;
