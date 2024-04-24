@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,9 +33,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.wear.compose.material.Button
 import com.org.egglog.client.data.UserInfo
 import com.org.egglog.client.ui.atoms.buttons.AuthButton
 import com.org.egglog.client.ui.atoms.buttons.BigButton
+import com.org.egglog.client.ui.atoms.buttons.FloatingButton
 import com.org.egglog.client.ui.atoms.buttons.GroupButton
 import com.org.egglog.client.ui.atoms.buttons.HalfBigButton
 import com.org.egglog.client.ui.atoms.buttons.HalfMiddleButton
@@ -69,6 +70,9 @@ import com.org.egglog.client.utils.MySetting
 import com.org.egglog.client.utils.addFocusCleaner
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import kotlin.math.log
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -99,8 +103,8 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    TimePickerTest()
 //    BottomSheetTest()
 //    AgreeListTest()
-    CardTest()
-//    ProfileButtonTest()
+//    CardTest()
+    ProfileButtonTest()
 }
 
 @Composable
@@ -110,19 +114,26 @@ fun BottomSheetTest() {
     fun dismissSheet() {
         showBottomSheet = false
     }
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        BottomSheet(
-            height = 400.dp,
-            showBottomSheet = showBottomSheet,
-            onDismiss = {
-                dismissSheet()
-            },
-        ) {
-            BottomSheetContent()
-        };
+
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .border(2.dp, NaturalBlack)) {
+
+        Text("hi")
+        Button(onClick = { println("버튼 눌리나?") }) {
+
+        }
+
+        FloatingButton(
+            onClick = { println("fab 클릭") },
+            onWorkClick = { println("근무 일정 추가 클릭") },
+            onPersonalClick = { println("개인 일정 추가 클릭") },
+            onSettingClick = { println("근무 설정 클릭") },
+            10.dp,
+            30.dp,
+        )
     }
+
 }
 
 @Composable
@@ -137,10 +148,10 @@ fun LabelTest(modifier: Modifier = Modifier) {
     Surface(modifier, color = MaterialTheme.colorScheme.background) {
         Column(modifier = modifier.fillMaxSize()) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Labels(text = "Day",size = "big")
-                Labels(text = "Eve",size = "big")
-                Labels(text = "Night",size = "big")
-                Labels(text = "교육",size = "big")
+                Labels(text = "Day", size = "big")
+                Labels(text = "Eve", size = "big")
+                Labels(text = "Night", size = "big")
+                Labels(text = "교육", size = "big")
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -152,7 +163,7 @@ fun LabelTest(modifier: Modifier = Modifier) {
                 Labels(text = "Eve")
                 Labels(text = "보건")
                 Labels(text = "휴가")
-                Labels(text= "None")
+                Labels(text = "None")
             }
         }
     }
@@ -170,7 +181,7 @@ fun TimePickerTest(modifier: Modifier = Modifier) {
                 Text(text = "Selected Time: ${selectedTime.value}")
             }
 
-            DateTimePicker{dateTime -> selectedDateTime.value = dateTime}
+            DateTimePicker { dateTime -> selectedDateTime.value = dateTime }
             selectedDateTime.value?.let {
                 Text(text = "Selected Time: ${selectedDateTime.value}")
             }
@@ -187,15 +198,6 @@ fun ToggleTest(modifier: Modifier = Modifier) {
                 checked = checkedState.value,
                 onCheckedChange = { checkedState.value = it }
             )
-        }
-    }
-}
-
-@Composable
-fun CardTest(modifier: Modifier = Modifier) {
-    Surface(modifier, color = MaterialTheme.colorScheme.background) {
-        Column(modifier = modifier.fillMaxSize()) {
-            ProfileCard(UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남", empNo = "18-12543", userEmail = "test@test.com", userId = 2))
         }
     }
 }
@@ -219,6 +221,15 @@ fun ProfileButtonTest(modifier: Modifier = Modifier) {
     Surface(modifier, color = MaterialTheme.colorScheme.background) {
         Column(modifier = modifier.fillMaxSize()) {
             ProfileButtonList(userInfoList, selectedList, myUserId)
+        }
+    }
+}
+
+@Composable
+fun CardTest(modifier: Modifier = Modifier) {
+    Surface(modifier, color = MaterialTheme.colorScheme.background) {
+        Column(modifier = modifier.fillMaxSize()) {
+            ProfileCard(UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남", empNo = "18-12543", userEmail = "test@test.com", userId = 2))
         }
     }
 }
@@ -302,7 +313,7 @@ fun ButtonTest(modifier: Modifier = Modifier) {
     Surface(modifier, color = MaterialTheme.colorScheme.background) {
         Column(modifier = modifier.fillMaxSize()) {
             BigButton(
-                onClick = { Log.d("clicked: ", "clicked!!!!")},
+                onClick = { Log.d("clicked: ", "clicked!!!!") },
                 colors = ButtonColors(
                     contentColor = Warning25,
                     containerColor = Warning300,
@@ -315,7 +326,7 @@ fun ButtonTest(modifier: Modifier = Modifier) {
                 )
             }
             MiddleButton(
-                onClick = { Log.d("clicked: ", "clicked!!!!")},
+                onClick = { Log.d("clicked: ", "clicked!!!!") },
                 colors = ButtonColors(
                     contentColor = Warning25,
                     containerColor = Warning300,
@@ -336,7 +347,7 @@ fun ButtonTest(modifier: Modifier = Modifier) {
             }
 
             ThinButton(
-                onClick = { Log.d("clicked: ", "clicked!!!!")},
+                onClick = { Log.d("clicked: ", "clicked!!!!") },
                 colors = ButtonColors(
                     contentColor = Warning25,
                     containerColor = Warning300,
@@ -350,7 +361,7 @@ fun ButtonTest(modifier: Modifier = Modifier) {
             }
 
             HalfBigButton(
-                onClick = { Log.d("clicked: ", "clicked!!!!")},
+                onClick = { Log.d("clicked: ", "clicked!!!!") },
                 colors = ButtonColors(
                     contentColor = Gray25,
                     containerColor = Gray300,
@@ -364,7 +375,7 @@ fun ButtonTest(modifier: Modifier = Modifier) {
             }
 
             HalfMiddleButton(
-                onClick = { Log.d("clicked: ", "clicked!!!!")},
+                onClick = { Log.d("clicked: ", "clicked!!!!") },
                 colors = ButtonColors(
                     contentColor = Gray800,
                     containerColor = Gray300,
@@ -378,7 +389,7 @@ fun ButtonTest(modifier: Modifier = Modifier) {
             }
 
             HalfThinButton(
-                onClick = { Log.d("clicked: ", "clicked!!!!")},
+                onClick = { Log.d("clicked: ", "clicked!!!!") },
                 colors = ButtonColors(
                     contentColor = Gray25,
                     containerColor = Gray300,
@@ -392,12 +403,12 @@ fun ButtonTest(modifier: Modifier = Modifier) {
             }
 
             Row {
-                AuthButton(onClick = {Log.d("test: ", "clicked!!!")}, type = "kakao")
-                AuthButton(onClick = {Log.d("test: ", "clicked!!!")}, type = "naver")
-                AuthButton(onClick = {Log.d("test: ", "clicked!!!")}, type = "google")
+                AuthButton(onClick = { Log.d("test: ", "clicked!!!") }, type = "kakao")
+                AuthButton(onClick = { Log.d("test: ", "clicked!!!") }, type = "naver")
+                AuthButton(onClick = { Log.d("test: ", "clicked!!!") }, type = "google")
             }
 
-            GroupButton(onClick = {Log.d("test: ", "clicked!!!")}, groupMaster = "김다희", groupName = "호남향우회", memberCnt = 1, groupImage = 1, groupId = 1)
+            GroupButton(onClick = { Log.d("test: ", "clicked!!!") }, groupMaster = "김다희", groupName = "호남향우회", memberCnt = 1, groupImage = 1, groupId = 1)
 
             Row {
                 ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, UserInfo(profileImgUrl = "https://picsum.photos/300", userId = 1, userName = "김호남"), isMine = true, isSelected = true)
