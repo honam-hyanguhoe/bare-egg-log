@@ -2,7 +2,8 @@ package org.egglog.api.group.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.egglog.api.user.model.entity.Users;
+import org.egglog.api.group.model.dto.response.GroupMemberDto;
+import org.egglog.api.user.model.entity.User;
 
 @Entity
 @Getter
@@ -18,11 +19,21 @@ public class GroupMember {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private Users user;
+    private User user;
 
-    @Column(name = "group_id")
-    private Long groupId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id")
+    private Group group;
 
     @Column(name = "is_admin")
     private Boolean isAdmin;
+
+    public GroupMemberDto toDto(){
+        return GroupMemberDto.builder()
+                .groupId(group.getId())
+                .userName(user.getName())
+                .profileImgUrl(user.getProfileImgUrl())
+                .isAdmin(this.isAdmin)
+                .build();
+    }
 }

@@ -19,7 +19,7 @@ import org.egglog.api.hospital.model.entity.Hospital;
 import org.egglog.api.hospital.model.repository.HospitalQueryRepository;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
-import org.egglog.api.user.model.entity.Users;
+import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.repository.UserQueryRepository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -59,7 +59,7 @@ public class BoardServiceImpl implements BoardService {
 
     private final RedisViewCountUtil redisViewCountUtil;    //조회수
 
-    private final StringRedisTemplate redisTemplate;    //급상승 게시물 
+    private final StringRedisTemplate redisTemplate;    //급상승 게시물
 
     /**
      * 게시판 글 목록
@@ -70,7 +70,7 @@ public class BoardServiceImpl implements BoardService {
      */
     @Override
     public List<BoardListOutputSpec> getBoardList(BoardListForm boardListForm, Long userId) {
-        Users user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
         List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
@@ -113,7 +113,7 @@ public class BoardServiceImpl implements BoardService {
             e.printStackTrace();
             throw new BoardException(BoardErrorCode.UNKNOWN_ERROR);
         }
-        
+
         return boardListOutputSpecList;
     }
 
@@ -126,7 +126,7 @@ public class BoardServiceImpl implements BoardService {
      * @return
      */
     public List<BoardListOutputSpec> getHotBoardList(Long hospitalId, Long groupId, Long userId) {
-        Users user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
 
@@ -156,7 +156,7 @@ public class BoardServiceImpl implements BoardService {
                     if (!isNotLiked(userId, board.getId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
                         isUserLiked = true;
                     }
-                    
+
                     BoardListOutputSpec boardListOutputSpec = BoardListOutputSpec.builder()
                         .boardId(board.getId())
                         .boardTitle(board.getTitle())
@@ -247,7 +247,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     @Transactional
     public void registBoard(BoardForm boardForm, Long userId) {
-        Users user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
 
@@ -322,7 +322,7 @@ public class BoardServiceImpl implements BoardService {
      */
     @Override
     public void deleteBoard(Long boardId, Long userId) {
-        Users user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
         Board board = boardQueryRepository.findById(boardId).orElseThrow(
@@ -356,7 +356,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     @Transactional
     public void modifyBoard(BoardModifyForm boardModifyForm, Long userId) {
-        Users user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
         Board board = boardQueryRepository.findById(boardModifyForm.getBoardId()).orElseThrow(
@@ -392,7 +392,7 @@ public class BoardServiceImpl implements BoardService {
      */
     @Override
     public BoardOutputSpec getBoard(Long boardId, Long userId) {
-        Users user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
         Board board = boardQueryRepository.findById(boardId).orElseThrow(
@@ -465,7 +465,7 @@ public class BoardServiceImpl implements BoardService {
      */
     @Override
     public void registLike(LikeForm likeForm, Long userId) {
-        Users user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
         Board board = boardQueryRepository.findById(likeForm.getBoardId()).orElseThrow(
@@ -503,7 +503,7 @@ public class BoardServiceImpl implements BoardService {
      */
     @Override
     public void deleteLike(LikeForm likeForm, Long userId) {
-        Users user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
 

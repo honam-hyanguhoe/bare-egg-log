@@ -6,7 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GroupUpdateForm {
+    private String newName = null;
+    private String newPassword =null;
 }

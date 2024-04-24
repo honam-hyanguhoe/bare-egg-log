@@ -17,7 +17,7 @@ import org.egglog.api.board.repository.CommentJpaRepository;
 import org.egglog.api.board.repository.CommentQueryRepository;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
-import org.egglog.api.user.model.entity.Users;
+import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.repository.UserQueryRepository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -70,7 +70,7 @@ public class CommentServiceImpl implements CommentService {
                             RecommentOutputSpec recommentListOutputSpec = RecommentOutputSpec.builder()
                                     .commentId(recomment.getId())
                                     .commentContent(recomment.getContent())
-                                    .hospitalName(recomment.getUser().getHospitalName())
+                                    .hospitalName(recomment.getUser().getHospital().getHospitalName())
                                     .userId(recomment.getUser().getId())
                                     .tempNickname(recomment.getTempNickname())
                                     .commentCreateAt(recomment.getCreatedAt())
@@ -83,7 +83,7 @@ public class CommentServiceImpl implements CommentService {
                     CommentListOutputSpec commentListOutputSpec = CommentListOutputSpec.builder()
                             .commentId(comment.getId())
                             .commentContent(comment.getContent())
-                            .hospitalName(comment.getUser().getHospitalName())
+                            .hospitalName(comment.getUser().getHospital().getHospitalName())
                             .userId(comment.getUser().getId())
                             .tempNickname(comment.getTempNickname())
                             .commentCreateAt(comment.getCreatedAt())
@@ -117,7 +117,7 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public void registComment(CommentForm commentForm, Long userId) {
-        Users user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
 
@@ -156,7 +156,7 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public void deleteComment(Long commentId, Long userId) {
-        Users user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
 
