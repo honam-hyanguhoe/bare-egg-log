@@ -1,4 +1,4 @@
-package com.org.egglog.client.ui.organisms.profileButtonList
+package com.org.egglog.client.ui.molecules.profileButtonList
 
 import android.util.Log
 import androidx.compose.foundation.horizontalScroll

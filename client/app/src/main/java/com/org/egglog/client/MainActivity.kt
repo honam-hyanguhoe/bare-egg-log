@@ -11,9 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonColors
@@ -47,7 +45,6 @@ import com.org.egglog.client.ui.atoms.buttons.SettingButton
 import com.org.egglog.client.ui.atoms.buttons.ThinButton
 import com.org.egglog.client.ui.atoms.cards.ProfileCard
 import com.org.egglog.client.ui.atoms.checkbox.CheckBoxRow
-import com.org.egglog.client.ui.atoms.dialogs.BottomSheet
 import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.ui.atoms.inputs.MultiInput
 import com.org.egglog.client.ui.atoms.inputs.PassInput
@@ -59,8 +56,9 @@ import com.org.egglog.client.ui.atoms.labels.Labels
 import com.org.egglog.client.ui.atoms.toggle.Toggle
 import com.org.egglog.client.ui.atoms.wheelPicker.DateTimePicker
 import com.org.egglog.client.ui.atoms.wheelPicker.TimePicker
+import com.org.egglog.client.ui.molecules.infoList.InfoList
 import com.org.egglog.client.ui.organisms.agreeList.AgreeList
-import com.org.egglog.client.ui.organisms.profileButtonList.ProfileButtonList
+import com.org.egglog.client.ui.molecules.profileButtonList.ProfileButtonList
 import com.org.egglog.client.utils.widthPercent
 import com.org.egglog.client.ui.theme.*
 import com.org.egglog.client.utils.AddBox
@@ -69,8 +67,6 @@ import com.org.egglog.client.utils.MySetting
 import com.org.egglog.client.utils.addFocusCleaner
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import kotlin.math.log
 
 
 class MainActivity : ComponentActivity() {
@@ -103,7 +99,8 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    BottomSheetTest()
 //    AgreeListTest()
 //    CardTest()
-    ProfileButtonTest()
+//    ProfileButtonTest()
+    InfoListTest()
 }
 
 @Composable
@@ -162,6 +159,13 @@ fun LabelTest(modifier: Modifier = Modifier) {
                 Labels(text = "None")
             }
         }
+    }
+}
+
+@Composable
+fun InfoListTest(modifier: Modifier = Modifier) {
+    Surface(modifier, color = MaterialTheme.colorScheme.background) {
+        InfoList()
     }
 }
 
