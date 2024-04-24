@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -33,6 +34,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Label
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -62,6 +64,7 @@ import com.org.egglog.client.ui.atoms.buttons.ProfileButton
 import com.org.egglog.client.ui.atoms.buttons.SettingButton
 import com.org.egglog.client.ui.atoms.buttons.ThinButton
 import com.org.egglog.client.ui.atoms.checkbox.CheckBoxRow
+import com.org.egglog.client.ui.atoms.dialogs.BottomSheet
 import com.org.egglog.client.ui.atoms.dialogs.Dialog
 import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.ui.atoms.imageLoader.LocalImageLoader
@@ -85,6 +88,8 @@ import com.org.egglog.client.utils.Logout
 import com.org.egglog.client.utils.MoreVert
 import com.org.egglog.client.utils.MySetting
 import com.org.egglog.client.utils.addFocusCleaner
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -113,7 +118,12 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    InputTest()
 //    CheckBoxTest()
 //    TimePickerTest()
-//    AgreeListTest()
+//    BottomSheetTest()
+    AgreeListTest()
+}
+
+@Composable
+fun BottomSheetTest() {
     var showBottomSheet by remember { mutableStateOf<Boolean>(false) }
 
     fun dismissSheet() {
