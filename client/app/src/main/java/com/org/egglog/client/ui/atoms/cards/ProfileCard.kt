@@ -10,17 +10,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.org.egglog.client.data.UserInfo
 import com.org.egglog.client.ui.atoms.imageLoader.UrlImageLoader
 import com.org.egglog.client.ui.theme.Typography
 import com.org.egglog.client.utils.widthPercent
 
+
 @Composable
-fun ProfileCard(profileImgUrl: String, userName: String, empNo: String, userEmail: String, userId: Int) {
+fun ProfileCard(userInfo: UserInfo) {
     val context = LocalContext.current
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        UrlImageLoader(imageUrl = profileImgUrl, modifier = Modifier.size(50.widthPercent(context).dp).clip(CircleShape))
-        Text(text = userName, style = Typography.bodyLarge)
-        Text(text = "($empNo)", style = Typography.labelMedium)
-        Text(text = userEmail, style = Typography.displayMedium)
+        UrlImageLoader(imageUrl = userInfo.profileImgUrl, modifier = Modifier.size(50.widthPercent(context).dp).clip(CircleShape))
+        Text(text = userInfo.userName, style = Typography.bodyLarge)
+        Text(text = "(${userInfo.empNo})", style = Typography.labelMedium)
+        Text(text = userInfo.userEmail, style = Typography.displayMedium)
     }
 }

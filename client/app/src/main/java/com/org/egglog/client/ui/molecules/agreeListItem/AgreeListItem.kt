@@ -1,6 +1,5 @@
 package com.org.egglog.client.ui.molecules.agreeListItem
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row

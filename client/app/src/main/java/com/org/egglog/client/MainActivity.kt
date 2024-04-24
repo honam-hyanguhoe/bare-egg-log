@@ -4,14 +4,18 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,6 +24,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -29,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.org.egglog.client.data.UserInfo
 import com.org.egglog.client.ui.atoms.buttons.AuthButton
 import com.org.egglog.client.ui.atoms.buttons.BigButton
 import com.org.egglog.client.ui.atoms.buttons.GroupButton
@@ -54,6 +60,7 @@ import com.org.egglog.client.ui.atoms.toggle.Toggle
 import com.org.egglog.client.ui.atoms.wheelPicker.DateTimePicker
 import com.org.egglog.client.ui.atoms.wheelPicker.TimePicker
 import com.org.egglog.client.ui.organisms.agreeList.AgreeList
+import com.org.egglog.client.ui.organisms.profileButtonList.ProfileButtonList
 import com.org.egglog.client.utils.widthPercent
 import com.org.egglog.client.ui.theme.*
 import com.org.egglog.client.utils.AddBox
@@ -93,6 +100,7 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    BottomSheetTest()
 //    AgreeListTest()
     CardTest()
+//    ProfileButtonTest()
 }
 
 @Composable
@@ -187,7 +195,30 @@ fun ToggleTest(modifier: Modifier = Modifier) {
 fun CardTest(modifier: Modifier = Modifier) {
     Surface(modifier, color = MaterialTheme.colorScheme.background) {
         Column(modifier = modifier.fillMaxSize()) {
-            ProfileCard(profileImgUrl = "https://picsum.photos/300", userName = "김호남", empNo = "18-12543", userEmail = "test@test.com", userId = 2)
+            ProfileCard(UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남", empNo = "18-12543", userEmail = "test@test.com", userId = 2))
+        }
+    }
+}
+
+@Composable
+fun ProfileButtonTest(modifier: Modifier = Modifier) {
+    val myUserId = 1
+    val userInfoList = arrayListOf(
+        UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남1", empNo = "18-12543", userEmail = "test@test.com", userId = 1),
+        UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남2", empNo = "18-12543", userEmail = "test@test.com", userId = 2),
+        UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남3", empNo = "18-12543", userEmail = "test@test.com", userId = 3),
+        UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남4", empNo = "18-12543", userEmail = "test@test.com", userId = 4),
+        UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남5", empNo = "18-12543", userEmail = "test@test.com", userId = 5),
+        UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남6", empNo = "18-12543", userEmail = "test@test.com", userId = 6),
+        UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남7", empNo = "18-12543", userEmail = "test@test.com", userId = 7),
+        UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남8", empNo = "18-12543", userEmail = "test@test.com", userId = 8),
+        UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남9", empNo = "18-12543", userEmail = "test@test.com", userId = 9)
+    )
+    val selectedList = remember { mutableStateListOf(0, 0, 0) }
+
+    Surface(modifier, color = MaterialTheme.colorScheme.background) {
+        Column(modifier = modifier.fillMaxSize()) {
+            ProfileButtonList(userInfoList, selectedList, myUserId)
         }
     }
 }
@@ -369,10 +400,10 @@ fun ButtonTest(modifier: Modifier = Modifier) {
             GroupButton(onClick = {Log.d("test: ", "clicked!!!")}, groupMaster = "김다희", groupName = "호남향우회", memberCnt = 1, groupImage = 1, groupId = 1)
 
             Row {
-                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, profileImgUrl = "https://picsum.photos/300", isMine = true, isSelected = true, userId = 1, userName = "김호남")
-                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, profileImgUrl = "https://picsum.photos/300", isMine = true, isSelected = false, userId = 1, userName = "김호남")
-                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, profileImgUrl = "https://picsum.photos/300", isMine = false, isSelected = true, userId = 1, userName = "김호남")
-                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, profileImgUrl = "https://picsum.photos/300", isMine = false, isSelected = false, userId = 1, userName = "김호남")
+                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, UserInfo(profileImgUrl = "https://picsum.photos/300", userId = 1, userName = "김호남"), isMine = true, isSelected = true)
+                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, UserInfo(profileImgUrl = "https://picsum.photos/300", userId = 1, userName = "김호남"), isMine = true, isSelected = false)
+                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, UserInfo(profileImgUrl = "https://picsum.photos/300", userId = 1, userName = "김호남"), isMine = false, isSelected = true)
+                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, UserInfo(profileImgUrl = "https://picsum.photos/300", userId = 1, userName = "김호남"), isMine = false, isSelected = false)
             }
 
             SettingButton(
