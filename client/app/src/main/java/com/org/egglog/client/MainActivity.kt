@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -22,6 +23,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.org.egglog.client.ui.atoms.buttons.AuthButton
@@ -35,6 +38,9 @@ import com.org.egglog.client.ui.atoms.buttons.ProfileButton
 import com.org.egglog.client.ui.atoms.buttons.SettingButton
 import com.org.egglog.client.ui.atoms.buttons.ThinButton
 import com.org.egglog.client.ui.atoms.icons.Icon
+import com.org.egglog.client.ui.atoms.inputs.MultiInput
+import com.org.egglog.client.ui.atoms.inputs.PassInput
+import com.org.egglog.client.ui.atoms.inputs.SingleInput
 import com.org.egglog.client.ui.theme.ClientTheme
 import com.org.egglog.client.ui.theme.Typography
 import com.org.egglog.client.ui.atoms.labels.Labels
@@ -44,6 +50,7 @@ import com.org.egglog.client.ui.theme.*
 import com.org.egglog.client.utils.AddBox
 import com.org.egglog.client.utils.Logout
 import com.org.egglog.client.utils.MySetting
+import com.org.egglog.client.utils.addFocusCleaner
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,7 +83,8 @@ fun MyAppPreview() {
 fun MyApp(modifier: Modifier = Modifier) {
 //    LabelTest()
 //    ButtonTest()
-    ToggleTest()
+//    ToggleTest()
+    InputTest()
 }
 
 @Composable
@@ -114,6 +122,32 @@ fun ToggleTest(modifier: Modifier = Modifier) {
                 checked = checkedState.value,
                 onCheckedChange = { checkedState.value = it }
             )
+        }
+    }
+}
+
+@Composable
+fun InputTest(modifier: Modifier = Modifier) {
+    val focusManager = LocalFocusManager.current
+    val pin = remember { mutableStateOf("") }
+    Surface(modifier.addFocusCleaner(focusManager), color = MaterialTheme.colorScheme.background) {
+        Column(modifier = modifier.fillMaxSize()) {
+            val text1 = remember { mutableStateOf("") }
+            val text2 = remember { mutableStateOf("") }
+            SingleInput(
+                text = text1.value,
+                onValueChange = { text1.value = it },
+                focusManager = focusManager,
+                placeholder = "사번 입력",
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+            MultiInput(
+                text = text2.value,
+                onValueChange = { text2.value = it },
+                focusManager = focusManager,
+                placeholder = "사번 입력"
+            )
+            PassInput(pin = pin.value, onValueChange = { pin.value = it })
         }
     }
 }
