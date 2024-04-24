@@ -39,6 +39,7 @@ import com.org.egglog.client.ui.atoms.buttons.MiddleButton
 import com.org.egglog.client.ui.atoms.buttons.ProfileButton
 import com.org.egglog.client.ui.atoms.buttons.SettingButton
 import com.org.egglog.client.ui.atoms.buttons.ThinButton
+import com.org.egglog.client.ui.atoms.cards.ProfileCard
 import com.org.egglog.client.ui.atoms.checkbox.CheckBoxRow
 import com.org.egglog.client.ui.atoms.dialogs.BottomSheet
 import com.org.egglog.client.ui.atoms.icons.Icon
@@ -86,11 +87,12 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    LabelTest()
 //    ButtonTest()
 //    ToggleTest()
-    InputTest()
+//    InputTest()
 //    CheckBoxTest()
 //    TimePickerTest()
 //    BottomSheetTest()
 //    AgreeListTest()
+    CardTest()
 }
 
 @Composable
@@ -177,6 +179,15 @@ fun ToggleTest(modifier: Modifier = Modifier) {
                 checked = checkedState.value,
                 onCheckedChange = { checkedState.value = it }
             )
+        }
+    }
+}
+
+@Composable
+fun CardTest(modifier: Modifier = Modifier) {
+    Surface(modifier, color = MaterialTheme.colorScheme.background) {
+        Column(modifier = modifier.fillMaxSize()) {
+            ProfileCard(profileImgUrl = "https://picsum.photos/300", userName = "김호남", empNo = "18-12543", userEmail = "test@test.com", userId = 2)
         }
     }
 }
