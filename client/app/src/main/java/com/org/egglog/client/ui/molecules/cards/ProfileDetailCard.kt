@@ -50,7 +50,7 @@ fun ProfileDetailCard(profile: Profile, type: String, createdAt: String, onDelet
                         style = Typography.displayMedium
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                Icon(imageVector = Trash, modifier = Modifier.width(12.widthPercent(LocalContext.current).dp))
+                Icon(imageVector = Trash, modifier = Modifier.width(12.widthPercent(LocalContext.current).dp), color = com.org.egglog.client.ui.theme.Gray500)
 
             }
         } else if (!type.equals("comment")) {

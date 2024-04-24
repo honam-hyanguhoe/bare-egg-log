@@ -1,29 +1,20 @@
 package org.egglog.api.scheduler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.egglog.api.board.exception.BoardErrorCode;
 import org.egglog.api.board.exception.BoardException;
 import org.egglog.api.board.model.entity.Board;
-import org.egglog.api.board.model.entity.BoardHit;
-import org.egglog.api.board.repository.BoardHitJpaRepository;
 import org.egglog.api.board.repository.BoardJpaRepository;
 import org.egglog.api.board.repository.BoardQueryRepository;
 import org.egglog.api.global.util.RedisViewCountUtil;
-import org.egglog.api.user.exception.UserErrorCode;
-import org.egglog.api.user.exception.UserException;
-import org.egglog.api.user.model.entity.Users;
-import org.egglog.api.user.repository.UserQueryRepository;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor

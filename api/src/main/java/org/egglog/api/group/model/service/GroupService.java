@@ -12,8 +12,7 @@ import org.egglog.api.group.model.entity.GroupMember;
 import org.egglog.api.group.model.entity.InvitationCode;
 import org.egglog.api.group.model.repository.GroupInvitationRepository;
 import org.egglog.api.group.model.repository.GroupRepository;
-import org.egglog.api.group.model.repository.GroupCustomQueryImpl;
-import org.egglog.api.user.model.entity.Users;
+import org.egglog.api.user.model.entity.User;
 import org.egglog.utility.utils.RandomStringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,7 +37,7 @@ public class GroupService {
      * @param acceptForm
      * @param user
      */
-    public void acceptInvitation(InvitationAcceptForm acceptForm, Users user) {
+    public void acceptInvitation(InvitationAcceptForm acceptForm, User user) {
         //존재하지 않는 코드는 exception 처리
         InvitationCode invitationCode = groupInvitationRepository
                 .findInvitationCodeById(acceptForm.getInvitationCode())
@@ -68,7 +67,7 @@ public class GroupService {
      * @param user
      * @return
      */
-    public String getOrGenerateInvitation(Long groupId, Users user) {
+    public String getOrGenerateInvitation(Long groupId, User user) {
         //기존 초대코드 존재 여부 확인
         InvitationCode invitationCode = groupInvitationRepository
                 .findInvitationCodeByGroupId(groupId)
@@ -91,7 +90,7 @@ public class GroupService {
      * @param memberId
      * @param user
      */
-    public void deleteGroupMember(Long groupId, Long memberId, Users user) {
+    public void deleteGroupMember(Long groupId, Long memberId, User user) {
         GroupMember boss = groupMemberService.getAdminMember(groupId);
         if(boss.getUser().getId()==user.getId()) {
             //그룹에 해당 멤버가 존재하는지 검증하고 삭제
@@ -105,7 +104,7 @@ public class GroupService {
      * @param user
      * @return
      */
-    public List<GroupPreviewDto> getGroupList(Users user) {
+    public List<GroupPreviewDto> getGroupList(User user) {
         List<GroupPreviewDto> groupList = groupRepository.findGroupByUserId(user.getId()).orElse(null);
         return groupList;
     }
@@ -116,7 +115,7 @@ public class GroupService {
      * @param user
      * @return
      */
-    public GroupDto retrieveGroup(Long groupId, Users user) {
+    public GroupDto retrieveGroup(Long groupId, User user) {
         Group group = groupRepository.findById(groupId).orElseThrow(() -> new GroupException(GroupErrorCode.NOT_FOUND));
         GroupMember boss = groupMemberService.getAdminMember(groupId);
         Boolean isBoss = false;
@@ -181,7 +180,7 @@ public class GroupService {
      * @param memberId
      * @param user
      */
-    public BossChangeDto updateGroupMember(Long groupId, Long memberId, Users user) {
+    public BossChangeDto updateGroupMember(Long groupId, Long memberId, User user) {
         GroupMember boss = groupMemberService.getGroupMember(groupId, user.getId());
         //사용자가 그룹장이 아니라면 권한 에러 403
         if(!boss.getIsAdmin()){
@@ -212,7 +211,7 @@ public class GroupService {
      * @param groupId
      * @param user
      */
-    public void exitGroup(Long groupId, Users user) {
+    public void exitGroup(Long groupId, User user) {
         GroupMember userInfo = groupMemberService.getGroupMember(groupId, user.getId());
         //그룹장인지 확인
         if(userInfo.getIsAdmin()){
@@ -236,9 +235,9 @@ public class GroupService {
      * @param groupForm
      * @param user
      */
-    public void generateGroup(GroupForm groupForm, Users user) {
+    public void generateGroup(GroupForm groupForm, User user) {
         Group newGroup = Group.builder()
-                .admin(user.getUserName())
+                .admin(user.getName())
                 .groupImage(groupForm.getGroupImage())
                 .groupName(groupForm.getGroupName())
                 .password(passwordEncoder.encode(groupForm.getGroupPassword()))
