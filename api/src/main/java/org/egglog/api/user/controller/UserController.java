@@ -6,9 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.user.model.dto.request.JoinUserRequest;
 import org.egglog.api.user.model.dto.request.UpdateUserHospitalRequest;
 import org.egglog.api.user.model.dto.request.UpdateUserRequest;
-import org.egglog.api.user.model.dto.response.UserResponse;
 import org.egglog.api.user.model.entity.User;
-import org.egglog.api.user.model.entity.enums.UserStatus;
 import org.egglog.api.user.model.service.UserService;
 import org.egglog.utility.utils.MessageUtils;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +46,7 @@ public class UserController {
         return ResponseEntity.ok().body(
                 MessageUtils.success(userService.updateUser(loginUser, request)));
     }
+
     @PatchMapping("/hospital/info-modify")
     public ResponseEntity<MessageUtils> modifyUser(
             @AuthenticationPrincipal User loginUser,
@@ -56,7 +55,6 @@ public class UserController {
         return ResponseEntity.ok().body(
                 MessageUtils.success(userService.updateUserHospital(loginUser, request)));
     }
-
 
     @PatchMapping("/delete")
     public ResponseEntity<MessageUtils> modifyUserStateDelete(
