@@ -10,16 +10,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -37,6 +41,8 @@ import com.org.egglog.client.ui.atoms.buttons.MiddleButton
 import com.org.egglog.client.ui.atoms.buttons.ProfileButton
 import com.org.egglog.client.ui.atoms.buttons.SettingButton
 import com.org.egglog.client.ui.atoms.buttons.ThinButton
+import com.org.egglog.client.ui.atoms.dialogs.BottomSheet
+import com.org.egglog.client.ui.atoms.dialogs.InteractiveBottomSheet
 import com.org.egglog.client.ui.atoms.checkbox.CheckBoxRow
 import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.ui.atoms.inputs.MultiInput
@@ -69,14 +75,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-//@Preview(
-//    uiMode = Configuration.UI_MODE_NIGHT_YES,
-//    name = "DefaultPreviewDark"
-//)
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_NO,
-    name = "DefaultPreviewLight"
-)
 @Composable
 fun MyAppPreview() {
     ClientTheme {
@@ -84,14 +82,33 @@ fun MyAppPreview() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyApp(modifier: Modifier = Modifier) {
-//    LabelTest()
-//    ButtonTest()
-//    ToggleTest()
-//    InputTest()
-//    CheckBoxTest()
-    TimePickerTest()
+    var showBottomSheet by remember { mutableStateOf<Boolean>(false) }
+
+    fun dismissSheet() {
+        showBottomSheet = false
+    }
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        BottomSheet(
+            height = 400.dp,
+            showBottomSheet = showBottomSheet,
+            onDismiss = {
+                dismissSheet()
+            },
+        ) {
+            BottomSheetContent()
+        };
+    }
+}
+
+@Composable
+fun BottomSheetContent() {
+    Text(text = "BottomSheetContent 테스트")
+    Spacer(modifier = Modifier.height(180.dp))
 }
 
 @Composable
@@ -318,8 +335,18 @@ fun ButtonTest(modifier: Modifier = Modifier) {
                 ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, profileImgUrl = "https://picsum.photos/300", isMine = false, isSelected = false, userId = 1, userName = "김호남")
             }
 
-            SettingButton(onClick = {Log.d("test: ", "clicked!!!")}, text =  "내 정보 설정", color = NaturalBlack, icon = MySetting)
-            SettingButton(onClick = {Log.d("test: ", "clicked!!!")}, text =  "로그아웃", color = Error500, icon = Logout)
+            SettingButton(
+                onClick = { Log.d("test: ", "clicked!!!") },
+                text = "내 정보 설정",
+                color = NaturalBlack,
+                icon = MySetting
+            )
+            SettingButton(
+                onClick = { Log.d("test: ", "clicked!!!") },
+                text = "로그아웃",
+                color = Error500,
+                icon = Logout
+            )
         }
     }
 }
