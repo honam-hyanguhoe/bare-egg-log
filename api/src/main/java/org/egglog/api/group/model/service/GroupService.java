@@ -12,7 +12,6 @@ import org.egglog.api.group.model.entity.GroupMember;
 import org.egglog.api.group.model.entity.InvitationCode;
 import org.egglog.api.group.model.repository.GroupInvitationRepository;
 import org.egglog.api.group.model.repository.GroupRepository;
-import org.egglog.api.group.model.repository.GroupCustomQueryImpl;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.utility.utils.RandomStringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
