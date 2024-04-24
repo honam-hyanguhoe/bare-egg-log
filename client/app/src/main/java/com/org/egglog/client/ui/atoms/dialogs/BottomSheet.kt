@@ -44,8 +44,6 @@ import com.org.egglog.client.ui.theme.NaturalWhite
 import com.org.egglog.client.ui.theme.White
 import kotlinx.coroutines.launch
 
-// 화면의 나머지 부분과 독립적.
-// 어둡게 dim 처리
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheet(
@@ -80,72 +78,6 @@ fun BottomSheet(
                 Text("이렇게 숨겨지면 배신")
             }
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun InteractiveBottomSheet(
-    height: Dp,
-    padding: Dp,
-) {
-    val scope = rememberCoroutineScope()
-
-    val sheetState = rememberStandardBottomSheetState(
-        initialValue = SheetValue.PartiallyExpanded,
-        skipHiddenState = false
-    );
-
-    val iBottomSheetState = rememberBottomSheetScaffoldState(
-        bottomSheetState = sheetState
-    )
-
-    BottomSheetScaffold(
-        sheetContent = {
-            SheetContent()
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(padding),
-        scaffoldState = iBottomSheetState,
-        sheetPeekHeight = height,
-        sheetContainerColor = White,
-        sheetContentColor = NaturalBlack,
-        containerColor = White,
-        contentColor = NaturalBlack,
-        sheetSwipeEnabled = false,
-    ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Column() {
-                Button(
-                    onClick = {
-                        scope.launch { iBottomSheetState.bottomSheetState.partialExpand() }
-                    }
-                ) {
-                    Text("열어줘")
-                }
-                Button(
-                    onClick = {
-                        scope.launch { iBottomSheetState.bottomSheetState.hide() }
-                    }
-                ) {
-                    Text("닫을래")
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun SheetContent() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .border(width = 1.dp, color = NaturalBlack),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = "test")
     }
 }
 
