@@ -98,7 +98,7 @@ public class User implements UserDetails {
         return this;
     }
 
-    public User deleteUser(){
+    public User delete(){
         this.name = "탈퇴회원";
         this.empNo = null;
 //        this.profileImgUrl = null;
@@ -108,15 +108,24 @@ public class User implements UserDetails {
         this.deletedAt = LocalDateTime.now();
         return this;
     }
+    public User join(String joinUserName, Hospital joinHospital, String joinEmpNo){
+        this.name = joinUserName;
+        this.hospital = joinHospital;
+        this.empNo = joinEmpNo;
+        this.loginAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        return this;
+    }
 
-    public User updateUserInfo(String updateUserName, String updateProfileImgUrl){
+    public User updateInfo(String updateUserName, String updateProfileImgUrl){
         this.name = updateUserName;
         this.profileImgUrl = updateProfileImgUrl;
         this.updatedAt = LocalDateTime.now();
         return this;
     }
 
-    public User updateHospitalInfo(Hospital updateHospital, String updateEmpNo){
+    public User updateHospital(Hospital updateHospital, String updateEmpNo){
         this.hospital = updateHospital;
         this.empNo = updateEmpNo;
         this.updatedAt = LocalDateTime.now();
