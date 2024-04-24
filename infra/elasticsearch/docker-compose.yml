@@ -13,7 +13,7 @@ services:
       - 9200:9200
       - 9300:9300
     networks:
-      - jenkins-project_socon-net
+      - jenkins_egg-log-net
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.13.0
@@ -27,7 +27,8 @@ services:
     depends_on:
       - elasticsearch
     networks:
-      - egg-log-net
+      - jenkins_egg-log-net
 
 networks:
-  egg-log-net:
+  jenkins_egg-log-net:
+    external: true

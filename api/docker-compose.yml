@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  socon:
+    container_name: main
+    image: kimdahui/main
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8010:8010"
+    networks:
+      - jenkins_egg-log-net
+
+networks:
+  jenkins_egg-log-net:
+    external: true
