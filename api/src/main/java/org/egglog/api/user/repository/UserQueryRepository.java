@@ -1,4 +1,4 @@
-package org.egglog.api.user.model.repository;
+package org.egglog.api.user.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

@@ -13,8 +13,6 @@ import org.egglog.api.alarm.model.entity.Alarm;
 import org.egglog.api.alarm.repository.AlarmRepository;
 import org.egglog.api.board.exception.BoardErrorCode;
 import org.egglog.api.board.exception.BoardException;
-import org.egglog.api.group.exception.GroupMemberErrorCode;
-import org.egglog.api.group.exception.GroupMemberException;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
