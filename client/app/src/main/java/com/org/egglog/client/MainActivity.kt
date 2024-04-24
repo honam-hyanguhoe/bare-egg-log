@@ -3,6 +3,7 @@ package com.org.egglog.client
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
+import android.widget.CheckBox
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +38,7 @@ import com.org.egglog.client.ui.atoms.buttons.MiddleButton
 import com.org.egglog.client.ui.atoms.buttons.ProfileButton
 import com.org.egglog.client.ui.atoms.buttons.SettingButton
 import com.org.egglog.client.ui.atoms.buttons.ThinButton
+import com.org.egglog.client.ui.atoms.checkbox.CheckBoxRow
 import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.ui.atoms.inputs.MultiInput
 import com.org.egglog.client.ui.atoms.inputs.PassInput
@@ -84,7 +86,8 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    LabelTest()
 //    ButtonTest()
 //    ToggleTest()
-    InputTest()
+//    InputTest()
+    CheckBoxTest()
 }
 
 @Composable
@@ -148,6 +151,36 @@ fun InputTest(modifier: Modifier = Modifier) {
                 placeholder = "사번 입력"
             )
             PassInput(pin = pin.value, onValueChange = { pin.value = it })
+        }
+    }
+}
+
+@Composable
+fun CheckBoxTest(modifier: Modifier = Modifier) {
+    Surface(modifier, color = MaterialTheme.colorScheme.background) {
+        Column(modifier = modifier.fillMaxSize()) {
+            val (checked1, setChecked1) = remember { mutableStateOf(false) }
+            val (checked2, setChecked2) = remember { mutableStateOf(false) }
+            val (checked3, setChecked3) = remember { mutableStateOf(false) }
+            val allChecked = (checked1 && checked2 && checked3)
+            CheckBoxRow(
+                text = "전체 동의",
+                value = allChecked,
+                onClick = {
+                    if (allChecked) {
+                        setChecked1(false)
+                        setChecked2(false)
+                        setChecked3(false)
+                    } else {
+                        setChecked1(true)
+                        setChecked2(true)
+                        setChecked3(true)
+                    }
+                },
+            )
+            CheckBoxRow(text = "동의1", value = checked1, onClick = { setChecked1(!checked1) })
+            CheckBoxRow(text = "동의2", value = checked2, onClick = { setChecked2(!checked2) })
+            CheckBoxRow(text = "동의3", value = checked3, onClick = { setChecked3(!checked3) })
         }
     }
 }
