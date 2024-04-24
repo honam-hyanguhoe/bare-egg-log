@@ -1,4 +1,4 @@
-package org.egglog.api.worktype.model.dto.response;
+package org.egglog.api.worktype.model.dto.params;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -10,11 +10,9 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class WorkTypeListOutputSpec {
+public class WorkTypeForm {
 
-    private Long id;
-
-    private String name;
+    private String title;
 
     private String color;
 
@@ -23,4 +21,7 @@ public class WorkTypeListOutputSpec {
     private String startTime;       //시작 시간
 
     private String endTime;     //종료 시간
+
+    private Long userId;
+
 }

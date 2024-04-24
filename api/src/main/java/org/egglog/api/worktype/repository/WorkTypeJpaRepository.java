@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface WorkTypeJpaRepository extends JpaRepository<BoardHit, Long> {
+public interface WorkTypeJpaRepository extends JpaRepository<WorkType, Long> {
 
     @Query("select wt from WorkType wt where wt.user.id = :userId")
     List<WorkType> findWorkTypesByUserId(Long userId);

@@ -40,7 +40,7 @@ public class BoardController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> registBoard(@RequestBody BoardForm boardForm) {
+    public ResponseEntity<?> registerBoard(@RequestBody BoardForm boardForm) {
 //        TODO @AuthenticationPrincipal User user
         Long userId = 1L;
         boardService.registBoard(boardForm, userId);

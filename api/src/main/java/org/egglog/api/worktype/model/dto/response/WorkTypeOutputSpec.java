@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class WorkTypeListOutputSpec {
+public class WorkTypeOutputSpec {
 
     private Long id;
 
@@ -23,4 +23,6 @@ public class WorkTypeListOutputSpec {
     private String startTime;       //시작 시간
 
     private String endTime;     //종료 시간
+
+    private Long userId;
 }

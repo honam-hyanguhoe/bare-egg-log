@@ -10,13 +10,13 @@ import org.egglog.api.board.model.dto.params.*;
 import org.egglog.api.board.model.dto.response.*;
 import org.egglog.api.board.model.entity.*;
 import org.egglog.api.board.repository.*;
-import org.egglog.api.board.search.domain.document.BoardDocument;
-import org.egglog.api.board.search.repository.SearchRepository;
+import org.egglog.api.search.domain.document.BoardDocument;
+import org.egglog.api.search.repository.SearchRepository;
 import org.egglog.api.global.util.RedisViewCountUtil;
 import org.egglog.api.hospital.exception.HospitalErrorCode;
 import org.egglog.api.hospital.exception.HospitalException;
 import org.egglog.api.hospital.model.entity.Hospital;
-import org.egglog.api.hospital.model.repository.HospitalQueryRepository;
+import org.egglog.api.hospital.repository.HospitalQueryRepository;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
