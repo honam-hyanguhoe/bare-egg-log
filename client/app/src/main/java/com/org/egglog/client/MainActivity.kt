@@ -129,6 +129,7 @@ fun ToggleTest(modifier: Modifier = Modifier) {
 @Composable
 fun InputTest(modifier: Modifier = Modifier) {
     val focusManager = LocalFocusManager.current
+    val pin = remember { mutableStateOf("") }
     Surface(modifier.addFocusCleaner(focusManager), color = MaterialTheme.colorScheme.background) {
         Column(modifier = modifier.fillMaxSize()) {
             val text1 = remember { mutableStateOf("") }
@@ -146,7 +147,7 @@ fun InputTest(modifier: Modifier = Modifier) {
                 focusManager = focusManager,
                 placeholder = "사번 입력"
             )
-            PassInput()
+            PassInput(pin = pin.value, onValueChange = { pin.value = it })
         }
     }
 }
