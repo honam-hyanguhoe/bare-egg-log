@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -105,7 +104,6 @@ internal fun DefaultWheelTimePicker(
                     enabled = false
                 ),
                 onScrollFinished = { snappedIndex ->
-
                     val newHour = if(timeFormat == TimeFormat.HOUR_24) {
                         hours.find { it.index == snappedIndex }?.value
                     } else {
@@ -212,7 +210,7 @@ internal fun DefaultWheelTimePicker(
                     rowCount = rowCount,
                     style = textStyle,
                     color = textColor,
-                    startIndex = amPms.find { it.value == amPmValueFromTime(startTime) }?.index ?:0,
+                    startIndex = amPms.find { it.value == amPmValueFromTime(startTime) }?.index ?: 0,
                     selectorProperties = WheelPickerDefaults.selectorProperties(
                         enabled = false
                     ),
@@ -282,21 +280,10 @@ private data class AmPmHour(
 )
 
 internal fun localTimeToAmPmHour(localTime: LocalTime): Int {
-
     if(
         isBetween(
             localTime,
             LocalTime.of(0,0),
-            LocalTime.of(0,59)
-        )
-    ) {
-        return localTime.hour + 12
-    }
-
-    if(
-        isBetween(
-            localTime,
-            LocalTime.of(1,0),
             LocalTime.of(11,59)
         )
     ) {
@@ -307,16 +294,6 @@ internal fun localTimeToAmPmHour(localTime: LocalTime): Int {
         isBetween(
             localTime,
             LocalTime.of(12,0),
-            LocalTime.of(12,59)
-        )
-    ) {
-        return localTime.hour
-    }
-
-    if(
-        isBetween(
-            localTime,
-            LocalTime.of(13,0),
             LocalTime.of(23,59)
         )
     ) {
@@ -331,7 +308,6 @@ private fun isBetween(localTime: LocalTime, startTime: LocalTime, endTime: Local
 }
 
 private fun amPmHourToHour24(amPmHour: Int, amPmMinute: Int, amPmValue: AmPmValue): Int {
-
     return when(amPmValue) {
         AmPmValue.AM -> {
             if(amPmHour == 12 && amPmMinute <= 59) {
@@ -367,5 +343,5 @@ internal enum class AmPmValue {
 }
 
 private fun amPmValueFromTime(time: LocalTime): AmPmValue {
-    return if(time.hour > 11) AmPmValue.PM else AmPmValue.AM
+    return if(time.hour > 12) AmPmValue.PM else AmPmValue.AM
 }

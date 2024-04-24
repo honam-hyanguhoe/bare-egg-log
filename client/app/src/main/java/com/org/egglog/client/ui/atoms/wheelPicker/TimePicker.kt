@@ -13,9 +13,10 @@ import com.org.egglog.client.ui.atoms.wheelPicker.core.WheelPickerDefaults
 import com.org.egglog.client.ui.theme.*
 import com.org.egglog.client.utils.heightPercent
 import com.org.egglog.client.utils.widthPercent
+import java.time.LocalTime
 
 @Composable
-fun TimePicker() {
+fun TimePicker(onTimeSelected: (LocalTime) -> Unit) {
     val context = LocalContext.current
     WheelTimePicker(
         timeFormat = TimeFormat.AM_PM,
@@ -28,6 +29,6 @@ fun TimePicker() {
         size = DpSize(320.widthPercent(context).dp, 120.heightPercent(context).dp),
         textStyle = Typography.headlineSmall.copy(fontWeight = FontWeight.Medium)
     ) {
-        snappedTime -> println(snappedTime)
+        snappedTime -> onTimeSelected(snappedTime)
     }
 }

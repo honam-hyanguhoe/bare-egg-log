@@ -54,6 +54,9 @@ import com.org.egglog.client.utils.AddBox
 import com.org.egglog.client.utils.Logout
 import com.org.egglog.client.utils.MySetting
 import com.org.egglog.client.utils.addFocusCleaner
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -119,10 +122,20 @@ fun LabelTest(modifier: Modifier = Modifier) {
 
 @Composable
 fun TimePickerTest(modifier: Modifier = Modifier) {
+    val selectedTime = remember { mutableStateOf<LocalTime?>(null) }
+    val selectedDateTime = remember { mutableStateOf<LocalDateTime?>(null) }
+
     Surface(modifier, color = MaterialTheme.colorScheme.background) {
         Column(modifier = modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-            TimePicker()
-            DateTimePicker()
+            TimePicker { time -> selectedTime.value = time }
+            selectedTime.value?.let {
+                Text(text = "Selected Time: ${selectedTime.value}")
+            }
+
+            DateTimePicker{dateTime -> selectedDateTime.value = dateTime}
+            selectedDateTime.value?.let {
+                Text(text = "Selected Time: ${selectedDateTime.value}")
+            }
         }
     }
 }
