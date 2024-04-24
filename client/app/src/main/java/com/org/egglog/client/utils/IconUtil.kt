@@ -66,3 +66,4 @@ val Logout = Icons.Default.Logout
 val Upload = Icons.Default.Upload
 val AddBox = Icons.Default.AddBox
 val Add = Icons.Default.Add
+val CommentBorder = Icons.Default.ChatBubbleOutline
