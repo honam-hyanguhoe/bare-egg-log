@@ -13,49 +13,33 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import javax.annotation.PreDestroy;
+
 @Configuration
 @EnableCaching
 @RequiredArgsConstructor
 public class RedisConfig {
 
     private final RedisProperties redisProperties;
-
-    // lettuce
     @Bean
-    @Profile("dev")
-    public RedisConnectionFactory redisConnectionFactoryDev() {
-        return new LettuceConnectionFactory(
-                new RedisStandaloneConfiguration(redisProperties.getHost(), redisProperties.getPort()));
-    }
-
-    @Bean
-    @Profile("dev")
-    public RedisTemplate<?, ?> redisTemplateDev() {
-        RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactoryDev());   //connection
-        redisTemplate.setKeySerializer(new StringRedisSerializer());    // key
-        redisTemplate.setValueSerializer(new StringRedisSerializer());  // value
-        return redisTemplate;
-    }
-
-    @Bean
-    @Profile("prod")
-    public RedisConnectionFactory redisConnectionFactoryProd() {
+    public LettuceConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
         config.setHostName(redisProperties.getHost());
         config.setPort(redisProperties.getPort());
-        config.setPassword(RedisPassword.of(redisProperties.getPassword()));
+        // 패스워드 설정은 환경에 따라 존재하거나 존재하지 않을 수 있음을 고려
+        if (redisProperties.getPassword() != null && !redisProperties.getPassword().isBlank()) {
+            config.setPassword(RedisPassword.of(redisProperties.getPassword()));
+        }
         return new LettuceConnectionFactory(config);
     }
 
-    // Redis template
     @Bean
-    @Profile("prod")
-    public RedisTemplate<?, ?> redisTemplateProd() {
+    public RedisTemplate<?, ?> redisTemplate() {
         RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactoryProd());   //connection
+        redisTemplate.setConnectionFactory(redisConnectionFactory());   //connection
         redisTemplate.setKeySerializer(new StringRedisSerializer());    // key
         redisTemplate.setValueSerializer(new StringRedisSerializer());  // value
         return redisTemplate;
     }
+
 }
