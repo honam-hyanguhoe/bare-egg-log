@@ -29,6 +29,7 @@ public class Alarm {
     @Column(name = "alarm_replay_time")
     private int replayTime;
 
+    @Column(name = "is_alarm_on")
     private Boolean isAlarmOn;      //알람 상태 On/Off
 
     @OneToOne(fetch = FetchType.LAZY)
