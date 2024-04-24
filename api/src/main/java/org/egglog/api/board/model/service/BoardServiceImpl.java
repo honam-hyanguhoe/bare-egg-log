@@ -20,7 +20,7 @@ import org.egglog.api.hospital.repository.HospitalQueryRepository;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
-import org.egglog.api.user.repository.UserQueryRepository;
+import org.egglog.api.user.model.repository.UserQueryRepository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;

@@ -3,12 +3,13 @@ package org.egglog.api.user.model.dto.request;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
+
 /**
  * packageName    : org.egglog.api.user.model.dto.request
- * fileName       : UpdateUserHospitalRequest
+ * fileName       : JoinUserRequest
  * author         : SSAFY
  * date           : 2024-04-24
- * description    : 유저의 병원 정보를 업데이트하는 정보 객체입니다.
+ * description    : 추가 정보 입력을 받아 로그인을 완료하는 정보 객체입니다.
  * ===========================================================
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
@@ -20,7 +21,8 @@ import lombok.*;
 @Setter
 @Builder
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class UpdateUserHospitalRequest {
+public class JoinUserRequest {
+    private String userName;
     private Long hospitalId;
     private String empNo;
 }
