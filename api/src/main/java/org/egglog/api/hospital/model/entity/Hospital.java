@@ -52,6 +52,7 @@ public class Hospital {
     private String lng;  //경도
 
     @OneToMany(mappedBy = "hospital")
+    @Builder.Default
     private List<User> users = new ArrayList<>();
 
     public UserHospitalResponse toUserHospitalResponse(){

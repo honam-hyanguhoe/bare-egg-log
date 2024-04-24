@@ -322,7 +322,7 @@ public class BoardServiceImpl implements BoardService {
      */
     @Override
     public void deleteBoard(Long boardId, Long userId) {
-        Users user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
         Board board = boardQueryRepository.findById(boardId).orElseThrow(
@@ -356,7 +356,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     @Transactional
     public void modifyBoard(BoardModifyForm boardModifyForm, Long userId) {
-        Users user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
         Board board = boardQueryRepository.findById(boardModifyForm.getBoardId()).orElseThrow(
@@ -392,7 +392,7 @@ public class BoardServiceImpl implements BoardService {
      */
     @Override
     public BoardOutputSpec getBoard(Long boardId, Long userId) {
-        Users user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
         Board board = boardQueryRepository.findById(boardId).orElseThrow(
@@ -465,7 +465,7 @@ public class BoardServiceImpl implements BoardService {
      */
     @Override
     public void registLike(LikeForm likeForm, Long userId) {
-        Users user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
         Board board = boardQueryRepository.findById(likeForm.getBoardId()).orElseThrow(
@@ -503,7 +503,7 @@ public class BoardServiceImpl implements BoardService {
      */
     @Override
     public void deleteLike(LikeForm likeForm, Long userId) {
-        Users user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
 

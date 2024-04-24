@@ -13,7 +13,7 @@ import org.egglog.api.board.repository.BoardQueryRepository;
 import org.egglog.api.global.util.RedisViewCountUtil;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
-import org.egglog.api.user.model.entity.Users;
+import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.repository.UserQueryRepository;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;

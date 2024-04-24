@@ -13,7 +13,7 @@ import org.egglog.utility.utils.MessageUtils;
 import org.egglog.utility.utils.SuccessType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.egglog.api.user.model.entity.Users;
+import org.egglog.api.user.model.entity.User;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class GroupController {
             @RequestBody InvitationAcceptForm acceptForm
 //            TODO @AuthenticationPrincipal User user){
     ){
-        Users user=null;
+        User user=null;
         groupService.acceptInvitation(acceptForm,user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.NO_CONTENT));
     }
@@ -47,7 +47,7 @@ public class GroupController {
             @PathVariable("group_id") Long groupId
 //            TODO @AuthenticationPrincipal User user
     ){
-        Users user=null;
+        User user=null;
         String inviteCode = groupService.getOrGenerateInvitation(groupId,user);
         return ResponseEntity.ok().body(MessageUtils.success(inviteCode));
     }
@@ -58,7 +58,7 @@ public class GroupController {
             @PathVariable("member_id") Long memberId
 //            TODO @AuthenticationPrincipal User user
     ){
-        Users user=null;
+        User user=null;
         groupService.deleteGroupMember(groupId,memberId,user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
     }
@@ -67,7 +67,7 @@ public class GroupController {
     public ResponseEntity getGroupList(
 //            TODO @AuthenticationPrincipal User user
     ){
-        Users user=null;
+        User user=null;
         List<GroupPreviewDto> groupList = groupService.getGroupList(user);
         return ResponseEntity.ok().body(MessageUtils.success(groupList));
     }
@@ -76,7 +76,7 @@ public class GroupController {
     public ResponseEntity retrieveGroup(@PathVariable("group_id") Long groupId
 //            TODO @AuthenticationPrincipal User user
     ){
-        Users user=null;
+        User user=null;
         GroupDto group = groupService.retrieveGroup(groupId,user);
         return ResponseEntity.ok().body(MessageUtils.success(group));
     }
@@ -99,7 +99,7 @@ public class GroupController {
             @PathVariable("member_id") Long memberId
 //            TODO @AuthenticationPrincipal User user
     ){
-        Users user=null;
+        User user=null;
         return ResponseEntity.ok().body(
                 MessageUtils.success(
                         groupService.updateGroupMember(groupId, memberId, user)));
@@ -110,7 +110,7 @@ public class GroupController {
             @PathVariable("group_id") Long groupId
 //            TODO @AuthenticationPrincipal User user
     ){
-        Users user=null;
+        User user=null;
         groupService.exitGroup(groupId,user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
     }
@@ -120,7 +120,7 @@ public class GroupController {
             @RequestBody GroupForm groupForm
 //            TODO @AuthenticationPrincipal User user
     ){
-        Users user=null;
+        User user=null;
         groupService.generateGroup(groupForm,user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }
