@@ -60,6 +60,8 @@ import com.org.egglog.client.ui.atoms.buttons.MiddleButton
 import com.org.egglog.client.ui.atoms.buttons.ProfileButton
 import com.org.egglog.client.ui.atoms.buttons.SettingButton
 import com.org.egglog.client.ui.atoms.buttons.ThinButton
+import com.org.egglog.client.ui.atoms.dialogs.BottomSheet
+import com.org.egglog.client.ui.atoms.dialogs.InteractiveBottomSheet
 import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.ui.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.client.ui.atoms.inputs.MultiInput
@@ -111,50 +113,50 @@ fun OnboardingScreen(
     val groupOptions = listOf("그룹 설정", "그룹원 설정", "그룹 나가기")
     val communityOptions = listOf("통합", "엑록병원", "호남향우회")
     var selectedMenuItem by remember { mutableStateOf<String?>(null) }
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Welcome to the Basics Codelab!")
-        Button(
-            modifier = Modifier.width(320.widthPercent(LocalContext.current).dp),
-            onClick = onContinueClicked
-        ) {
-            Text("${320.widthPercent(LocalContext.current).dp}")
-//            Icon(Notification, modifier = Modifier.size(25.dp))
-        }
-        LocalImageLoader(imageUrl = R.drawable.off)
-        ScrollableMenus(options = groupOptions, selectedOption = selectedMenuItem, onSelect = {selectedMenuItem = it} )
-
-        UrlImageLoader(imageUrl = "https://picsum.photos/300", modifier = Modifier.size(320.widthPercent(LocalContext.current).dp))
-        LocalImageLoader(imageUrl = R.drawable.off)
-
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Labels(text = "Day",size = "big")
-            Labels(text = "Eve",size = "big")
-            Labels(text = "Night",size = "big")
-            Labels(text = "교육",size = "big")
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Labels(text = "Eve")
-            Labels(text = "Off")
-            Labels(text = "Night")
-            Labels(text = "Eve")
-            Labels(text = "보건")
-            Labels(text = "휴가")
-            Labels(text= "None")
-        }
-
-
-
-    }
+    var showBottomSheet by remember { mutableStateOf<Boolean>(false) }
+    InteractiveBottomSheet()
+//    Column(
+//        modifier = modifier
+//            .fillMaxSize()
+//            .verticalScroll(scrollState),
+//        verticalArrangement = Arrangement.Center,
+//        horizontalAlignment = Alignment.CenterHorizontally
+//    ) {
+//        Text("Welcome to the Basics Codelab!")
+//        Button(
+//            modifier = Modifier.width(320.widthPercent(LocalContext.current).dp),
+//            onClick = onContinueClicked
+//        ) {
+//            Text("${320.widthPercent(LocalContext.current).dp}")
+////            Icon(Notification, modifier = Modifier.size(25.dp))
+//        }
+//        LocalImageLoader(imageUrl = R.drawable.off)
+//        ScrollableMenus(options = groupOptions, selectedOption = selectedMenuItem, onSelect = {selectedMenuItem = it} )
+//
+//        UrlImageLoader(imageUrl = "https://picsum.photos/300", modifier = Modifier.size(320.widthPercent(LocalContext.current).dp))
+//        LocalImageLoader(imageUrl = R.drawable.off)
+//
+//        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+//            Labels(text = "Day",size = "big")
+//            Labels(text = "Eve",size = "big")
+//            Labels(text = "Night",size = "big")
+//            Labels(text = "교육",size = "big")
+//        }
+//
+//        Spacer(modifier = Modifier.height(8.dp))
+//
+//        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+//            Labels(text = "Eve")
+//            Labels(text = "Off")
+//            Labels(text = "Night")
+//            Labels(text = "Eve")
+//            Labels(text = "보건")
+//            Labels(text = "휴가")
+//            Labels(text= "None")
+//        }
+////        BottomSheet()
+//
+//    }
 }
 
 @Composable
