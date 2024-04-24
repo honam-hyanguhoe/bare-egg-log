@@ -1,15 +1,15 @@
 version: '3.8'
 
 services:
-  main:
-    container_name: main
-    image: kimdahui/main
+  web:
+    container_name: web
+    image: kimdahui/web
     build:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
     ports:
-      - "8010:8010"
+      - "3000:3000"
     networks:
       - jenkins_egg-log-net
 
