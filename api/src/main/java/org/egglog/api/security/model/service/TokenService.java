@@ -6,8 +6,8 @@ import org.egglog.api.security.exception.JwtErrorCode;
 import org.egglog.api.security.exception.JwtException;
 import org.egglog.api.security.model.dto.response.TokenResponse;
 import org.egglog.api.security.model.entity.Token;
-import org.egglog.api.security.model.repository.RefreshTokenRepository;
-import org.egglog.api.security.model.repository.UnsafeTokenRepository;
+import org.egglog.api.security.repository.redis.RefreshTokenRepository;
+import org.egglog.api.security.repository.redis.UnsafeTokenRepository;
 import org.egglog.api.security.util.JwtUtils;
 import org.springframework.stereotype.Service;
 
