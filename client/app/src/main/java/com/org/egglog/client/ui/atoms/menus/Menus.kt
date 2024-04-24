@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.ui.theme.Gray100
+import com.org.egglog.client.ui.theme.NaturalBlack
 import com.org.egglog.client.ui.theme.Typography
 import com.org.egglog.client.utils.MoreVert
 
@@ -41,7 +42,7 @@ fun ScrollableMenus( options : List<String>, selectedOption : String?, onSelect 
             .padding(0.dp)
     ) {
         IconButton(onClick = { expanded = true }) {
-            Icon(MoreVert, modifier = Modifier.size(25.dp))
+            Icon(MoreVert, modifier = Modifier.size(25.dp), color = NaturalBlack)
         }
         DropdownMenu(
             expanded = expanded,
@@ -74,5 +75,6 @@ fun ScrollableMenus( options : List<String>, selectedOption : String?, onSelect 
         }
     }
 }
+
 
 
