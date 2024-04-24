@@ -3,6 +3,7 @@ package com.org.egglog.client
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
+import android.widget.CheckBox
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.animateContentSize
@@ -32,6 +33,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Label
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -62,6 +64,8 @@ import com.org.egglog.client.ui.atoms.buttons.SettingButton
 import com.org.egglog.client.ui.atoms.buttons.ThinButton
 import com.org.egglog.client.ui.atoms.dialogs.BottomSheet
 import com.org.egglog.client.ui.atoms.dialogs.InteractiveBottomSheet
+import com.org.egglog.client.ui.atoms.checkbox.CheckBoxRow
+import com.org.egglog.client.ui.atoms.dialogs.SheetContent
 import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.ui.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.client.ui.atoms.inputs.MultiInput
@@ -75,7 +79,9 @@ import com.org.egglog.client.ui.atoms.toggle.Toggle
 import com.org.egglog.client.utils.widthPercent
 import com.org.egglog.client.ui.theme.*
 import com.org.egglog.client.utils.AddBox
+import com.org.egglog.client.utils.Favorite
 import com.org.egglog.client.utils.Logout
+import com.org.egglog.client.utils.MoreVert
 import com.org.egglog.client.utils.MySetting
 import com.org.egglog.client.utils.addFocusCleaner
 
@@ -91,78 +97,30 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MyApp(modifier: Modifier = Modifier) {
-    var shouldShowOnboarding by rememberSaveable { mutableStateOf(true) }
-
-    Surface(modifier, color = MaterialTheme.colorScheme.background) {
-        if (shouldShowOnboarding) {
-            OnboardingScreen(onContinueClicked = { shouldShowOnboarding = false })
-        } else {
-            Greetings()
-        }
+fun MyAppPreview() {
+    ClientTheme {
+        MyApp(Modifier.fillMaxSize())
     }
 }
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OnboardingScreen(
-    onContinueClicked: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val scrollState = rememberScrollState()
-    val groupOptions = listOf("그룹 설정", "그룹원 설정", "그룹 나가기")
-    val communityOptions = listOf("통합", "엑록병원", "호남향우회")
-    var selectedMenuItem by remember { mutableStateOf<String?>(null) }
+fun MyApp(modifier: Modifier = Modifier) {
     var showBottomSheet by remember { mutableStateOf<Boolean>(false) }
-    InteractiveBottomSheet()
-//    Column(
-//        modifier = modifier
-//            .fillMaxSize()
-//            .verticalScroll(scrollState),
-//        verticalArrangement = Arrangement.Center,
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        Text("Welcome to the Basics Codelab!")
-//        Button(
-//            modifier = Modifier.width(320.widthPercent(LocalContext.current).dp),
-//            onClick = onContinueClicked
-//        ) {
-//            Text("${320.widthPercent(LocalContext.current).dp}")
-////            Icon(Notification, modifier = Modifier.size(25.dp))
-//        }
-//        LocalImageLoader(imageUrl = R.drawable.off)
-//        ScrollableMenus(options = groupOptions, selectedOption = selectedMenuItem, onSelect = {selectedMenuItem = it} )
-//
-//        UrlImageLoader(imageUrl = "https://picsum.photos/300", modifier = Modifier.size(320.widthPercent(LocalContext.current).dp))
-//        LocalImageLoader(imageUrl = R.drawable.off)
-//
-//        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-//            Labels(text = "Day",size = "big")
-//            Labels(text = "Eve",size = "big")
-//            Labels(text = "Night",size = "big")
-//            Labels(text = "교육",size = "big")
-//        }
-//
-//        Spacer(modifier = Modifier.height(8.dp))
-//
-//        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-//            Labels(text = "Eve")
-//            Labels(text = "Off")
-//            Labels(text = "Night")
-//            Labels(text = "Eve")
-//            Labels(text = "보건")
-//            Labels(text = "휴가")
-//            Labels(text= "None")
-//        }
-////        BottomSheet()
-//
-//    }
+    InteractiveBottomSheet(
+        height = 380.dp,
+        padding = 5.dp,
+        sheetContent = { SheetContent() },
+        backgroundSheetContent = {
+            Text("hi")
+        }
+    )
 }
 
-@Composable
-fun UrlImageLoader(imageUrl: String, modifier: Modifier) {
-
-}
+//@Composable
+//fun BottomSheetTest(){
+//    BottomSheet()
+//}
 
 @Composable
 private fun Greetings(
@@ -244,30 +202,17 @@ private fun CardContent(name: String) {
     uiMode = Configuration.UI_MODE_NIGHT_NO,
     name = "DefaultPreviewLight"
 )
-@Composable
-fun MyAppPreview() {
-    ClientTheme {
-        MyApp(Modifier.fillMaxSize())
-    }
-}
 
-//@Composable
-//fun MyApp(modifier: Modifier = Modifier) {
-////    LabelTest()
-////    ButtonTest()
-////    ToggleTest()
-//    InputTest()
-//}
 
 @Composable
 fun LabelTest(modifier: Modifier = Modifier) {
     Surface(modifier, color = MaterialTheme.colorScheme.background) {
         Column(modifier = modifier.fillMaxSize()) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Labels(text = "Day",size = "big")
-                Labels(text = "Eve",size = "big")
-                Labels(text = "Night",size = "big")
-                Labels(text = "교육",size = "big")
+                Labels(text = "Day", size = "big")
+                Labels(text = "Eve", size = "big")
+                Labels(text = "Night", size = "big")
+                Labels(text = "교육", size = "big")
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -279,7 +224,7 @@ fun LabelTest(modifier: Modifier = Modifier) {
                 Labels(text = "Eve")
                 Labels(text = "보건")
                 Labels(text = "휴가")
-                Labels(text= "None")
+                Labels(text = "None")
             }
         }
     }
@@ -325,30 +270,62 @@ fun InputTest(modifier: Modifier = Modifier) {
 }
 
 @Composable
+fun CheckBoxTest(modifier: Modifier = Modifier) {
+    Surface(modifier, color = MaterialTheme.colorScheme.background) {
+        Column(modifier = modifier.fillMaxSize()) {
+            val (checked1, setChecked1) = remember { mutableStateOf(false) }
+            val (checked2, setChecked2) = remember { mutableStateOf(false) }
+            val (checked3, setChecked3) = remember { mutableStateOf(false) }
+            val allChecked = (checked1 && checked2 && checked3)
+            CheckBoxRow(
+                text = "전체 동의",
+                value = allChecked,
+                onClick = {
+                    if (allChecked) {
+                        setChecked1(false)
+                        setChecked2(false)
+                        setChecked3(false)
+                    } else {
+                        setChecked1(true)
+                        setChecked2(true)
+                        setChecked3(true)
+                    }
+                },
+            )
+            CheckBoxRow(text = "동의1", value = checked1, onClick = { setChecked1(!checked1) })
+            CheckBoxRow(text = "동의2", value = checked2, onClick = { setChecked2(!checked2) })
+            CheckBoxRow(text = "동의3", value = checked3, onClick = { setChecked3(!checked3) })
+        }
+    }
+}
+
+@Composable
 fun ButtonTest(modifier: Modifier = Modifier) {
     Surface(modifier, color = MaterialTheme.colorScheme.background) {
         Column(modifier = modifier.fillMaxSize()) {
             BigButton(
-                onClick = { Log.d("clicked: ", "clicked!!!!")},
+                onClick = { Log.d("clicked: ", "clicked!!!!") },
                 colors = ButtonColors(
                     contentColor = Warning25,
                     containerColor = Warning300,
                     disabledContentColor = Gray25,
                     disabledContainerColor = Gray300
-                )) {
+                )
+            ) {
                 Text(
                     style = Typography.bodyLarge,
                     text = "회원가입 완료하기"
                 )
             }
             MiddleButton(
-                onClick = { Log.d("clicked: ", "clicked!!!!")},
+                onClick = { Log.d("clicked: ", "clicked!!!!") },
                 colors = ButtonColors(
                     contentColor = Warning25,
                     containerColor = Warning300,
                     disabledContentColor = Gray25,
                     disabledContainerColor = Gray300
-                )) {
+                )
+            ) {
                 Row(Modifier.fillMaxSize(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
                     Text(
                         style = Typography.displayLarge,
@@ -363,13 +340,14 @@ fun ButtonTest(modifier: Modifier = Modifier) {
             }
 
             ThinButton(
-                onClick = { Log.d("clicked: ", "clicked!!!!")},
+                onClick = { Log.d("clicked: ", "clicked!!!!") },
                 colors = ButtonColors(
                     contentColor = Warning25,
                     containerColor = Warning300,
                     disabledContentColor = Gray25,
                     disabledContainerColor = Gray300
-                )) {
+                )
+            ) {
                 Text(
                     style = Typography.labelLarge,
                     text = "근무표 등록하기"
@@ -377,13 +355,14 @@ fun ButtonTest(modifier: Modifier = Modifier) {
             }
 
             HalfBigButton(
-                onClick = { Log.d("clicked: ", "clicked!!!!")},
+                onClick = { Log.d("clicked: ", "clicked!!!!") },
                 colors = ButtonColors(
                     contentColor = Gray25,
                     containerColor = Gray300,
                     disabledContentColor = Gray25,
                     disabledContainerColor = Gray300
-                )) {
+                )
+            ) {
                 Text(
                     style = Typography.displayLarge,
                     text = "취소"
@@ -391,13 +370,14 @@ fun ButtonTest(modifier: Modifier = Modifier) {
             }
 
             HalfMiddleButton(
-                onClick = { Log.d("clicked: ", "clicked!!!!")},
+                onClick = { Log.d("clicked: ", "clicked!!!!") },
                 colors = ButtonColors(
                     contentColor = Gray800,
                     containerColor = Gray300,
                     disabledContentColor = Gray25,
                     disabledContainerColor = Gray300
-                )) {
+                )
+            ) {
                 Text(
                     style = Typography.displayLarge,
                     text = "취소"
@@ -405,13 +385,14 @@ fun ButtonTest(modifier: Modifier = Modifier) {
             }
 
             HalfThinButton(
-                onClick = { Log.d("clicked: ", "clicked!!!!")},
+                onClick = { Log.d("clicked: ", "clicked!!!!") },
                 colors = ButtonColors(
                     contentColor = Gray25,
                     containerColor = Gray300,
                     disabledContentColor = Gray25,
                     disabledContainerColor = Gray300
-                )) {
+                )
+            ) {
                 Text(
                     style = Typography.displayLarge,
                     text = "취소"
@@ -419,22 +400,68 @@ fun ButtonTest(modifier: Modifier = Modifier) {
             }
 
             Row {
-                AuthButton(onClick = {Log.d("test: ", "clicked!!!")}, type = "kakao")
-                AuthButton(onClick = {Log.d("test: ", "clicked!!!")}, type = "naver")
-                AuthButton(onClick = {Log.d("test: ", "clicked!!!")}, type = "google")
+                AuthButton(onClick = { Log.d("test: ", "clicked!!!") }, type = "kakao")
+                AuthButton(onClick = { Log.d("test: ", "clicked!!!") }, type = "naver")
+                AuthButton(onClick = { Log.d("test: ", "clicked!!!") }, type = "google")
             }
 
-            GroupButton(onClick = {Log.d("test: ", "clicked!!!")}, groupMaster = "김다희", groupName = "호남향우회", memberCnt = 1, groupImage = 1, groupId = 1)
+            GroupButton(
+                onClick = { Log.d("test: ", "clicked!!!") },
+                groupMaster = "김다희",
+                groupName = "호남향우회",
+                memberCnt = 1,
+                groupImage = 1,
+                groupId = 1
+            )
 
             Row {
-                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, profileImgUrl = "https://picsum.photos/300", isMine = true, isSelected = true, userId = 1, userName = "김호남")
-                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, profileImgUrl = "https://picsum.photos/300", isMine = true, isSelected = false, userId = 1, userName = "김호남")
-                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, profileImgUrl = "https://picsum.photos/300", isMine = false, isSelected = true, userId = 1, userName = "김호남")
-                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, profileImgUrl = "https://picsum.photos/300", isMine = false, isSelected = false, userId = 1, userName = "김호남")
+                ProfileButton(
+                    onClick = { Log.d("test: ", "clicked!!!") },
+                    profileImgUrl = "https://picsum.photos/300",
+                    isMine = true,
+                    isSelected = true,
+                    userId = 1,
+                    userName = "김호남"
+                )
+                ProfileButton(
+                    onClick = { Log.d("test: ", "clicked!!!") },
+                    profileImgUrl = "https://picsum.photos/300",
+                    isMine = true,
+                    isSelected = false,
+                    userId = 1,
+                    userName = "김호남"
+                )
+                ProfileButton(
+                    onClick = { Log.d("test: ", "clicked!!!") },
+                    profileImgUrl = "https://picsum.photos/300",
+                    isMine = false,
+                    isSelected = true,
+                    userId = 1,
+                    userName = "김호남"
+                )
+                ProfileButton(
+                    onClick = { Log.d("test: ", "clicked!!!") },
+                    profileImgUrl = "https://picsum.photos/300",
+                    isMine = false,
+                    isSelected = false,
+                    userId = 1,
+                    userName = "김호남"
+                )
             }
 
-            SettingButton(onClick = {Log.d("test: ", "clicked!!!")}, text =  "내 정보 설정", color = NaturalBlack, icon = MySetting)
-            SettingButton(onClick = {Log.d("test: ", "clicked!!!")}, text =  "로그아웃", color = Error500, icon = Logout)
+            SettingButton(
+                onClick = { Log.d("test: ", "clicked!!!") },
+                text = "내 정보 설정",
+                color = NaturalBlack,
+                icon = MySetting
+            )
+            SettingButton(
+                onClick = { Log.d("test: ", "clicked!!!") },
+                text = "로그아웃",
+                color = Error500,
+                icon = Logout
+            )
         }
     }
 }
+
