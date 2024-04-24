@@ -3,27 +3,51 @@ package com.org.egglog.client
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
+import android.widget.CheckBox
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Label
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,13 +62,16 @@ import com.org.egglog.client.ui.atoms.buttons.ProfileButton
 import com.org.egglog.client.ui.atoms.buttons.SettingButton
 import com.org.egglog.client.ui.atoms.buttons.ThinButton
 import com.org.egglog.client.ui.atoms.checkbox.CheckBoxRow
+import com.org.egglog.client.ui.atoms.dialogs.Dialog
 import com.org.egglog.client.ui.atoms.icons.Icon
+import com.org.egglog.client.ui.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.client.ui.atoms.inputs.MultiInput
 import com.org.egglog.client.ui.atoms.inputs.PassInput
 import com.org.egglog.client.ui.atoms.inputs.SingleInput
 import com.org.egglog.client.ui.theme.ClientTheme
 import com.org.egglog.client.ui.theme.Typography
 import com.org.egglog.client.ui.atoms.labels.Labels
+import com.org.egglog.client.ui.atoms.menus.ScrollableMenus
 import com.org.egglog.client.ui.atoms.toggle.Toggle
 import com.org.egglog.client.ui.atoms.wheelPicker.DateTimePicker
 import com.org.egglog.client.ui.atoms.wheelPicker.TimePicker
@@ -53,12 +80,11 @@ import com.org.egglog.client.ui.organisms.agreeList.AgreeList
 import com.org.egglog.client.utils.widthPercent
 import com.org.egglog.client.ui.theme.*
 import com.org.egglog.client.utils.AddBox
+import com.org.egglog.client.utils.Favorite
 import com.org.egglog.client.utils.Logout
+import com.org.egglog.client.utils.MoreVert
 import com.org.egglog.client.utils.MySetting
 import com.org.egglog.client.utils.addFocusCleaner
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,14 +97,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-//@Preview(
-//    uiMode = Configuration.UI_MODE_NIGHT_YES,
-//    name = "DefaultPreviewDark"
-//)
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_NO,
-    name = "DefaultPreviewLight"
-)
 @Composable
 fun MyAppPreview() {
     ClientTheme {
@@ -86,6 +104,7 @@ fun MyAppPreview() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyApp(modifier: Modifier = Modifier) {
 //    LabelTest()
@@ -94,7 +113,31 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    InputTest()
 //    CheckBoxTest()
 //    TimePickerTest()
-    AgreeListTest()
+//    AgreeListTest()
+    var showBottomSheet by remember { mutableStateOf<Boolean>(false) }
+
+    fun dismissSheet() {
+        showBottomSheet = false
+    }
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        BottomSheet(
+            height = 400.dp,
+            showBottomSheet = showBottomSheet,
+            onDismiss = {
+                dismissSheet()
+            },
+        ) {
+            BottomSheetContent()
+        };
+    }
+}
+
+@Composable
+fun BottomSheetContent() {
+    Text(text = "BottomSheetContent 테스트")
+    Spacer(modifier = Modifier.height(180.dp))
 }
 
 
@@ -332,8 +375,18 @@ fun ButtonTest(modifier: Modifier = Modifier) {
                 ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, profileImgUrl = "https://picsum.photos/300", isMine = false, isSelected = false, userId = 1, userName = "김호남")
             }
 
-            SettingButton(onClick = {Log.d("test: ", "clicked!!!")}, text =  "내 정보 설정", color = NaturalBlack, icon = MySetting)
-            SettingButton(onClick = {Log.d("test: ", "clicked!!!")}, text =  "로그아웃", color = Error500, icon = Logout)
+            SettingButton(
+                onClick = { Log.d("test: ", "clicked!!!") },
+                text = "내 정보 설정",
+                color = NaturalBlack,
+                icon = MySetting
+            )
+            SettingButton(
+                onClick = { Log.d("test: ", "clicked!!!") },
+                text = "로그아웃",
+                color = Error500,
+                icon = Logout
+            )
         }
     }
 }

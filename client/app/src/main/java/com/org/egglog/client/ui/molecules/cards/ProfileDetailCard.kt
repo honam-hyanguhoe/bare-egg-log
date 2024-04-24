@@ -19,6 +19,7 @@ import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.ui.atoms.profileItem.Profile
 import com.org.egglog.client.ui.atoms.profileItem.ProfileItem
 import com.org.egglog.client.ui.theme.ClientTheme
+import com.org.egglog.client.ui.theme.NaturalBlack
 import com.org.egglog.client.ui.theme.Typography
 import com.org.egglog.client.utils.Trash
 import com.org.egglog.client.utils.widthPercent

@@ -19,11 +19,7 @@ public class OAuthAttribute {
     private String nameAttributesKey;
     private String name;
     private String email;
-    private String nickName;
     private String profileImgUrl;
-    private String gender;
-    private String birthdateYear;
-    private String birthdateMonth;
     private AuthProvider provider;
 
 
@@ -43,10 +39,6 @@ public class OAuthAttribute {
 
         return OAuthAttribute.builder()
                 .name(String.valueOf(response.get("name")))
-                .nickName(String.valueOf(response.get("nickname")))
-                .gender(String.valueOf(response.get("gender")))
-                .birthdateYear(String.valueOf(response.get("birthyear")))
-                .birthdateMonth(String.valueOf(response.get("birthday")))
                 .email(String.valueOf(response.get("email")))
                 .profileImgUrl(String.valueOf(response.get("profile_image")))
                 .provider(NAVER)
@@ -73,11 +65,7 @@ public class OAuthAttribute {
         return OAuthAttribute.builder()
                 .name(String.valueOf(kakaoAccount.get("name")))
                 .email(String.valueOf(kakaoAccount.get("email")))
-                .birthdateMonth(String.valueOf(kakaoAccount.get("birthday")))
-                .birthdateYear(String.valueOf(kakaoAccount.get("birthyear")))
-                .gender(String.valueOf(kakaoAccount.get("gender")))
                 .profileImgUrl(String.valueOf(kakaoProfile.get("profile_image_url")))
-                .nickName(String.valueOf(kakaoProfile.get("nickname")))
                 .provider(KAKAO)
                 .nameAttributesKey(userNameAttributeName)
                 .attributes(attributes)
@@ -88,10 +76,6 @@ public class OAuthAttribute {
         map.put("id", nameAttributesKey);
         map.put("key", nameAttributesKey);
         map.put("name", name);
-        map.put("nickName",nickName);
-        map.put("gender",gender);
-        map.put("birthDateYear", birthdateYear);
-        map.put("birthDateMonth", birthdateMonth);
         map.put("provider", provider);
         map.put("email", email);
         map.put("picture", profileImgUrl);
