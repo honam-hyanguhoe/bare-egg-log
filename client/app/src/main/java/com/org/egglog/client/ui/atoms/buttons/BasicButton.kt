@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun BasicButton(modifier: Modifier, onClick: () -> Unit, shape: RoundedCornerShape, colors: ButtonColors, content: @Composable () -> Unit) {
+fun BasicButton(modifier: Modifier, onClick: () -> Unit, shape: RoundedCornerShape, colors: ButtonColors, enabled: Boolean = true, content: @Composable () -> Unit) {
     Button(
         onClick = onClick,
         modifier = modifier,
@@ -17,7 +17,8 @@ fun BasicButton(modifier: Modifier, onClick: () -> Unit, shape: RoundedCornerSha
             contentColor = colors.contentColor,
             disabledContainerColor = colors.disabledContainerColor,
             disabledContentColor = colors.disabledContainerColor
-        )
+        ),
+        enabled = enabled
     ) {
         content()
     }

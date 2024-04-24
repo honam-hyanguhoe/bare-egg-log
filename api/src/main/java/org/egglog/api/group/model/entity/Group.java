@@ -2,7 +2,6 @@ package org.egglog.api.group.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.checkerframework.checker.units.qual.C;
 import org.egglog.api.group.model.dto.response.GroupSimpleDto;
 
 @Entity
@@ -11,6 +10,7 @@ import org.egglog.api.group.model.dto.response.GroupSimpleDto;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@Table(name = "`Groups`")
 public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

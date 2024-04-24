@@ -19,6 +19,7 @@ import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.ui.atoms.profileItem.Profile
 import com.org.egglog.client.ui.atoms.profileItem.ProfileItem
 import com.org.egglog.client.ui.theme.ClientTheme
+import com.org.egglog.client.ui.theme.NaturalBlack
 import com.org.egglog.client.ui.theme.Typography
 import com.org.egglog.client.utils.Trash
 import com.org.egglog.client.utils.widthPercent
@@ -50,7 +51,7 @@ fun ProfileDetailCard(profile: Profile, type: String, createdAt: String, onDelet
                         style = Typography.displayMedium
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                Icon(imageVector = Trash, modifier = Modifier.width(12.widthPercent(LocalContext.current).dp))
+                Icon(imageVector = Trash, modifier = Modifier.width(12.widthPercent(LocalContext.current).dp), color = com.org.egglog.client.ui.theme.Gray500)
 
             }
         } else if (!type.equals("comment")) {

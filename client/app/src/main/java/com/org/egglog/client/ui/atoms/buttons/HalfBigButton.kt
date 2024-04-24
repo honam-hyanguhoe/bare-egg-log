@@ -12,12 +12,13 @@ import com.org.egglog.client.utils.heightPercent
 import com.org.egglog.client.utils.widthPercent
 
 @Composable
-fun HalfBigButton(modifier: Modifier = Modifier, colors: ButtonColors, onClick: () -> Unit, content: @Composable () -> Unit) {
+fun HalfBigButton(modifier: Modifier = Modifier, colors: ButtonColors, onClick: () -> Unit, enabled: Boolean = true, content: @Composable () -> Unit) {
     BasicButton(
         modifier = modifier.width(142.widthPercent(LocalContext.current).dp).height(50.heightPercent(LocalContext.current).dp),
         onClick = onClick,
         colors = colors,
-        shape = RoundedCornerShape(8.widthPercent(LocalContext.current).dp)
+        shape = RoundedCornerShape(8.widthPercent(LocalContext.current).dp),
+        enabled = enabled
     ) {
         content()
     }

@@ -22,7 +22,7 @@ public class GroupMember {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_id")
+    @JoinColumn(name = "groups_id")
     private Group group;
 
     @Column(name = "is_admin")

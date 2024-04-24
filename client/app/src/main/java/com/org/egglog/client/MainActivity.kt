@@ -10,16 +10,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -37,6 +41,9 @@ import com.org.egglog.client.ui.atoms.buttons.MiddleButton
 import com.org.egglog.client.ui.atoms.buttons.ProfileButton
 import com.org.egglog.client.ui.atoms.buttons.SettingButton
 import com.org.egglog.client.ui.atoms.buttons.ThinButton
+import com.org.egglog.client.ui.atoms.dialogs.BottomSheet
+import com.org.egglog.client.ui.atoms.dialogs.InteractiveBottomSheet
+import com.org.egglog.client.ui.atoms.checkbox.CheckBoxRow
 import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.ui.atoms.inputs.MultiInput
 import com.org.egglog.client.ui.atoms.inputs.PassInput
@@ -45,12 +52,17 @@ import com.org.egglog.client.ui.theme.ClientTheme
 import com.org.egglog.client.ui.theme.Typography
 import com.org.egglog.client.ui.atoms.labels.Labels
 import com.org.egglog.client.ui.atoms.toggle.Toggle
+import com.org.egglog.client.ui.atoms.wheelPicker.DateTimePicker
+import com.org.egglog.client.ui.atoms.wheelPicker.TimePicker
 import com.org.egglog.client.utils.widthPercent
 import com.org.egglog.client.ui.theme.*
 import com.org.egglog.client.utils.AddBox
 import com.org.egglog.client.utils.Logout
 import com.org.egglog.client.utils.MySetting
 import com.org.egglog.client.utils.addFocusCleaner
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,15 +75,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
-//@Preview(
-//    uiMode = Configuration.UI_MODE_NIGHT_YES,
-//    name = "DefaultPreviewDark"
-//)
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_NO,
-    name = "DefaultPreviewLight"
-)
 @Composable
 fun MyAppPreview() {
     ClientTheme {
@@ -79,12 +82,33 @@ fun MyAppPreview() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyApp(modifier: Modifier = Modifier) {
-//    LabelTest()
-//    ButtonTest()
-//    ToggleTest()
-    InputTest()
+    var showBottomSheet by remember { mutableStateOf<Boolean>(false) }
+
+    fun dismissSheet() {
+        showBottomSheet = false
+    }
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        BottomSheet(
+            height = 400.dp,
+            showBottomSheet = showBottomSheet,
+            onDismiss = {
+                dismissSheet()
+            },
+        ) {
+            BottomSheetContent()
+        };
+    }
+}
+
+@Composable
+fun BottomSheetContent() {
+    Text(text = "BottomSheetContent 테스트")
+    Spacer(modifier = Modifier.height(180.dp))
 }
 
 @Composable
@@ -108,6 +132,26 @@ fun LabelTest(modifier: Modifier = Modifier) {
                 Labels(text = "보건")
                 Labels(text = "휴가")
                 Labels(text= "None")
+            }
+        }
+    }
+}
+
+@Composable
+fun TimePickerTest(modifier: Modifier = Modifier) {
+    val selectedTime = remember { mutableStateOf<LocalTime?>(null) }
+    val selectedDateTime = remember { mutableStateOf<LocalDateTime?>(null) }
+
+    Surface(modifier, color = MaterialTheme.colorScheme.background) {
+        Column(modifier = modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+            TimePicker { time -> selectedTime.value = time }
+            selectedTime.value?.let {
+                Text(text = "Selected Time: ${selectedTime.value}")
+            }
+
+            DateTimePicker{dateTime -> selectedDateTime.value = dateTime}
+            selectedDateTime.value?.let {
+                Text(text = "Selected Time: ${selectedDateTime.value}")
             }
         }
     }
@@ -148,6 +192,36 @@ fun InputTest(modifier: Modifier = Modifier) {
                 placeholder = "사번 입력"
             )
             PassInput(pin = pin.value, onValueChange = { pin.value = it })
+        }
+    }
+}
+
+@Composable
+fun CheckBoxTest(modifier: Modifier = Modifier) {
+    Surface(modifier, color = MaterialTheme.colorScheme.background) {
+        Column(modifier = modifier.fillMaxSize()) {
+            val (checked1, setChecked1) = remember { mutableStateOf(false) }
+            val (checked2, setChecked2) = remember { mutableStateOf(false) }
+            val (checked3, setChecked3) = remember { mutableStateOf(false) }
+            val allChecked = (checked1 && checked2 && checked3)
+            CheckBoxRow(
+                text = "전체 동의",
+                value = allChecked,
+                onClick = {
+                    if (allChecked) {
+                        setChecked1(false)
+                        setChecked2(false)
+                        setChecked3(false)
+                    } else {
+                        setChecked1(true)
+                        setChecked2(true)
+                        setChecked3(true)
+                    }
+                },
+            )
+            CheckBoxRow(text = "동의1", value = checked1, onClick = { setChecked1(!checked1) })
+            CheckBoxRow(text = "동의2", value = checked2, onClick = { setChecked2(!checked2) })
+            CheckBoxRow(text = "동의3", value = checked3, onClick = { setChecked3(!checked3) })
         }
     }
 }
@@ -261,8 +335,18 @@ fun ButtonTest(modifier: Modifier = Modifier) {
                 ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, profileImgUrl = "https://picsum.photos/300", isMine = false, isSelected = false, userId = 1, userName = "김호남")
             }
 
-            SettingButton(onClick = {Log.d("test: ", "clicked!!!")}, text =  "내 정보 설정", color = NaturalBlack, icon = MySetting)
-            SettingButton(onClick = {Log.d("test: ", "clicked!!!")}, text =  "로그아웃", color = Error500, icon = Logout)
+            SettingButton(
+                onClick = { Log.d("test: ", "clicked!!!") },
+                text = "내 정보 설정",
+                color = NaturalBlack,
+                icon = MySetting
+            )
+            SettingButton(
+                onClick = { Log.d("test: ", "clicked!!!") },
+                text = "로그아웃",
+                color = Error500,
+                icon = Logout
+            )
         }
     }
 }
