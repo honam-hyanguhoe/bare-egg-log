@@ -25,7 +25,7 @@ public class AuthFailureHandler implements AuthenticationFailureHandler, Authent
         response.setContentType("application/json;charset=UTF-8");
 
         // MessageUtils 객체를 사용하여 실패 응답 생성
-        MessageUtils<?> failureResponse = MessageUtils.fail(HttpStatus.UNAUTHORIZED.toString(), "인증이 필요합니다.");
+        MessageUtils<?> failureResponse = MessageUtils.fail(HttpStatus.INTERNAL_SERVER_ERROR.toString(), "소셜 로그인 실패");
 
         // ObjectMapper를 사용하여 MessageUtils 객체를 JSON 문자열로 변환
         String jsonResponse = objectMapper.writeValueAsString(failureResponse);
