@@ -42,7 +42,6 @@ import com.org.egglog.client.ui.atoms.buttons.ProfileButton
 import com.org.egglog.client.ui.atoms.buttons.SettingButton
 import com.org.egglog.client.ui.atoms.buttons.ThinButton
 import com.org.egglog.client.ui.atoms.dialogs.BottomSheet
-import com.org.egglog.client.ui.atoms.dialogs.InteractiveBottomSheet
 import com.org.egglog.client.ui.atoms.checkbox.CheckBoxRow
 import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.ui.atoms.inputs.MultiInput
