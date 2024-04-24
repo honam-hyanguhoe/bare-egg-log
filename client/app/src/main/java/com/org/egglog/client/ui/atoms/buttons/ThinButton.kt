@@ -12,13 +12,14 @@ import com.org.egglog.client.utils.heightPercent
 import com.org.egglog.client.utils.widthPercent
 
 @Composable
-fun ThinButton(modifier: Modifier = Modifier, colors: ButtonColors, onClick: () -> Unit, content: @Composable () -> Unit) {
+fun ThinButton(modifier: Modifier = Modifier, colors: ButtonColors, onClick: () -> Unit, enabled: Boolean = true, content: @Composable () -> Unit) {
     BasicButton(
         modifier = modifier.width(142.widthPercent(LocalContext.current).dp).height(36.heightPercent(
             LocalContext.current).dp),
         onClick = onClick,
         colors = colors,
-        shape = RoundedCornerShape(5.widthPercent(LocalContext.current).dp)
+        shape = RoundedCornerShape(5.widthPercent(LocalContext.current).dp),
+        enabled = enabled
     ) {
         content()
     }
