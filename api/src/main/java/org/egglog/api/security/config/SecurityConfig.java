@@ -25,7 +25,7 @@ import java.util.Collections;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig{
-    private static final String[] ALLOWED_URIS = {""};
+    private static final String[] ALLOWED_URIS = {"/**"};
     private final JwtFilter jwtFilter;
     private final CustomOAuth2Service customOAuth2Service;
     private final OAuthSuccessHandler oAuth2SuccessHandler;
@@ -43,24 +43,24 @@ public class SecurityConfig{
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(ALLOWED_URIS).permitAll() // 특정 경로 인증 미요구
-                        .anyRequest().authenticated() // 나머지 경로는 인증 요구
+//                        .requestMatchers(ALLOWED_URIS).permitAll() // 특정 경로 인증 미요구
+//                        .anyRequest().authenticated() // 나머지 경로는 인증 요구
+                                .anyRequest().permitAll()
                 )
-                .exceptionHandling(exceptionHandling ->
-                        exceptionHandling
-                                .authenticationEntryPoint(authFailureHandler)
-                )
-
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)// JwtFilter 추가
                 .addFilterBefore(exceptionHandlerFilter, JwtFilter.class) // ExceptionHandlerFilter 추가
-
                 .oauth2Login(customizer ->
                         customizer
-                                .failureHandler(authFailureHandler)
+//                                .failureHandler(authFailureHandler)
                                 .successHandler(oAuth2SuccessHandler)
                                 .userInfoEndpoint(userInfoEndpoint ->
                                         userInfoEndpoint.userService(customOAuth2Service))
                 );
+//                .exceptionHandling(exceptionHandling ->
+//                        exceptionHandling
+//                                .authenticationEntryPoint(authFailureHandler)
+//                );
+
 
         return http.build();
     }

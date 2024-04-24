@@ -17,8 +17,7 @@ import org.egglog.api.security.util.JwtUtils;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
-import org.egglog.api.user.model.repository.UserJpaRepository;
-import org.egglog.api.user.model.repository.UserQueryRepository;
+import org.egglog.api.user.repository.UserQueryRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -31,7 +30,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @Component
 public class JwtFilter extends OncePerRequestFilter {
-    private final UserJpaRepository userJpaRepository;
+
     private final UserQueryRepository userQueryRepository;
     private final JwtUtils jwtUtils;
     private final UnsafeTokenRepository unsafeTokenRepository;

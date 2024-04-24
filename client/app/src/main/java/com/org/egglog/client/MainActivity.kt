@@ -1,6 +1,5 @@
 package com.org.egglog.client
 
-import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -29,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.org.egglog.client.ui.atoms.buttons.AuthButton
 import com.org.egglog.client.ui.atoms.buttons.BigButton
@@ -41,11 +39,12 @@ import com.org.egglog.client.ui.atoms.buttons.MiddleButton
 import com.org.egglog.client.ui.atoms.buttons.ProfileButton
 import com.org.egglog.client.ui.atoms.buttons.SettingButton
 import com.org.egglog.client.ui.atoms.buttons.ThinButton
-import com.org.egglog.client.ui.atoms.dialogs.BottomSheet
 import com.org.egglog.client.ui.atoms.checkbox.CheckBoxRow
+import com.org.egglog.client.ui.atoms.dialogs.BottomSheet
 import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.ui.atoms.inputs.MultiInput
 import com.org.egglog.client.ui.atoms.inputs.PassInput
+import com.org.egglog.client.ui.atoms.inputs.SearchInput
 import com.org.egglog.client.ui.atoms.inputs.SingleInput
 import com.org.egglog.client.ui.theme.ClientTheme
 import com.org.egglog.client.ui.theme.Typography
@@ -53,6 +52,7 @@ import com.org.egglog.client.ui.atoms.labels.Labels
 import com.org.egglog.client.ui.atoms.toggle.Toggle
 import com.org.egglog.client.ui.atoms.wheelPicker.DateTimePicker
 import com.org.egglog.client.ui.atoms.wheelPicker.TimePicker
+import com.org.egglog.client.ui.organisms.agreeList.AgreeList
 import com.org.egglog.client.utils.widthPercent
 import com.org.egglog.client.ui.theme.*
 import com.org.egglog.client.utils.AddBox
@@ -61,7 +61,6 @@ import com.org.egglog.client.utils.MySetting
 import com.org.egglog.client.utils.addFocusCleaner
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,6 +83,18 @@ fun MyAppPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyApp(modifier: Modifier = Modifier) {
+//    LabelTest()
+//    ButtonTest()
+//    ToggleTest()
+    InputTest()
+//    CheckBoxTest()
+//    TimePickerTest()
+//    BottomSheetTest()
+//    AgreeListTest()
+}
+
+@Composable
+fun BottomSheetTest() {
     var showBottomSheet by remember { mutableStateOf<Boolean>(false) }
 
     fun dismissSheet() {
@@ -109,6 +120,7 @@ fun BottomSheetContent() {
     Text(text = "BottomSheetContent 테스트")
     Spacer(modifier = Modifier.height(180.dp))
 }
+
 
 @Composable
 fun LabelTest(modifier: Modifier = Modifier) {
@@ -170,6 +182,16 @@ fun ToggleTest(modifier: Modifier = Modifier) {
 }
 
 @Composable
+fun AgreeListTest(modifier: Modifier = Modifier) {
+    val (ageChecked, setAgeClick) = remember { mutableStateOf(false) }
+    val (agreeChecked, setAgreeClick) = remember { mutableStateOf(false) }
+    val (infoChecked, setInfoClick) = remember { mutableStateOf(false) }
+    Surface(modifier, color = MaterialTheme.colorScheme.background) {
+        AgreeList(ageChecked, setAgeClick, agreeChecked, setAgreeClick, infoChecked, setInfoClick)
+    }
+}
+
+@Composable
 fun InputTest(modifier: Modifier = Modifier) {
     val focusManager = LocalFocusManager.current
     val pin = remember { mutableStateOf("") }
@@ -177,6 +199,7 @@ fun InputTest(modifier: Modifier = Modifier) {
         Column(modifier = modifier.fillMaxSize()) {
             val text1 = remember { mutableStateOf("") }
             val text2 = remember { mutableStateOf("") }
+            val text3 = remember { mutableStateOf("") }
             SingleInput(
                 text = text1.value,
                 onValueChange = { text1.value = it },
@@ -189,6 +212,13 @@ fun InputTest(modifier: Modifier = Modifier) {
                 onValueChange = { text2.value = it },
                 focusManager = focusManager,
                 placeholder = "사번 입력"
+            )
+            SearchInput(
+                text = text3.value,
+                onValueChange = { text3.value = it },
+                focusManager = focusManager,
+                placeholder = "근무지 지역 선택",
+                onClickDone = { Log.d("click done: ", text3.value) }
             )
             PassInput(pin = pin.value, onValueChange = { pin.value = it })
         }
