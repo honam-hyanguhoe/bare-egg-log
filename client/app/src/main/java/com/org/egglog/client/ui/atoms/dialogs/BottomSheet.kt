@@ -4,6 +4,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,6 +24,7 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +36,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.org.egglog.client.ui.theme.Gray100
+import com.org.egglog.client.ui.theme.Gray300
+import com.org.egglog.client.ui.theme.Gray500
+import com.org.egglog.client.ui.theme.Gray700
 import com.org.egglog.client.ui.theme.NaturalBlack
 import com.org.egglog.client.ui.theme.NaturalWhite
 import com.org.egglog.client.ui.theme.White
@@ -43,36 +48,46 @@ import kotlinx.coroutines.launch
 // 어둡게 dim 처리
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomSheet() {
-    val BottomSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = false,
-    )
+fun BottomSheet(
+    height: Dp,
+    showBottomSheet: Boolean,
+    onDismiss: () -> Unit,
+    sheetContent: @Composable () -> Unit
+) {
     val scope = rememberCoroutineScope()
-    var showBottomSheet by remember { mutableStateOf(false) }
+    val bottomSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+    )
 
     ModalBottomSheet(
-        onDismissRequest = { showBottomSheet = false },
-        sheetState = BottomSheetState,
+        onDismissRequest = { onDismiss() },
+//        modifier = Modifier.fillMaxHeight(),
+        sheetState = bottomSheetState,
         containerColor = White,
         contentColor = NaturalBlack,
-        modifier = Modifier.fillMaxHeight(),
+        scrimColor = NaturalBlack.copy(alpha = 0.6F),
         dragHandle = { BottomSheetDefaults.DragHandle() },
-        scrimColor = Gray100,
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .height(height)
         ) {
+            sheetContent()
+            Button(onClick = {
+                scope.launch { bottomSheetState.hide() }
+            }) {
+                Text("이렇게 숨겨지면 배신")
+            }
         }
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InteractiveBottomSheet(
-    height : Dp,
-    padding : Dp,
+    height: Dp,
+    padding: Dp,
 ) {
     val scope = rememberCoroutineScope()
 
@@ -80,6 +95,7 @@ fun InteractiveBottomSheet(
         initialValue = SheetValue.PartiallyExpanded,
         skipHiddenState = false
     );
+
     val iBottomSheetState = rememberBottomSheetScaffoldState(
         bottomSheetState = sheetState
     )
@@ -103,14 +119,14 @@ fun InteractiveBottomSheet(
             Column() {
                 Button(
                     onClick = {
-                        scope.launch { iBottomSheetState.bottomSheetState.partialExpand()}
+                        scope.launch { iBottomSheetState.bottomSheetState.partialExpand() }
                     }
                 ) {
                     Text("열어줘")
                 }
                 Button(
                     onClick = {
-                        scope.launch { iBottomSheetState.bottomSheetState.hide()}
+                        scope.launch { iBottomSheetState.bottomSheetState.hide() }
                     }
                 ) {
                     Text("닫을래")
@@ -119,8 +135,6 @@ fun InteractiveBottomSheet(
         }
     }
 }
-
-
 
 @Composable
 fun SheetContent() {

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -107,14 +108,29 @@ fun MyAppPreview() {
 @Composable
 fun MyApp(modifier: Modifier = Modifier) {
     var showBottomSheet by remember { mutableStateOf<Boolean>(false) }
-    InteractiveBottomSheet(
-        height = 380.dp,
-        padding = 5.dp,
-        sheetContent = { SheetContent() },
-        backgroundSheetContent = {
-            Text("hi")
-        }
-    )
+
+    fun dismissSheet() {
+        showBottomSheet = false
+    }
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        BottomSheet(
+            height = 400.dp,
+            showBottomSheet = showBottomSheet,
+            onDismiss = {
+                dismissSheet()
+            },
+        ) {
+            BottomSheetContent()
+        };
+    }
+}
+
+@Composable
+fun BottomSheetContent() {
+    Text(text = "BottomSheetContent 테스트")
+    Spacer(modifier = Modifier.height(180.dp))
 }
 
 //@Composable
