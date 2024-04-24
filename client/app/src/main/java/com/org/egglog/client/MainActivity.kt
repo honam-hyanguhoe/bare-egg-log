@@ -33,7 +33,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.wear.compose.material.Button
 import com.org.egglog.client.data.UserInfo
 import com.org.egglog.client.ui.atoms.buttons.AuthButton
 import com.org.egglog.client.ui.atoms.buttons.BigButton
@@ -120,9 +119,6 @@ fun BottomSheetTest() {
         .border(2.dp, NaturalBlack)) {
 
         Text("hi")
-        Button(onClick = { println("버튼 눌리나?") }) {
-
-        }
 
         FloatingButton(
             onClick = { println("fab 클릭") },
