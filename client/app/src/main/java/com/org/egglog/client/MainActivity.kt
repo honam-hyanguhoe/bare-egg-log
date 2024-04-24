@@ -31,6 +31,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.org.egglog.client.ui.atoms.buttons.AuthButton
 import com.org.egglog.client.ui.atoms.buttons.BigButton
+import com.org.egglog.client.ui.atoms.buttons.FloatingButton
 import com.org.egglog.client.ui.atoms.buttons.GroupButton
 import com.org.egglog.client.ui.atoms.buttons.HalfBigButton
 import com.org.egglog.client.ui.atoms.buttons.HalfMiddleButton
@@ -62,6 +63,9 @@ import com.org.egglog.client.utils.MySetting
 import com.org.egglog.client.utils.addFocusCleaner
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import kotlin.math.log
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,15 +109,10 @@ fun BottomSheetTest() {
     Column(
         modifier = Modifier.fillMaxWidth(),
     ) {
-        BottomSheet(
-            height = 400.dp,
-            showBottomSheet = showBottomSheet,
-            onDismiss = {
-                dismissSheet()
-            },
-        ) {
-            BottomSheetContent()
-        };
+        Text(text = "플로팅 버튼 테스트")
+        FloatingButton {
+            println("플로팅 버튼")
+        }
     }
 }
 
