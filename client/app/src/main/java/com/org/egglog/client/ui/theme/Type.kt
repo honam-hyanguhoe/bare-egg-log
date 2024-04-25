@@ -99,5 +99,15 @@ val Typography = Typography(
         fontSize = 12.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.5.sp
+    ),
+
+    // font-size-xxxs Bold
+    labelSmall = TextStyle(
+        fontFamily = lineFontFamily,
+        fontWeight = FontWeight.Medium,
+        fontSize = 10.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.2.sp
     )
+
 )

@@ -57,6 +57,8 @@ import com.org.egglog.client.ui.atoms.toggle.Toggle
 import com.org.egglog.client.ui.atoms.wheelPicker.DateTimePicker
 import com.org.egglog.client.ui.atoms.wheelPicker.TimePicker
 import com.org.egglog.client.ui.molecules.headers.BasicHeader
+import com.org.egglog.client.ui.molecules.headers.NoticeHeader
+import com.org.egglog.client.ui.molecules.headers.SearchHeader
 import com.org.egglog.client.ui.molecules.tabBar.TabBar
 import com.org.egglog.client.ui.molecules.infoList.InfoList
 import com.org.egglog.client.ui.organisms.agreeList.AgreeList
@@ -108,9 +110,33 @@ fun MyApp(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun HeaderTest(){
-    BasicHeader(title = "무튼 제목임", hasArrow = false, hasClose = false, hasLeftClose = true, hasProgressBar = true, hasMore = true)
+fun HeaderTest() {
+    Column {
+        BasicHeader(
+            title = "무튼 제목임",
+            hasArrow = true,
+            hasLeftClose = false,
+            hasClose = false,
+            hasInvitationButton = true,
+            hasProgressBar = true,
+            hasMore = true,
+        )
+
+        Spacer(modifier = Modifier.height(30.dp))
+        NoticeHeader(
+            title = "무튼 제목임",
+            hasSearch = true,
+            hasLogo = false,
+            hasMenu = true
+        )
+
+        Spacer(modifier = Modifier.height(30.dp))
+
+        SearchHeader()
+    }
+
 }
+
 @Composable
 fun BottomSheetTest() {
     var showBottomSheet by remember { mutableStateOf<Boolean>(false) }
