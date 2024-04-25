@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
@@ -35,7 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.org.egglog.client.data.CommentInfo
 import com.org.egglog.client.data.PostReactionInfo
-import com.org.egglog.client.data.RadioButtonColorInfo
+import com.org.egglog.client.data.Profile
 import com.org.egglog.client.data.UserInfo
 import com.org.egglog.client.ui.atoms.buttons.AuthButton
 import com.org.egglog.client.ui.atoms.buttons.BigButton
@@ -60,10 +63,21 @@ import com.org.egglog.client.ui.atoms.inputs.SingleInput
 import com.org.egglog.client.ui.theme.ClientTheme
 import com.org.egglog.client.ui.theme.Typography
 import com.org.egglog.client.ui.atoms.labels.Labels
+import com.org.egglog.client.ui.atoms.profileItem.ProfileItem
 import com.org.egglog.client.ui.atoms.toggle.Toggle
 import com.org.egglog.client.ui.atoms.wheelPicker.DateTimePicker
 import com.org.egglog.client.ui.atoms.wheelPicker.TimePicker
+import com.org.egglog.client.ui.molecules.cards.AlarmScheduleCard
+import com.org.egglog.client.ui.molecules.cards.AlarmSettingCard
+import com.org.egglog.client.ui.molecules.cards.BigScheduleCard
+import com.org.egglog.client.ui.molecules.headers.BasicHeader
+import com.org.egglog.client.ui.molecules.headers.NoticeHeader
+import com.org.egglog.client.ui.molecules.headers.SearchHeader
 import com.org.egglog.client.ui.molecules.cards.CommentCard
+import com.org.egglog.client.ui.molecules.cards.ExcelCard
+import com.org.egglog.client.ui.molecules.cards.HotPostCard
+import com.org.egglog.client.ui.molecules.cards.PostInfo
+import com.org.egglog.client.ui.molecules.cards.SmallScheduleCard
 import com.org.egglog.client.ui.molecules.tabBar.TabBar
 import com.org.egglog.client.ui.molecules.listItems.InfoList
 import com.org.egglog.client.ui.molecules.postReaction.PostReaction
@@ -71,6 +85,12 @@ import com.org.egglog.client.ui.organisms.agreeList.AgreeList
 import com.org.egglog.client.ui.molecules.profileButtonList.ProfileButtonList
 import com.org.egglog.client.ui.molecules.radioButtons.DayRadioButton
 import com.org.egglog.client.ui.molecules.radioButtons.WorkRadioButton
+import com.org.egglog.client.ui.molecules.infoList.InfoList
+import com.org.egglog.client.ui.molecules.listItems.AlarmListItem
+import com.org.egglog.client.ui.molecules.postReaction.PostReaction
+import com.org.egglog.client.ui.organisms.agreeList.AgreeList
+import com.org.egglog.client.ui.molecules.profileButtonList.ProfileButtonList
+import com.org.egglog.client.ui.molecules.swiper.Swiper
 import com.org.egglog.client.utils.widthPercent
 import com.org.egglog.client.ui.theme.*
 import com.org.egglog.client.utils.AddBox
@@ -101,8 +121,7 @@ fun MyAppPreview() {
 }
 
 @Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_NO,
-    name = "DefaultPreviewLight"
+    uiMode = Configuration.UI_MODE_NIGHT_NO, name = "DefaultPreviewLight"
 )
 @Composable
 fun MyApp(modifier: Modifier = Modifier) {
@@ -121,6 +140,65 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    TabBarTest()
 //    InfoListTest()
     RadioButtonTest()
+//    HeaderTest()
+//    ListTest()
+}
+
+@Composable
+fun ListTest() {
+    val checkedState = remember { mutableStateOf(false) }
+    AlarmListItem(title = "전체 알림",
+        checked = checkedState.value,
+        onCheckedChange = { checkedState.value = it }
+    )
+}
+
+@Composable
+fun HeaderTest() {
+    Column {
+
+        val groupOptions = listOf("그룹 설정", "그룹원 설정", "그룹 나가기")
+        var selectedMenuItem by remember { mutableStateOf<String?>(null) }
+
+        val communityOptions = listOf("통합", "엑록병원", "호남향우회")
+//        var selectedMenuItem by remember { mutableStateOf<String?>(null) }
+
+        BasicHeader(
+            title = "무튼 제목임",
+            hasTitle = false,
+            hasArrow = true,
+            hasLeftClose = false,
+            hasClose = false,
+            hasInvitationButton = true,
+            hasProgressBar = true,
+            hasMore = true,
+            onClickBack = {},
+            onClickLink = {},
+            onClickClose = {},
+            onClickMenus = {},
+            options = groupOptions,
+            selectedOption = selectedMenuItem,
+            onSelect = { selectedMenuItem = it }
+        )
+
+        Spacer(modifier = Modifier.height(30.dp))
+        NoticeHeader(
+            title = "무튼 제목임",
+            hasSearch = true,
+            hasLogo = false,
+            hasMenu = true,
+            onClickSearch = {},
+            onClickNotification = {},
+            onClickMenus = {},
+            options = communityOptions,
+            selectedOption = selectedMenuItem,
+            onSelect = { selectedMenuItem = it }
+        )
+
+        Spacer(modifier = Modifier.height(30.dp))
+
+        SearchHeader()
+    }
 }
 
 @Composable
@@ -229,54 +307,60 @@ fun InfoListTest(modifier: Modifier = Modifier) {
 @Composable
 fun CommunityTest(modifier: Modifier = Modifier) {
     val postReaction1 = PostReactionInfo(1, 100, 13, 123, true, true, true)
-    val postReaction2 = PostReactionInfo(1, 100, 13,  isLiked = true, isCommented =  true)
+    val postReaction2 = PostReactionInfo(1, 100, 13, isLiked = true, isCommented = true)
 
     Surface(modifier, color = MaterialTheme.colorScheme.background) {
         Column(modifier = Modifier.fillMaxSize()) {
             PostReaction(postReactionInfo = postReaction1)
             PostReaction(postReactionInfo = postReaction2)
-            CommentCard(
-                CommentInfo(
-                    1,
-                    1,
-                    "test",
-                    "전남대병원",
-                    "익명의 구운란",
-                    "2023-12-24 13:28:12",
-                    "https://picsum.photos/300",
-                    true,
-                    arrayListOf(
-                        CommentInfo(
-                            1,
-                            2,
-                            "test",
-                            "전남대병원",
-                            "익명의 구운란",
-                            "2023-12-24 13:28:12",
-                            "https://picsum.photos/300",
-                            true
-                        )
+            CommentCard(CommentInfo(
+                1,
+                1,
+                "test",
+                "전남대병원",
+                "익명의 구운란",
+                "2023-12-24 13:28:12",
+                "https://picsum.photos/300",
+                true,
+                arrayListOf(
+                    CommentInfo(
+                        1,
+                        2,
+                        "test",
+                        "전남대병원",
+                        "익명의 구운란",
+                        "2023-12-24 13:28:12",
+                        "https://picsum.photos/300",
+                        true
                     )
-                ),
-                myUserId = 2,
-                onDeleteClick = { clickedCommentId -> Log.d("답글삭제 클릭: ", "$clickedCommentId clicked!!!") },
-                onRecommentClick = { clickedCommentId -> Log.d("답글달기 클릭: ", "$clickedCommentId clicked!!!") }
-            )
-            CommentCard(
-                CommentInfo(
-                    1,
-                    2,
-                    "test",
-                    "전남대병원",
-                    "익명의 구운란",
-                    "2023-12-24 13:28:12",
-                    "https://picsum.photos/300",
-                    true
-                ),
-                myUserId = 1,
-                onDeleteClick = { clickedCommentId -> Log.d("답글삭제 클릭: ", "$clickedCommentId clicked!!!") },
-                onRecommentClick = { clickedCommentId -> Log.d("답글달기 클릭: ", "$clickedCommentId clicked!!!") }
-            )
+                )
+            ), myUserId = 2, onDeleteClick = { clickedCommentId ->
+                Log.d(
+                    "답글삭제 클릭: ", "$clickedCommentId clicked!!!"
+                )
+            }, onRecommentClick = { clickedCommentId ->
+                Log.d(
+                    "답글달기 클릭: ", "$clickedCommentId clicked!!!"
+                )
+            })
+            CommentCard(CommentInfo(
+                1,
+                2,
+                "test",
+                "전남대병원",
+                "익명의 구운란",
+                "2023-12-24 13:28:12",
+                "https://picsum.photos/300",
+                true
+            ), myUserId = 1, onDeleteClick = { clickedCommentId ->
+                Log.d(
+                    "답글삭제 클릭: ", "$clickedCommentId clicked!!!"
+                )
+            }, onRecommentClick = { clickedCommentId ->
+                Log.d(
+                    "답글달기 클릭: ", "$clickedCommentId clicked!!!"
+                )
+            })
         }
     }
 }
@@ -288,8 +372,7 @@ fun TimePickerTest(modifier: Modifier = Modifier) {
 
     Surface(modifier, color = MaterialTheme.colorScheme.background) {
         Column(
-            modifier = modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
         ) {
             TimePicker { time -> selectedTime.value = time }
             selectedTime.value?.let {
@@ -309,10 +392,7 @@ fun ToggleTest(modifier: Modifier = Modifier) {
     Surface(modifier, color = MaterialTheme.colorScheme.background) {
         Column(modifier = modifier.fillMaxSize()) {
             val checkedState = remember { mutableStateOf(true) }
-            Toggle(
-                checked = checkedState.value,
-                onCheckedChange = { checkedState.value = it }
-            )
+            Toggle(checked = checkedState.value, onCheckedChange = { checkedState.value = it })
         }
     }
 }
@@ -321,15 +401,61 @@ fun ToggleTest(modifier: Modifier = Modifier) {
 fun ProfileButtonTest(modifier: Modifier = Modifier) {
     val myUserId: Long = 1
     val userInfoList = arrayListOf(
-            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남1", empNo = "18-12543", userEmail = "test@test.com", userId = 1),
-            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남2", empNo = "18-12543", userEmail = "test@test.com", userId = 2),
-            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남3", empNo = "18-12543", userEmail = "test@test.com", userId = 3),
-            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남4", empNo = "18-12543", userEmail = "test@test.com", userId = 4),
-            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남5", empNo = "18-12543", userEmail = "test@test.com", userId = 5),
-            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남6", empNo = "18-12543", userEmail = "test@test.com", userId = 6),
-            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남7", empNo = "18-12543", userEmail = "test@test.com", userId = 7),
-            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남8", empNo = "18-12543", userEmail = "test@test.com", userId = 8),
-            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남9", empNo = "18-12543", userEmail = "test@test.com", userId = 9)
+        UserInfo(
+            profileImgUrl = "https://picsum.photos/300",
+            userName = "김호남1",
+            empNo = "18-12543",
+            userEmail = "test@test.com",
+            userId = 1
+        ), UserInfo(
+            profileImgUrl = "https://picsum.photos/300",
+            userName = "김호남2",
+            empNo = "18-12543",
+            userEmail = "test@test.com",
+            userId = 2
+        ), UserInfo(
+            profileImgUrl = "https://picsum.photos/300",
+            userName = "김호남3",
+            empNo = "18-12543",
+            userEmail = "test@test.com",
+            userId = 3
+        ), UserInfo(
+            profileImgUrl = "https://picsum.photos/300",
+            userName = "김호남4",
+            empNo = "18-12543",
+            userEmail = "test@test.com",
+            userId = 4
+        ), UserInfo(
+            profileImgUrl = "https://picsum.photos/300",
+            userName = "김호남5",
+            empNo = "18-12543",
+            userEmail = "test@test.com",
+            userId = 5
+        ), UserInfo(
+            profileImgUrl = "https://picsum.photos/300",
+            userName = "김호남6",
+            empNo = "18-12543",
+            userEmail = "test@test.com",
+            userId = 6
+        ), UserInfo(
+            profileImgUrl = "https://picsum.photos/300",
+            userName = "김호남7",
+            empNo = "18-12543",
+            userEmail = "test@test.com",
+            userId = 7
+        ), UserInfo(
+            profileImgUrl = "https://picsum.photos/300",
+            userName = "김호남8",
+            empNo = "18-12543",
+            userEmail = "test@test.com",
+            userId = 8
+        ), UserInfo(
+            profileImgUrl = "https://picsum.photos/300",
+            userName = "김호남9",
+            empNo = "18-12543",
+            userEmail = "test@test.com",
+            userId = 9
+        )
     )
     val selectedList = remember { mutableStateListOf<Long>(0, 0, 0) }
 
@@ -344,7 +470,15 @@ fun ProfileButtonTest(modifier: Modifier = Modifier) {
 fun CardTest(modifier: Modifier = Modifier) {
     Surface(modifier, color = MaterialTheme.colorScheme.background) {
         Column(modifier = modifier.fillMaxSize()) {
-            ProfileCard(UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남", empNo = "18-12543", userEmail = "test@test.com", userId = 2))
+            ProfileCard(
+                UserInfo(
+                    profileImgUrl = "https://picsum.photos/300",
+                    userName = "김호남",
+                    empNo = "18-12543",
+                    userEmail = "test@test.com",
+                    userId = 2
+                )
+            )
         }
     }
 }
@@ -381,13 +515,11 @@ fun InputTest(modifier: Modifier = Modifier) {
                 focusManager = focusManager,
                 placeholder = "사번 입력"
             )
-            SearchInput(
-                text = text3.value,
+            SearchInput(text = text3.value,
                 onValueChange = { text3.value = it },
                 focusManager = focusManager,
                 placeholder = "근무지 지역 선택",
-                onClickDone = { Log.d("click done: ", text3.value) }
-            )
+                onClickDone = { Log.d("click done: ", text3.value) })
             PassInput(pin = pin.value, onValueChange = { pin.value = it })
         }
     }
@@ -428,8 +560,7 @@ fun ButtonTest(modifier: Modifier = Modifier) {
     Surface(modifier, color = MaterialTheme.colorScheme.background) {
         Column(modifier = modifier.fillMaxSize()) {
             BigButton(
-                onClick = { Log.d("clicked: ", "clicked!!!!") },
-                colors = ButtonColors(
+                onClick = { Log.d("clicked: ", "clicked!!!!") }, colors = ButtonColors(
                     contentColor = Warning25,
                     containerColor = Warning300,
                     disabledContentColor = Gray25,
@@ -437,13 +568,11 @@ fun ButtonTest(modifier: Modifier = Modifier) {
                 )
             ) {
                 Text(
-                    style = Typography.bodyLarge,
-                    text = "회원가입 완료하기"
+                    style = Typography.bodyLarge, text = "회원가입 완료하기"
                 )
             }
             MiddleButton(
-                onClick = { Log.d("clicked: ", "clicked!!!!") },
-                colors = ButtonColors(
+                onClick = { Log.d("clicked: ", "clicked!!!!") }, colors = ButtonColors(
                     contentColor = Warning25,
                     containerColor = Warning300,
                     disabledContentColor = Gray25,
@@ -452,8 +581,7 @@ fun ButtonTest(modifier: Modifier = Modifier) {
             ) {
                 Row(Modifier.fillMaxSize(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
                     Text(
-                        style = Typography.displayLarge,
-                        text = "그룹을 만들고 동료를 초대해보세요"
+                        style = Typography.displayLarge, text = "그룹을 만들고 동료를 초대해보세요"
                     )
                     Icon(
                         AddBox,
@@ -464,8 +592,7 @@ fun ButtonTest(modifier: Modifier = Modifier) {
             }
 
             ThinButton(
-                onClick = { Log.d("clicked: ", "clicked!!!!") },
-                colors = ButtonColors(
+                onClick = { Log.d("clicked: ", "clicked!!!!") }, colors = ButtonColors(
                     contentColor = Warning25,
                     containerColor = Warning300,
                     disabledContentColor = Gray25,
@@ -473,14 +600,12 @@ fun ButtonTest(modifier: Modifier = Modifier) {
                 )
             ) {
                 Text(
-                    style = Typography.labelLarge,
-                    text = "근무표 등록하기"
+                    style = Typography.labelLarge, text = "근무표 등록하기"
                 )
             }
 
             HalfBigButton(
-                onClick = { Log.d("clicked: ", "clicked!!!!") },
-                colors = ButtonColors(
+                onClick = { Log.d("clicked: ", "clicked!!!!") }, colors = ButtonColors(
                     contentColor = Gray25,
                     containerColor = Gray300,
                     disabledContentColor = Gray25,
@@ -488,14 +613,12 @@ fun ButtonTest(modifier: Modifier = Modifier) {
                 )
             ) {
                 Text(
-                    style = Typography.displayLarge,
-                    text = "취소"
+                    style = Typography.displayLarge, text = "취소"
                 )
             }
 
             HalfMiddleButton(
-                onClick = { Log.d("clicked: ", "clicked!!!!") },
-                colors = ButtonColors(
+                onClick = { Log.d("clicked: ", "clicked!!!!") }, colors = ButtonColors(
                     contentColor = Gray800,
                     containerColor = Gray300,
                     disabledContentColor = Gray25,
@@ -503,14 +626,12 @@ fun ButtonTest(modifier: Modifier = Modifier) {
                 )
             ) {
                 Text(
-                    style = Typography.displayLarge,
-                    text = "취소"
+                    style = Typography.displayLarge, text = "취소"
                 )
             }
 
             HalfThinButton(
-                onClick = { Log.d("clicked: ", "clicked!!!!") },
-                colors = ButtonColors(
+                onClick = { Log.d("clicked: ", "clicked!!!!") }, colors = ButtonColors(
                     contentColor = Gray25,
                     containerColor = Gray300,
                     disabledContentColor = Gray25,
@@ -518,8 +639,7 @@ fun ButtonTest(modifier: Modifier = Modifier) {
                 )
             ) {
                 Text(
-                    style = Typography.displayLarge,
-                    text = "취소"
+                    style = Typography.displayLarge, text = "취소"
                 )
             }
 
@@ -540,44 +660,24 @@ fun ButtonTest(modifier: Modifier = Modifier) {
 
             Row {
                 ProfileButton(
-                    onClick = { Log.d("test: ", "clicked!!!") },
-                    UserInfo(
-                        profileImgUrl = "https://picsum.photos/300",
-                        userId = 1,
-                        userName = "김호남"
-                    ),
-                    isMine = true,
-                    isSelected = true
+                    onClick = { Log.d("test: ", "clicked!!!") }, UserInfo(
+                        profileImgUrl = "https://picsum.photos/300", userId = 1, userName = "김호남"
+                    ), isMine = true, isSelected = true
                 )
                 ProfileButton(
-                    onClick = { Log.d("test: ", "clicked!!!") },
-                    UserInfo(
-                        profileImgUrl = "https://picsum.photos/300",
-                        userId = 1,
-                        userName = "김호남"
-                    ),
-                    isMine = true,
-                    isSelected = false
+                    onClick = { Log.d("test: ", "clicked!!!") }, UserInfo(
+                        profileImgUrl = "https://picsum.photos/300", userId = 1, userName = "김호남"
+                    ), isMine = true, isSelected = false
                 )
                 ProfileButton(
-                    onClick = { Log.d("test: ", "clicked!!!") },
-                    UserInfo(
-                        profileImgUrl = "https://picsum.photos/300",
-                        userId = 1,
-                        userName = "김호남"
-                    ),
-                    isMine = false,
-                    isSelected = true
+                    onClick = { Log.d("test: ", "clicked!!!") }, UserInfo(
+                        profileImgUrl = "https://picsum.photos/300", userId = 1, userName = "김호남"
+                    ), isMine = false, isSelected = true
                 )
                 ProfileButton(
-                    onClick = { Log.d("test: ", "clicked!!!") },
-                    UserInfo(
-                        profileImgUrl = "https://picsum.photos/300",
-                        userId = 1,
-                        userName = "김호남"
-                    ),
-                    isMine = false,
-                    isSelected = false
+                    onClick = { Log.d("test: ", "clicked!!!") }, UserInfo(
+                        profileImgUrl = "https://picsum.photos/300", userId = 1, userName = "김호남"
+                    ), isMine = false, isSelected = false
                 )
             }
 
@@ -594,6 +694,100 @@ fun ButtonTest(modifier: Modifier = Modifier) {
                 icon = Logout
             )
             IconTextButton(onClick = {}, width = 70, height = 30, icon = Search, text = "안녕")
+        }
+    }
+}
+
+
+@Composable
+fun SwiperTest() {
+    fun onDelete() {
+        // 삭제버튼 클릭시 실행할 함수
+        println("삭제함")
+    }
+
+    fun onChnageLeader() {
+        // 모임장 위임 버튼 클릭시 실행할 함수
+        println("모임장 바꿈")
+    }
+
+    Swiper(onDelete = ::onDelete, onChangeLeader =::onChnageLeader) {
+        // swipe 되는 Box 안에 들어갈 요소
+        val profile = Profile(1, "김싸피", "전남대학교병원")
+        ProfileItem(profile = profile, type = "basic")
+    }
+}
+
+
+@Composable
+fun CardTest() {
+    val onClickPost: ()->Unit = {
+        println("클릭됨")
+    }
+
+    val onClickMore: (planId: Any) -> Unit = {
+            planId -> println("${planId}번 클릭됨")
+    }
+
+    val postInfo = PostInfo("부서 골라주실 분!!!", "익명의 구운란", 5, 100, false)
+    var checked by remember { mutableStateOf(false) }
+
+    val setToggle: () -> Unit = {
+        checked = !checked
+    }
+
+    // onClickCard 함수 정의
+    val onClickCard: () -> Unit = {
+        // Card를 클릭했을 때 수행할 작업
+        println("안녕")
+    }
+
+    LazyColumn(Modifier.padding(10.dp)) {
+        item {
+            HotPostCard(postInfo = postInfo, onClickPost = onClickPost)
+        }
+        item {
+            SmallScheduleCard("day", "14:00", "20:00") {
+                onClickMore(0)
+            }
+        }
+
+        item {
+            BigScheduleCard("day", "14:00", "20:00", "조선대병원 3중환자실") {
+                onClickMore(0)
+            }
+        }
+        item {
+            BigScheduleCard("eve", "14:00", "20:00", "조선대병원 3중환자실") {
+                onClickMore(0)
+            }
+        }
+        item {
+            BigScheduleCard("basic", "14:00", "20:00", "조선대병원 3중환자실", title = "추가 근무", color = Color(0xFFFDA29B)) {
+                onClickMore(0)
+            }
+        }
+        item {
+            AlarmScheduleCard(title = "기상 알람", time = "11:00", duration = 30, interval = 5)
+        }
+        item {
+            AlarmSettingCard("Day", "14:00", 30, 5, checked, setToggle=setToggle, onClickCard=onClickCard)
+        }
+
+        item {
+            AlarmSettingCard("Eve", "14:00", 30, 5, checked, setToggle=setToggle, onClickCard=onClickCard)
+        }
+
+        item {
+            AlarmSettingCard("개인", "14:00", 30, 5, checked, setToggle=setToggle, onClickCard=onClickCard, color = Color(0xFFFDA29B))
+        }
+
+
+        item {
+            Row() {
+                ExcelCard(color = "green", date = "2024-03-03", name = "김싸피", onClickCard = {println("안녕하세요")})
+                ExcelCard(color = "white", date = "2024-03-03", name = "김싸피", onClickCard = {println("안녕하세요")})
+            }
         }
     }
 }
