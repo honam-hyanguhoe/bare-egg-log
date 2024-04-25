@@ -32,7 +32,13 @@ fun BackgroundCard(margin: Dp, padding: Dp, color: Color, borderRadius: Dp, onCl
             .fillMaxWidth()
             .padding(margin)
             .background(color, RoundedCornerShape(borderRadius))
-            .clickable { onClickCard ?: {} }
+            .run {
+                if (onClickCard != null) {
+                    clickable { onClickCard() }
+                } else {
+                    this
+                }
+            }
             .padding(padding)) {
         children()
     }
