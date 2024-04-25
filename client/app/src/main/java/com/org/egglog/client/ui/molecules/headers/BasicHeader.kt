@@ -53,10 +53,13 @@ fun BasicHeader(
     hasInvitationButton: Boolean = false,
     hasProgressBar: Boolean = false,
     hasMore: Boolean = false,
-    onClickBack : () -> Unit,
-    onClickLink : () -> Unit,
-    onClickClose : () -> Unit,
-    onClickMenus : () -> Unit,
+    onClickBack: () -> Unit,
+    onClickLink: () -> Unit,
+    onClickClose: () -> Unit,
+    onClickMenus: () -> Unit,
+    options: List<String> = listOf(""),
+    selectedOption: String?,
+    onSelect: (String) -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -76,6 +79,9 @@ fun BasicHeader(
                 onClickLink = onClickLink,
                 onClickClose = onClickClose,
                 onClickMenus = onClickMenus,
+                options = options,
+                selectedOption = selectedOption,
+                onSelect = onSelect
             )
             if (hasProgressBar) {
                 Spacer(modifier = Modifier.height(5.dp))
@@ -94,10 +100,13 @@ fun BasicHeaderContents(
     hasClose: Boolean = false,
     hasInvitationButton: Boolean = false,
     hasMore: Boolean = false,
-    onClickBack : () -> Unit = {},
-    onClickLink : () -> Unit = {},
-    onClickClose : () -> Unit = {},
-    onClickMenus : () -> Unit = {},
+    onClickBack: () -> Unit = {},
+    onClickLink: () -> Unit = {},
+    onClickClose: () -> Unit = {},
+    onClickMenus: () -> Unit = {},
+    options: List<String> = listOf(""),
+    selectedOption: String?,
+    onSelect: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
 
@@ -158,12 +167,12 @@ fun BasicHeaderContents(
                     color = NaturalBlack,
                     onClick = { onClickClose })
             } else if (hasMore) {
-                val groupOptions = listOf("그룹 설정", "그룹원 설정", "그룹 나가기")
-                var selectedMenuItem by remember { mutableStateOf<String?>(null) }
+
                 ScrollableMenus(
-                    options = groupOptions,
-                    selectedOption = selectedMenuItem,
-                    onSelect = { selectedMenuItem = it })
+                    options = options,
+                    selectedOption = selectedOption,
+                    onSelect = onSelect
+                )
             } else {
                 Box(modifier = Modifier.size(30.widthPercent(context).dp))
             }

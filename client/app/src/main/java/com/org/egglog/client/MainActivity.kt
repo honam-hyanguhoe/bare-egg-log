@@ -123,6 +123,13 @@ fun MyApp(modifier: Modifier = Modifier) {
 @Composable
 fun HeaderTest() {
     Column {
+
+        val groupOptions = listOf("그룹 설정", "그룹원 설정", "그룹 나가기")
+        var selectedMenuItem by remember { mutableStateOf<String?>(null) }
+
+        val communityOptions = listOf("통합", "엑록병원", "호남향우회")
+//        var selectedMenuItem by remember { mutableStateOf<String?>(null) }
+
         BasicHeader(
             title = "무튼 제목임",
             hasTitle = false,
@@ -135,21 +142,30 @@ fun HeaderTest() {
             onClickBack = {},
             onClickLink = {},
             onClickClose = {},
-            onClickMenus = {}
+            onClickMenus = {},
+            options = groupOptions,
+            selectedOption = selectedMenuItem,
+            onSelect = {selectedMenuItem = it}
         )
 
         Spacer(modifier = Modifier.height(30.dp))
         NoticeHeader(
-            title = "무튼 제목임", hasSearch = true, hasLogo = true, hasMenu = false, onClickSearch = {},
+            title = "무튼 제목임",
+            hasSearch = true,
+            hasLogo = false,
+            hasMenu = true,
+            onClickSearch = {},
             onClickNotification = {},
             onClickMenus = {},
+            options = communityOptions,
+            selectedOption = selectedMenuItem,
+            onSelect = {selectedMenuItem = it}
         )
 
         Spacer(modifier = Modifier.height(30.dp))
 
         SearchHeader()
     }
-
 }
 
 @Composable

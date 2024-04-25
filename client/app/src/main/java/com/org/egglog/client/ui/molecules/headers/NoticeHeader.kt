@@ -44,6 +44,9 @@ fun NoticeHeader(
     onClickSearch : () -> Unit = {},
     onClickNotification : () -> Unit = {},
     onClickMenus : () -> Unit = {},
+    options: List<String> = listOf(""),
+    selectedOption: String?,
+    onSelect: (String) -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -60,6 +63,9 @@ fun NoticeHeader(
                 onClickSearch = onClickSearch,
                 onClickNotification = onClickNotification,
                 onClickMenus = onClickMenus,
+                options = options,
+                selectedOption = selectedOption,
+                onSelect = onSelect
             )
         }
     }
@@ -74,6 +80,9 @@ fun NoticeHeaderContents(
     onClickSearch : () -> Unit = {},
     onClickNotification : () -> Unit = {},
     onClickMenus : () -> Unit = {},
+    options: List<String> = listOf(""),
+    selectedOption: String?,
+    onSelect: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
     Row(
@@ -104,15 +113,13 @@ fun NoticeHeaderContents(
                 )
 
                 if (hasMenu) {
-                    val communityOptions = listOf("통합", "엑록병원", "호남향우회")
-                    var selectedMenuItem by remember { mutableStateOf<String?>(null) }
 
                     ScrollableMenus(
                         iconShape = ArrowDown,
                         horizontalOffset = -80.dp,
-                        options = communityOptions,
-                        selectedOption = selectedMenuItem,
-                        onSelect = { selectedMenuItem = it })
+                        options = options,
+                        selectedOption = selectedOption,
+                        onSelect = onSelect)
                 }
             }
         }
