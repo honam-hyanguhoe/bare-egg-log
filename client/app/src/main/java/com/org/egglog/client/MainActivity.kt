@@ -1,5 +1,6 @@
 package com.org.egglog.client
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -30,7 +31,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.org.egglog.client.data.PostReactionInfo
 import com.org.egglog.client.data.UserInfo
 import com.org.egglog.client.ui.atoms.buttons.AuthButton
 import com.org.egglog.client.ui.atoms.buttons.BigButton
@@ -57,6 +60,7 @@ import com.org.egglog.client.ui.atoms.toggle.Toggle
 import com.org.egglog.client.ui.atoms.wheelPicker.DateTimePicker
 import com.org.egglog.client.ui.atoms.wheelPicker.TimePicker
 import com.org.egglog.client.ui.molecules.infoList.InfoList
+import com.org.egglog.client.ui.molecules.postReaction.PostReaction
 import com.org.egglog.client.ui.organisms.agreeList.AgreeList
 import com.org.egglog.client.ui.molecules.profileButtonList.ProfileButtonList
 import com.org.egglog.client.utils.widthPercent
@@ -87,7 +91,10 @@ fun MyAppPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    name = "DefaultPreviewLight"
+)
 @Composable
 fun MyApp(modifier: Modifier = Modifier) {
 //    LabelTest()
@@ -100,7 +107,8 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    AgreeListTest()
 //    CardTest()
 //    ProfileButtonTest()
-    InfoListTest()
+//    InfoListTest()
+    CommunityTest()
 }
 
 @Composable
@@ -166,6 +174,16 @@ fun LabelTest(modifier: Modifier = Modifier) {
 fun InfoListTest(modifier: Modifier = Modifier) {
     Surface(modifier, color = MaterialTheme.colorScheme.background) {
         InfoList()
+    }
+}
+
+@Composable
+fun CommunityTest(modifier: Modifier = Modifier) {
+    Surface(modifier, color = MaterialTheme.colorScheme.background) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            PostReaction(postReactionInfo = PostReactionInfo(100, 13, 123, true, true, true))
+            PostReaction(postReactionInfo = PostReactionInfo(100, 13,  isLiked = true, isCommented =  true))
+        }
     }
 }
 
