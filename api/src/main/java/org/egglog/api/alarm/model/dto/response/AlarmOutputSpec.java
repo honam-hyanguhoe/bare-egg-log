@@ -11,7 +11,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class AlarmOutputSpec {
 
     private Long alarmId;
@@ -25,4 +25,6 @@ public class AlarmOutputSpec {
     private Boolean isAlarmOn;
 
     private String workTypeTitle;
+
+    private String workTypeColor;
 }
