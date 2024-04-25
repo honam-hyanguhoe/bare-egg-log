@@ -40,10 +40,10 @@ public class BoardController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> registBoard(@RequestBody BoardForm boardForm) {
+    public ResponseEntity<?> registerBoard(@RequestBody BoardForm boardForm) {
 //        TODO @AuthenticationPrincipal User user
         Long userId = 1L;
-        boardService.registBoard(boardForm, userId);
+        boardService.registerBoard(boardForm, userId);
         return ResponseEntity.ok().body(MessageUtils.success());
     }
 
@@ -71,10 +71,10 @@ public class BoardController {
     }
 
     @PostMapping("/like")
-    public ResponseEntity<?> registLike(@RequestBody LikeForm likeForm) {
+    public ResponseEntity<?> registerLike(@RequestBody LikeForm likeForm) {
         //        TODO @AuthenticationPrincipal User user
         Long userId = 1L;
-        boardService.registLike(likeForm, userId);
+        boardService.registerLike(likeForm, userId);
         return ResponseEntity.ok().body(MessageUtils.success());
     }
 

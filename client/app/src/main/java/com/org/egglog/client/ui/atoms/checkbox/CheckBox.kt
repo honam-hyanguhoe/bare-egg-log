@@ -36,7 +36,7 @@ fun CheckBoxRow(text: String = "", value: Boolean, onClick: (Any) -> Unit, enabl
             enabled = enabled
         )
         ClickableText(
-            text = AnnotatedString(text), onClick = onClick, modifier = Modifier.fillMaxWidth(), style = Typography.bodyMedium
+            text = AnnotatedString(text), onClick = onClick, style = Typography.bodyMedium
         )
     }
 }

@@ -25,7 +25,7 @@ import com.org.egglog.client.utils.heightPercent
 import com.org.egglog.client.utils.widthPercent
 
 @Composable
-fun SettingButton(onClick: () -> Unit, icon: ImageVector, text: String, color: Color) {
+fun SettingButton(onClick: () -> Unit, icon: ImageVector, text: String, color: Color, iconColor: Color = color) {
     val context = LocalContext.current
     Surface(
         onClick = onClick,
@@ -36,8 +36,8 @@ fun SettingButton(onClick: () -> Unit, icon: ImageVector, text: String, color: C
         Row(Modifier.fillMaxWidth(), Arrangement.Start, Alignment.CenterVertically) {
             Icon(
                 imageVector = icon,
-                modifier = Modifier.size(22.widthPercent(context).dp),
-                color = color
+                modifier = Modifier.size(20.widthPercent(context).dp),
+                color = iconColor
             )
             Spacer(Modifier.padding(2.widthPercent(context).dp))
             Text(style = Typography.bodyMedium, text = text, color = color)

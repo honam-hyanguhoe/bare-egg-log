@@ -15,7 +15,7 @@ public interface BoardService {
 
     List<BoardListOutputSpec> getBoardList(BoardListForm boardListForm, Long userId);
 
-    void registBoard(BoardForm boardForm, Long userId);
+    void registerBoard(BoardForm boardForm, Long userId);
 
     void deleteBoard(Long boardId, Long userId);
 
@@ -23,7 +23,7 @@ public interface BoardService {
 
     BoardOutputSpec getBoard(Long boardId, Long userId);
 
-    void registLike(LikeForm likeForm, Long userId);
+    void registerLike(LikeForm likeForm, Long userId);
 
     void deleteLike(LikeForm likeForm, Long userId);
 }

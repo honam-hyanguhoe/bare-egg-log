@@ -15,8 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.org.egglog.client.data.Profile
 import com.org.egglog.client.ui.atoms.icons.Icon
-import com.org.egglog.client.ui.atoms.profileItem.Profile
 import com.org.egglog.client.ui.atoms.profileItem.ProfileItem
 import com.org.egglog.client.ui.theme.ClientTheme
 import com.org.egglog.client.ui.theme.Typography
@@ -34,7 +34,7 @@ fun ProfileDetailCard(profile: Profile, type: String, createdAt: String, onDelet
             else -> null
         }
 
-        val myUserId = 1
+        val myUserId: Long = 1
 
         ProfileItem(profile = profile, type = "post", createdAt = created)
 

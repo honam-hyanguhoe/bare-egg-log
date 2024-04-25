@@ -6,8 +6,8 @@ import org.egglog.api.security.exception.JwtErrorCode;
 import org.egglog.api.security.exception.JwtException;
 import org.egglog.api.security.model.dto.response.TokenResponse;
 import org.egglog.api.security.model.entity.Token;
-import org.egglog.api.security.model.repository.RefreshTokenRepository;
-import org.egglog.api.security.model.repository.UnsafeTokenRepository;
+import org.egglog.api.security.repository.redis.RefreshTokenRepository;
+import org.egglog.api.security.repository.redis.UnsafeTokenRepository;
 import org.egglog.api.security.util.JwtUtils;
 import org.springframework.stereotype.Service;
 
@@ -36,8 +36,14 @@ public class TokenService {
             Long id = jwtUtils.getUserIdByRefreshToken(refreshToken);
             String role = jwtUtils.getUserRoleByRefreshToken(refreshToken);
             Token token = refreshTokenRepository.findById(id).orElseThrow(() -> new JwtException(JwtErrorCode.NOT_EXISTS_TOKEN));
+
+            //블랙리스트에 존재한다면
+            if (!unsafeTokenRepository.findById(token.getAccessToken()).isPresent()){
+                refreshTokenRepository.delete(token); //토큰 지우고
+                throw new JwtException(JwtErrorCode.INVALID_TOKEN); //로그인 재요청
+            }
             if(refreshToken.equals(token.getRefreshToken())){
-                RemoveToken(id);
+                refreshTokenRepository.delete(token);
                 return generatedToken(id, role);
             }else {
                 RemoveToken(id);

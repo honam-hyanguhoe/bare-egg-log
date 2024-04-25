@@ -8,12 +8,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.egglog.api.security.exception.JwtErrorCode;
+import org.egglog.api.security.exception.JwtException;
+import org.egglog.api.security.model.entity.Token;
+import org.egglog.api.security.repository.redis.RefreshTokenRepository;
+import org.egglog.api.security.repository.redis.UnsafeTokenRepository;
 import org.egglog.api.security.util.JwtUtils;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
-import org.egglog.api.user.repository.UserJpaRepository;
-import org.egglog.api.user.repository.UserQueryRepository;
+import org.egglog.api.user.repository.jpa.UserQueryRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -21,13 +25,17 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class JwtFilter extends OncePerRequestFilter {
-    private final UserJpaRepository userJpaRepository;
+
     private final UserQueryRepository userQueryRepository;
     private final JwtUtils jwtUtils;
+    private final UnsafeTokenRepository unsafeTokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String BEARER_PREFIX = "Bearer ";
 
@@ -53,7 +61,12 @@ public class JwtFilter extends OncePerRequestFilter {
         if(claimsJws != null){
             User user = userQueryRepository.findById(jwtUtils.getUserIdByAccessToken(accessToken))
                     .orElseThrow(() -> new UserException(UserErrorCode.NOT_EXISTS_USER));
-
+            //블랙리스트에 존재한다면
+            if (!unsafeTokenRepository.findById(accessToken).isPresent()){
+                Token token = refreshTokenRepository.findById(user.getId()).orElseThrow(() -> new JwtException(JwtErrorCode.NOT_EXISTS_TOKEN));
+                refreshTokenRepository.delete(token); //토큰 지우고
+                throw new JwtException(JwtErrorCode.INVALID_TOKEN); //로그인 재요청
+            }
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         }

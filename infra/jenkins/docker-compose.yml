@@ -15,7 +15,6 @@ services:
       - "8080:8080"
     networks:
       - egg-log-net
-    command: sh -c "chown root:docker /var/run/docker.sock"
 
 networks:
   egg-log-net:
