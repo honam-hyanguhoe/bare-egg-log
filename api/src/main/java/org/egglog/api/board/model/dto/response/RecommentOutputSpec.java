@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class RecommentOutputSpec {
 
     private Long commentId;
@@ -28,6 +28,6 @@ public class RecommentOutputSpec {
 
     private String profileImgUrl;
 
-    private Boolean isAuth;     // 인증 여부
+    private Boolean isHospitalAuth;     // 인증 여부
 
 }

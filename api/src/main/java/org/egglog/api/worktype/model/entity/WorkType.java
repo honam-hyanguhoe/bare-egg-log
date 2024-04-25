@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.egglog.api.user.model.entity.User;
 
+import java.time.LocalTime;
+
 @Entity
 @Getter
 @Setter
@@ -25,10 +27,10 @@ public class WorkType {
     private String workTypeImgUrl;      //근무 이미지
 
     @Column(name = "work_start_time")
-    private String startTime;       //시작시간
+    private LocalTime startTime;       //시작시간
 
     @Column(name = "work_end_time")
-    private String endTime;     //종료 시간
+    private LocalTime endTime;     //종료 시간
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

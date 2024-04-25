@@ -10,7 +10,7 @@ import org.egglog.api.board.model.entity.BoardType;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class BoardData {
 
     private String boardContent;
