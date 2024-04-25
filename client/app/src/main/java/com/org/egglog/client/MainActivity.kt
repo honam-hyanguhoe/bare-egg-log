@@ -23,7 +23,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,7 +49,6 @@ import com.org.egglog.client.ui.atoms.buttons.HalfThinButton
 import com.org.egglog.client.ui.atoms.buttons.IconTextButton
 import com.org.egglog.client.ui.atoms.buttons.MiddleButton
 import com.org.egglog.client.ui.atoms.buttons.ProfileButton
-import com.org.egglog.client.ui.atoms.buttons.RadioLabelButton
 import com.org.egglog.client.ui.atoms.buttons.SettingButton
 import com.org.egglog.client.ui.atoms.buttons.ThinButton
 import com.org.egglog.client.ui.atoms.cards.ProfileCard
@@ -85,11 +83,7 @@ import com.org.egglog.client.ui.organisms.agreeList.AgreeList
 import com.org.egglog.client.ui.molecules.profileButtonList.ProfileButtonList
 import com.org.egglog.client.ui.molecules.radioButtons.DayRadioButton
 import com.org.egglog.client.ui.molecules.radioButtons.WorkRadioButton
-import com.org.egglog.client.ui.molecules.infoList.InfoList
 import com.org.egglog.client.ui.molecules.listItems.AlarmListItem
-import com.org.egglog.client.ui.molecules.postReaction.PostReaction
-import com.org.egglog.client.ui.organisms.agreeList.AgreeList
-import com.org.egglog.client.ui.molecules.profileButtonList.ProfileButtonList
 import com.org.egglog.client.ui.molecules.swiper.Swiper
 import com.org.egglog.client.utils.widthPercent
 import com.org.egglog.client.ui.theme.*
