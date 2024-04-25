@@ -1,5 +1,6 @@
 package com.org.egglog.client
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -15,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -30,7 +30,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.org.egglog.client.data.PostReactionInfo
 import com.org.egglog.client.data.UserInfo
 import com.org.egglog.client.ui.atoms.buttons.AuthButton
 import com.org.egglog.client.ui.atoms.buttons.BigButton
@@ -56,7 +58,9 @@ import com.org.egglog.client.ui.atoms.labels.Labels
 import com.org.egglog.client.ui.atoms.toggle.Toggle
 import com.org.egglog.client.ui.atoms.wheelPicker.DateTimePicker
 import com.org.egglog.client.ui.atoms.wheelPicker.TimePicker
+import com.org.egglog.client.ui.molecules.tabBar.TabBar
 import com.org.egglog.client.ui.molecules.infoList.InfoList
+import com.org.egglog.client.ui.molecules.postReaction.PostReaction
 import com.org.egglog.client.ui.organisms.agreeList.AgreeList
 import com.org.egglog.client.ui.molecules.profileButtonList.ProfileButtonList
 import com.org.egglog.client.utils.widthPercent
@@ -87,7 +91,10 @@ fun MyAppPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    name = "DefaultPreviewLight"
+)
 @Composable
 fun MyApp(modifier: Modifier = Modifier) {
 //    LabelTest()
@@ -100,7 +107,10 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    AgreeListTest()
 //    CardTest()
 //    ProfileButtonTest()
-    InfoListTest()
+//    InfoListTest()
+    CommunityTest()
+//    TabBarTest()
+//    InfoListTest()
 }
 
 @Composable
@@ -111,9 +121,11 @@ fun BottomSheetTest() {
         showBottomSheet = false
     }
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .border(2.dp, NaturalBlack)) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .border(2.dp, NaturalBlack)
+    ) {
 
         Text("hi")
 
@@ -135,6 +147,29 @@ fun BottomSheetContent() {
     Spacer(modifier = Modifier.height(180.dp))
 }
 
+@Composable
+fun TabBarTest() {
+    val titles = listOf("근무", "알람")
+    TabBar(
+        titles,
+        { FirstTabContents() },
+        { SecondTabContents() },
+    )
+}
+
+@Composable
+fun FirstTabContents() {
+    Column {
+        Text("첫번쨰 컨텐츠")
+    }
+}
+
+@Composable
+fun SecondTabContents() {
+    Column {
+        Text("두번쨰 컨텐츠")
+    }
+}
 
 @Composable
 fun LabelTest(modifier: Modifier = Modifier) {
@@ -170,12 +205,28 @@ fun InfoListTest(modifier: Modifier = Modifier) {
 }
 
 @Composable
+fun CommunityTest(modifier: Modifier = Modifier) {
+    val postReaction1 = PostReactionInfo(1, 100, 13, 123, true, true, true)
+    val postReaction2 = PostReactionInfo(1, 100, 13,  isLiked = true, isCommented =  true)
+
+    Surface(modifier, color = MaterialTheme.colorScheme.background) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            PostReaction(postReactionInfo = postReaction1)
+            PostReaction(postReactionInfo = postReaction2)
+        }
+    }
+}
+
+@Composable
 fun TimePickerTest(modifier: Modifier = Modifier) {
     val selectedTime = remember { mutableStateOf<LocalTime?>(null) }
     val selectedDateTime = remember { mutableStateOf<LocalDateTime?>(null) }
 
     Surface(modifier, color = MaterialTheme.colorScheme.background) {
-        Column(modifier = modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            modifier = modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             TimePicker { time -> selectedTime.value = time }
             selectedTime.value?.let {
                 Text(text = "Selected Time: ${selectedTime.value}")
@@ -206,15 +257,15 @@ fun ToggleTest(modifier: Modifier = Modifier) {
 fun ProfileButtonTest(modifier: Modifier = Modifier) {
     val myUserId = 1
     val userInfoList = arrayListOf(
-        UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남1", empNo = "18-12543", userEmail = "test@test.com", userId = 1),
-        UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남2", empNo = "18-12543", userEmail = "test@test.com", userId = 2),
-        UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남3", empNo = "18-12543", userEmail = "test@test.com", userId = 3),
-        UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남4", empNo = "18-12543", userEmail = "test@test.com", userId = 4),
-        UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남5", empNo = "18-12543", userEmail = "test@test.com", userId = 5),
-        UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남6", empNo = "18-12543", userEmail = "test@test.com", userId = 6),
-        UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남7", empNo = "18-12543", userEmail = "test@test.com", userId = 7),
-        UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남8", empNo = "18-12543", userEmail = "test@test.com", userId = 8),
-        UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남9", empNo = "18-12543", userEmail = "test@test.com", userId = 9)
+            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남1", empNo = "18-12543", userEmail = "test@test.com", userId = 1),
+            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남2", empNo = "18-12543", userEmail = "test@test.com", userId = 2),
+            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남3", empNo = "18-12543", userEmail = "test@test.com", userId = 3),
+            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남4", empNo = "18-12543", userEmail = "test@test.com", userId = 4),
+            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남5", empNo = "18-12543", userEmail = "test@test.com", userId = 5),
+            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남6", empNo = "18-12543", userEmail = "test@test.com", userId = 6),
+            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남7", empNo = "18-12543", userEmail = "test@test.com", userId = 7),
+            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남8", empNo = "18-12543", userEmail = "test@test.com", userId = 8),
+            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남9", empNo = "18-12543", userEmail = "test@test.com", userId = 9)
     )
     val selectedList = remember { mutableStateListOf(0, 0, 0) }
 
@@ -319,7 +370,8 @@ fun ButtonTest(modifier: Modifier = Modifier) {
                     containerColor = Warning300,
                     disabledContentColor = Gray25,
                     disabledContainerColor = Gray300
-                )) {
+                )
+            ) {
                 Text(
                     style = Typography.bodyLarge,
                     text = "회원가입 완료하기"
@@ -332,7 +384,8 @@ fun ButtonTest(modifier: Modifier = Modifier) {
                     containerColor = Warning300,
                     disabledContentColor = Gray25,
                     disabledContainerColor = Gray300
-                )) {
+                )
+            ) {
                 Row(Modifier.fillMaxSize(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
                     Text(
                         style = Typography.displayLarge,
@@ -353,7 +406,8 @@ fun ButtonTest(modifier: Modifier = Modifier) {
                     containerColor = Warning300,
                     disabledContentColor = Gray25,
                     disabledContainerColor = Gray300
-                )) {
+                )
+            ) {
                 Text(
                     style = Typography.labelLarge,
                     text = "근무표 등록하기"
@@ -367,7 +421,8 @@ fun ButtonTest(modifier: Modifier = Modifier) {
                     containerColor = Gray300,
                     disabledContentColor = Gray25,
                     disabledContainerColor = Gray300
-                )) {
+                )
+            ) {
                 Text(
                     style = Typography.displayLarge,
                     text = "취소"
@@ -381,7 +436,8 @@ fun ButtonTest(modifier: Modifier = Modifier) {
                     containerColor = Gray300,
                     disabledContentColor = Gray25,
                     disabledContainerColor = Gray300
-                )) {
+                )
+            ) {
                 Text(
                     style = Typography.displayLarge,
                     text = "취소"
@@ -395,7 +451,8 @@ fun ButtonTest(modifier: Modifier = Modifier) {
                     containerColor = Gray300,
                     disabledContentColor = Gray25,
                     disabledContainerColor = Gray300
-                )) {
+                )
+            ) {
                 Text(
                     style = Typography.displayLarge,
                     text = "취소"
@@ -408,13 +465,56 @@ fun ButtonTest(modifier: Modifier = Modifier) {
                 AuthButton(onClick = { Log.d("test: ", "clicked!!!") }, type = "google")
             }
 
-            GroupButton(onClick = { Log.d("test: ", "clicked!!!") }, groupMaster = "김다희", groupName = "호남향우회", memberCnt = 1, groupImage = 1, groupId = 1)
+            GroupButton(
+                onClick = { Log.d("test: ", "clicked!!!") },
+                groupMaster = "김다희",
+                groupName = "호남향우회",
+                memberCnt = 1,
+                groupImage = 1,
+                groupId = 1
+            )
 
             Row {
-                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, UserInfo(profileImgUrl = "https://picsum.photos/300", userId = 1, userName = "김호남"), isMine = true, isSelected = true)
-                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, UserInfo(profileImgUrl = "https://picsum.photos/300", userId = 1, userName = "김호남"), isMine = true, isSelected = false)
-                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, UserInfo(profileImgUrl = "https://picsum.photos/300", userId = 1, userName = "김호남"), isMine = false, isSelected = true)
-                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, UserInfo(profileImgUrl = "https://picsum.photos/300", userId = 1, userName = "김호남"), isMine = false, isSelected = false)
+                ProfileButton(
+                    onClick = { Log.d("test: ", "clicked!!!") },
+                    UserInfo(
+                        profileImgUrl = "https://picsum.photos/300",
+                        userId = 1,
+                        userName = "김호남"
+                    ),
+                    isMine = true,
+                    isSelected = true
+                )
+                ProfileButton(
+                    onClick = { Log.d("test: ", "clicked!!!") },
+                    UserInfo(
+                        profileImgUrl = "https://picsum.photos/300",
+                        userId = 1,
+                        userName = "김호남"
+                    ),
+                    isMine = true,
+                    isSelected = false
+                )
+                ProfileButton(
+                    onClick = { Log.d("test: ", "clicked!!!") },
+                    UserInfo(
+                        profileImgUrl = "https://picsum.photos/300",
+                        userId = 1,
+                        userName = "김호남"
+                    ),
+                    isMine = false,
+                    isSelected = true
+                )
+                ProfileButton(
+                    onClick = { Log.d("test: ", "clicked!!!") },
+                    UserInfo(
+                        profileImgUrl = "https://picsum.photos/300",
+                        userId = 1,
+                        userName = "김호남"
+                    ),
+                    isMine = false,
+                    isSelected = false
+                )
             }
 
             SettingButton(

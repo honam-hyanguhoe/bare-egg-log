@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class BoardOutputSpec {
 
     private Long boardId;           // 게시판 아이디
@@ -49,9 +49,11 @@ public class BoardOutputSpec {
 
     private String hospitalName;    // 사용자 병원명
 
-    private boolean doLiked;        // 좋아요 여부
+    private Boolean isLiked;        // 좋아요 여부
 
-    private Boolean isAuth;     // 인증 여부
+    private Boolean isCommented;        // 댓글 여부
+
+    private Boolean isHospitalAuth;     // 인증 여부
 
     private List<CommentListOutputSpec> comments;    //댓글
 
