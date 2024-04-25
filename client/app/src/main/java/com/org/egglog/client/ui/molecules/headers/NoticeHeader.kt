@@ -41,6 +41,9 @@ fun NoticeHeader(
     hasSearch: Boolean = false,
     hasLogo: Boolean = false,
     hasMenu: Boolean = false,
+    onClickSearch : () -> Unit = {},
+    onClickNotification : () -> Unit = {},
+    onClickMenus : () -> Unit = {},
 ) {
     Box(
         modifier = Modifier
@@ -53,9 +56,11 @@ fun NoticeHeader(
                 title = title,
                 hasSearch = hasSearch,
                 hasLogo = hasLogo,
-                hasMenu = hasMenu
+                hasMenu = hasMenu,
+                onClickSearch = onClickSearch,
+                onClickNotification = onClickNotification,
+                onClickMenus = onClickMenus,
             )
-
         }
     }
 }
@@ -66,6 +71,9 @@ fun NoticeHeaderContents(
     hasSearch: Boolean = false,
     hasLogo: Boolean = false,
     hasMenu: Boolean = false,
+    onClickSearch : () -> Unit = {},
+    onClickNotification : () -> Unit = {},
+    onClickMenus : () -> Unit = {},
 ) {
     val context = LocalContext.current
     Row(
@@ -118,13 +126,13 @@ fun NoticeHeaderContents(
                     size = 25.dp,
                     imageVector = Search,
                     color = NaturalBlack,
-                    onClick = { /*TODO*/ })
+                    onClick = { onClickSearch })
             }
             IconButton(
                 size = 25.dp,
                 imageVector = Notification,
                 color = NaturalBlack,
-                onClick = { /*TODO*/ })
+                onClick = { onClickNotification })
         }
     }
 }

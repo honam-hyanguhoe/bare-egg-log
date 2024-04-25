@@ -31,7 +31,7 @@ import com.org.egglog.client.utils.Search
 
 @Composable
 fun SearchHeader(
-
+    onClickBack : () -> Unit = {},
 ) {
     Box(
         modifier = Modifier
@@ -41,7 +41,7 @@ fun SearchHeader(
     ) {
         Column {
             SearchHeaderContents(
-
+                onClickBack = onClickBack
             )
 
         }
@@ -50,7 +50,9 @@ fun SearchHeader(
 
 
 @Composable
-fun SearchHeaderContents() {
+fun SearchHeaderContents(
+    onClickBack : () -> Unit = {},
+) {
     val context = LocalContext.current
     Row(
         modifier = Modifier
@@ -65,7 +67,7 @@ fun SearchHeaderContents() {
             size = 25.dp,
             imageVector = ArrowLeft,
             color = NaturalBlack,
-            onClick = { /*TODO*/ })
+            onClick = { onClickBack })
 
 
         val focusManager = LocalFocusManager.current

@@ -132,11 +132,17 @@ fun HeaderTest() {
             hasInvitationButton = true,
             hasProgressBar = true,
             hasMore = true,
+            onClickBack = {},
+            onClickLink = {},
+            onClickClose = {},
+            onClickMenus = {}
         )
 
         Spacer(modifier = Modifier.height(30.dp))
         NoticeHeader(
-            title = "무튼 제목임", hasSearch = true, hasLogo = false, hasMenu = true
+            title = "무튼 제목임", hasSearch = true, hasLogo = true, hasMenu = false, onClickSearch = {},
+            onClickNotification = {},
+            onClickMenus = {},
         )
 
         Spacer(modifier = Modifier.height(30.dp))
