@@ -20,12 +20,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.org.egglog.client.R
+import com.org.egglog.client.data.ScheduleInfo
 import com.org.egglog.client.ui.atoms.cards.BackgroundCard
 import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.ui.atoms.imageLoader.LocalImageLoader
@@ -42,20 +42,20 @@ import com.org.egglog.client.ui.theme.Primary600
 import com.org.egglog.client.ui.theme.Typography
 import com.org.egglog.client.utils.MoreHoriz
 
+
 @Composable
 fun SmallScheduleCard(work: String, startTime: String, endTime: String, onClickMore: () -> Unit) {
     val context = LocalContext.current
-    class CardContent(val color: Color, val text: String, val imageName: Any)
 
-    val cardContent: CardContent = when(work) {
-        "day" -> CardContent(DayCard, "Day 근무", R.drawable.day)
-        "eve" -> CardContent(EveCard, "Eve 근무", R.drawable.eve)
-        "night" -> CardContent(NightCard, "Night 근무", R.drawable.night)
-        "off" -> CardContent(Primary400, "Off", R.drawable.off)
-        "교육" -> CardContent(Orange300, "교육", R.drawable.education)
-        "휴가" -> CardContent(Error300, "휴가", R.drawable.vacation)
-        "보건" -> CardContent(Pink300, "보건", R.drawable.health)
-        else -> CardContent(Gray100, "", R.drawable.dark)
+    val cardContent: ScheduleInfo = when(work) {
+        "day" -> ScheduleInfo(DayCard, "Day 근무", R.drawable.day)
+        "eve" -> ScheduleInfo(EveCard, "Eve 근무", R.drawable.eve)
+        "night" -> ScheduleInfo(NightCard, "Night 근무", R.drawable.night)
+        "off" -> ScheduleInfo(Primary400, "Off", R.drawable.off)
+        "교육" -> ScheduleInfo(Orange300, "교육", R.drawable.education)
+        "휴가" -> ScheduleInfo(Error300, "휴가", R.drawable.vacation)
+        "보건" -> ScheduleInfo(Pink300, "보건", R.drawable.health)
+        else -> ScheduleInfo(Gray100, "", R.drawable.dark)
     }
 
     BackgroundCard(margin = 4.widthPercent(context).dp, padding = 12.widthPercent(context).dp, color = cardContent.color, borderRadius = 10.widthPercent(context).dp) {
@@ -83,7 +83,7 @@ fun SmallScheduleCard(work: String, startTime: String, endTime: String, onClickM
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "${cardContent.text}", style = Typography.bodyLarge.copy(fontSize = 18.sp))
+                Text(text = "${cardContent.title}", style = Typography.bodyLarge.copy(fontSize = 18.sp))
                 LocalImageLoader(imageUrl = cardContent.imageName, Modifier.size(36.dp))
             }
         }

@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.org.egglog.client.R
+import com.org.egglog.client.data.ScheduleInfo
 import com.org.egglog.client.ui.atoms.cards.BackgroundCard
 import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.ui.atoms.imageLoader.LocalImageLoader
@@ -40,19 +41,18 @@ import com.org.egglog.client.utils.MoreHoriz
 import com.org.egglog.client.utils.widthPercent
 
 @Composable
-fun BigScheduleCard(work: String ,content: String, startTime: String, endTime: String, title: String? = "", onClickMore: () -> Unit) {
+fun BigScheduleCard(work: String, startTime: String, endTime: String, content: String, title: String? = "", color: Color? = Gray100, onClickMore: () -> Unit) {
     val context = LocalContext.current
-    class CardContent(val color: Color, val title: String, val imageName: Any)
 
-    val cardContent: CardContent = when(work) {
-        "day" -> CardContent(DayCard, "Day 근무", R.drawable.day)
-        "eve" -> CardContent(EveCard, "Eve 근무", R.drawable.eve)
-        "night" -> CardContent(NightCard, "Night 근무", R.drawable.night)
-        "off" -> CardContent(Primary400, "Off", R.drawable.off)
-        "교육" -> CardContent(Orange300, "교육", R.drawable.education)
-        "휴가" -> CardContent(Error300, "휴가", R.drawable.vacation)
-        "보건" -> CardContent(Pink300, "보건", R.drawable.health)
-        else -> CardContent(Gray100, title ?: "", "")
+    val cardContent: ScheduleInfo = when(work) {
+        "day" -> ScheduleInfo(DayCard, "Day 근무", R.drawable.day)
+        "eve" -> ScheduleInfo(EveCard, "Eve 근무", R.drawable.eve)
+        "night" -> ScheduleInfo(NightCard, "Night 근무", R.drawable.night)
+        "off" -> ScheduleInfo(Primary400, "Off", R.drawable.off)
+        "교육" -> ScheduleInfo(Orange300, "교육", R.drawable.education)
+        "휴가" -> ScheduleInfo(Error300, "휴가", R.drawable.vacation)
+        "보건" -> ScheduleInfo(Pink300, "보건", R.drawable.health)
+        else -> ScheduleInfo(color ?: Gray100, title ?: "", "")
     }
 
     BackgroundCard(margin = 4.widthPercent(context).dp, padding = 12.widthPercent(context).dp, color = cardContent.color, borderRadius = 10.widthPercent(context).dp) {
