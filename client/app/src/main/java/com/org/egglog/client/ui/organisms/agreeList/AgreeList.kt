@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.org.egglog.client.ui.molecules.agreeListItem.AgreeListItem
+import com.org.egglog.client.ui.molecules.listItems.AgreeListItem
 
 @Composable
 fun AgreeList(ageChecked: Boolean, setAgeClick: (Boolean) -> Unit, agreeChecked: Boolean, setAgreeClick: (Boolean) -> Unit, infoChecked: Boolean, setInfoClick: (Boolean) -> Unit ) {
