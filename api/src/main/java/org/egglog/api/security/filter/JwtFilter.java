@@ -62,8 +62,9 @@ public class JwtFilter extends OncePerRequestFilter {
             User user = userQueryRepository.findById(jwtUtils.getUserIdByAccessToken(accessToken))
                     .orElseThrow(() -> new UserException(UserErrorCode.NOT_EXISTS_USER));
             //블랙리스트에 존재한다면
-            if (!unsafeTokenRepository.findById(accessToken).isPresent()){
+            if (unsafeTokenRepository.findById(accessToken).isPresent()){
                 Token token = refreshTokenRepository.findById(user.getId()).orElseThrow(() -> new JwtException(JwtErrorCode.NOT_EXISTS_TOKEN));
+                log.info("token = {}",token);
                 refreshTokenRepository.delete(token); //토큰 지우고
                 throw new JwtException(JwtErrorCode.INVALID_TOKEN); //로그인 재요청
             }

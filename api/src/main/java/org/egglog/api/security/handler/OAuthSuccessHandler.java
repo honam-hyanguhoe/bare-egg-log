@@ -41,6 +41,7 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         if (optionalUser.isPresent()){
             //로그인인 경우
             User user = optionalUser.get();
+            userJpaRepository.save(user.doLogin());
             response.getWriter().write(objectMapper.writeValueAsString(
                     MessageUtils.success(tokenService.generatedToken(user.getId(), user.getUserRole().name()))
             ));
