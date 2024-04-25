@@ -101,8 +101,8 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    AgreeListTest()
 //    CardTest()
 //    ProfileButtonTest()
-//    TabBarTest()
-    InfoListTest()
+    TabBarTest()
+//    InfoListTest()
 }
 
 @Composable
