@@ -40,9 +40,9 @@ import com.org.egglog.client.utils.MoreHoriz
 import com.org.egglog.client.utils.widthPercent
 
 @Composable
-fun BigScheduleCard(work: String, content: String, startTime: String, endTime: String, onClickMore: () -> Unit) {
+fun BigScheduleCard(work: String ,content: String, startTime: String, endTime: String, title: String? = "", onClickMore: () -> Unit) {
     val context = LocalContext.current
-    class CardContent(val color: Color, val text: String, val imageName: Any)
+    class CardContent(val color: Color, val title: String, val imageName: Any)
 
     val cardContent: CardContent = when(work) {
         "day" -> CardContent(DayCard, "Day 근무", R.drawable.day)
@@ -52,7 +52,7 @@ fun BigScheduleCard(work: String, content: String, startTime: String, endTime: S
         "교육" -> CardContent(Orange300, "교육", R.drawable.education)
         "휴가" -> CardContent(Error300, "휴가", R.drawable.vacation)
         "보건" -> CardContent(Pink300, "보건", R.drawable.health)
-        else -> CardContent(Gray100, "", R.drawable.dark)
+        else -> CardContent(Gray100, title ?: "", "")
     }
 
     BackgroundCard(margin = 4.widthPercent(context).dp, padding = 12.widthPercent(context).dp, color = cardContent.color, borderRadius = 10.widthPercent(context).dp) {
@@ -81,11 +81,13 @@ fun BigScheduleCard(work: String, content: String, startTime: String, endTime: S
                     verticalAlignment = Alignment.CenterVertically
             ) {
             Column() {
-                Text(text = "${cardContent.text}", style = Typography.bodyLarge.copy(fontSize = 18.sp))
+                Text(text = "${cardContent.title}", style = Typography.bodyLarge.copy(fontSize = 18.sp))
                 Spacer(modifier = Modifier.height(6.dp))
                     Text("${content}", style = Typography.displayMedium)
                 }
-                LocalImageLoader(imageUrl = cardContent.imageName, Modifier.size(42.widthPercent(context).dp))
+                if(!cardContent.imageName.equals("")) {
+                    LocalImageLoader(imageUrl = cardContent.imageName, Modifier.size(42.widthPercent(context).dp))
+                }
             }
         }
     }
