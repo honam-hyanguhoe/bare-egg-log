@@ -72,6 +72,7 @@ public class BoardServiceImpl implements BoardService {
         User user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
+
         List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
         int size = 10;
 
@@ -85,11 +86,16 @@ public class BoardServiceImpl implements BoardService {
                 Long hitCnt = viewCount + board.getViewCount();
 
                 boolean isUserLiked = false;  //좋아요 누른 여부
+                boolean isCommented = false;    //댓글 유무 여부
 
+                if (commentCnt != null) {
+                    isCommented = true;
+                }
                 //사용자가 이미 좋아요를 눌렀는지
                 if (!isNotLiked(userId, board.getId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
                     isUserLiked = true;
                 }
+
                 BoardListOutputSpec boardListOutputSpec = BoardListOutputSpec.builder()
                         .boardId(board.getId())
                         .boardTitle(board.getTitle())
@@ -99,7 +105,8 @@ public class BoardServiceImpl implements BoardService {
                         .viewCount(hitCnt)
                         .commentCount(commentCnt)
                         .likeCount(likeCnt)
-                        .doLiked(isUserLiked)  //좋아요 여부
+                        .isLiked(isUserLiked)  //좋아요 여부
+                        .isCommented(isCommented)   //댓글 유무
 //                        .isAuth(user.getIsAuth())   //인증 여부
                         .build();
 
@@ -150,6 +157,11 @@ public class BoardServiceImpl implements BoardService {
                     Long hitCnt = viewCount + board.getViewCount();
 
                     boolean isUserLiked = false;  //좋아요 누른 여부
+                    boolean isCommented = false;    //댓글 유무 여부
+
+                    if (commentCnt != null) {
+                        isCommented = true;
+                    }
 
                     //사용자가 이미 좋아요를 눌렀는지
                     if (!isNotLiked(userId, board.getId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
@@ -157,17 +169,18 @@ public class BoardServiceImpl implements BoardService {
                     }
 
                     BoardListOutputSpec boardListOutputSpec = BoardListOutputSpec.builder()
-                        .boardId(board.getId())
-                        .boardTitle(board.getTitle())
-                        .boardContent(board.getContent())
-                        .boardCreatedAt(board.getCreatedAt())
-                        .tempNickname(board.getTempNickname())
-                        .viewCount(hitCnt)
-                        .commentCount(commentCnt)
-                        .likeCount(likeCnt)
-                        .doLiked(isUserLiked)
+                            .boardId(board.getId())
+                            .boardTitle(board.getTitle())
+                            .boardContent(board.getContent())
+                            .boardCreatedAt(board.getCreatedAt())
+                            .tempNickname(board.getTempNickname())
+                            .viewCount(hitCnt)
+                            .commentCount(commentCnt)
+                            .likeCount(likeCnt)
+                            .isLiked(isUserLiked)
+                            .isCommented(isCommented)
 //                        .isAuth(user.getIsAuth())   //인증 여부
-                        .build();
+                            .build();
 
                     boardListOutputSpecList.add(boardListOutputSpec);
                 }
@@ -184,55 +197,6 @@ public class BoardServiceImpl implements BoardService {
 
     }
 
-//    public List<BoardListOutputSpec> getBoardHotList(Long hospitalId, Long groupId, Long userId) {
-//        Users user = userQueryRepository.findById(userId).orElseThrow(
-//                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-//        );
-//
-//        List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
-//
-//        try {
-//            List<Board> boardHotList = boardQueryRepository.findBoardHotList(groupId, hospitalId);
-//
-//            for (Board board : boardHotList) {
-//                Long commentCnt = commentQueryRepository.getCommentCount(board.getId());
-//                Long likeCnt = boardQueryRepository.getLikeCount(board.getId());
-//                long viewCount = redisViewCountUtil.getViewCount(String.valueOf(board.getId())); //하루 동안의 조회수
-//                Long hitCnt = viewCount + board.getViewCount();     // DB + redis
-//
-//                boolean isUserLiked = false;  //좋아요 누른 여부
-//                boolean isUserHit = false;  //조회 여부
-//
-//                //사용자가 이미 좋아요를 눌렀는지
-//                if (!isNotLiked(userId, board.getId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
-//                    isUserLiked = true;
-//                }
-//
-//                BoardListOutputSpec boardListOutputSpec = BoardListOutputSpec.builder()
-//                        .boardId(board.getId())
-//                        .boardTitle(board.getTitle())
-//                        .boardContent(board.getContent())
-//                        .boardCreatedAt(board.getCreatedAt())
-//                        .tempNickname(board.getTempNickname())
-//                        .viewCount(hitCnt)
-//                        .commentCount(commentCnt)
-//                        .likeCount(likeCnt)
-//                        .doLiked(isUserLiked)
-////                        .isAuth(user.getIsAuth())   //인증 여부
-//                        .build();
-//
-//                boardListOutputSpecList.add(boardListOutputSpec);
-//            }
-//        } catch (DataAccessException e) {
-//            throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            throw new BoardException(BoardErrorCode.UNKNOWN_ERROR);
-//        }
-//
-//        return boardListOutputSpecList;
-//
-//    }
 
     /**
      * 게시판 작성을 위한 메서드<br/>
@@ -245,7 +209,7 @@ public class BoardServiceImpl implements BoardService {
      */
     @Override
     @Transactional
-    public void registBoard(BoardForm boardForm, Long userId) {
+    public void registerBoard(BoardForm boardForm, Long userId) {
         User user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
@@ -400,8 +364,6 @@ public class BoardServiceImpl implements BoardService {
         BoardOutputSpec boardOutputSpec = null;
 
         try {
-            boolean isUserLiked = false;  //좋아요 누른 여부
-
             //조회수 증가해도 되는지 검증
             if (redisViewCountUtil.checkAndIncrementViewCount(String.valueOf(boardId), String.valueOf(userId))) {
                 redisViewCountUtil.incrementViewCount(String.valueOf(boardId));
@@ -412,6 +374,12 @@ public class BoardServiceImpl implements BoardService {
             Long likeCnt = boardQueryRepository.getLikeCount(board.getId());
             Long hitCnt = viewCount + board.getViewCount();     // DB + redis
 
+            boolean isUserLiked = false;  //좋아요 누른 여부
+            boolean isCommented = false;    //댓글 유무 여부
+
+            if (commentCnt != null) {
+                isCommented = true;
+            }
             //사용자가 이미 좋아요를 눌렀는지
             if (!isNotLiked(userId, board.getId())) {
                 isUserLiked = true;
@@ -435,7 +403,8 @@ public class BoardServiceImpl implements BoardService {
                     .commentCount(commentCnt)
                     .boardLikeCount(likeCnt)
                     .hospitalName(board.getHospital().getHospitalName())
-                    .doLiked(isUserLiked)
+                    .isLiked(isUserLiked)
+                    .isCommented(isCommented)
 //                    .isAuth(user.getIsAuth())   //인증 여부
                     .comments(commentList)
                     .build();
@@ -463,7 +432,7 @@ public class BoardServiceImpl implements BoardService {
      * @param userId
      */
     @Override
-    public void registLike(LikeForm likeForm, Long userId) {
+    public void registerLike(LikeForm likeForm, Long userId) {
         User user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );

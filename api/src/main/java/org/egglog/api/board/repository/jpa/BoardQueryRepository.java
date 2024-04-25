@@ -13,7 +13,6 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.egglog.api.board.model.entity.Board;
-import org.egglog.api.board.model.entity.BoardHit;
 import org.egglog.api.board.model.entity.BoardLike;
 import org.hibernate.query.criteria.JpaSubQuery;
 import org.springframework.stereotype.Repository;
