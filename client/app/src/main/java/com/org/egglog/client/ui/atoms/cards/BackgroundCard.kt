@@ -1,6 +1,7 @@
 package com.org.egglog.client.ui.atoms.cards
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -26,11 +27,18 @@ import com.org.egglog.client.ui.theme.ClientTheme
 import com.org.egglog.client.ui.theme.Typography
 
 @Composable
-fun BackgroundCard(margin: Dp, padding: Dp, color: Color, borderRadius: Dp, children: @Composable () -> Unit) {
+fun BackgroundCard(margin: Dp, padding: Dp, color: Color, borderRadius: Dp, onClickCard: (() -> Unit) ?= null, children: @Composable () -> Unit) {
     Box(Modifier
             .fillMaxWidth()
             .padding(margin)
             .background(color, RoundedCornerShape(borderRadius))
+            .run {
+                if (onClickCard != null) {
+                    clickable { onClickCard() }
+                } else {
+                    this
+                }
+            }
             .padding(padding)) {
         children()
     }
@@ -41,7 +49,7 @@ fun BackgroundCard(margin: Dp, padding: Dp, color: Color, borderRadius: Dp, chil
 fun Preview() {
     ClientTheme {
             // 사용 예시
-            BackgroundCard(margin=20.dp, padding=20.dp, color=com.org.egglog.client.ui.theme.Warning200, borderRadius=10.dp) {
+            BackgroundCard(margin=20.dp, padding=20.dp, color=com.org.egglog.client.ui.theme.Warning200, borderRadius=10.dp, onClickCard = null) {
                 Row(horizontalArrangement = Arrangement.SpaceBetween) {
                     Column{
                         Text(text = "에그로그에 친구를 초대하고,", style= Typography.displayLarge)

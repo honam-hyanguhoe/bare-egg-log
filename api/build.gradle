@@ -68,6 +68,14 @@ dependencies {
     // https://mvnrepository.com/artifact/org.mnode.ical4j/ical4j
     implementation group: 'org.mnode.ical4j', name: 'ical4j', version: '4.0.0-rc5'
 
+
+
+    // http://localhost:8080/swagger-ui/index.html
+    // https://github.com/springdoc/springdoc-openapi
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+    // https://springdoc.org/#javadoc-support
+    annotationProcessor 'com.github.therapi:therapi-runtime-javadoc-scribe:0.15.0'
+    implementation 'com.github.therapi:therapi-runtime-javadoc:0.15.0'
 }
 
 

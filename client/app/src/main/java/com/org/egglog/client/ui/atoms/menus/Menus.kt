@@ -1,8 +1,10 @@
 package com.org.egglog.client.ui.atoms.menus
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,36 +22,48 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.ui.theme.Gray100
 import com.org.egglog.client.ui.theme.NaturalBlack
 import com.org.egglog.client.ui.theme.Typography
+import com.org.egglog.client.ui.theme.Warning400
 import com.org.egglog.client.utils.MoreVert
+import com.org.egglog.client.utils.widthPercent
 
 
 @Composable
-fun ScrollableMenus( options : List<String>, selectedOption : String?, onSelect : (String) -> Unit ) {
+fun ScrollableMenus(
+    iconShape : ImageVector = MoreVert,
+    horizontalOffset : Dp = -6.dp,
+    verticalOffset : Dp = 0.dp,
+    options: List<String>,
+    selectedOption: String?,
+    onSelect: (String) -> Unit ) {
     var expanded by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
     var selectedMenuItem by remember { mutableStateOf<String>(options.get(0)) }
+    val context = LocalContext.current
 
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .wrapContentSize(Alignment.TopEnd)
-            .padding(0.dp)
+            .size(30.widthPercent(context).dp),
+//            .border(1.dp, Warning400),
+        contentAlignment = Alignment.CenterEnd
     ) {
         IconButton(onClick = { expanded = true }) {
-            Icon(MoreVert, modifier = Modifier.size(25.dp), color = NaturalBlack)
+            Icon(iconShape, modifier = Modifier.size(25.dp), color = NaturalBlack)
         }
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = {
                 expanded = false
             },
-            offset = DpOffset(-15.dp, -1.dp),
+            offset = DpOffset(horizontalOffset, verticalOffset),
             modifier = Modifier
                 .background(Gray100)
                 .heightIn(max = 200.dp),
