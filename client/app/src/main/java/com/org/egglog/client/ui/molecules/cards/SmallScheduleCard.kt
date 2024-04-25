@@ -1,6 +1,9 @@
 package com.org.egglog.client.ui.molecules.cards
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -33,6 +38,7 @@ import com.org.egglog.client.ui.theme.Orange300
 import com.org.egglog.client.ui.theme.Error300
 import com.org.egglog.client.ui.theme.Pink300
 import com.org.egglog.client.ui.theme.Gray100
+import com.org.egglog.client.ui.theme.Primary600
 import com.org.egglog.client.ui.theme.Typography
 import com.org.egglog.client.utils.MoreHoriz
 
@@ -59,7 +65,14 @@ fun SmallScheduleCard(work: String, startTime: String, endTime: String, onClickM
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "${startTime} - ${endTime}", style = Typography.displayLarge)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier
+                            .size(10.widthPercent(context).dp)
+                            .background(Color.Transparent, CircleShape)
+                            .border(3.dp, Primary600, CircleShape)) {}
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(text = "${startTime} - ${endTime}", style = Typography.displayLarge)
+                }
                 IconButton(onClick = { onClickMore() }, Modifier.size(20.dp)) {
                     Icon(imageVector = MoreHoriz, modifier = Modifier.fillMaxSize())
                 }
