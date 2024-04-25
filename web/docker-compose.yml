@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  web:
+    container_name: web
+    image: kimdahui/web
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: npm start
+    ports:
+      - "3000:3000"
+    networks:
+      - jenkins_egg-log-net
+
+networks:
+  jenkins_egg-log-net:
+    external: true

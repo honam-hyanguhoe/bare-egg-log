@@ -10,7 +10,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     networks:
-      - jenkins-project_egg-log-net
+      - jenkins_egg-log-net
     volumes:
       - redis-data:/data
     user: root
@@ -19,7 +19,7 @@ services:
       - "6379:6379"
 
 networks:
-  jenkins-project_egg-log-net:
+  jenkins_egg-log-net:
     external: true
 
 volumes:

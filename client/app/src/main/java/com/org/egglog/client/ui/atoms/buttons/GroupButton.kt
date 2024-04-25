@@ -27,7 +27,7 @@ import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.utils.ArrowRight
 
 @Composable
-fun GroupButton(onClick: () -> Unit, groupName: String, memberCnt: Int, groupMaster: String, groupImage: Int, groupId: Int) {
+fun GroupButton(onClick: () -> Unit, groupName: String, memberCnt: Int, groupMaster: String, groupImage: Int, groupId: Long) {
     val context = LocalContext.current
     val image = when(groupImage) {
         1 -> R.drawable.dark

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class BoardListOutputSpec {
 
     private Long boardId;           // 게시판 아이디
@@ -32,8 +32,10 @@ public class BoardListOutputSpec {
 
     private String pictureOne;  // 첫번째 사진
 
-    private boolean doLiked;        // 좋아요 여부
+    private Boolean isLiked;        // 좋아요 여부
+
+    private Boolean isCommented;    //댓글 유무 여부
     
-    private Boolean isAuth;     // 인증 여부
+    private Boolean isHospitalAuth;     // 인증 여부
 
 }

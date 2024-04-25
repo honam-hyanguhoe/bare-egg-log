@@ -8,7 +8,7 @@ import org.egglog.api.board.exception.BoardException;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
-import org.egglog.api.user.repository.UserQueryRepository;
+import org.egglog.api.user.repository.jpa.UserQueryRepository;
 
 import org.egglog.api.worktype.exception.WorkTypeErrorCode;
 import org.egglog.api.worktype.exception.WorkTypeException;
@@ -17,7 +17,7 @@ import org.egglog.api.worktype.model.dto.params.WorkTypeModifyForm;
 import org.egglog.api.worktype.model.dto.response.WorkTypeListOutputSpec;
 import org.egglog.api.worktype.model.dto.response.WorkTypeOutputSpec;
 import org.egglog.api.worktype.model.entity.WorkType;
-import org.egglog.api.worktype.repository.WorkTypeJpaRepository;
+import org.egglog.api.worktype.repository.jpa.WorkTypeJpaRepository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

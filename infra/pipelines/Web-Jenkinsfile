@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+    stages {
+        stage('Checkout Main Repo') {
+            steps {
+                checkout scm
+            }
+        }
+        stage("Build & Run") {
+            steps {
+                dir("web"){
+                    script {
+                        try {
+                            sh "docker-compose build --no-cache"
+                            sh "docker-compose up -d"
+                        }catch (Exception e) {
+                            sh "echo '빌드에 실패했습니다.'"
+                            sh "docker-compose down"
+                            sh "docker-compose up -d"
+                        }
+                    }
+                }
+            }
+        }
+        stage('Prune old images'){
+            steps{
+                script{
+                    sh "yes | docker system prune --filter until=1h"
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                def Author_ID = sh(script: "git show -s --pretty=%an", returnStdout: true).trim()
+                def Author_Name = sh(script: "git show -s --pretty=%ae", returnStdout: true).trim()
+                mattermostSend (color: currentBuild.currentResult=='SUCCESS'?'good':'danger',
+                        message: "빌드 ${currentBuild.currentResult}: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${Author_ID}(${Author_Name})\n(<${env.BUILD_URL}|Details>)",
+                        endpoint: 'https://meeting.ssafy.com/hooks/65u7o3o7kfb87dqcs8cxyzbdpo',
+                        channel: 'Jenkins'
+                )
+            }
+        }
+    }
+}
+
