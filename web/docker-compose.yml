@@ -8,6 +8,7 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
+    command: npm start
     ports:
       - "3000:3000"
     networks:
