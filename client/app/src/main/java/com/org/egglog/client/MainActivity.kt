@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -207,10 +206,13 @@ fun InfoListTest(modifier: Modifier = Modifier) {
 
 @Composable
 fun CommunityTest(modifier: Modifier = Modifier) {
+    val postReaction1 = PostReactionInfo(1, 100, 13, 123, true, true, true)
+    val postReaction2 = PostReactionInfo(1, 100, 13,  isLiked = true, isCommented =  true)
+
     Surface(modifier, color = MaterialTheme.colorScheme.background) {
         Column(modifier = Modifier.fillMaxSize()) {
-            PostReaction(postReactionInfo = PostReactionInfo(100, 13, 123, true, true, true))
-            PostReaction(postReactionInfo = PostReactionInfo(100, 13,  isLiked = true, isCommented =  true))
+            PostReaction(postReactionInfo = postReaction1)
+            PostReaction(postReactionInfo = postReaction2)
         }
     }
 }
@@ -251,105 +253,19 @@ fun ToggleTest(modifier: Modifier = Modifier) {
     }
 }
 
-//@Composable
-//fun ProfileButtonTest(modifier: Modifier = Modifier) {
-//    val myUserId = 1
-//    val userInfoList = arrayListOf(
-//            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남1", empNo = "18-12543", userEmail = "test@test.com", userId = 1),
-//            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남2", empNo = "18-12543", userEmail = "test@test.com", userId = 2),
-//            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남3", empNo = "18-12543", userEmail = "test@test.com", userId = 3),
-//            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남4", empNo = "18-12543", userEmail = "test@test.com", userId = 4),
-//            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남5", empNo = "18-12543", userEmail = "test@test.com", userId = 5),
-//            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남6", empNo = "18-12543", userEmail = "test@test.com", userId = 6),
-//            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남7", empNo = "18-12543", userEmail = "test@test.com", userId = 7),
-//            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남8", empNo = "18-12543", userEmail = "test@test.com", userId = 8),
-//            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남9", empNo = "18-12543", userEmail = "test@test.com", userId = 9)
-//    )
-//    val selectedList = remember { mutableStateListOf(0, 0, 0) }
-//
-//    Surface(modifier, color = MaterialTheme.colorScheme.background) {
-//        Column(modifier = modifier.fillMaxSize()) {
-//            ProfileButtonList(userInfoList, selectedList, myUserId)
-//        }
-//    }
-//}
-//
-//@Composable
-//fun CardTest(modifier: Modifier = Modifier) {
-//    Surface(modifier, color = MaterialTheme.colorScheme.background) {
-//        Column(modifier = modifier.fillMaxSize()) {
-//            ProfileCard(UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남", empNo = "18-12543", userEmail = "test@test.com", userId = 2))
-//        }
-//    }
-//}
-
 @Composable
 fun ProfileButtonTest(modifier: Modifier = Modifier) {
     val myUserId = 1
     val userInfoList = arrayListOf(
-        UserInfo(
-            profileImgUrl = "https://picsum.photos/300",
-            userName = "김호남1",
-            empNo = "18-12543",
-            userEmail = "test@test.com",
-            userId = 1
-        ),
-        UserInfo(
-            profileImgUrl = "https://picsum.photos/300",
-            userName = "김호남2",
-            empNo = "18-12543",
-            userEmail = "test@test.com",
-            userId = 2
-        ),
-        UserInfo(
-            profileImgUrl = "https://picsum.photos/300",
-            userName = "김호남3",
-            empNo = "18-12543",
-            userEmail = "test@test.com",
-            userId = 3
-        ),
-        UserInfo(
-            profileImgUrl = "https://picsum.photos/300",
-            userName = "김호남4",
-            empNo = "18-12543",
-            userEmail = "test@test.com",
-            userId = 4
-        ),
-        UserInfo(
-            profileImgUrl = "https://picsum.photos/300",
-            userName = "김호남5",
-            empNo = "18-12543",
-            userEmail = "test@test.com",
-            userId = 5
-        ),
-        UserInfo(
-            profileImgUrl = "https://picsum.photos/300",
-            userName = "김호남6",
-            empNo = "18-12543",
-            userEmail = "test@test.com",
-            userId = 6
-        ),
-        UserInfo(
-            profileImgUrl = "https://picsum.photos/300",
-            userName = "김호남7",
-            empNo = "18-12543",
-            userEmail = "test@test.com",
-            userId = 7
-        ),
-        UserInfo(
-            profileImgUrl = "https://picsum.photos/300",
-            userName = "김호남8",
-            empNo = "18-12543",
-            userEmail = "test@test.com",
-            userId = 8
-        ),
-        UserInfo(
-            profileImgUrl = "https://picsum.photos/300",
-            userName = "김호남9",
-            empNo = "18-12543",
-            userEmail = "test@test.com",
-            userId = 9
-        )
+            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남1", empNo = "18-12543", userEmail = "test@test.com", userId = 1),
+            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남2", empNo = "18-12543", userEmail = "test@test.com", userId = 2),
+            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남3", empNo = "18-12543", userEmail = "test@test.com", userId = 3),
+            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남4", empNo = "18-12543", userEmail = "test@test.com", userId = 4),
+            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남5", empNo = "18-12543", userEmail = "test@test.com", userId = 5),
+            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남6", empNo = "18-12543", userEmail = "test@test.com", userId = 6),
+            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남7", empNo = "18-12543", userEmail = "test@test.com", userId = 7),
+            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남8", empNo = "18-12543", userEmail = "test@test.com", userId = 8),
+            UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남9", empNo = "18-12543", userEmail = "test@test.com", userId = 9)
     )
     val selectedList = remember { mutableStateListOf(0, 0, 0) }
 
@@ -364,19 +280,10 @@ fun ProfileButtonTest(modifier: Modifier = Modifier) {
 fun CardTest(modifier: Modifier = Modifier) {
     Surface(modifier, color = MaterialTheme.colorScheme.background) {
         Column(modifier = modifier.fillMaxSize()) {
-            ProfileCard(
-                UserInfo(
-                    profileImgUrl = "https://picsum.photos/300",
-                    userName = "김호남",
-                    empNo = "18-12543",
-                    userEmail = "test@test.com",
-                    userId = 2
-                )
-            )
+            ProfileCard(UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남", empNo = "18-12543", userEmail = "test@test.com", userId = 2))
         }
     }
 }
-
 
 @Composable
 fun AgreeListTest(modifier: Modifier = Modifier) {
@@ -451,131 +358,6 @@ fun CheckBoxTest(modifier: Modifier = Modifier) {
         }
     }
 }
-
-//@Composable
-//fun ButtonTest(modifier: Modifier = Modifier) {
-//    Surface(modifier, color = MaterialTheme.colorScheme.background) {
-//        Column(modifier = modifier.fillMaxSize()) {
-//            BigButton(
-//                    onClick = { Log.d("clicked: ", "clicked!!!!") },
-//                    colors = ButtonColors(
-//                            contentColor = Warning25,
-//                            containerColor = Warning300,
-//                            disabledContentColor = Gray25,
-//                            disabledContainerColor = Gray300
-//                    )) {
-//                Text(
-//                        style = Typography.bodyLarge,
-//                        text = "회원가입 완료하기"
-//                )
-//            }
-//            MiddleButton(
-//                    onClick = { Log.d("clicked: ", "clicked!!!!") },
-//                    colors = ButtonColors(
-//                            contentColor = Warning25,
-//                            containerColor = Warning300,
-//                            disabledContentColor = Gray25,
-//                            disabledContainerColor = Gray300
-//                    )) {
-//                Row(Modifier.fillMaxSize(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
-//                    Text(
-//                            style = Typography.displayLarge,
-//                            text = "그룹을 만들고 동료를 초대해보세요"
-//                    )
-//                    Icon(
-//                            AddBox,
-//                            Modifier.size(24.widthPercent(LocalContext.current).dp),
-//                            NaturalWhite
-//                    )
-//                }
-//            }
-//
-//            ThinButton(
-//                    onClick = { Log.d("clicked: ", "clicked!!!!") },
-//                    colors = ButtonColors(
-//                            contentColor = Warning25,
-//                            containerColor = Warning300,
-//                            disabledContentColor = Gray25,
-//                            disabledContainerColor = Gray300
-//                    )) {
-//                Text(
-//                        style = Typography.labelLarge,
-//                        text = "근무표 등록하기"
-//                )
-//            }
-//
-//            HalfBigButton(
-//                    onClick = { Log.d("clicked: ", "clicked!!!!") },
-//                    colors = ButtonColors(
-//                            contentColor = Gray25,
-//                            containerColor = Gray300,
-//                            disabledContentColor = Gray25,
-//                            disabledContainerColor = Gray300
-//                    )) {
-//                Text(
-//                        style = Typography.displayLarge,
-//                        text = "취소"
-//                )
-//            }
-//
-//            HalfMiddleButton(
-//                    onClick = { Log.d("clicked: ", "clicked!!!!") },
-//                    colors = ButtonColors(
-//                            contentColor = Gray800,
-//                            containerColor = Gray300,
-//                            disabledContentColor = Gray25,
-//                            disabledContainerColor = Gray300
-//                    )) {
-//                Text(
-//                        style = Typography.displayLarge,
-//                        text = "취소"
-//                )
-//            }
-//
-//            HalfThinButton(
-//                    onClick = { Log.d("clicked: ", "clicked!!!!") },
-//                    colors = ButtonColors(
-//                            contentColor = Gray25,
-//                            containerColor = Gray300,
-//                            disabledContentColor = Gray25,
-//                            disabledContainerColor = Gray300
-//                    )) {
-//                Text(
-//                        style = Typography.displayLarge,
-//                        text = "취소"
-//                )
-//            }
-//
-//            Row {
-//                AuthButton(onClick = { Log.d("test: ", "clicked!!!") }, type = "kakao")
-//                AuthButton(onClick = { Log.d("test: ", "clicked!!!") }, type = "naver")
-//                AuthButton(onClick = { Log.d("test: ", "clicked!!!") }, type = "google")
-//            }
-//
-//            GroupButton(onClick = { Log.d("test: ", "clicked!!!") }, groupMaster = "김다희", groupName = "호남향우회", memberCnt = 1, groupImage = 1, groupId = 1)
-//
-//            Row {
-//                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, UserInfo(profileImgUrl = "https://picsum.photos/300", userId = 1, userName = "김호남"), isMine = true, isSelected = true)
-//                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, UserInfo(profileImgUrl = "https://picsum.photos/300", userId = 1, userName = "김호남"), isMine = true, isSelected = false)
-//                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, UserInfo(profileImgUrl = "https://picsum.photos/300", userId = 1, userName = "김호남"), isMine = false, isSelected = true)
-//                ProfileButton(onClick = {Log.d("test: ", "clicked!!!")}, UserInfo(profileImgUrl = "https://picsum.photos/300", userId = 1, userName = "김호남"), isMine = false, isSelected = false)
-//            }
-//
-//            SettingButton(
-//                    onClick = { Log.d("test: ", "clicked!!!") },
-//                    text = "내 정보 설정",
-//                    color = NaturalBlack,
-//                    icon = MySetting
-//            )
-//            SettingButton(
-//                    onClick = { Log.d("test: ", "clicked!!!") },
-//                    text = "로그아웃",
-//                    color = Error500,
-//                    icon = Logout
-//            )
-//        }
-//    }
-//}
 
 @Composable
 fun ButtonTest(modifier: Modifier = Modifier) {
