@@ -1,5 +1,6 @@
 package com.org.egglog.client.ui.atoms.linearIndicator
 
+import android.content.Context
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,10 +25,10 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun LinearIndicator(
-    step : Float = 0f,
-    isLoading : Boolean = false
-){
-    var currentProgress by remember { mutableStateOf( step) }
+    step: Float = 0f,
+    isLoading: Boolean = false,
+) {
+    var currentProgress by remember { mutableStateOf(step) }
     var loading by remember { mutableStateOf(isLoading) }
     val scope = rememberCoroutineScope()
 
@@ -48,7 +49,7 @@ fun LinearIndicator(
 //        }
 //    }
 
-    if(loading){
+    if (loading) {
         LinearProgressIndicator(
             progress = { currentProgress },
             modifier = Modifier

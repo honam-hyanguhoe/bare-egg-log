@@ -109,7 +109,7 @@ fun MyApp(modifier: Modifier = Modifier) {
 
 @Composable
 fun HeaderTest(){
-    BasicHeader(title = "무튼 제목임", hasArrow = false, hasClose = false, hasProgressBar = true)
+    BasicHeader(title = "무튼 제목임", hasArrow = false, hasClose = false, hasLeftClose = true, hasProgressBar = true, hasMore = true)
 }
 @Composable
 fun BottomSheetTest() {
