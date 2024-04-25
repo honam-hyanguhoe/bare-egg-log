@@ -18,16 +18,36 @@ import com.org.egglog.client.ui.theme.Typography
 import com.org.egglog.client.utils.widthPercent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
+import com.org.egglog.client.R
+import com.org.egglog.client.data.ScheduleInfo
 import com.org.egglog.client.ui.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.client.ui.atoms.toggle.Toggle
-
-class CardContent(val title: String, val color: Color, val imageName: Any, val time: String, val duration: Number, val interval: Number)
+import com.org.egglog.client.ui.theme.DayCard
+import com.org.egglog.client.ui.theme.Error300
+import com.org.egglog.client.ui.theme.EveCard
+import com.org.egglog.client.ui.theme.Gray100
+import com.org.egglog.client.ui.theme.NightCard
+import com.org.egglog.client.ui.theme.Orange300
+import com.org.egglog.client.ui.theme.Pink300
+import com.org.egglog.client.ui.theme.Primary400
 
 @Composable
-fun AlarmSettingCard(cardContent: CardContent, checked: Boolean, setToggle: () -> Unit) {
+fun AlarmSettingCard(work: String, time: String, duration: Number, interval: Number, checked: Boolean, setToggle: () -> Unit, onClickCard: () -> Unit,color: Color? = Gray100) {
     val context = LocalContext.current
 
-    val hour = cardContent.time.substringBefore(":").toInt()
+    val hour = time.substringBefore(":").toInt()
+    val title = "${work} 근무 자동 알람 설정"
+
+    val cardContent: ScheduleInfo = when(work) {
+        "Day" -> ScheduleInfo(DayCard, title, R.drawable.day)
+        "Eve" -> ScheduleInfo(EveCard, title, R.drawable.eve)
+        "Night" -> ScheduleInfo(NightCard, title, R.drawable.night)
+        "Off" -> ScheduleInfo(Primary400, title, R.drawable.off)
+        "교육" -> ScheduleInfo(Orange300, title, R.drawable.education)
+        "휴가" -> ScheduleInfo(Error300, title, R.drawable.vacation)
+        "보건" -> ScheduleInfo(Pink300, title, R.drawable.health)
+        else -> ScheduleInfo(color ?: Gray100, title, "")
+    }
 
     BackgroundCard(margin = 4.widthPercent(context).dp, padding = 10.widthPercent(context).dp, color = cardContent.color, borderRadius = 10.widthPercent(context).dp) {
         Column() {
@@ -42,7 +62,7 @@ fun AlarmSettingCard(cardContent: CardContent, checked: Boolean, setToggle: () -
             Spacer(modifier = Modifier.height(6.dp))
             Row(Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("${if(hour in 0..11) "오전" else "오후"} ${cardContent.time} | ${cardContent.duration}분 간 | ${cardContent.interval}분 간격", style = Typography.displayLarge)
+                Text("${if(hour in 0..11) "오전" else "오후"} ${time} | ${duration}분 간 | ${interval}분 간격", style = Typography.displayLarge)
                 LocalImageLoader(imageUrl = cardContent.imageName, Modifier.size(44.dp))
             }
         }
