@@ -17,11 +17,11 @@ public class CalendarController {
 
     private final CalendarService calendarService;
 
-    @PostMapping("")
-    public ResponseEntity<?> registerSchedule(@RequestBody ScheduleForm scheduleForm) {
-//        TODO @AuthenticationPrincipal User user
-        Long userId = 1L;
-        calendarService.r(boardForm, userId);
-        return ResponseEntity.ok().body(MessageUtils.success());
-    }
+//    @PostMapping("")
+//    public ResponseEntity<?> registerSchedule(@RequestBody ScheduleForm scheduleForm) {
+////        TODO @AuthenticationPrincipal User user
+//        Long userId = 1L;
+//        calendarService.
+//        return ResponseEntity.ok().body(MessageUtils.success());
+//    }
 }
