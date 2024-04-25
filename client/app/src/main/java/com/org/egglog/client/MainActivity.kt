@@ -65,6 +65,7 @@ import com.org.egglog.client.ui.atoms.profileItem.ProfileItem
 import com.org.egglog.client.ui.atoms.toggle.Toggle
 import com.org.egglog.client.ui.atoms.wheelPicker.DateTimePicker
 import com.org.egglog.client.ui.atoms.wheelPicker.TimePicker
+import com.org.egglog.client.ui.molecules.bottomNavigator.BottomNavigator
 import com.org.egglog.client.ui.molecules.cards.AlarmScheduleCard
 import com.org.egglog.client.ui.molecules.cards.AlarmSettingCard
 import com.org.egglog.client.ui.molecules.cards.BigScheduleCard
@@ -133,11 +134,21 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    CommunityTest()
 //    TabBarTest()
 //    InfoListTest()
-    RadioButtonTest()
+//    RadioButtonTest()
 //    HeaderTest()
 //    ListTest()
+    NavigatorTest()
 }
 
+@Composable
+fun NavigatorTest(){
+    Column (
+        modifier = Modifier.fillMaxSize()
+    ){
+        Text("bottom Navigator test", modifier = Modifier.weight(1f))
+        BottomNavigator()
+    }
+}
 @Composable
 fun ListTest() {
     val checkedState = remember { mutableStateOf(false) }
