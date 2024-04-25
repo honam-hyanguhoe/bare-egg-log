@@ -1,4 +1,4 @@
-package com.org.egglog.client.ui.molecules.agreeListItem
+package com.org.egglog.client.ui.molecules.listItems
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

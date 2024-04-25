@@ -21,6 +21,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.org.egglog.client.data.CommentInfo
 import com.org.egglog.client.data.PostReactionInfo
+import com.org.egglog.client.data.RadioButtonColorInfo
 import com.org.egglog.client.data.UserInfo
 import com.org.egglog.client.ui.atoms.buttons.AuthButton
 import com.org.egglog.client.ui.atoms.buttons.BigButton
@@ -45,6 +47,7 @@ import com.org.egglog.client.ui.atoms.buttons.HalfThinButton
 import com.org.egglog.client.ui.atoms.buttons.IconTextButton
 import com.org.egglog.client.ui.atoms.buttons.MiddleButton
 import com.org.egglog.client.ui.atoms.buttons.ProfileButton
+import com.org.egglog.client.ui.atoms.buttons.RadioLabelButton
 import com.org.egglog.client.ui.atoms.buttons.SettingButton
 import com.org.egglog.client.ui.atoms.buttons.ThinButton
 import com.org.egglog.client.ui.atoms.cards.ProfileCard
@@ -62,10 +65,12 @@ import com.org.egglog.client.ui.atoms.wheelPicker.DateTimePicker
 import com.org.egglog.client.ui.atoms.wheelPicker.TimePicker
 import com.org.egglog.client.ui.molecules.cards.CommentCard
 import com.org.egglog.client.ui.molecules.tabBar.TabBar
-import com.org.egglog.client.ui.molecules.infoList.InfoList
+import com.org.egglog.client.ui.molecules.listItems.InfoList
 import com.org.egglog.client.ui.molecules.postReaction.PostReaction
 import com.org.egglog.client.ui.organisms.agreeList.AgreeList
 import com.org.egglog.client.ui.molecules.profileButtonList.ProfileButtonList
+import com.org.egglog.client.ui.molecules.radioButtons.DayRadioButton
+import com.org.egglog.client.ui.molecules.radioButtons.WorkRadioButton
 import com.org.egglog.client.utils.widthPercent
 import com.org.egglog.client.ui.theme.*
 import com.org.egglog.client.utils.AddBox
@@ -102,7 +107,7 @@ fun MyAppPreview() {
 @Composable
 fun MyApp(modifier: Modifier = Modifier) {
 //    LabelTest()
-    ButtonTest()
+//    ButtonTest()
 //    ToggleTest()
 //    InputTest()
 //    CheckBoxTest()
@@ -115,6 +120,7 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    CommunityTest()
 //    TabBarTest()
 //    InfoListTest()
+    RadioButtonTest()
 }
 
 @Composable
@@ -159,6 +165,18 @@ fun TabBarTest() {
         { FirstTabContents() },
         { SecondTabContents() },
     )
+}
+
+@Composable
+fun RadioButtonTest() {
+    Surface(color = MaterialTheme.colorScheme.background) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            val radioList = arrayListOf("eve", "night", "day")
+            val selected = remember { mutableStateOf("") }
+            WorkRadioButton(radioList = radioList, selected = selected)
+            DayRadioButton(radioList = radioList, selected = selected)
+        }
+    }
 }
 
 @Composable
