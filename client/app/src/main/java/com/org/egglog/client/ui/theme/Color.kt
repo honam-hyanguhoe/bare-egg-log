@@ -175,3 +175,9 @@ val Orange900 = Color(0xFF7E2410)
 val Google = Color(0xFF4285F4)
 val Naver = Color(0xFF06CC80)
 val Kakao = Color(0xFFFFCD00)
+
+val DayCard = Color(0xFF87DCCE)
+val EveCard = Color(0xFFFAF0A2)
+val NightCard = Color(0xFFA6C4FF)
+
+
