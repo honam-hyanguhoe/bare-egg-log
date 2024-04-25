@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class BoardListForm {
 
     private Long hospitalId;    //병원 아이디

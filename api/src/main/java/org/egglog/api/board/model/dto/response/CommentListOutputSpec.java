@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class CommentListOutputSpec {
 
     private Long commentId;
@@ -29,7 +29,7 @@ public class CommentListOutputSpec {
 
     private String profileImgUrl;
 
-    private Boolean isAuth;     // 인증 여부
+    private Boolean isHospitalAuth;     // 인증 여부
 
     private List<RecommentOutputSpec> recomments;    //대댓글
 }

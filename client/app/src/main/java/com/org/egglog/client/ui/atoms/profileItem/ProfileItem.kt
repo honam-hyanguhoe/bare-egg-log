@@ -21,12 +21,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.org.egglog.client.R
+import com.org.egglog.client.data.Profile
 import com.org.egglog.client.ui.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.client.ui.theme.ClientTheme
 import com.org.egglog.client.ui.theme.Typography
 import com.org.egglog.client.utils.widthPercent
 
-class Profile(val userId: Int, val name: String, val hospital: String, val isAuth: Boolean ?= false)
 
 @Composable
 fun ProfileItem(profile: Profile, type: String, createdAt: String ?= null)  {
@@ -50,7 +50,7 @@ fun ProfileItem(profile: Profile, type: String, createdAt: String ?= null)  {
             // 이름, 인증뱃지
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                        text = "${profile.name}",
+                        text = profile.name,
                         color = com.org.egglog.client.ui.theme.NaturalBlack,
                         style = if (itemType == "post") Typography.displayLarge else Typography.bodyLarge
                 )

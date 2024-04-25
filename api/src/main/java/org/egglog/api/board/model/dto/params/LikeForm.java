@@ -8,7 +8,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class LikeForm {
 
     private Long boardId;

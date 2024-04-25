@@ -41,6 +41,7 @@ import androidx.compose.material.icons.filled.SupervisedUserCircle
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.filled.VerifiedUser
+import androidx.compose.material.icons.outlined.RemoveRedEye
 
 val ArrowLeft = Icons.Default.KeyboardArrowLeft
 val ArrowDown = Icons.Default.KeyboardArrowDown
@@ -55,15 +56,15 @@ val Search = Icons.Default.Search
 val Calendar = Icons.Default.CalendarMonth
 val User = Icons.Default.SupervisedUserCircle
 val Home = Icons.Default.Home
-val community = Icons.Default.Forum
+val Community = Icons.Default.Forum
 val Settings = Icons.Default.Settings
 val Edit = Icons.Default.Edit
 val MoreHoriz = Icons.Default.MoreHoriz
 val MoreVert = Icons.Default.MoreVert
 val FavoriteBorder = Icons.Default.FavoriteBorder
 val Favorite = Icons.Default.Favorite
-val comment = Icons.Default.ModeComment
-val watch = Icons.Default.RemoveRedEye
+val Comment = Icons.Default.ChatBubbleOutline
+val Watch = Icons.Outlined.RemoveRedEye
 val Trash = Icons.Default.DeleteOutline
 val MySetting = Icons.Default.PersonOutline
 val WorkSetting = Icons.Default.DirectionsRun
