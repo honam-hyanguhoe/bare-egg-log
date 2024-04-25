@@ -66,6 +66,7 @@ import com.org.egglog.client.ui.molecules.headers.SearchHeader
 import com.org.egglog.client.ui.molecules.cards.CommentCard
 import com.org.egglog.client.ui.molecules.tabBar.TabBar
 import com.org.egglog.client.ui.molecules.infoList.InfoList
+import com.org.egglog.client.ui.molecules.listItems.AlarmListItem
 import com.org.egglog.client.ui.molecules.postReaction.PostReaction
 import com.org.egglog.client.ui.organisms.agreeList.AgreeList
 import com.org.egglog.client.ui.molecules.profileButtonList.ProfileButtonList
@@ -117,7 +118,17 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    CommunityTest()
 //    TabBarTest()
 //    InfoListTest()
-    HeaderTest()
+//    HeaderTest()
+    ListTest()
+}
+
+@Composable
+fun ListTest() {
+    val checkedState = remember { mutableStateOf(false) }
+    AlarmListItem(title = "전체 알림",
+        checked = checkedState.value,
+        onCheckedChange = { checkedState.value = it }
+    )
 }
 
 @Composable
@@ -145,7 +156,7 @@ fun HeaderTest() {
             onClickMenus = {},
             options = groupOptions,
             selectedOption = selectedMenuItem,
-            onSelect = {selectedMenuItem = it}
+            onSelect = { selectedMenuItem = it }
         )
 
         Spacer(modifier = Modifier.height(30.dp))
@@ -159,7 +170,7 @@ fun HeaderTest() {
             onClickMenus = {},
             options = communityOptions,
             selectedOption = selectedMenuItem,
-            onSelect = {selectedMenuItem = it}
+            onSelect = { selectedMenuItem = it }
         )
 
         Spacer(modifier = Modifier.height(30.dp))
