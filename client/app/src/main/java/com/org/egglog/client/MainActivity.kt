@@ -23,6 +23,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,6 +66,7 @@ import com.org.egglog.client.ui.atoms.profileItem.ProfileItem
 import com.org.egglog.client.ui.atoms.toggle.Toggle
 import com.org.egglog.client.ui.atoms.wheelPicker.DateTimePicker
 import com.org.egglog.client.ui.atoms.wheelPicker.TimePicker
+import com.org.egglog.client.ui.molecules.bottomNavigator.BottomNavigator
 import com.org.egglog.client.ui.molecules.cards.AlarmScheduleCard
 import com.org.egglog.client.ui.molecules.cards.AlarmSettingCard
 import com.org.egglog.client.ui.molecules.cards.BigScheduleCard
@@ -137,9 +139,58 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    RadioButtonTest()
 //    HeaderTest()
 //    ListTest()
-    PostCardTest()
+//    PostCardTest()
+    NavigatorTest()
 }
 
+
+@Composable
+fun NavigatorTest(){
+    var selectedItem by remember { mutableIntStateOf(0) }
+
+    Column (
+        modifier = Modifier.fillMaxSize()
+    ){
+        Box(modifier = Modifier.weight(1f)){
+            when (selectedItem) {
+                0 -> CalendarPage()
+                1 -> GroupPage()
+                2 -> HomePage()
+                3 -> CommunityPage()
+                4 -> SettingsPage()
+            }
+        }
+        BottomNavigator(selectedItem = selectedItem, onItemSelected = { selectedItem = it })
+
+
+    }
+}
+
+@Composable
+fun CalendarPage() {
+        Text("Calendar Page")
+
+}
+
+@Composable
+fun GroupPage() {
+    Text("Group Page")
+}
+
+@Composable
+fun HomePage() {
+    Text("Home Page")
+}
+
+@Composable
+fun CommunityPage() {
+    Text("Community Page")
+}
+
+@Composable
+fun SettingsPage() {
+    Text("Settings Page")
+}
 
 @Composable
 fun ListTest() {
