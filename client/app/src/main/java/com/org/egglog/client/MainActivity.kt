@@ -83,6 +83,7 @@ import com.org.egglog.client.ui.molecules.postReaction.PostReaction
 import com.org.egglog.client.ui.organisms.agreeList.AgreeList
 import com.org.egglog.client.ui.molecules.profileButtonList.ProfileButtonList
 import com.org.egglog.client.ui.molecules.swiper.Swiper
+import com.org.egglog.client.ui.organisms.postCard.PostCard
 import com.org.egglog.client.utils.widthPercent
 import com.org.egglog.client.ui.theme.*
 import com.org.egglog.client.utils.AddBox
@@ -132,8 +133,10 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    TabBarTest()
 //    InfoListTest()
 //    HeaderTest()
-    ListTest()
+//    ListTest()
+    PostCardTest()
 }
+
 
 @Composable
 fun ListTest() {
@@ -202,8 +205,8 @@ fun BottomSheetTest() {
 
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .border(2.dp, NaturalBlack)
+                .fillMaxSize()
+                .border(2.dp, NaturalBlack)
     ) {
 
         Text("hi")
@@ -769,4 +772,17 @@ fun CardTest() {
             }
         }
     }
+}
+
+@Composable
+fun PostCardTest() {
+    val profile1 = Profile(1,"익명의 구운란1", "전남대병원", true)
+    val postInfo = com.org.egglog.client.data.PostInfo("태화루에 있는 동강병원 어떤가요?", "근무환경이나 일의 강도 복지 궁금합니다", "https://picsum.photos/300")
+    val postInfo2 = com.org.egglog.client.data.PostInfo("태화루에 있는 동강병원 어떤가요?", "근무환경이나 일의 강도 복지 궁금합니다")
+    val postReaction1 = PostReactionInfo(1, 100, 13, 123, true, true, true)
+    LazyColumn(Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp)) {
+        item { PostCard(profile1, postInfo, postReaction1, onClick = {println("안녕")}) }
+        item { PostCard(profile1, postInfo2, postReaction1) }
+    }
+
 }
