@@ -18,7 +18,7 @@ import com.org.egglog.client.ui.atoms.buttons.ProfileButton
 import com.org.egglog.client.utils.widthPercent
 
 @Composable
-fun ProfileButtonList(userInfoList: ArrayList<UserInfo>, selectedList: SnapshotStateList<Int>, myUserId: Int) {
+fun ProfileButtonList(userInfoList: ArrayList<UserInfo>, selectedList: SnapshotStateList<Long>, myUserId: Long) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

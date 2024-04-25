@@ -32,6 +32,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.org.egglog.client.data.CommentInfo
 import com.org.egglog.client.data.PostReactionInfo
 import com.org.egglog.client.data.UserInfo
 import com.org.egglog.client.ui.atoms.buttons.AuthButton
@@ -58,6 +59,7 @@ import com.org.egglog.client.ui.atoms.labels.Labels
 import com.org.egglog.client.ui.atoms.toggle.Toggle
 import com.org.egglog.client.ui.atoms.wheelPicker.DateTimePicker
 import com.org.egglog.client.ui.atoms.wheelPicker.TimePicker
+import com.org.egglog.client.ui.molecules.cards.CommentCard
 import com.org.egglog.client.ui.molecules.tabBar.TabBar
 import com.org.egglog.client.ui.molecules.infoList.InfoList
 import com.org.egglog.client.ui.molecules.postReaction.PostReaction
@@ -213,6 +215,32 @@ fun CommunityTest(modifier: Modifier = Modifier) {
         Column(modifier = Modifier.fillMaxSize()) {
             PostReaction(postReactionInfo = postReaction1)
             PostReaction(postReactionInfo = postReaction2)
+            CommentCard(
+                CommentInfo(
+                    1,
+                    1,
+                    "test",
+                    "전남대병원",
+                    "익명의 구운란",
+                    "2023-12-24 13:28:12",
+                    "https://picsum.photos/300",
+                    true,
+                    arrayListOf(
+                        CommentInfo(
+                            1,
+                            1,
+                            "test",
+                            "전남대병원",
+                            "익명의 구운란",
+                            "2023-12-24 13:28:12",
+                            "https://picsum.photos/300",
+                            true
+                        )
+                    )
+                ),
+                myUserId = 2
+            )
+            CommentCard(CommentInfo(1, 1, "test", "전남대병원", "익명의 구운란", "2023-12-24 13:28:12", "https://picsum.photos/300", true), myUserId = 1)
         }
     }
 }
@@ -255,7 +283,7 @@ fun ToggleTest(modifier: Modifier = Modifier) {
 
 @Composable
 fun ProfileButtonTest(modifier: Modifier = Modifier) {
-    val myUserId = 1
+    val myUserId: Long = 1
     val userInfoList = arrayListOf(
             UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남1", empNo = "18-12543", userEmail = "test@test.com", userId = 1),
             UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남2", empNo = "18-12543", userEmail = "test@test.com", userId = 2),
@@ -267,7 +295,7 @@ fun ProfileButtonTest(modifier: Modifier = Modifier) {
             UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남8", empNo = "18-12543", userEmail = "test@test.com", userId = 8),
             UserInfo(profileImgUrl = "https://picsum.photos/300", userName = "김호남9", empNo = "18-12543", userEmail = "test@test.com", userId = 9)
     )
-    val selectedList = remember { mutableStateListOf(0, 0, 0) }
+    val selectedList = remember { mutableStateListOf<Long>(0, 0, 0) }
 
     Surface(modifier, color = MaterialTheme.colorScheme.background) {
         Column(modifier = modifier.fillMaxSize()) {
