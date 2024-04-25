@@ -1,6 +1,5 @@
 package com.org.egglog.client.ui.molecules.cards
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,7 +32,7 @@ import com.org.egglog.client.utils.heightPercent
 import com.org.egglog.client.utils.widthPercent
 
 @Composable
-fun CommentCard(commentInfo: CommentInfo, myUserId: Long) {
+fun CommentCard(commentInfo: CommentInfo, myUserId: Long, onDeleteClick: (Long) -> Unit, onRecommentClick: (Long) -> Unit) {
     val context = LocalContext.current
     Row(
         Modifier
@@ -57,7 +56,7 @@ fun CommentCard(commentInfo: CommentInfo, myUserId: Long) {
                     createdAt = commentInfo.commentCreateAt
                 )
                 if (commentInfo.userId == myUserId) {
-                    Surface(onClick = {}, modifier = Modifier.height(20.heightPercent(context).dp), shape = RoundedCornerShape(4.widthPercent(context).dp), contentColor = Gray100, color = Gray100) {
+                    Surface(onClick = { onDeleteClick(commentInfo.commentId) }, modifier = Modifier.height(20.heightPercent(context).dp), shape = RoundedCornerShape(4.widthPercent(context).dp), contentColor = Gray100, color = Gray100) {
                         Row(Modifier.height(18.heightPercent(context).dp), Arrangement.Center, Alignment.CenterVertically) {
                             Text(text = "삭제", style = Typography.labelMedium.copy(color = Gray400))
                             Spacer(modifier = Modifier.padding(1.widthPercent(context).dp))
@@ -71,7 +70,7 @@ fun CommentCard(commentInfo: CommentInfo, myUserId: Long) {
             Spacer(modifier = Modifier.padding(4.widthPercent(context).dp))
             if(commentInfo.recomment.size != 0) {
                 ClickableText(text = AnnotatedString("답글달기"), style = Typography.labelMedium.copy(color = Gray400)) {
-                    Log.d("답글달기 클릭: ", "${commentInfo.commentId} clicked!!!")
+                    onRecommentClick(commentInfo.commentId)
                 }
             }
         }
