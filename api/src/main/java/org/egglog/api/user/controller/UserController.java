@@ -39,7 +39,7 @@ public class UserController {
     }
 
     @PatchMapping("/info-modify")
-    public ResponseEntity<MessageUtils> modifyUser(
+    public ResponseEntity<MessageUtils> modifyUserInfo(
             @AuthenticationPrincipal User loginUser,
             @RequestBody UpdateUserRequest request
             ){
@@ -48,7 +48,7 @@ public class UserController {
     }
 
     @PatchMapping("/hospital/info-modify")
-    public ResponseEntity<MessageUtils> modifyUser(
+    public ResponseEntity<MessageUtils> modifyHospitalUserInfo(
             @AuthenticationPrincipal User loginUser,
             @RequestBody UpdateUserHospitalRequest request
     ){

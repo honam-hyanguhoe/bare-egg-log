@@ -51,7 +51,6 @@ public class SecurityConfig{
                 .addFilterBefore(exceptionHandlerFilter, JwtFilter.class) // ExceptionHandlerFilter 추가
                 .oauth2Login(customizer ->
                         customizer
-//                                .failureHandler(authFailureHandler)
                                 .successHandler(oAuth2SuccessHandler)
                                 .userInfoEndpoint(userInfoEndpoint ->
                                         userInfoEndpoint.userService(customOAuth2Service))

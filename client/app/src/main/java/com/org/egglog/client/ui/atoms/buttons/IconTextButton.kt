@@ -38,7 +38,9 @@ fun IconTextButton(
     iconColor: Color = NaturalBlack,
     textColor: Color = NaturalBlack,
     textStyle: TextStyle = Typography.bodyMedium,
-    borderRadius: Int = 50
+    borderRadius: Int = 50,
+    paddingWidth: Int = 6,
+    paddingHeight: Int = 2
 ) {
     val context = LocalContext.current
     Surface(
@@ -49,7 +51,7 @@ fun IconTextButton(
         contentColor = contentColor,
         color = color
     ) {
-        Row(Modifier.padding(horizontal = 6.widthPercent(context).dp, vertical = 2.heightPercent(context).dp), Arrangement.Center, Alignment.CenterVertically) {
+        Row(Modifier.padding(horizontal = paddingWidth.widthPercent(context).dp, vertical = paddingHeight.heightPercent(context).dp), Arrangement.Center, Alignment.CenterVertically) {
             Icon(imageVector = icon, modifier = Modifier.size(iconSize.widthPercent(context).dp), color = iconColor)
             Spacer(modifier = Modifier.padding(2.widthPercent(context).dp))
             Text(text = text, style = textStyle, color = textColor)

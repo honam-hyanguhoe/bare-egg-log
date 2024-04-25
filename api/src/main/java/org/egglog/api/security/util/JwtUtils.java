@@ -44,6 +44,7 @@ public class JwtUtils {
     //토큰만료시간
     public Date getExpiredTime(Long period){
         log.info("기간={}",period);
+        log.info("기간={}",Date.from(ZonedDateTime.now(zoneId).plus(Duration.ofMillis(period)).toInstant()));
         return Date.from(ZonedDateTime.now(zoneId).plus(Duration.ofMillis(period)).toInstant());
     }
 
