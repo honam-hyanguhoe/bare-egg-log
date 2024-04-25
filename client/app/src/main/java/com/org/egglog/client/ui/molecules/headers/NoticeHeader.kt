@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.org.egglog.client.R
+import com.org.egglog.client.ui.atoms.buttons.IconButton
 import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.ui.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.client.ui.atoms.menus.ScrollableMenus
@@ -110,31 +110,21 @@ fun NoticeHeaderContents(
         }
         // right
         Row(
-            horizontalArrangement = Arrangement.Center,
+            horizontalArrangement = Arrangement.spacedBy(3.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             if (hasSearch) {
                 IconButton(
-                    onClick = { }, modifier = Modifier.border(1.dp, Warning400)
-                ) {
-                    Icon(
-                        Search,
-                        modifier = Modifier.size(25.dp).border(1.dp, Warning400),
-                        color = NaturalBlack
-                    )
-                }
+                    size = 25.dp,
+                    imageVector = Search,
+                    color = NaturalBlack,
+                    onClick = { /*TODO*/ })
             }
-
             IconButton(
-                onClick = { }, modifier = Modifier
-            ) {
-                Icon(
-                    Notification,
-                    modifier = Modifier.size(25.dp),
-                    color = NaturalBlack
-                )
-            }
+                size = 25.dp,
+                imageVector = Notification,
+                color = NaturalBlack,
+                onClick = { /*TODO*/ })
         }
     }
 }

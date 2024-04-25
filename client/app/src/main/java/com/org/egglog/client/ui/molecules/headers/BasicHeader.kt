@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,6 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.org.egglog.client.ui.atoms.buttons.IconButton
+import com.org.egglog.client.ui.atoms.buttons.IconTextButton
 import com.org.egglog.client.ui.atoms.icons.Icon
 import com.org.egglog.client.ui.atoms.linearIndicator.LinearIndicator
 import com.org.egglog.client.ui.atoms.menus.ScrollableMenus
@@ -38,12 +39,14 @@ import com.org.egglog.client.ui.theme.Warning400
 import com.org.egglog.client.utils.ArrowLeft
 import com.org.egglog.client.utils.Close
 import com.org.egglog.client.utils.Link
+import com.org.egglog.client.utils.Search
 import com.org.egglog.client.utils.heightPercent
 import com.org.egglog.client.utils.widthPercent
 
 @Composable
 fun BasicHeader(
-    title: String,
+    title: String = "무튼 제목임",
+    hasTitle: Boolean = false,
     hasArrow: Boolean = false,
     hasLeftClose: Boolean = false,
     hasClose: Boolean = false,
@@ -59,6 +62,7 @@ fun BasicHeader(
         Column {
             BasicHeaderContents(
                 title = title,
+                hasTitle = hasTitle,
                 hasArrow = hasArrow,
                 hasLeftClose = hasLeftClose,
                 hasClose = hasClose,
@@ -76,6 +80,7 @@ fun BasicHeader(
 @Composable
 fun BasicHeaderContents(
     title: String,
+    hasTitle: Boolean = false,
     hasArrow: Boolean = false,
     hasLeftClose: Boolean = false,
     hasClose: Boolean = false,
@@ -94,69 +99,52 @@ fun BasicHeaderContents(
     ) {
         if (hasArrow) {
             IconButton(
-                onClick = { }, modifier = Modifier
-                    .size(30.widthPercent(context).dp)
-                    .border(1.dp, Warning400)
-            ) {
-                Icon(
-                    ArrowLeft,
-                    modifier = Modifier.size(30.widthPercent(context).dp),
-                    color = NaturalBlack
-                )
-            }
+                size = 25.dp,
+                imageVector = ArrowLeft,
+                color = NaturalBlack,
+                onClick = { /*TODO*/ })
         } else if (hasLeftClose) {
             IconButton(
-                onClick = { }, modifier = Modifier
-                    .size(30.widthPercent(context).dp)
-                    .border(1.dp, Warning400)
-            ) {
-                Icon(
-                    Close,
-                    modifier = Modifier.size(30.widthPercent(context).dp),
-                    color = NaturalBlack
-                )
-            }
+                size = 25.dp,
+                imageVector = Close,
+                color = NaturalBlack,
+                onClick = { /*TODO*/ })
         } else {
             Box(modifier = Modifier.size(30.widthPercent(context).dp))
         }
 
-
-        Text(
-            text = title,
-            style = Typography.bodyLarge,
-            color = NaturalBlack,
-            textAlign = TextAlign.Center,
-
-            modifier =
-                if(hasInvitationButton){
-                    Modifier.padding(start = 70.widthPercent(context).dp)
-                } else {
-                    Modifier.padding(start = 0.widthPercent(context).dp)
-                }
-
-        )
+        if (hasTitle) {
+            Text(
+                text = title,
+                style = Typography.bodyLarge,
+                color = NaturalBlack,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+            )
+        }
 
 
-        Row (
+        Row(
             horizontalArrangement = Arrangement.spacedBy(3.dp),
             verticalAlignment = Alignment.CenterVertically
-        ){
+        ) {
             if (hasInvitationButton) {
-                Box(modifier = Modifier
-                    .height(40.heightPercent(context).dp)
-                    .width(70.widthPercent(context).dp)
-                    .border(1.dp, Warning400))
+                IconTextButton(
+                    onClick = { /*TODO*/ },
+                    width = 80,
+                    height = 30,
+                    icon = Link,
+                    text = "초대링크",
+                    textStyle = Typography.labelSmall
+                )
             }
 
-
             if (hasClose) {
-                IconButton(onClick = { }, modifier = Modifier.size(30.widthPercent(context).dp)) {
-                    Icon(
-                        Close,
-                        modifier = Modifier.size(30.widthPercent(context).dp),
-                        color = NaturalBlack
-                    )
-                }
+                IconButton(
+                    size = 25.dp,
+                    imageVector = Close,
+                    color = NaturalBlack,
+                    onClick = { /*TODO*/ })
             } else if (hasMore) {
                 val groupOptions = listOf("그룹 설정", "그룹원 설정", "그룹 나가기")
                 var selectedMenuItem by remember { mutableStateOf<String?>(null) }
@@ -167,36 +155,6 @@ fun BasicHeaderContents(
             } else {
                 Box(modifier = Modifier.size(30.widthPercent(context).dp))
             }
-
-        }
-
-
-    }
-}
-
-
-@Composable
-fun InvitationButton(
-    context: Context
-) {
-    Button(
-        onClick = { /*TODO*/ },
-        modifier = Modifier
-            .height(30.dp),
-        border = BorderStroke(1.dp, NaturalBlack),
-        shape = ButtonDefaults.outlinedShape,
-        colors = ButtonDefaults.buttonColors(NaturalWhite)
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(3.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                Link,
-                modifier = Modifier.size(15.widthPercent(context).dp),
-                color = NaturalBlack
-            )
-            Text(text = "초대링크", style = Typography.labelSmall, color = NaturalBlack)
         }
     }
 }

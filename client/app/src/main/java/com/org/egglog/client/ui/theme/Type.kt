@@ -104,7 +104,7 @@ val Typography = Typography(
     // font-size-xxxs Bold
     labelSmall = TextStyle(
         fontFamily = lineFontFamily,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.Bold,
         fontSize = 10.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.2.sp
