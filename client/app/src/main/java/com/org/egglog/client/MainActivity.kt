@@ -23,6 +23,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,6 +50,7 @@ import com.org.egglog.client.ui.atoms.buttons.HalfThinButton
 import com.org.egglog.client.ui.atoms.buttons.IconTextButton
 import com.org.egglog.client.ui.atoms.buttons.MiddleButton
 import com.org.egglog.client.ui.atoms.buttons.ProfileButton
+import com.org.egglog.client.ui.atoms.buttons.RadioLabelButton
 import com.org.egglog.client.ui.atoms.buttons.SettingButton
 import com.org.egglog.client.ui.atoms.buttons.ThinButton
 import com.org.egglog.client.ui.atoms.cards.ProfileCard
@@ -77,6 +79,12 @@ import com.org.egglog.client.ui.molecules.cards.HotPostCard
 import com.org.egglog.client.ui.molecules.cards.PostInfo
 import com.org.egglog.client.ui.molecules.cards.SmallScheduleCard
 import com.org.egglog.client.ui.molecules.tabBar.TabBar
+import com.org.egglog.client.ui.molecules.listItems.InfoList
+import com.org.egglog.client.ui.molecules.postReaction.PostReaction
+import com.org.egglog.client.ui.organisms.agreeList.AgreeList
+import com.org.egglog.client.ui.molecules.profileButtonList.ProfileButtonList
+import com.org.egglog.client.ui.molecules.radioButtons.DayRadioButton
+import com.org.egglog.client.ui.molecules.radioButtons.WorkRadioButton
 import com.org.egglog.client.ui.molecules.infoList.InfoList
 import com.org.egglog.client.ui.molecules.listItems.AlarmListItem
 import com.org.egglog.client.ui.molecules.postReaction.PostReaction
@@ -131,8 +139,9 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    CommunityTest()
 //    TabBarTest()
 //    InfoListTest()
+    RadioButtonTest()
 //    HeaderTest()
-    ListTest()
+//    ListTest()
 }
 
 @Composable
@@ -234,6 +243,18 @@ fun TabBarTest() {
         { FirstTabContents() },
         { SecondTabContents() },
     )
+}
+
+@Composable
+fun RadioButtonTest() {
+    Surface(color = MaterialTheme.colorScheme.background) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            val radioList = arrayListOf("eve", "night", "day")
+            val selected = remember { mutableStateOf("") }
+            WorkRadioButton(radioList = radioList, selected = selected)
+            DayRadioButton(radioList = radioList, selected = selected)
+        }
+    }
 }
 
 @Composable
@@ -705,7 +726,7 @@ fun CardTest() {
     }
 
     val onClickMore: (planId: Any) -> Unit = {
-        planId -> println("${planId}번 클릭됨")
+            planId -> println("${planId}번 클릭됨")
     }
 
     val postInfo = PostInfo("부서 골라주실 분!!!", "익명의 구운란", 5, 100, false)
