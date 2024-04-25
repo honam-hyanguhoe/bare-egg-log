@@ -42,6 +42,7 @@ import com.org.egglog.client.ui.atoms.buttons.GroupButton
 import com.org.egglog.client.ui.atoms.buttons.HalfBigButton
 import com.org.egglog.client.ui.atoms.buttons.HalfMiddleButton
 import com.org.egglog.client.ui.atoms.buttons.HalfThinButton
+import com.org.egglog.client.ui.atoms.buttons.IconTextButton
 import com.org.egglog.client.ui.atoms.buttons.MiddleButton
 import com.org.egglog.client.ui.atoms.buttons.ProfileButton
 import com.org.egglog.client.ui.atoms.buttons.SettingButton
@@ -70,6 +71,7 @@ import com.org.egglog.client.ui.theme.*
 import com.org.egglog.client.utils.AddBox
 import com.org.egglog.client.utils.Logout
 import com.org.egglog.client.utils.MySetting
+import com.org.egglog.client.utils.Search
 import com.org.egglog.client.utils.addFocusCleaner
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -100,7 +102,7 @@ fun MyAppPreview() {
 @Composable
 fun MyApp(modifier: Modifier = Modifier) {
 //    LabelTest()
-//    ButtonTest()
+    ButtonTest()
 //    ToggleTest()
 //    InputTest()
 //    CheckBoxTest()
@@ -110,7 +112,7 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    CardTest()
 //    ProfileButtonTest()
 //    InfoListTest()
-    CommunityTest()
+//    CommunityTest()
 //    TabBarTest()
 //    InfoListTest()
 }
@@ -228,7 +230,7 @@ fun CommunityTest(modifier: Modifier = Modifier) {
                     arrayListOf(
                         CommentInfo(
                             1,
-                            1,
+                            2,
                             "test",
                             "전남대병원",
                             "익명의 구운란",
@@ -238,9 +240,25 @@ fun CommunityTest(modifier: Modifier = Modifier) {
                         )
                     )
                 ),
-                myUserId = 2
+                myUserId = 2,
+                onDeleteClick = { clickedCommentId -> Log.d("답글삭제 클릭: ", "$clickedCommentId clicked!!!") },
+                onRecommentClick = { clickedCommentId -> Log.d("답글달기 클릭: ", "$clickedCommentId clicked!!!") }
             )
-            CommentCard(CommentInfo(1, 1, "test", "전남대병원", "익명의 구운란", "2023-12-24 13:28:12", "https://picsum.photos/300", true), myUserId = 1)
+            CommentCard(
+                CommentInfo(
+                    1,
+                    2,
+                    "test",
+                    "전남대병원",
+                    "익명의 구운란",
+                    "2023-12-24 13:28:12",
+                    "https://picsum.photos/300",
+                    true
+                ),
+                myUserId = 1,
+                onDeleteClick = { clickedCommentId -> Log.d("답글삭제 클릭: ", "$clickedCommentId clicked!!!") },
+                onRecommentClick = { clickedCommentId -> Log.d("답글달기 클릭: ", "$clickedCommentId clicked!!!") }
+            )
         }
     }
 }
@@ -557,6 +575,7 @@ fun ButtonTest(modifier: Modifier = Modifier) {
                 color = Error500,
                 icon = Logout
             )
+            IconTextButton(onClick = {}, width = 70, height = 30, icon = Search, text = "안녕")
         }
     }
 }
