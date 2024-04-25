@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.ModeComment
 import androidx.compose.material.icons.filled.MoreHoriz
@@ -74,3 +75,4 @@ val Upload = Icons.Default.Upload
 val AddBox = Icons.Default.AddBox
 val Add = Icons.Default.Add
 val Agree = Icons.Default.Verified
+val Link = Icons.Default.Link
