@@ -46,23 +46,23 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun TabBar(
-        firstContent: @Composable () -> Unit,
-        secendContent: @Composable () -> Unit
+    titles: List<String>,
+    firstContent: @Composable () -> Unit,
+    secendContent: @Composable () -> Unit
 ) {
-    val titles = listOf("근무", "알람")
 
     var pagerState = rememberPagerState(
-            initialPage = 0,
-            initialPageOffsetFraction = 0F,
-            pageCount = { titles.size }
+        initialPage = 0,
+        initialPageOffsetFraction = 0F,
+        pageCount = { titles.size }
     )
 
     var coroutineScope = rememberCoroutineScope()
 
 
-    Column (
+    Column(
         modifier = Modifier.fillMaxSize()
-    ){
+    ) {
         SecondaryTabRow(
             selectedTabIndex = pagerState.currentPage,
             containerColor = NaturalWhite,
