@@ -68,7 +68,7 @@ fun BottomNavigator(){
                 colors = NavigationBarItemColors(
                     selectedIconColor = NaturalWhite,
                     selectedTextColor = NaturalWhite,
-                    selectedIndicatorColor = Warning300.copy(alpha = 0.5f),
+                    selectedIndicatorColor = Warning300.copy(alpha = 0.8f),
                     unselectedIconColor = NaturalBlack,
                     unselectedTextColor = NaturalBlack,
                     disabledIconColor = Gray100,
