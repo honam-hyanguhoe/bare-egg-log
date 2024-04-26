@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.egglog.api.user.model.dto.request.JoinUserRequest;
+import org.egglog.api.user.model.dto.request.UpdateFcmRequest;
 import org.egglog.api.user.model.dto.request.UpdateUserHospitalRequest;
 import org.egglog.api.user.model.dto.request.UpdateUserRequest;
 import org.egglog.api.user.model.entity.User;
@@ -25,7 +26,7 @@ public class UserController {
             @AuthenticationPrincipal User loginUser
     ){
         return ResponseEntity.ok().body(
-                MessageUtils.success(loginUser.toResponse()));
+                MessageUtils.success(userService.find(loginUser)));
     }
 
     @PatchMapping("/join")
@@ -33,11 +34,17 @@ public class UserController {
             @AuthenticationPrincipal User loginUser,
             @RequestBody JoinUserRequest request
             ){
-
         return ResponseEntity.ok().body(
                 MessageUtils.success(userService.joinUser(loginUser, request)));
     }
-
+    @PatchMapping("/fcm-modify")
+    public ResponseEntity<MessageUtils> modifyUserFcm(
+            @AuthenticationPrincipal User loginUser,
+            @RequestBody UpdateFcmRequest request
+    ){
+        return ResponseEntity.ok().body(
+                MessageUtils.success(userService.updateUser(loginUser, request)));
+    }
     @PatchMapping("/info-modify")
     public ResponseEntity<MessageUtils> modifyUserInfo(
             @AuthenticationPrincipal User loginUser,

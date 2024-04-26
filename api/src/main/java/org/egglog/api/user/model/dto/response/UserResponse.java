@@ -6,6 +6,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.*;
+import org.egglog.api.hospital.model.dto.response.HospitalAuthResponse;
 import org.egglog.api.hospital.model.dto.response.UserHospitalResponse;
 import org.egglog.api.user.model.entity.enums.UserRole;
 import org.egglog.api.user.model.entity.enums.UserStatus;
@@ -28,18 +29,17 @@ import java.time.LocalDateTime;
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UserResponse {
     private Long id;
     private String email;
     private String userName;
-    private UserHospitalResponse hospital;
-    private String empNo;
+    private UserHospitalResponse selectedHospital;
+    private HospitalAuthResponse hospitalAuth;
     private String profileImgUrl;
     private UserRole userRole;
     private UserStatus userStatus;
-    private Boolean isHospitalAuth;
-
+    private String deviceToken;
+    private String empNo;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime loginAt;

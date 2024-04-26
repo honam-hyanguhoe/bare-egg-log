@@ -20,9 +20,9 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class JoinUserRequest {
     private String userName;
     private Long hospitalId;
     private String empNo;
+    private String fcmToken;
 }
