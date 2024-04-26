@@ -1,6 +1,6 @@
 import React from "react";
 
-const PrivacyPolicy = () => {
+const PrivacyPolicyPage = () => {
   return (
     <>
       <div>개인정보처리방침</div>
@@ -8,4 +8,4 @@ const PrivacyPolicy = () => {
   );
 };
 
-export default PrivacyPolicy;
+export default PrivacyPolicyPage;

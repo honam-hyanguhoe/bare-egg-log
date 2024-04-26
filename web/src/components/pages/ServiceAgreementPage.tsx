@@ -1,6 +1,6 @@
 import React from "react";
 
-const ServiceAgreement = () => {
+const ServiceAgreementPage = () => {
   return (
     <>
       <div>이용약관처리방침</div>
@@ -8,4 +8,4 @@ const ServiceAgreement = () => {
   );
 };
 
-export default ServiceAgreement;
+export default ServiceAgreementPage;

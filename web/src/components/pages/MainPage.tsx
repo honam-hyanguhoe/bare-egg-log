@@ -1,6 +1,6 @@
 import React from "react";
 
-const Main = () => {
+const MainPage = () => {
   return (
     <>
       <div>에그로그 메인이에요</div>
@@ -9,4 +9,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default MainPage;
