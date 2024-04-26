@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonColors
@@ -88,6 +89,8 @@ import com.org.egglog.client.ui.molecules.radioButtons.WorkRadioButton
 import com.org.egglog.client.ui.molecules.listItems.AlarmListItem
 import com.org.egglog.client.ui.molecules.swiper.Swiper
 import com.org.egglog.client.ui.organisms.postCard.PostCard
+import com.org.egglog.client.ui.organisms.webView.ContentWebView
+import com.org.egglog.client.ui.organisms.webView.FullPageWebView
 import com.org.egglog.client.utils.widthPercent
 import com.org.egglog.client.ui.theme.*
 import com.org.egglog.client.utils.AddBox
@@ -95,6 +98,7 @@ import com.org.egglog.client.utils.Logout
 import com.org.egglog.client.utils.MySetting
 import com.org.egglog.client.utils.Search
 import com.org.egglog.client.utils.addFocusCleaner
+import com.org.egglog.client.utils.heightPercent
 import java.time.LocalDateTime
 import java.time.LocalTime
 
@@ -140,18 +144,24 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    HeaderTest()
 //    ListTest()
 //    PostCardTest()
-    NavigatorTest()
+//    NavigatorTest()
+    WebViewTest()
 }
 
+@Composable
+fun WebViewTest() {
+//    ContentWebView()
+    FullPageWebView()
+}
 
 @Composable
-fun NavigatorTest(){
+fun NavigatorTest() {
     var selectedItem by remember { mutableIntStateOf(0) }
 
-    Column (
+    Column(
         modifier = Modifier.fillMaxSize()
-    ){
-        Box(modifier = Modifier.weight(1f)){
+    ) {
+        Box(modifier = Modifier.weight(1f)) {
             when (selectedItem) {
                 0 -> CalendarPage()
                 1 -> GroupPage()
@@ -168,7 +178,7 @@ fun NavigatorTest(){
 
 @Composable
 fun CalendarPage() {
-        Text("Calendar Page")
+    Text("Calendar Page")
 
 }
 
@@ -259,8 +269,8 @@ fun BottomSheetTest() {
 
     Box(
         modifier = Modifier
-                .fillMaxSize()
-                .border(2.dp, NaturalBlack)
+            .fillMaxSize()
+            .border(2.dp, NaturalBlack)
     ) {
 
         Text("hi")
@@ -759,7 +769,7 @@ fun SwiperTest() {
         println("모임장 바꿈")
     }
 
-    Swiper(onDelete = ::onDelete, onChangeLeader =::onChnageLeader) {
+    Swiper(onDelete = ::onDelete, onChangeLeader = ::onChnageLeader) {
         // swipe 되는 Box 안에 들어갈 요소
         val profile = Profile(1, "김싸피", "전남대학교병원")
         ProfileItem(profile = profile, type = "basic")
@@ -769,12 +779,12 @@ fun SwiperTest() {
 
 @Composable
 fun CardTest() {
-    val onClickPost: ()->Unit = {
+    val onClickPost: () -> Unit = {
         println("클릭됨")
     }
 
-    val onClickMore: (planId: Any) -> Unit = {
-            planId -> println("${planId}번 클릭됨")
+    val onClickMore: (planId: Any) -> Unit = { planId ->
+        println("${planId}번 클릭됨")
     }
 
     val postInfo = PostInfo("부서 골라주실 분!!!", "익명의 구운란", 5, 100, false)
@@ -811,7 +821,14 @@ fun CardTest() {
             }
         }
         item {
-            BigScheduleCard("basic", "14:00", "20:00", "조선대병원 3중환자실", title = "추가 근무", color = Color(0xFFFDA29B)) {
+            BigScheduleCard(
+                "basic",
+                "14:00",
+                "20:00",
+                "조선대병원 3중환자실",
+                title = "추가 근무",
+                color = Color(0xFFFDA29B)
+            ) {
                 onClickMore(0)
             }
         }
@@ -819,22 +836,55 @@ fun CardTest() {
             AlarmScheduleCard(title = "기상 알람", time = "11:00", duration = 30, interval = 5)
         }
         item {
-            AlarmSettingCard("Day", "14:00", 30, 5, checked, setToggle=setToggle, onClickCard=onClickCard)
+            AlarmSettingCard(
+                "Day",
+                "14:00",
+                30,
+                5,
+                checked,
+                setToggle = setToggle,
+                onClickCard = onClickCard
+            )
         }
 
         item {
-            AlarmSettingCard("Eve", "14:00", 30, 5, checked, setToggle=setToggle, onClickCard=onClickCard)
+            AlarmSettingCard(
+                "Eve",
+                "14:00",
+                30,
+                5,
+                checked,
+                setToggle = setToggle,
+                onClickCard = onClickCard
+            )
         }
 
         item {
-            AlarmSettingCard("개인", "14:00", 30, 5, checked, setToggle=setToggle, onClickCard=onClickCard, color = Color(0xFFFDA29B))
+            AlarmSettingCard(
+                "개인",
+                "14:00",
+                30,
+                5,
+                checked,
+                setToggle = setToggle,
+                onClickCard = onClickCard,
+                color = Color(0xFFFDA29B)
+            )
         }
 
 
         item {
             Row() {
-                ExcelCard(color = "green", date = "2024-03-03", name = "김싸피", onClickCard = {println("안녕하세요")})
-                ExcelCard(color = "white", date = "2024-03-03", name = "김싸피", onClickCard = {println("안녕하세요")})
+                ExcelCard(
+                    color = "green",
+                    date = "2024-03-03",
+                    name = "김싸피",
+                    onClickCard = { println("안녕하세요") })
+                ExcelCard(
+                    color = "white",
+                    date = "2024-03-03",
+                    name = "김싸피",
+                    onClickCard = { println("안녕하세요") })
             }
         }
     }
@@ -842,12 +892,17 @@ fun CardTest() {
 
 @Composable
 fun PostCardTest() {
-    val profile1 = Profile(1,"익명의 구운란1", "전남대병원", true)
-    val postInfo = com.org.egglog.client.data.PostInfo("태화루에 있는 동강병원 어떤가요?", "근무환경이나 일의 강도 복지 궁금합니다", "https://picsum.photos/300")
-    val postInfo2 = com.org.egglog.client.data.PostInfo("태화루에 있는 동강병원 어떤가요?", "근무환경이나 일의 강도 복지 궁금합니다")
+    val profile1 = Profile(1, "익명의 구운란1", "전남대병원", true)
+    val postInfo = com.org.egglog.client.data.PostInfo(
+        "태화루에 있는 동강병원 어떤가요?",
+        "근무환경이나 일의 강도 복지 궁금합니다",
+        "https://picsum.photos/300"
+    )
+    val postInfo2 =
+        com.org.egglog.client.data.PostInfo("태화루에 있는 동강병원 어떤가요?", "근무환경이나 일의 강도 복지 궁금합니다")
     val postReaction1 = PostReactionInfo(1, 100, 13, 123, true, true, true)
     LazyColumn(Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp)) {
-        item { PostCard(profile1, postInfo, postReaction1, onClick = {println("안녕")}) }
+        item { PostCard(profile1, postInfo, postReaction1, onClick = { println("안녕") }) }
         item { PostCard(profile1, postInfo2, postReaction1) }
     }
 

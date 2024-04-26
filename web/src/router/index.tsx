@@ -1,20 +1,22 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Main from "../components/pages/Main";
-import PrivacyPolicy from "../components/pages/PrivacyPolicy";
-import ServiceAgreement from "../components/pages/ServiceAgreement";
 import RemainingDutyPage from "../components/pages/RemainingDutyPage";
 import WorkStaticsPage from "../components/pages/WorkStaticsPage";
+import MainPage from "../components/pages/MainPage";
+import PrivacyPolicyPage from "../components/pages/PrivacyPolicyPage";
+import ServiceAgreementPage from "../components/pages/ServiceAgreementPage";
+import ErrorPage from "../components/pages/ErrorPage";
 
 const Router = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Main />} />
-        <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/agreement" element={<ServiceAgreement />} />
+        <Route path="/" element={<MainPage />} />
+        <Route path="/privacy" element={<PrivacyPolicyPage />} />
+        <Route path="/agreement" element={<ServiceAgreementPage />} />
         <Route path="/remain" element={<RemainingDutyPage />} />
         <Route path="/statics" element={<WorkStaticsPage />} />
+        <Route path="/error" element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>
   );
