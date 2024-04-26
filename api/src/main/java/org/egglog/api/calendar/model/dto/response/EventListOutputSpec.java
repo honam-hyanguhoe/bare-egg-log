@@ -1,4 +1,4 @@
-package org.egglog.api.calendar.dto.response;
+package org.egglog.api.calendar.model.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -12,13 +12,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-public class ScheduleListOutputSpec {
+public class EventListOutputSpec {
 
-    private Long scheduleId;
+    private Long eventId;
 
-    private String scheduleTitle;
+    private String eventTitle;
 
-    private String scheduleContent;
+    private String eventContent;
 
     private LocalDateTime startDate;
 

@@ -1,4 +1,4 @@
-package org.egglog.api.calendar.dto.params;
+package org.egglog.api.calendar.model.dto.params;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -12,11 +12,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-public class ScheduleForm {
+public class EventForm {
 
-    private String scheduleTitle;
+    private String eventTitle;
 
-    private String scheduleContent;
+    private String eventContent;
 
     private LocalDateTime startDate;
 

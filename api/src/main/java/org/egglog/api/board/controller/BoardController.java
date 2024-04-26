@@ -44,21 +44,21 @@ public class BoardController {
         return ResponseEntity.ok().body(MessageUtils.success());
     }
 
-    @GetMapping("/{boardId}")
-    public ResponseEntity<?> getBoard(@PathVariable Long boardId, @AuthenticationPrincipal User user) {
+    @GetMapping("/{board_id}")
+    public ResponseEntity<?> getBoard(@PathVariable("board_id") Long boardId, @AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(MessageUtils.success(boardService.getBoard(boardId, user.getId())));
     }
 
-    @DeleteMapping("/{boardId}")
-    public ResponseEntity<?> deleteBoard(@PathVariable Long boardId, @AuthenticationPrincipal User user) {
+    @DeleteMapping("/{board_id}")
+    public ResponseEntity<?> deleteBoard(@PathVariable("board_id") Long boardId, @AuthenticationPrincipal User user) {
         boardService.deleteBoard(boardId, user.getId());
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
     }
 
-    @PatchMapping("")
-    public ResponseEntity<?> modifyBoard(@RequestBody BoardModifyForm boardModifyForm, @AuthenticationPrincipal User user) {
+    @PatchMapping("/{board_id}")
+    public ResponseEntity<?> modifyBoard(@PathVariable("board_id") Long boardId, @RequestBody BoardUpdateForm boardUpdateForm, @AuthenticationPrincipal User user) {
 
-        return ResponseEntity.ok().body(MessageUtils.success(boardService.modifyBoard(boardModifyForm, user.getId())));
+        return ResponseEntity.ok().body(MessageUtils.success(boardService.modifyBoard(boardId, boardUpdateForm, user.getId())));
     }
 
     @PostMapping("/like")

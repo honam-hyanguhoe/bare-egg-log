@@ -59,7 +59,7 @@ public class JwtFilter extends OncePerRequestFilter {
         //엑세스 토큰 검증
         Jws<Claims> claimsJws = jwtUtils.validateAccessToken(accessToken);
         if(claimsJws != null){
-            User user = userQueryRepository.findById(jwtUtils.getUserIdByAccessToken(accessToken))
+            User user = userQueryRepository.findByIdWithHospital(jwtUtils.getUserIdByAccessToken(accessToken))
                     .orElseThrow(() -> new UserException(UserErrorCode.NOT_EXISTS_USER));
             //블랙리스트에 존재한다면
             if (unsafeTokenRepository.findById(accessToken).isPresent()){

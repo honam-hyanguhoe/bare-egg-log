@@ -310,26 +310,26 @@ public class BoardService {
      * 게시판 수정 메서드<br/>
      * [로직]<br/>
      *
-     * @param boardModifyForm
+     * @param boardUpdateForm
      * @param userId
      */
     @Transactional
-    public BoardModifyOutputSpec modifyBoard(BoardModifyForm boardModifyForm, Long userId) {
+    public BoardModifyOutputSpec modifyBoard(Long boardId, BoardUpdateForm boardUpdateForm, Long userId) {
         User user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
-        Board board = boardQueryRepository.findById(boardModifyForm.getBoardId()).orElseThrow(
+        Board board = boardQueryRepository.findById(boardId).orElseThrow(
                 () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
         );
         BoardModifyOutputSpec boardOutputSpec = null;
 
         try {
-            board.setTitle(boardModifyForm.getBoardContent());
-            board.setContent(boardModifyForm.getBoardContent());
-            board.setPictureOne(boardModifyForm.getPictureOne());
-            board.setPictureTwo(boardModifyForm.getPictureTwo());
-            board.setPictureThree(boardModifyForm.getPictureThree());
-            board.setPictureFour(boardModifyForm.getPictureFour());
+            board.setTitle(boardUpdateForm.getBoardContent());
+            board.setContent(boardUpdateForm.getBoardContent());
+            board.setPictureOne(boardUpdateForm.getPictureOne());
+            board.setPictureTwo(boardUpdateForm.getPictureTwo());
+            board.setPictureThree(boardUpdateForm.getPictureThree());
+            board.setPictureFour(boardUpdateForm.getPictureFour());
 
             long viewCount = redisViewCountUtil.getViewCount(String.valueOf(board.getId())); //하루 동안의 조회수
             Long hitCnt = viewCount + board.getViewCount();     // DB + redis
@@ -347,13 +347,13 @@ public class BoardService {
                 isUserLiked = true;
             }
             boardOutputSpec = BoardModifyOutputSpec.builder()
-                    .boardId(boardModifyForm.getBoardId())
-                    .boardTitle(boardModifyForm.getBoardContent())
-                    .boardContent(boardModifyForm.getBoardContent())
-                    .pictureOne(boardModifyForm.getPictureOne())
-                    .pictureTwo(boardModifyForm.getPictureTwo())
-                    .pictureThree(boardModifyForm.getPictureThree())
-                    .pictureFour(boardModifyForm.getPictureFour())
+                    .boardId(boardId)
+                    .boardTitle(boardUpdateForm.getBoardContent())
+                    .boardContent(boardUpdateForm.getBoardContent())
+                    .pictureOne(boardUpdateForm.getPictureOne())
+                    .pictureTwo(boardUpdateForm.getPictureTwo())
+                    .pictureThree(boardUpdateForm.getPictureThree())
+                    .pictureFour(boardUpdateForm.getPictureFour())
                     .boardCreatedAt(board.getCreatedAt())
                     .groupId(board.getGroup().getId())
                     .userId(user.getId())

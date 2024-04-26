@@ -12,18 +12,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public class Schedule {
+public class Event {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "schedule_id")
+    @Column(name = "event_id")
     private Long id;
 
-    @Column(name = "schedule_title")
-    private String scheduleTitle;
+    @Column(name = "event_title")
+    private String eventTitle;
 
-    @Column(name = "schedule_content")
-    private String scheduleContent;
+    @Column(name = "event_content")
+    private String eventContent;
 
     @Column(name = "start_date")
     private LocalDateTime startDate;
