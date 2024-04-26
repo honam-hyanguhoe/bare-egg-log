@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-public class BoardOutputSpec {
+public class BoardModifyOutputSpec {
 
     private Long boardId;           // 게시판 아이디
 
@@ -45,14 +45,10 @@ public class BoardOutputSpec {
 
     private Long boardLikeCount;    // 좋아요 수
 
-    private String hospitalName;    // 사용자 병원명
-
     private Boolean isLiked;        // 좋아요 여부
 
     private Boolean isCommented;        // 댓글 여부
 
     private Boolean isHospitalAuth;     // 인증 여부
-
-    private List<CommentListOutputSpec> comments;    //댓글
 
 }

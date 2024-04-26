@@ -23,6 +23,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,6 +66,7 @@ import com.org.egglog.client.ui.atoms.profileItem.ProfileItem
 import com.org.egglog.client.ui.atoms.toggle.Toggle
 import com.org.egglog.client.ui.atoms.wheelPicker.DateTimePicker
 import com.org.egglog.client.ui.atoms.wheelPicker.TimePicker
+import com.org.egglog.client.ui.molecules.bottomNavigator.BottomNavigator
 import com.org.egglog.client.ui.molecules.cards.AlarmScheduleCard
 import com.org.egglog.client.ui.molecules.cards.AlarmSettingCard
 import com.org.egglog.client.ui.molecules.cards.BigScheduleCard
@@ -85,6 +87,7 @@ import com.org.egglog.client.ui.molecules.radioButtons.DayRadioButton
 import com.org.egglog.client.ui.molecules.radioButtons.WorkRadioButton
 import com.org.egglog.client.ui.molecules.listItems.AlarmListItem
 import com.org.egglog.client.ui.molecules.swiper.Swiper
+import com.org.egglog.client.ui.organisms.postCard.PostCard
 import com.org.egglog.client.utils.widthPercent
 import com.org.egglog.client.ui.theme.*
 import com.org.egglog.client.utils.AddBox
@@ -133,9 +136,60 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    CommunityTest()
 //    TabBarTest()
 //    InfoListTest()
-    RadioButtonTest()
+//    RadioButtonTest()
 //    HeaderTest()
 //    ListTest()
+//    PostCardTest()
+    NavigatorTest()
+}
+
+
+@Composable
+fun NavigatorTest(){
+    var selectedItem by remember { mutableIntStateOf(0) }
+
+    Column (
+        modifier = Modifier.fillMaxSize()
+    ){
+        Box(modifier = Modifier.weight(1f)){
+            when (selectedItem) {
+                0 -> CalendarPage()
+                1 -> GroupPage()
+                2 -> HomePage()
+                3 -> CommunityPage()
+                4 -> SettingsPage()
+            }
+        }
+        BottomNavigator(selectedItem = selectedItem, onItemSelected = { selectedItem = it })
+
+
+    }
+}
+
+@Composable
+fun CalendarPage() {
+        Text("Calendar Page")
+
+}
+
+@Composable
+fun GroupPage() {
+    Text("Group Page")
+}
+
+@Composable
+fun HomePage() {
+    Text("Home Page")
+}
+
+@Composable
+fun CommunityPage() {
+    Text("Community Page")
+}
+
+@Composable
+fun SettingsPage() {
+    Text("Settings Page")
 }
 
 @Composable
@@ -205,8 +259,8 @@ fun BottomSheetTest() {
 
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .border(2.dp, NaturalBlack)
+                .fillMaxSize()
+                .border(2.dp, NaturalBlack)
     ) {
 
         Text("hi")
@@ -784,4 +838,17 @@ fun CardTest() {
             }
         }
     }
+}
+
+@Composable
+fun PostCardTest() {
+    val profile1 = Profile(1,"익명의 구운란1", "전남대병원", true)
+    val postInfo = com.org.egglog.client.data.PostInfo("태화루에 있는 동강병원 어떤가요?", "근무환경이나 일의 강도 복지 궁금합니다", "https://picsum.photos/300")
+    val postInfo2 = com.org.egglog.client.data.PostInfo("태화루에 있는 동강병원 어떤가요?", "근무환경이나 일의 강도 복지 궁금합니다")
+    val postReaction1 = PostReactionInfo(1, 100, 13, 123, true, true, true)
+    LazyColumn(Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp)) {
+        item { PostCard(profile1, postInfo, postReaction1, onClick = {println("안녕")}) }
+        item { PostCard(profile1, postInfo2, postReaction1) }
+    }
+
 }
