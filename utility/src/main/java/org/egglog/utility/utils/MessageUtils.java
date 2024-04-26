@@ -1,14 +1,14 @@
 package org.egglog.utility.utils;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+//import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+//import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
 import static org.springframework.http.HttpStatus.*;
 
 @Data
 @Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+//@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class MessageUtils<T> {
     private final DataHeader dataHeader;
     private final T dataBody;
@@ -58,7 +58,7 @@ public class MessageUtils<T> {
     @NoArgsConstructor
     @Builder
     @Getter
-    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+//    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     private static class DataHeader {
 
         private int successCode;

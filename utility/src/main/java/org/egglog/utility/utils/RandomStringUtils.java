@@ -38,8 +38,8 @@ public class RandomStringUtils {
         SecureRandom secureRandom = new SecureRandom();
         StringBuilder builder = new StringBuilder();
         String alphabets = IntStream.concat(
-                        IntStream.rangeClosed(33, 47),
-                        IntStream.rangeClosed(58, 126))
+                        IntStream.rangeClosed(65,90),
+                        IntStream.rangeClosed(97,122))
                 .mapToObj(ch -> String.valueOf((char) ch))
                 .collect(Collectors.joining());
         for(int i=0 ; i<length ; i++){
@@ -61,8 +61,9 @@ public class RandomStringUtils {
         SecureRandom secureRandom = new SecureRandom();
         StringBuilder builder = new StringBuilder();
         String alphabets = IntStream.concat(
-                IntStream.rangeClosed(65,90),
-                IntStream.rangeClosed(97,122))
+                    IntStream.rangeClosed(33, 47),
+                    IntStream.rangeClosed(58, 126)
+                )
                 .mapToObj(ch -> String.valueOf((char) ch))
                 .collect(Collectors.joining());
         for(int i=0 ; i<length ; i++){
