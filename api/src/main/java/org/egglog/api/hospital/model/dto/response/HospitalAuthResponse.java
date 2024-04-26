@@ -2,18 +2,23 @@ package org.egglog.api.hospital.model.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import jakarta.persistence.*;
 import lombok.*;
+import org.egglog.api.hospital.model.entity.Hospital;
+import org.egglog.api.user.model.entity.User;
+
+import java.time.LocalDateTime;
 
 /**
  * packageName    : org.egglog.api.hospital.model.dto.response
- * fileName       : HospitalResponse
+ * fileName       : HospitalAuthResponse
  * author         : 김형민
- * date           : 2024-04-22
- * description    : 병원 정보를 리턴하는 객체입니다.
+ * date           : 2024-04-26
+ * description    :
  * ===========================================================
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
- * 2024-04-22        김형민       최초 생성
+ * 2024-04-26        김형민       최초 생성
  */
 @Builder
 @Getter
@@ -21,17 +26,9 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class UserHospitalResponse {
-
-    private Long id;
-    private String sidoCode;
-    private String sido;
-    private String gunguCode;
-    private String gungu;
-    private String dong;
-    private String zipCode;
-    private String address;
-    private String hospitalName;
-    private String lat;
-    private String lng;
+public class HospitalAuthResponse {
+    private String empNo;
+    private Boolean auth;
+    private LocalDateTime authRequestTime;
+    private LocalDateTime confirmTime;
 }

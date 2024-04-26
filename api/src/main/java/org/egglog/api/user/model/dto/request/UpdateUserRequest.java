@@ -19,7 +19,6 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class UpdateUserRequest {
     private String userName;
     private String profileImgUrl;
