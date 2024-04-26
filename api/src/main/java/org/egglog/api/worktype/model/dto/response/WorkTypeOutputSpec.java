@@ -16,7 +16,7 @@ public class WorkTypeOutputSpec {
 
     private Long id;
 
-    private String name;
+    private String title;
 
     private String color;
 

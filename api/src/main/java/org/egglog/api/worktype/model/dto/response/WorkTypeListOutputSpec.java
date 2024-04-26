@@ -11,12 +11,12 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class WorkTypeListOutputSpec {
 
     private Long id;
 
-    private String name;
+    private String title;
 
     private String color;
 

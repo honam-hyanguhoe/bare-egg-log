@@ -41,7 +41,7 @@ public class WorkTypeService {
         for (WorkType workType : workTypesByUserId) {
             WorkTypeListOutputSpec workTypeListOutputSpec = WorkTypeListOutputSpec.builder()
                     .id(workType.getId())
-                    .name(workType.getTitle())
+                    .title(workType.getTitle())
                     .imgUrl(workType.getWorkTypeImgUrl())
                     .color(workType.getColor())
                     .startTime(workType.getStartTime())
@@ -92,7 +92,7 @@ public class WorkTypeService {
 
         WorkTypeOutputSpec workTypeOutputSpec = WorkTypeOutputSpec.builder()
                 .id(workTypeModifyForm.getId())
-                .name(workTypeModifyForm.getTitle())
+                .title(workTypeModifyForm.getTitle())
                 .imgUrl(workType.getWorkTypeImgUrl())
                 .color(workTypeModifyForm.getColor())
                 .startTime(workTypeModifyForm.getStartTime())

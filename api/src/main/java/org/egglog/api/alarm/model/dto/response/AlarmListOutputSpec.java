@@ -11,7 +11,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class AlarmListOutputSpec {
 
     private Long alarmId;
@@ -23,4 +23,8 @@ public class AlarmListOutputSpec {
     private int replayTime;
 
     private Boolean isAlarmOn;
+
+    private String workTypeTitle;   //근무 제목
+
+    private String workTypeColor;   //근무 색깔
 }
