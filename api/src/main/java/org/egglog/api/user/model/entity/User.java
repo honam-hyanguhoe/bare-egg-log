@@ -55,39 +55,31 @@ public class User implements UserDetails {
     @JoinColumn(name = "hospital_id")
     private Hospital hospital;
 
-    @Column(nullable = false, length = 30, name = "emp_no")
+    @Column(length = 30, name = "emp_no")
     private String empNo;
 
     @Column(length = 2000, name = "profile_img_url")
     private String profileImgUrl;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, name = "role")
+    @Column( name = "role")
     private UserRole userRole;
 
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, name = "status")
+    @Column(name = "status")
     private UserStatus userStatus;
 
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false, name = "created_at")
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false, name = "updated_at")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false, name = "login_at")
+    @Column(name = "login_at")
     private LocalDateTime loginAt;
 
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false, name = "deleted_at")
+    @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
     @Column(name = "is_hospital_auth")
@@ -115,6 +107,7 @@ public class User implements UserDetails {
         this.loginAt = LocalDateTime.now();
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        this.isHospitalAuth = false;
         return this;
     }
 
@@ -137,7 +130,7 @@ public class User implements UserDetails {
                 .id(this.id)
                 .email(this.email)
                 .userName(this.name)
-                .hospital(this.hospital.toUserHospitalResponse())
+                .hospital(this.hospital!=null ? this.hospital.toUserHospitalResponse() : null)
                 .userRole(this.userRole)
                 .profileImgUrl(this.profileImgUrl)
                 .empNo(this.empNo)

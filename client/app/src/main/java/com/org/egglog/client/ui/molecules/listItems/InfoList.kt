@@ -1,4 +1,4 @@
-package com.org.egglog.client.ui.molecules.infoList
+package com.org.egglog.client.ui.molecules.listItems
 
 import android.util.Log
 import androidx.compose.foundation.layout.Column

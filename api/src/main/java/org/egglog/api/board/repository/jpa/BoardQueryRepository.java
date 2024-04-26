@@ -1,27 +1,19 @@
 package org.egglog.api.board.repository.jpa;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.JPQLQuery;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.egglog.api.board.model.entity.Board;
 import org.egglog.api.board.model.entity.BoardLike;
-import org.hibernate.query.criteria.JpaSubQuery;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.egglog.api.board.model.entity.QBoard.board;
-import static org.egglog.api.board.model.entity.QBoardHit.boardHit;
 import static org.egglog.api.board.model.entity.QBoardLike.boardLike;
 import static org.egglog.api.board.model.entity.QComment.comment;
 

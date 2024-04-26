@@ -5,7 +5,7 @@ services:
     container_name: nginx
     image: 54.180.55.106:5000/nginx
     build:
-      context: ..
+      context: .
       dockerfile: Dockerfile
     restart: always
     #    볼륨 매핑은 젠킨스 워크스페이스 기준

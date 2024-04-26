@@ -2,15 +2,12 @@ package org.egglog.api.board.repository.jpa;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.egglog.api.board.model.entity.BoardLike;
 import org.egglog.api.board.model.entity.Comment;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
-import static org.egglog.api.board.model.entity.QBoardHit.boardHit;
-import static org.egglog.api.board.model.entity.QBoardLike.boardLike;
+
 import static org.egglog.api.board.model.entity.QComment.comment;
 
 @Repository
