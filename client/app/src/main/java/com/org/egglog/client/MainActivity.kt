@@ -87,6 +87,7 @@ import com.org.egglog.client.ui.molecules.radioButtons.DayRadioButton
 import com.org.egglog.client.ui.molecules.radioButtons.WorkRadioButton
 import com.org.egglog.client.ui.molecules.listItems.AlarmListItem
 import com.org.egglog.client.ui.molecules.swiper.Swiper
+import com.org.egglog.client.ui.organisms.calendars.WeeklyCalendar
 import com.org.egglog.client.ui.organisms.postCard.PostCard
 import com.org.egglog.client.utils.widthPercent
 import com.org.egglog.client.ui.theme.*
@@ -168,8 +169,10 @@ fun NavigatorTest(){
 
 @Composable
 fun CalendarPage() {
+    Column() {
         Text("Calendar Page")
-
+        CalendarTest()
+    }
 }
 
 @Composable
@@ -851,4 +854,30 @@ fun PostCardTest() {
         item { PostCard(profile1, postInfo2, postReaction1) }
     }
 
+}
+
+@Composable
+fun CalendarTest() {
+    Box(Modifier
+            .padding(horizontal = 20.dp, vertical = 10.dp)
+    ) {
+        Column {
+            Text(text = "[ 그룹 페이지 캘린더 ]")
+            WeeklyCalendar(type = "group")
+
+            Spacer(Modifier.height(20.dp))
+
+            Text(text = "[ 메인 페이지 캘린더 ]")
+            WeeklyCalendar(type = "main")
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Labels(text = "Eve")
+                Labels(text = "Off")
+                Labels(text = "Night")
+                Labels(text = "Eve")
+                Labels(text = "보건")
+                Labels(text = "휴가")
+                Labels(text = "None")
+            }
+        }
+    }
 }
