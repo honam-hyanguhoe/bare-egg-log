@@ -1,6 +1,7 @@
 package org.egglog.api.group.model.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.group.exception.GroupErrorCode;
 import org.egglog.api.group.exception.GroupException;
 import org.egglog.api.group.model.dto.request.GroupForm;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GroupService {
     private final PasswordEncoder passwordEncoder;
     private final GroupMemberService groupMemberService;
@@ -38,16 +40,26 @@ public class GroupService {
      * @param user
      */
     public void acceptInvitation(InvitationAcceptForm acceptForm, User user) {
+        log.debug(acceptForm.toString());
         //존재하지 않는 코드는 exception 처리
         InvitationCode invitationCode = groupInvitationRepository
-                .findInvitationCodeById(acceptForm.getInvitationCode())
+                .findInvitationCodeByCode(acceptForm.getInvitationCode())
                 .orElseThrow(() -> new GroupException(GroupErrorCode.NOT_FOUND_INVITATION));
+        log.debug("\nin : {}\norigin : {}\nmatch : {}",
+                acceptForm.getPassword(),
+                invitationCode.getPassword(),
+                passwordEncoder.matches(acceptForm.getPassword(),invitationCode.getPassword())
+                );
         //password 검증
         //만약 password가 동일하다면 초대 수락
-        if(passwordEncoder.encode(acceptForm.getPassword()).equals(invitationCode.getPassword())){
+        if(passwordEncoder.matches(acceptForm.getPassword(), invitationCode.getPassword())){
             Group group = groupRepository
                     .findById(invitationCode.getGroupId())
                     .orElseThrow(() -> new GroupException(GroupErrorCode.NOT_FOUND));
+            //이미 그룹원이라면 추가하지 않는다.
+            if(groupMemberService.isGroupMember(group.getId(), user.getId())){
+                throw new GroupException(GroupErrorCode.DUPLICATED_MEMBER);
+            }
             GroupMember newMember = GroupMember.builder()
                     .group(group)
                     .user(user)
@@ -80,6 +92,11 @@ public class GroupService {
                     .code(RandomStringUtils.generateRandomMixChar(10))
                     .password(group.getPassword())
                     .build();
+        }
+        try {
+            groupInvitationRepository.save(invitationCode);
+        }catch (Exception e){
+            throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
         }
         return invitationCode.getCode();
     }
@@ -119,8 +136,7 @@ public class GroupService {
         Group group = groupRepository.findById(groupId).orElseThrow(() -> new GroupException(GroupErrorCode.NOT_FOUND));
         GroupMember boss = groupMemberService.getAdminMember(groupId);
         Boolean isBoss = false;
-        //TODO 검증 필요
-        if(boss.getUser()==user){
+        if(boss.getUser().getId() == user.getId()){
             isBoss = true;
         }
         List<GroupMemberDto> memberList = groupMemberService
@@ -192,6 +208,9 @@ public class GroupService {
         newBoss.setIsAdmin(true);
         boss.setIsAdmin(false);
 
+        if(newBoss == boss){
+            throw new GroupException(GroupErrorCode.GROUP_ROLE_NOT_MATCH);
+        }
         //변경 정보 DB 반영
         groupMemberService.createGroupMember(newBoss);
         groupMemberService.createGroupMember(boss);
