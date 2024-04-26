@@ -25,10 +25,11 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class HospitalAuthResponse {
     private String empNo;
     private Boolean auth;
     private LocalDateTime authRequestTime;
     private LocalDateTime confirmTime;
+    private String nurseCertificationImgUrl;
+    private String hospitalCertificationImgUrl;
 }

@@ -111,7 +111,6 @@ public class UserService {
                 .orElseThrow(() -> new HospitalException(HospitalErrorCode.NOT_FOUND));
         //유저 병원 업데이트
         User updateUser = userJpaRepository.save(loginUser.updateHospital(selectHospital, request.getEmpNo()));
-        //사번 어디에 저장해야하지? 하 정말
         Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUsersAndHospital(updateUser, selectHospital);
         if (hospitalAuth.isPresent()){
             return updateUser.toResponse(hospitalAuth.get());
