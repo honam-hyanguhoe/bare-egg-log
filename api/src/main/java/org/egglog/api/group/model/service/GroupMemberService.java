@@ -35,6 +35,19 @@ public class GroupMemberService {
     }
 
     /**
+     * 그룹원 검색에 성공하면 true, 실패하면 false 반환
+     * @param groupId
+     * @param userId
+     * @return
+     */
+    public Boolean isGroupMember(Long groupId, Long userId){
+        GroupMember member = groupMemberRepository
+                .findGroupMemberByGroupIdAndUserId(groupId,userId)
+                .orElse(null);
+        return (member == null) ? false : true;
+     }
+
+    /**
      * 생성된 그룹원 DB 등록
      * @param groupMember
      */

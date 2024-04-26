@@ -22,8 +22,10 @@ public class WorkType {
     @Column(name = "work_type_title")
     private String title;        //Day, Eve, Night, 교육, Off, 보건, None 등
 
+    @Column(name = "work_type_color")
     private String color;       //색상
 
+    @Column(name = "work_type_img_url")
     private String workTypeImgUrl;      //근무 이미지
 
     @Column(name = "work_start_time")

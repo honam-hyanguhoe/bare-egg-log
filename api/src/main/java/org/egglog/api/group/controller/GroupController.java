@@ -12,6 +12,7 @@ import org.egglog.api.group.model.service.GroupService;
 import org.egglog.utility.utils.MessageUtils;
 import org.egglog.utility.utils.SuccessType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.egglog.api.user.model.entity.User;
 
@@ -27,27 +28,24 @@ public class GroupController {
 
     //TODO kafka 적용해 이벤트 큐에 파싱 요청 송신하는 형태로 작성할 것
     @PostMapping("/duty")
-    public ResponseEntity generateGroupDuty(){
+    public ResponseEntity generateGroupDuty(@AuthenticationPrincipal User user){
         Long userId=1L;
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }
 
     @PostMapping("/invitation/accept")
     public ResponseEntity acceptInvitaion(
-            @RequestBody InvitationAcceptForm acceptForm
-//            TODO @AuthenticationPrincipal User user){
-    ){
-        User user=null;
+            @RequestBody InvitationAcceptForm acceptForm,
+            @AuthenticationPrincipal User user){
         groupService.acceptInvitation(acceptForm,user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.NO_CONTENT));
     }
 
     @GetMapping("/invitaion/{group_id}")
     public ResponseEntity getInvitation(
-            @PathVariable("group_id") Long groupId
-//            TODO @AuthenticationPrincipal User user
+            @PathVariable("group_id") Long groupId,
+            @AuthenticationPrincipal User user
     ){
-        User user=null;
         String inviteCode = groupService.getOrGenerateInvitation(groupId,user);
         return ResponseEntity.ok().body(MessageUtils.success(inviteCode));
     }
@@ -55,51 +53,46 @@ public class GroupController {
     @DeleteMapping("/{group_id}/{member_id}")
     public ResponseEntity deleteGroupMember(
             @PathVariable("group_id") Long groupId,
-            @PathVariable("member_id") Long memberId
-//            TODO @AuthenticationPrincipal User user
+            @PathVariable("member_id") Long memberId,
+            @AuthenticationPrincipal User user
     ){
-        User user=null;
         groupService.deleteGroupMember(groupId,memberId,user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
     }
 
     @GetMapping("/list")
     public ResponseEntity getGroupList(
-//            TODO @AuthenticationPrincipal User user
+            @AuthenticationPrincipal User user
     ){
-        User user=null;
         List<GroupPreviewDto> groupList = groupService.getGroupList(user);
         return ResponseEntity.ok().body(MessageUtils.success(groupList));
     }
 
     @GetMapping("/{group_id}")
-    public ResponseEntity retrieveGroup(@PathVariable("group_id") Long groupId
-//            TODO @AuthenticationPrincipal User user
+    public ResponseEntity retrieveGroup(@PathVariable("group_id") Long groupId,
+            @AuthenticationPrincipal User user
     ){
-        User user=null;
         GroupDto group = groupService.retrieveGroup(groupId,user);
         return ResponseEntity.ok().body(MessageUtils.success(group));
     }
 
-    //TODO 수정 데이터 확인용 전송
+    //수정 데이터 확인용 전송
     @PatchMapping("/{group_id}")
     public ResponseEntity updateGroup(
             @PathVariable("group_id") Long groupId,
-            @RequestBody GroupUpdateForm groupUpdateForm
-//            TODO @AuthenticationPrincipal User user
+            @RequestBody GroupUpdateForm groupUpdateForm,
+            @AuthenticationPrincipal User user
     ){
-        Long userId=1L;
         return ResponseEntity.ok().body(
-                MessageUtils.success(groupService.updateGroup(groupId,groupUpdateForm,userId)));
+                MessageUtils.success(groupService.updateGroup(groupId,groupUpdateForm,user.getId())));
     }
 
     @PatchMapping("/{group_id}/{member_id}")
     public ResponseEntity updateGroupMember(
             @PathVariable("group_id") Long groupId,
-            @PathVariable("member_id") Long memberId
-//            TODO @AuthenticationPrincipal User user
+            @PathVariable("member_id") Long memberId,
+            @AuthenticationPrincipal User user
     ){
-        User user=null;
         return ResponseEntity.ok().body(
                 MessageUtils.success(
                         groupService.updateGroupMember(groupId, memberId, user)));
@@ -107,20 +100,18 @@ public class GroupController {
 
     @DeleteMapping("/exit/{group_id}")
     public ResponseEntity exitGroup(
-            @PathVariable("group_id") Long groupId
-//            TODO @AuthenticationPrincipal User user
+            @PathVariable("group_id") Long groupId,
+            @AuthenticationPrincipal User user
     ){
-        User user=null;
         groupService.exitGroup(groupId,user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
     }
 
     @PostMapping("/")
     public ResponseEntity generateGroup(
-            @RequestBody GroupForm groupForm
-//            TODO @AuthenticationPrincipal User user
+            @RequestBody GroupForm groupForm,
+            @AuthenticationPrincipal User user
     ){
-        User user=null;
         groupService.generateGroup(groupForm,user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }

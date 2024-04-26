@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface GroupInvitationRepository extends CrudRepository<InvitationCode, String> {
     Optional<InvitationCode> findInvitationCodeByGroupId(Long groupId);
-    Optional<InvitationCode> findInvitationCodeById(String code);
+    Optional<InvitationCode> findInvitationCodeByCode(String code);
 }
