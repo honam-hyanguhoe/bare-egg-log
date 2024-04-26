@@ -51,7 +51,7 @@ public class Hospital {
     @Column(name = "lng")
     private String lng;  //경도
 
-    @OneToMany(mappedBy = "hospital")
+    @OneToMany(mappedBy = "selectedHospital", fetch = FetchType.LAZY)
     @Builder.Default
     private List<User> users = new ArrayList<>();
 

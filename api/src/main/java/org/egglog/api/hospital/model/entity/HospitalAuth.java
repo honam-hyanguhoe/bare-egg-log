@@ -56,6 +56,15 @@ public class HospitalAuth {
 
     @Column(name = "hospital_certification_img_url")
     private String hospitalCertificationImgUrl;
+
+
+
+    public HospitalAuth confirm(){
+        this.auth = true;
+        this.confirmTime = LocalDateTime.now();
+        return this;
+    }
+
     public HospitalAuth create(User user, String nurseCertificationImgUrl, String hospitalCertificationImgUrl){
         this.auth = false;
         this.authRequestTime = LocalDateTime.now();
