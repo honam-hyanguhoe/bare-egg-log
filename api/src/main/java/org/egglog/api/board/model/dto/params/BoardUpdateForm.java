@@ -10,9 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-public class BoardModifyForm {
-
-    private Long boardId;
+public class BoardUpdateForm {
 
     private String boardContent;
 

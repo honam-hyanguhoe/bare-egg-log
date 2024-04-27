@@ -19,7 +19,6 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class UpdateUserHospitalRequest {
     private Long hospitalId;
     private String empNo;

@@ -4,6 +4,7 @@ package org.egglog.api.user.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.egglog.api.hospital.model.entity.Hospital;
+import org.egglog.api.hospital.model.entity.HospitalAuth;
 import org.egglog.api.user.model.dto.response.UserResponse;
 import org.egglog.api.user.model.entity.enums.AuthProvider;
 import org.egglog.api.user.model.entity.enums.UserRole;
@@ -14,9 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -52,11 +51,9 @@ public class User implements UserDetails {
     private AuthProvider provider;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hospital_id")
-    private Hospital hospital;
+    @JoinColumn(name = "select_hospital_id")
+    private Hospital selectedHospital;
 
-    @Column(length = 30, name = "emp_no")
-    private String empNo;
 
     @Column(length = 2000, name = "profile_img_url")
     private String profileImgUrl;
@@ -65,10 +62,12 @@ public class User implements UserDetails {
     @Column( name = "role")
     private UserRole userRole;
 
-
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private UserStatus userStatus;
+
+    @Column(length = 30, name = "emp_no")
+    private String empNo;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -82,8 +81,8 @@ public class User implements UserDetails {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @Column(name = "is_hospital_auth")
-    private Boolean isHospitalAuth;
+    @Column(name = "device_token")
+    private String deviceToken;
 
     public User doLogin(){
         this.loginAt = LocalDateTime.now();
@@ -92,22 +91,26 @@ public class User implements UserDetails {
 
     public User delete(){
         this.name = "탈퇴회원";
-        this.empNo = null;
 //        this.profileImgUrl = null;
-        this.hospital = null;
-        this.isHospitalAuth = false;
+        this.selectedHospital = null;
         this.userStatus = UserStatus.DELETED;
         this.deletedAt = LocalDateTime.now();
         return this;
     }
-    public User join(String joinUserName, Hospital joinHospital, String joinEmpNo){
+    public User join(String joinUserName, Hospital joinHospital, String empNo, String token){
         this.name = joinUserName;
-        this.hospital = joinHospital;
-        this.empNo = joinEmpNo;
+        this.selectedHospital = joinHospital;
         this.loginAt = LocalDateTime.now();
+        this.deviceToken = token;
+        this.empNo = empNo;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-        this.isHospitalAuth = false;
+        return this;
+    }
+
+    public User updateFcmToken(String token){
+        this.deviceToken = token;
+        this.updatedAt = LocalDateTime.now();
         return this;
     }
 
@@ -118,8 +121,8 @@ public class User implements UserDetails {
         return this;
     }
 
-    public User updateHospital(Hospital updateHospital, String updateEmpNo){
-        this.hospital = updateHospital;
+    public User updateHospital(Hospital selectHospital, String updateEmpNo){
+        this.selectedHospital = selectHospital;
         this.empNo = updateEmpNo;
         this.updatedAt = LocalDateTime.now();
         return this;
@@ -130,14 +133,32 @@ public class User implements UserDetails {
                 .id(this.id)
                 .email(this.email)
                 .userName(this.name)
-                .hospital(this.hospital!=null ? this.hospital.toUserHospitalResponse() : null)
+                .selectedHospital(this.selectedHospital!=null ? this.selectedHospital.toUserHospitalResponse() : null)
+                .hospitalAuth(null)
                 .userRole(this.userRole)
-                .profileImgUrl(this.profileImgUrl)
                 .empNo(this.empNo)
+                .profileImgUrl(this.profileImgUrl)
                 .userStatus(this.userStatus)
-                .isHospitalAuth(this.isHospitalAuth)
                 .updatedAt(this.updatedAt)
                 .createdAt(this.createdAt)
+                .deviceToken(this.deviceToken)
+                .loginAt(this.loginAt)
+                .build();
+    }
+    public UserResponse toResponse(HospitalAuth hospitalAuth){
+        return UserResponse.builder()
+                .id(this.id)
+                .email(this.email)
+                .userName(this.name)
+                .selectedHospital(this.selectedHospital!=null ? this.selectedHospital.toUserHospitalResponse() : null)
+                .hospitalAuth(hospitalAuth!=null ? hospitalAuth.toResponse() : null)
+                .userRole(this.userRole)
+                .empNo(this.empNo)
+                .profileImgUrl(this.profileImgUrl)
+                .userStatus(this.userStatus)
+                .updatedAt(this.updatedAt)
+                .createdAt(this.createdAt)
+                .deviceToken(this.deviceToken)
                 .loginAt(this.loginAt)
                 .build();
     }
@@ -180,10 +201,6 @@ public class User implements UserDetails {
         User user = new User();
         String email = (String) map.get("email");
         String name = (String) map.get("name");
-//        String nickName = (String) map.get("nickName");
-//        String birthDateMonth = (String) map.get("birthDateMonth");
-//        String birthDateYear = (String) map.get("birthDateYear");
-//        String gender = (String) map.get("gender");
         String picture = (String) map.get("picture");
         AuthProvider provider = (AuthProvider) map.get("provider");
 

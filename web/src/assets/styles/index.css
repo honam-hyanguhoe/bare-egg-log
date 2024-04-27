@@ -1,0 +1,29 @@
+@font-face {
+  font-family: "Line-Seed-Sans-App";
+  font-weight: 700;
+  src: url("../fonts/LINESeedSans_W_XBd.woff") format("truetype");
+}
+
+@font-face {
+  font-family: "Line-Seed-Sans-App";
+  font-weight: 600;
+  src: url("../fonts/LINESeedSans_W_Bd.woff") format("truetype");
+}
+
+@font-face {
+  font-family: "Line-Seed-Sans-App";
+  font-weight: 500;
+  src: url("../fonts/LINESeedSans_W_He.woff") format("truetype");
+}
+
+@font-face {
+  font-family: "Line-Seed-Sans-App";
+  font-weight: 400;
+  src: url("../fonts/LINESeedSans_W_Rg.woff") format("truetype");
+}
+
+@font-face {
+  font-family: "Line-Seed-Sans-App";
+  font-weight: 300;
+  src: url("../fonts/LINESeedSans_W_Th.woff") format("truetype");
+}

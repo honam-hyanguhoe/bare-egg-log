@@ -20,7 +20,6 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UserHospitalResponse {
 
     private Long id;
@@ -34,5 +33,4 @@ public class UserHospitalResponse {
     private String hospitalName;
     private String lat;
     private String lng;
-
 }

@@ -4,8 +4,11 @@ package org.egglog.api.board.controller;
 import lombok.RequiredArgsConstructor;
 import org.egglog.api.board.model.dto.params.*;
 import org.egglog.api.board.model.service.BoardService;
+import org.egglog.api.user.model.entity.User;
 import org.egglog.utility.utils.MessageUtils;
+import org.egglog.utility.utils.SuccessType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,19 +18,16 @@ public class BoardController {
 
     private final BoardService boardService;
 
-
     @GetMapping("/hot")
-    public ResponseEntity<?> getHotBoardList(@RequestParam("hospital_id") Long hospitalId, @RequestParam("group_id") Long groupId) {
-//        TODO @AuthenticationPrincipal User user
-        Long userId = 1L;
-        return ResponseEntity.ok().body(MessageUtils.success(boardService.getHotBoardList(hospitalId, groupId, userId)));
+    public ResponseEntity<?> getHotBoardList(@RequestParam("hospital_id") Long hospitalId, @RequestParam("group_id") Long groupId, @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(MessageUtils.success(boardService.getHotBoardList(hospitalId, groupId, user.getId())));
     }
 
 
     @GetMapping("")
     public ResponseEntity<?> getBoardList(@RequestParam("hospital_id") Long hospitalId, @RequestParam("group_id") Long groupId,
-                                          @RequestParam("search_word") String searchWord, @RequestParam("last_board_id") Long lastBoardId) {
-//        TODO @AuthenticationPrincipal User user
+                                          @RequestParam("search_word") String searchWord, @RequestParam("last_board_id") Long lastBoardId,
+                                          @AuthenticationPrincipal User user) {
         BoardListForm boardListForm = BoardListForm.builder()
                 .hospitalId(hospitalId)
                 .groupId(groupId)
@@ -35,54 +35,41 @@ public class BoardController {
                 .lastBoardId(lastBoardId)
                 .build();
 
-        Long userId = 1L;
-        return ResponseEntity.ok().body(MessageUtils.success(boardService.getBoardList(boardListForm, userId)));
+        return ResponseEntity.ok().body(MessageUtils.success(boardService.getBoardList(boardListForm, user.getId())));
     }
 
     @PostMapping("")
-    public ResponseEntity<?> registerBoard(@RequestBody BoardForm boardForm) {
-//        TODO @AuthenticationPrincipal User user
-        Long userId = 1L;
-        boardService.registerBoard(boardForm, userId);
+    public ResponseEntity<?> registerBoard(@RequestBody BoardForm boardForm, @AuthenticationPrincipal User user) {
+        boardService.registerBoard(boardForm, user.getId());
         return ResponseEntity.ok().body(MessageUtils.success());
     }
 
-    @GetMapping("/{boardId}")
-    public ResponseEntity<?> getBoard(@PathVariable Long boardId) {
-//        TODO @AuthenticationPrincipal User user
-        Long userId = 1L;
-        return ResponseEntity.ok().body(MessageUtils.success(boardService.getBoard(boardId, userId)));
+    @GetMapping("/{board_id}")
+    public ResponseEntity<?> getBoard(@PathVariable("board_id") Long boardId, @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(MessageUtils.success(boardService.getBoard(boardId, user.getId())));
     }
 
-    @DeleteMapping("/{boardId}")
-    public ResponseEntity<?> deleteBoard(@PathVariable Long boardId) {
-//        TODO @AuthenticationPrincipal User user
-        Long userId = 1L;
-        boardService.deleteBoard(boardId, userId);
-        return ResponseEntity.ok().body(MessageUtils.success());
+    @DeleteMapping("/{board_id}")
+    public ResponseEntity<?> deleteBoard(@PathVariable("board_id") Long boardId, @AuthenticationPrincipal User user) {
+        boardService.deleteBoard(boardId, user.getId());
+        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
     }
 
-    @PatchMapping("")
-    public ResponseEntity<?> modifyBoard(@RequestBody BoardModifyForm boardModifyForm) {
-//        TODO @AuthenticationPrincipal User user
-        Long userId = 1L;
-        boardService.modifyBoard(boardModifyForm, userId);
-        return ResponseEntity.ok().body(MessageUtils.success());
+    @PatchMapping("/{board_id}")
+    public ResponseEntity<?> modifyBoard(@PathVariable("board_id") Long boardId, @RequestBody BoardUpdateForm boardUpdateForm, @AuthenticationPrincipal User user) {
+
+        return ResponseEntity.ok().body(MessageUtils.success(boardService.modifyBoard(boardId, boardUpdateForm, user.getId())));
     }
 
     @PostMapping("/like")
-    public ResponseEntity<?> registerLike(@RequestBody LikeForm likeForm) {
-        //        TODO @AuthenticationPrincipal User user
-        Long userId = 1L;
-        boardService.registerLike(likeForm, userId);
+    public ResponseEntity<?> registerLike(@RequestBody LikeForm likeForm, @AuthenticationPrincipal User user) {
+        boardService.registerLike(likeForm, user.getId());
         return ResponseEntity.ok().body(MessageUtils.success());
     }
 
     @DeleteMapping("/unlike")
-    public ResponseEntity<?> deleteLike(@RequestBody LikeForm likeForm) {
-        //        TODO @AuthenticationPrincipal User user
-        Long userId = 1L;
-        boardService.deleteLike(likeForm, userId);
+    public ResponseEntity<?> deleteLike(@RequestBody LikeForm likeForm, @AuthenticationPrincipal User user) {
+        boardService.deleteLike(likeForm, user.getId());
         return ResponseEntity.ok().body(MessageUtils.success());
     }
 }

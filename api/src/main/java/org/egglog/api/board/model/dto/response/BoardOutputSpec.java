@@ -31,8 +31,6 @@ public class BoardOutputSpec {
 
     private String pictureFour;     // 게시판 사진 4
 
-    private Long hit;               // 게시판 조회수
-
     private Long groupId;           // 그룹 id
 
     private Long userId;            // 유저 id
