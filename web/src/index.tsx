@@ -1,5 +1,7 @@
 import ReactDOM from "react-dom/client";
 import Router from "./router";
+import "./assets/styles/index.css";
+import GlobalStyle from "./assets/styles/globalStyle";
 // import GlobalStyle from "./styles/globalStyle";
 
 const root = ReactDOM.createRoot(
@@ -9,7 +11,7 @@ const root = ReactDOM.createRoot(
 const App = () => {
   return (
     <>
-      {/* <GlobalStyle /> */}
+      <GlobalStyle />
       <Router />
     </>
   );
