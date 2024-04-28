@@ -145,13 +145,13 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    ListTest()
 //    PostCardTest()
 //    NavigatorTest()
-    WebViewTest()
+//    WebViewTest()
 }
 
 @Composable
 fun WebViewTest() {
 //    ContentWebView()
-    FullPageWebView()
+    FullPageWebView( url = "https://www.egg-log.org/remain")
 }
 
 @Composable
