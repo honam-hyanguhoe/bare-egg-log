@@ -1,14 +1,14 @@
-package org.egglog.api.calendar.model.service;
+package org.egglog.api.event.model.service;
 
 import lombok.RequiredArgsConstructor;
-import org.egglog.api.calendar.model.dto.params.EventForm;
-import org.egglog.api.calendar.model.dto.params.EventUpdateForm;
-import org.egglog.api.calendar.model.dto.response.EventListOutputSpec;
-import org.egglog.api.calendar.model.dto.response.EventOutputSpec;
-import org.egglog.api.calendar.exception.EventErrorCode;
-import org.egglog.api.calendar.exception.EventException;
-import org.egglog.api.calendar.model.entity.Event;
-import org.egglog.api.calendar.repository.jpa.EventRepository;
+import org.egglog.api.event.model.dto.params.EventForm;
+import org.egglog.api.event.model.dto.params.EventUpdateForm;
+import org.egglog.api.event.model.dto.response.EventListOutputSpec;
+import org.egglog.api.event.model.dto.response.EventOutputSpec;
+import org.egglog.api.event.exception.EventErrorCode;
+import org.egglog.api.event.exception.EventException;
+import org.egglog.api.event.model.entity.Event;
+import org.egglog.api.event.repository.jpa.EventRepository;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;

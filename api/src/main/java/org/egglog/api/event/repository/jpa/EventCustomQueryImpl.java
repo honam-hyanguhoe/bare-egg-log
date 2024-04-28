@@ -1,4 +1,4 @@
-package org.egglog.api.calendar.repository.jpa;
+package org.egglog.api.event.repository.jpa;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

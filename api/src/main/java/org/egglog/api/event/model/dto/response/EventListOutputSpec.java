@@ -1,4 +1,4 @@
-package org.egglog.api.calendar.model.dto.response;
+package org.egglog.api.event.model.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
