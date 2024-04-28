@@ -156,7 +156,7 @@ fun MyApp(modifier: Modifier = Modifier) {
 @Composable
 fun WebViewTest() {
 //    ContentWebView()
-    FullPageWebView()
+    FullPageWebView( url = "https://www.egg-log.org/remain")
 }
 
 @Composable
