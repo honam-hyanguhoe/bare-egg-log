@@ -1,10 +1,8 @@
-package org.egglog.api.event.model.dto.params;
+package org.egglog.api.calendargroup.model.dto.params;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -12,15 +10,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-public class EventForm {
+public class CalendarGroupForm {
 
-    private String eventTitle;
+    private String url;
 
-    private String eventContent;
-
-    private LocalDateTime startDate;
-
-    private LocalDateTime endDate;
-
-    private Long calendarGroupId;
+    private String alias;
 }
