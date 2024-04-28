@@ -107,7 +107,7 @@ public class GroupController {
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity generateGroup(
             @RequestBody GroupForm groupForm,
             @AuthenticationPrincipal User user

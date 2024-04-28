@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonColors
@@ -87,7 +88,12 @@ import com.org.egglog.client.ui.molecules.radioButtons.DayRadioButton
 import com.org.egglog.client.ui.molecules.radioButtons.WorkRadioButton
 import com.org.egglog.client.ui.molecules.listItems.AlarmListItem
 import com.org.egglog.client.ui.molecules.swiper.Swiper
+import com.org.egglog.client.ui.organisms.calendars.WeeklyCalendar
+import com.org.egglog.client.ui.organisms.calendars.weeklyData.WeeklyDataSource
+import com.org.egglog.client.ui.organisms.calendars.weeklyData.WeeklyUiModel
 import com.org.egglog.client.ui.organisms.postCard.PostCard
+import com.org.egglog.client.ui.organisms.webView.ContentWebView
+import com.org.egglog.client.ui.organisms.webView.FullPageWebView
 import com.org.egglog.client.utils.widthPercent
 import com.org.egglog.client.ui.theme.*
 import com.org.egglog.client.utils.AddBox
@@ -95,6 +101,8 @@ import com.org.egglog.client.utils.Logout
 import com.org.egglog.client.utils.MySetting
 import com.org.egglog.client.utils.Search
 import com.org.egglog.client.utils.addFocusCleaner
+import com.org.egglog.client.utils.heightPercent
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
@@ -140,18 +148,25 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    HeaderTest()
 //    ListTest()
 //    PostCardTest()
-    NavigatorTest()
+//    NavigatorTest()
+//    WebViewTest()
+    CalendarTest()
 }
 
+@Composable
+fun WebViewTest() {
+//    ContentWebView()
+    FullPageWebView()
+}
 
 @Composable
-fun NavigatorTest(){
+fun NavigatorTest() {
     var selectedItem by remember { mutableIntStateOf(0) }
 
-    Column (
+    Column(
         modifier = Modifier.fillMaxSize()
-    ){
-        Box(modifier = Modifier.weight(1f)){
+    ) {
+        Box(modifier = Modifier.weight(1f)) {
             when (selectedItem) {
                 0 -> CalendarPage()
                 1 -> GroupPage()
@@ -168,8 +183,10 @@ fun NavigatorTest(){
 
 @Composable
 fun CalendarPage() {
+    Column() {
         Text("Calendar Page")
-
+        CalendarTest()
+    }
 }
 
 @Composable
@@ -759,7 +776,7 @@ fun SwiperTest() {
         println("모임장 바꿈")
     }
 
-    Swiper(onDelete = ::onDelete, onChangeLeader =::onChnageLeader) {
+    Swiper(onDelete = ::onDelete, onChangeLeader = ::onChnageLeader) {
         // swipe 되는 Box 안에 들어갈 요소
         val profile = Profile(1, "김싸피", "전남대학교병원")
         ProfileItem(profile = profile, type = "basic")
@@ -769,12 +786,12 @@ fun SwiperTest() {
 
 @Composable
 fun CardTest() {
-    val onClickPost: ()->Unit = {
+    val onClickPost: () -> Unit = {
         println("클릭됨")
     }
 
-    val onClickMore: (planId: Any) -> Unit = {
-            planId -> println("${planId}번 클릭됨")
+    val onClickMore: (planId: Any) -> Unit = { planId ->
+        println("${planId}번 클릭됨")
     }
 
     val postInfo = PostInfo("부서 골라주실 분!!!", "익명의 구운란", 5, 100, false)
@@ -811,7 +828,14 @@ fun CardTest() {
             }
         }
         item {
-            BigScheduleCard("basic", "14:00", "20:00", "조선대병원 3중환자실", title = "추가 근무", color = Color(0xFFFDA29B)) {
+            BigScheduleCard(
+                "basic",
+                "14:00",
+                "20:00",
+                "조선대병원 3중환자실",
+                title = "추가 근무",
+                color = Color(0xFFFDA29B)
+            ) {
                 onClickMore(0)
             }
         }
@@ -819,22 +843,55 @@ fun CardTest() {
             AlarmScheduleCard(title = "기상 알람", time = "11:00", duration = 30, interval = 5)
         }
         item {
-            AlarmSettingCard("Day", "14:00", 30, 5, checked, setToggle=setToggle, onClickCard=onClickCard)
+            AlarmSettingCard(
+                "Day",
+                "14:00",
+                30,
+                5,
+                checked,
+                setToggle = setToggle,
+                onClickCard = onClickCard
+            )
         }
 
         item {
-            AlarmSettingCard("Eve", "14:00", 30, 5, checked, setToggle=setToggle, onClickCard=onClickCard)
+            AlarmSettingCard(
+                "Eve",
+                "14:00",
+                30,
+                5,
+                checked,
+                setToggle = setToggle,
+                onClickCard = onClickCard
+            )
         }
 
         item {
-            AlarmSettingCard("개인", "14:00", 30, 5, checked, setToggle=setToggle, onClickCard=onClickCard, color = Color(0xFFFDA29B))
+            AlarmSettingCard(
+                "개인",
+                "14:00",
+                30,
+                5,
+                checked,
+                setToggle = setToggle,
+                onClickCard = onClickCard,
+                color = Color(0xFFFDA29B)
+            )
         }
 
 
         item {
             Row() {
-                ExcelCard(color = "green", date = "2024-03-03", name = "김싸피", onClickCard = {println("안녕하세요")})
-                ExcelCard(color = "white", date = "2024-03-03", name = "김싸피", onClickCard = {println("안녕하세요")})
+                ExcelCard(
+                    color = "green",
+                    date = "2024-03-03",
+                    name = "김싸피",
+                    onClickCard = { println("안녕하세요") })
+                ExcelCard(
+                    color = "white",
+                    date = "2024-03-03",
+                    name = "김싸피",
+                    onClickCard = { println("안녕하세요") })
             }
         }
     }
@@ -842,13 +899,78 @@ fun CardTest() {
 
 @Composable
 fun PostCardTest() {
-    val profile1 = Profile(1,"익명의 구운란1", "전남대병원", true)
-    val postInfo = com.org.egglog.client.data.PostInfo("태화루에 있는 동강병원 어떤가요?", "근무환경이나 일의 강도 복지 궁금합니다", "https://picsum.photos/300")
-    val postInfo2 = com.org.egglog.client.data.PostInfo("태화루에 있는 동강병원 어떤가요?", "근무환경이나 일의 강도 복지 궁금합니다")
+    val profile1 = Profile(1, "익명의 구운란1", "전남대병원", true)
+    val postInfo = com.org.egglog.client.data.PostInfo(
+        "태화루에 있는 동강병원 어떤가요?",
+        "근무환경이나 일의 강도 복지 궁금합니다",
+        "https://picsum.photos/300"
+    )
+    val postInfo2 =
+        com.org.egglog.client.data.PostInfo("태화루에 있는 동강병원 어떤가요?", "근무환경이나 일의 강도 복지 궁금합니다")
     val postReaction1 = PostReactionInfo(1, 100, 13, 123, true, true, true)
     LazyColumn(Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp)) {
-        item { PostCard(profile1, postInfo, postReaction1, onClick = {println("안녕")}) }
+        item { PostCard(profile1, postInfo, postReaction1, onClick = { println("안녕") }) }
         item { PostCard(profile1, postInfo2, postReaction1) }
     }
 
+}
+
+@Composable
+fun CalendarTest() {
+    Box(Modifier
+            .padding(horizontal = 20.dp, vertical = 10.dp)
+    ) {
+        Column {
+            Text(text = "[ 메인 페이지 캘린더 ]")
+
+            val dataSource = WeeklyDataSource()
+            var calendarUiModel by remember { mutableStateOf(dataSource.getData(lastSelectedDate = dataSource.today)) }
+
+            val onDateClick: (WeeklyUiModel.Date) -> Unit = { date ->
+                calendarUiModel = calendarUiModel
+                        .copy(
+                                selectedDate = date,
+                                visibleDates = calendarUiModel.visibleDates.map {
+                                    it.copy(
+                                            isSelected = it.date.isEqual(date.date)
+                                    )
+                                })
+                // ** TODO **
+                // 클릭한 날짜에 대한 근무 인원 정보 받아오기
+                println("선택한 날짜는 ${date.date}")
+            }
+
+            val onPrevClick: (LocalDate) -> Unit = { startDate ->
+                val finalStartDate = startDate.minusDays(1)
+                calendarUiModel = dataSource.getData(startDate = finalStartDate, lastSelectedDate = finalStartDate)
+                // ** TODO **
+                // 클릭한 날짜에 대한 근무 인원 정보 받아오기
+                println("선택한 날짜는 ${finalStartDate}")}
+
+            val onNextClick: (LocalDate) -> Unit = { endDate ->
+                val finalStartDate = endDate.plusDays(2)
+                calendarUiModel = dataSource.getData(startDate = finalStartDate, lastSelectedDate = finalStartDate.minusDays(1))
+                // ** TODO **
+                // 클릭한 날짜에 대한 근무 인원 정보 받아오기
+                println("선택한 날짜는 ${finalStartDate.minusDays(1)}")
+            }
+
+            WeeklyCalendar(type = "group", calendarUiModel, onDateClick, onPrevClick, onNextClick)
+
+            ////////////////////////////////////////////////////////////
+            Text(text = "[ 그룹 페이지 캘린더 ]")
+
+            var calendarUiModel2 by remember { mutableStateOf(dataSource.getData(lastSelectedDate = dataSource.today)) }
+            val lastSelectedDate = LocalDate.now()
+            val visibleDates = dataSource.getData(lastSelectedDate = lastSelectedDate).visibleDates
+            val startDate = visibleDates.first()
+            val endDtate = visibleDates.last()
+            // ** TODO **
+            // startDate와 endDate로 이번주 근무 타입을 List<String>으로 받아오기
+            val tempLabels: List<String> = listOf("Night", "Day", "휴가", "보건", "Off", "Eve", "Eve")
+
+            WeeklyCalendar(type = "main", calendarUiModel2, labels = tempLabels)
+
+        }
+    }
 }
