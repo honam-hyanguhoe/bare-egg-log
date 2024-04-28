@@ -1,4 +1,4 @@
-package org.egglog.api.calendar.exception;
+package org.egglog.api.event.exception;
 
 import lombok.Getter;
 import org.egglog.utility.exception.BaseException;

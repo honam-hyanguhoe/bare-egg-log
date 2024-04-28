@@ -1,4 +1,4 @@
-package org.egglog.api.calendar.model.dto.params;
+package org.egglog.api.event.model.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -12,7 +12,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-public class EventUpdateForm {
+public class EventOutputSpec {
+
+    private Long eventId;
 
     private String eventTitle;
 
@@ -21,4 +23,5 @@ public class EventUpdateForm {
     private LocalDateTime startDate;
 
     private LocalDateTime endDate;
+
 }
