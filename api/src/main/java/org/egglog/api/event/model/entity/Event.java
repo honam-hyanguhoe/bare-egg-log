@@ -1,4 +1,4 @@
-package org.egglog.api.calendar.model.entity;
+package org.egglog.api.event.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

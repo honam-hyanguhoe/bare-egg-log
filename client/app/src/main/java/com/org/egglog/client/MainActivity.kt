@@ -88,6 +88,9 @@ import com.org.egglog.client.ui.molecules.radioButtons.DayRadioButton
 import com.org.egglog.client.ui.molecules.radioButtons.WorkRadioButton
 import com.org.egglog.client.ui.molecules.listItems.AlarmListItem
 import com.org.egglog.client.ui.molecules.swiper.Swiper
+import com.org.egglog.client.ui.organisms.calendars.WeeklyCalendar
+import com.org.egglog.client.ui.organisms.calendars.weeklyData.WeeklyDataSource
+import com.org.egglog.client.ui.organisms.calendars.weeklyData.WeeklyUiModel
 import com.org.egglog.client.ui.organisms.postCard.PostCard
 import com.org.egglog.client.ui.organisms.webView.ContentWebView
 import com.org.egglog.client.ui.organisms.webView.FullPageWebView
@@ -99,6 +102,7 @@ import com.org.egglog.client.utils.MySetting
 import com.org.egglog.client.utils.Search
 import com.org.egglog.client.utils.addFocusCleaner
 import com.org.egglog.client.utils.heightPercent
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
@@ -145,13 +149,14 @@ fun MyApp(modifier: Modifier = Modifier) {
 //    ListTest()
 //    PostCardTest()
 //    NavigatorTest()
-    WebViewTest()
+//    WebViewTest()
+    CalendarTest()
 }
 
 @Composable
 fun WebViewTest() {
 //    ContentWebView()
-    FullPageWebView()
+    FullPageWebView( url = "https://www.egg-log.org/remain")
 }
 
 @Composable
@@ -178,8 +183,10 @@ fun NavigatorTest() {
 
 @Composable
 fun CalendarPage() {
-    Text("Calendar Page")
-
+    Column() {
+        Text("Calendar Page")
+        CalendarTest()
+    }
 }
 
 @Composable
@@ -269,8 +276,8 @@ fun BottomSheetTest() {
 
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .border(2.dp, NaturalBlack)
+                .fillMaxSize()
+                .border(2.dp, NaturalBlack)
     ) {
 
         Text("hi")
@@ -906,4 +913,64 @@ fun PostCardTest() {
         item { PostCard(profile1, postInfo2, postReaction1) }
     }
 
+}
+
+@Composable
+fun CalendarTest() {
+    Box(Modifier
+            .padding(horizontal = 20.dp, vertical = 10.dp)
+    ) {
+        Column {
+            Text(text = "[ 메인 페이지 캘린더 ]")
+
+            val dataSource = WeeklyDataSource()
+            var calendarUiModel by remember { mutableStateOf(dataSource.getData(lastSelectedDate = dataSource.today)) }
+
+            val onDateClick: (WeeklyUiModel.Date) -> Unit = { date ->
+                calendarUiModel = calendarUiModel
+                        .copy(
+                                selectedDate = date,
+                                visibleDates = calendarUiModel.visibleDates.map {
+                                    it.copy(
+                                            isSelected = it.date.isEqual(date.date)
+                                    )
+                                })
+                // ** TODO **
+                // 클릭한 날짜에 대한 근무 인원 정보 받아오기
+                println("선택한 날짜는 ${date.date}")
+            }
+
+            val onPrevClick: (LocalDate) -> Unit = { startDate ->
+                val finalStartDate = startDate.minusDays(1)
+                calendarUiModel = dataSource.getData(startDate = finalStartDate, lastSelectedDate = finalStartDate)
+                // ** TODO **
+                // 클릭한 날짜에 대한 근무 인원 정보 받아오기
+                println("선택한 날짜는 ${finalStartDate}")}
+
+            val onNextClick: (LocalDate) -> Unit = { endDate ->
+                val finalStartDate = endDate.plusDays(2)
+                calendarUiModel = dataSource.getData(startDate = finalStartDate, lastSelectedDate = finalStartDate.minusDays(1))
+                // ** TODO **
+                // 클릭한 날짜에 대한 근무 인원 정보 받아오기
+                println("선택한 날짜는 ${finalStartDate.minusDays(1)}")
+            }
+
+            WeeklyCalendar(type = "group", calendarUiModel, onDateClick, onPrevClick, onNextClick)
+
+            ////////////////////////////////////////////////////////////
+            Text(text = "[ 그룹 페이지 캘린더 ]")
+
+            var calendarUiModel2 by remember { mutableStateOf(dataSource.getData(lastSelectedDate = dataSource.today)) }
+            val lastSelectedDate = LocalDate.now()
+            val visibleDates = dataSource.getData(lastSelectedDate = lastSelectedDate).visibleDates
+            val startDate = visibleDates.first()
+            val endDtate = visibleDates.last()
+            // ** TODO **
+            // startDate와 endDate로 이번주 근무 타입을 List<String>으로 받아오기
+            val tempLabels: List<String> = listOf("Night", "Day", "휴가", "보건", "Off", "Eve", "Eve")
+
+            WeeklyCalendar(type = "main", calendarUiModel2, labels = tempLabels)
+
+        }
+    }
 }
