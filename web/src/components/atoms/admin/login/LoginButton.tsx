@@ -3,22 +3,24 @@ import styled from 'styled-components';
 
 // 스타일드 버튼 컴포넌트 정의
 const StyledButton = styled.button`
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
-  font-size: 16px;
+  padding: 0.8em;
+  background-color: #FEC84B;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: "Line-Seed-Sans-App";
+  color: #F9F9F9;
+  width: 16em;
   border: none;
-  border-radius: 5px;
-  cursor: pointer;
   outline: none;
+  border-radius: 0.4em;
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: #0056b3;
+    background-color: #ffb618;
   }
 
   &:active {
-    background-color: #004085;
+    background-color: #ffb618;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) inset;
   }
 

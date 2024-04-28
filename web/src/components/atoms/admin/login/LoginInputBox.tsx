@@ -6,20 +6,22 @@ interface LoginInputProps {
 }
 
 const StyledLoginInput = styled.input`
-  padding: 8px 12px;
-  border: 2px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-  color: #333;
+  padding: 0.8em;
+  border: 0.1em solid #F9F9F9;
+  border-radius: 0.4em;
+  width: 20em;
+  font-size: 0.8em;
+  font-weight: 300;
+  font-family: "Line-Seed-Sans-App";
+  color: #F9F9F9;
   outline: none;
   
   &::placeholder {
-    color: #aaa;
+    color: #F9F9F9;
   }
   
   &:focus {
-    border-color: #0056b3;
-    box-shadow: 0 0 5px rgba(0, 86, 179, 0.25);
+    border-color: #FFF;
   }
 `;
 

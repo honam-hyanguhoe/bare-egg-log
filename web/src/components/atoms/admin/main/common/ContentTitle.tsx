@@ -1,14 +1,15 @@
 import React from "react";
 import styled from "styled-components";
 
-const ContentTitle = styled.h2`
-  font-size: 18px;
-  font-weight: bold;
+const StyledContentTitle = styled.h2`
+  font-size: 1.4em;
+  font-weight: 700;
+  font-family: "Line-Seed-Sans-App";
   color: #000;
 `;
 
-const ContentAtom: React.FC<{ title: string }> = ({ title }) => {
-  return <ContentTitle>{title}</ContentTitle>;
+const ContentTitle = ({ title }: { title: string }) => {
+  return <StyledContentTitle>{title}</StyledContentTitle>;
 };
 
-export default ContentAtom;
+export default ContentTitle;
