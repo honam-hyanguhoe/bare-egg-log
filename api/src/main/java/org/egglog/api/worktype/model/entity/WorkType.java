@@ -3,6 +3,7 @@ package org.egglog.api.worktype.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.egglog.api.user.model.entity.User;
+import org.egglog.api.worktype.model.dto.response.WorkTypeResponse;
 
 import java.time.LocalTime;
 
@@ -37,4 +38,15 @@ public class WorkType {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    public WorkTypeResponse toResponse(){
+        return WorkTypeResponse.builder()
+                .workTypeId(this.id)
+                .title(this.title)
+                .color(this.color)
+                .workTypeImgUrl(this.workTypeImgUrl)
+                .startTime(this.startTime)
+                .endTime(this.endTime)
+                .build();
+    }
 }
