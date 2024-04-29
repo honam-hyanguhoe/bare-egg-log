@@ -8,10 +8,10 @@
     ],
     "baseUrl": ".", // 현재 디렉토리를 기준 경로로 설정,
     "paths": {
-      "@components/*": ["src/components/*"], // src/components 폴더를 @components/로 접근
-      "@utils/*": ["src/utils/*"], // src/utils 폴더를 @utils/로 접근
+      "@custom-components/*": ["src/components/*"], // src/components 폴더를 @components/로 접근
+      "@custom-utils/*": ["src/utils/*"], // src/utils 폴더를 @utils/로 접근
       "@custom-types/*": ["src/components/types/*"], // src/utils 폴더를 @utils/로 접근
-      "@assets/*": ["src/assets/*"]
+      "@custom-assets/*": ["src/assets/*"]
     },
     "allowJs": true,
     "skipLibCheck": true,

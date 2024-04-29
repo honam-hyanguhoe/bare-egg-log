@@ -5,6 +5,9 @@ import MainLogoIcon from '../../../../assets/images/default/main_logo.svg';
 const StyledMainLogo = styled.div`
     display: flex;
     justify-content: center;
+    & > img {
+      width: 15em;
+    }
 `;
 
 const MainLogo = () => {
