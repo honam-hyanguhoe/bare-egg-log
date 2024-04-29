@@ -21,7 +21,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @Builder
 public class WorkTypeResponse {
-    private Long id;
+    private Long workTypeId;
     private String title;        //Day, Eve, Night, 교육, Off, 보건, None 등
     private String color;       //색상
     private String workTypeImgUrl;      //근무 이미지
