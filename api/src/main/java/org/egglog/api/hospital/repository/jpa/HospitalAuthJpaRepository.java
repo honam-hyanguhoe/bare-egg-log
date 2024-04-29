@@ -9,6 +9,6 @@ import java.util.Optional;
 
 public interface HospitalAuthJpaRepository extends JpaRepository<HospitalAuth, Long> {
 
-    Optional<HospitalAuth> findByUsersAndHospital(User user, Hospital userSelectHospital);
+    Optional<HospitalAuth> findByUserAndHospital(User user, Hospital userSelectHospital);
 
 }

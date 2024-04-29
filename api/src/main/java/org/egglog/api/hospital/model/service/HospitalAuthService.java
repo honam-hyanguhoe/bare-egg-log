@@ -38,7 +38,7 @@ public class HospitalAuthService {
     @Transactional
     public HospitalAuthResponse createHospitalAuth(User loginUser, CreateHospitalAuthRequest request){
         return hospitalAuthJpaRepository.save(hospitalAuthJpaRepository
-                .findByUsersAndHospital(loginUser, loginUser.getSelectedHospital())
+                .findByUserAndHospital(loginUser, loginUser.getSelectedHospital())
                 .map(auth -> auth.create(loginUser, request.getNurseCertificationImgUrl(), request.getHospitalCertificationImgUrl()))
                 .orElseGet(() -> new HospitalAuth().create(loginUser, request.getNurseCertificationImgUrl(), request.getHospitalCertificationImgUrl())))
                 .toResponse();

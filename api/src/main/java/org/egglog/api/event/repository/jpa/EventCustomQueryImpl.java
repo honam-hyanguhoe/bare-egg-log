@@ -1,14 +1,18 @@
 package org.egglog.api.event.repository.jpa;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.egglog.api.event.model.entity.Event;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.egglog.api.event.model.entity.QEvent.event;
+import static org.egglog.api.user.model.entity.QUser.user;
 
 @Repository
 @RequiredArgsConstructor
@@ -23,4 +27,49 @@ public class EventCustomQueryImpl implements EventCustomQuery {
                 .where(event.calendarGroup.id.eq(calendarGroupId))
                 .fetch());
     }
+
+
+//    public List<Event> findByMonthAndUserId(LocalDate date, Long userId) {
+//        return jpaQueryFactory
+//                .selectFrom(event)
+//                .join(event.user, user)
+//                .where(
+//                        user.id.eq(userId),
+//                        isStartDateEq(date).or(isEndDateEq(date))
+//                )
+//                .fetch();
+//    }
+
+    /**
+     * 한달 개인 일정 조회
+     *
+     * @param startDate
+     * @param endDate
+     * @param userId
+     * @return
+     */
+    public Optional<List<Event>> findByMonthAndUserId(LocalDateTime startDate, LocalDateTime endDate, Long userId) {
+        return Optional.ofNullable(jpaQueryFactory
+                .selectFrom(event)
+                .join(event.user, user)
+                .where(
+                        user.id.eq(userId),
+                        event.startDate.between(startDate, endDate)
+                                .or(event.endDate.between(startDate, endDate))
+                )
+                .fetch());
+    }
+
+    public Optional<List<Event>> findByTargetDate(LocalDateTime targetDate, Long userId) {
+        return Optional.ofNullable(jpaQueryFactory
+                .selectFrom(event)
+                .join(event.user, user)
+                .where(
+                        user.id.eq(userId),
+                        event.startDate.goe(targetDate).and(event.startDate.loe(targetDate))
+                )
+                .fetch());
+    }
+
+
 }
