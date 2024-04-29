@@ -12,6 +12,7 @@ const StyledChangeStatusButton = styled.button`
   text-align: center;
   padding: 0.8em 2em;
   border: none;
+  transition: background-color 0.3s ease;
 
   &:hover {
     background-color: #ffb618;

@@ -6,10 +6,10 @@ interface LoginInputProps {
 }
 
 const StyledLoginInput = styled.input`
-  padding: 0.8em;
   border: 0.1em solid #F9F9F9;
   border-radius: 0.4em;
   width: 20em;
+  height: 3.1em;
   font-size: 0.8em;
   font-weight: 300;
   font-family: "Line-Seed-Sans-App";

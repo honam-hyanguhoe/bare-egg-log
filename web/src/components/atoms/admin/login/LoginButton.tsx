@@ -3,13 +3,13 @@ import styled from 'styled-components';
 
 // 스타일드 버튼 컴포넌트 정의
 const StyledButton = styled.button`
-  padding: 0.8em;
   background-color: #FEC84B;
   font-size: 1em;
   font-weight: 500;
   font-family: "Line-Seed-Sans-App";
   color: #F9F9F9;
   width: 16em;
+  height: 2.5em;
   border: none;
   outline: none;
   border-radius: 0.4em;

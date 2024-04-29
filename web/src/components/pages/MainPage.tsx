@@ -22,11 +22,18 @@ import { InquiryUser } from "@custom-types/InquiryUser";
 import UserDefaultImage from "../../assets/images/default/default-user-profile.png";
 import ConfirmDefaultImage01 from "../../assets/images/default/confirm-sample-01.png";
 import ConfirmDefaultImage02 from "../../assets/images/default/confirm-sample-02.png";
+import ChatAltLight from "../../assets/images/default/chat_alt_light.svg";
+import UserCircleLight from "../../assets/images/default/user_cicrle_light.svg";
 import ConfirmImageBox from "../atoms/admin/main/confirm/ConfirmImageBox";
 import {Images} from "@custom-types/Images";
 import InfoDetailTitle from "../atoms/admin/main/confirm/InfoDetailTitle";
 import {InfoDetailElement} from "@custom-types/InfoDetailElement";
 import InfoDetailListElement from "../atoms/admin/main/confirm/InfoDetailListElement";
+import InquiryDetail from "../atoms/admin/main/inquiry/InquiryDetail";
+import MailInputBox from "../atoms/admin/main/inquiry/MailInputBox";
+import CategoryListBox from "../atoms/admin/sidebar/CategoryListBox";
+import LogoutButton from "../atoms/admin/sidebar/LogoutButton";
+import MainLogo from "../atoms/admin/sidebar/MainLogo";
 
 const MainPage = () => {
   const handleLoginClick = () => {
@@ -93,6 +100,12 @@ const MainPage = () => {
         <ContentTitle title={"문의사항"} />
         <InfoDetailTitle title={"병원 정보"}/>
       <InfoDetailListElement infoDetailElement={defaultInfoDetailElement}/>
+      <InquiryDetail content={defaultInquiryTrue.content}/>
+      <MailInputBox/>
+      <CategoryListBox imageUrl={UserCircleLight} text={"인증 승인 요청"} isActive={false}/>
+      <CategoryListBox imageUrl={ChatAltLight} text={"문의사항"} isActive={true}/>
+      <LogoutButton/>
+        <MainLogo/>
     </>
   );
 };
