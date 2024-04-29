@@ -81,6 +81,7 @@ public class EventService {
                     .eventContent(event.getEventContent())
                     .startDate(event.getStartDate())
                     .endDate(event.getEndDate())
+                    .calendarGroupId(event.getCalendarGroup().getId())
                     .build();
 
             eventListOutputSpecList.add(eventListOutputSpec);
@@ -125,7 +126,7 @@ public class EventService {
                 .eventContent(eventUpdateForm.getEventContent())
                 .startDate(eventUpdateForm.getStartDate())
                 .endDate(eventUpdateForm.getEndDate())
-                .calendarGroupId(eventUpdateForm.get)
+                .calendarGroupId(eventUpdateForm.getCalendarGroupId())
                 .build();
     }
 
