@@ -3,15 +3,14 @@ package org.egglog.api.work.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.user.model.entity.User;
-import org.egglog.api.work.model.dto.request.CreateAndEditWorkListRequest;
+import org.egglog.api.work.model.dto.request.CreateWorkListRequest;
+import org.egglog.api.work.model.dto.request.EditAndDeleteWorkListRequest;
+import org.egglog.api.work.model.dto.request.EditAndDeleteWorkRequest;
 import org.egglog.api.work.model.service.WorkService;
 import org.egglog.utility.utils.MessageUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 /**
@@ -35,11 +34,20 @@ public class WorkController {
 
     @PostMapping("/create")
     public ResponseEntity<MessageUtils> createWork(
-            @AuthenticationPrincipal User user,
-            @RequestBody CreateAndEditWorkListRequest request
+            @AuthenticationPrincipal User loginUser,
+            @RequestBody CreateWorkListRequest request
             ){
-        workService.createWork(user, request);
+        workService.createWork(loginUser, request);
         return ResponseEntity.ok().body(
                 MessageUtils.success());
+    }
+
+    @PatchMapping("/update")
+    public ResponseEntity<MessageUtils> updateWork(
+            @AuthenticationPrincipal User loginUser,
+            @RequestBody EditAndDeleteWorkListRequest request
+            ){
+        workService.updateWork(loginUser, request);
+        return ResponseEntity.ok().body(MessageUtils.success());
     }
 }
