@@ -2,11 +2,13 @@ import React from "react";
 import LoginInputBox from "../atoms/admin/login/LoginInputBox";
 import LoginButton from "../atoms/admin/login/LoginButton";
 
-import ContentField from "../atoms/admin/main/common/ContentTitle";
+import ContentTitle from "../atoms/admin/main/common/ContentTitle";
 import TabBox from "../atoms/admin/main/common/TabBox";
 import Title from "../atoms/admin/main/common/Title";
 import UserInfo from "../atoms/admin/main/common/UserInfo";
 
+import ChangeStatusButton from "../atoms/admin/main/inquiry/ChangeStatusButton";
+import MailSendButton from "../atoms/admin/main/inquiry/MailSendButton";
 import InquiryUserListBox from "../atoms/admin/main/inquiry/InquiryUserListBox";
 
 import ConfirmAcceptButton from "../atoms/admin/main/confirm/ConfirmAcceptButton";
@@ -14,12 +16,17 @@ import ConfirmDenyButton from "../atoms/admin/main/confirm/ConfirmDenyButton";
 
 import BigNumber from "bignumber.js";
 import { User } from "@custom-types/User";
-import { Inquiry } from "@custom-types/Inquiry";
 
+import { Inquiry } from "@custom-types/Inquiry";
 import { InquiryUser } from "@custom-types/InquiryUser";
 import UserDefaultImage from "../../assets/images/default/default-user-profile.png";
-import ChangeStatusButton from "../atoms/admin/main/inquiry/ChangeStatusButton";
-import MailSendButton from "../atoms/admin/main/inquiry/MailSendButton";
+import ConfirmDefaultImage01 from "../../assets/images/default/confirm-sample-01.png";
+import ConfirmDefaultImage02 from "../../assets/images/default/confirm-sample-02.png";
+import ConfirmImageBox from "../atoms/admin/main/confirm/ConfirmImageBox";
+import {Images} from "@custom-types/Images";
+import InfoDetailTitle from "../atoms/admin/main/confirm/InfoDetailTitle";
+import {InfoDetailElement} from "@custom-types/InfoDetailElement";
+import InfoDetailListElement from "../atoms/admin/main/confirm/InfoDetailListElement";
 
 const MainPage = () => {
   const handleLoginClick = () => {
@@ -56,23 +63,36 @@ const MainPage = () => {
     inquiry: defaultInquiryFalse,
   };
 
+  const defaultImages : Images = {
+   imageFirst: ConfirmDefaultImage01,
+   imageSecond: ConfirmDefaultImage02
+  }
+
+  const defaultInfoDetailElement : InfoDetailElement = {
+    item: "항목",
+    desc: "동그란병원"
+  }
+
   return (
     <>
       <div>에그로그 메인이에요</div>
       <LoginInputBox type={"email"} />
       <LoginInputBox type={"password"} />
       <LoginButton onClick={handleLoginClick} />
-      <ContentField title={"문의사항"} />
       <TabBox isActive={true} text={"선택1"} />
-      <TabBox isActive={false} text={"선택2"} />
-      <Title title={"소제목"} />
-      <UserInfo user={defaultUser} />
-      <InquiryUserListBox inquiry={defaultInquiryUserTrue} />
-      <InquiryUserListBox inquiry={defaultInquiryUserFalse} />
-      <ConfirmAcceptButton id={new BigNumber(1)} />
-      <ConfirmDenyButton id={new BigNumber(1)} />
-      <ChangeStatusButton id={new BigNumber(1)} />
-      <MailSendButton email={defaultUser.email} />
+        <TabBox isActive={false} text={"선택2"} />
+        <Title title={"소제목"} />
+        <UserInfo user={defaultUser} />
+        <InquiryUserListBox inquiry={defaultInquiryUserTrue} />
+        <InquiryUserListBox inquiry={defaultInquiryUserFalse} />
+        <ConfirmAcceptButton id={new BigNumber(1)} />
+        <ConfirmDenyButton id={new BigNumber(1)} />
+        <ChangeStatusButton id={new BigNumber(1)} />
+        <MailSendButton email={defaultUser.email} />
+        {/*<ConfirmImageBox images={defaultImages}/>*/}
+        <ContentTitle title={"문의사항"} />
+        <InfoDetailTitle title={"병원 정보"}/>
+      <InfoDetailListElement infoDetailElement={defaultInfoDetailElement}/>
     </>
   );
 };
