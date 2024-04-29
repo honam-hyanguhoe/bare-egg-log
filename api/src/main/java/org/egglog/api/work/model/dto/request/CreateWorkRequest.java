@@ -27,7 +27,7 @@ import java.util.Map;
 @Getter
 @Setter
 @Builder
-public class CreateAndEditWorkRequest {
+public class CreateWorkRequest {
     private LocalDate workDate;
     private Long workTypeId;
 

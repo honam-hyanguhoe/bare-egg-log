@@ -2,15 +2,14 @@ package org.egglog.api.work.model.dto.request;
 
 import lombok.*;
 
-import java.util.List;
-
+import java.time.LocalDate;
 
 /**
  * ```
  * ===================[Info]=========================
  * packageName    : org.egglog.api.work.model.dto.request
- * fileName      : CreateWorkListRequest
- * description    : 근무일정 리스트 추가 요청 객체
+ * fileName      : EditAndDeleteWorkRequest
+ * description    : 근무일정 리스트 수정 및 삭제 요청 객체
  * =================================================
  * ```
  * |DATE|AUTHOR|NOTE|
@@ -22,8 +21,9 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class CreateAndEditWorkListRequest {
-
-    private Long calendarGroupId;
-    private List<CreateAndEditWorkRequest> workTypes;
+public class EditAndDeleteWorkRequest {
+    private Long workId;
+    private LocalDate workDate;
+    private Long workTypeId;
+    private Boolean isDeleted;
 }

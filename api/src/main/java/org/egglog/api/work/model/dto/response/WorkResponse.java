@@ -1,6 +1,12 @@
 package org.egglog.api.work.model.dto.response;
 
+
 import lombok.*;
+import org.egglog.api.calendargroup.model.dto.response.CalendarGroupResponse;
+import org.egglog.api.user.model.entity.User;
+import org.egglog.api.worktype.model.dto.response.WorkTypeResponse;
+
+import java.time.LocalDate;
 
 
 /**
@@ -22,5 +28,10 @@ import lombok.*;
 @NoArgsConstructor
 public class WorkResponse {
 
+    private Long workId;
+    private LocalDate workDate;
+    private WorkTypeResponse workType;
+    private CalendarGroupResponse calendarGroup;
+    private User user;
 
 }
