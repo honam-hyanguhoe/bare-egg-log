@@ -15,7 +15,6 @@ import static org.egglog.api.calendargroup.model.entity.QCalendarGroup.calendarG
 public class CalendarGroupCustomQueryImpl implements CalendarGroupCustomQuery {
 
     private final JPAQueryFactory jpaQueryFactory;
-    private final CalendarGroupRepository calendarGroupRepository;
 
 
 }

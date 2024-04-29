@@ -30,19 +30,26 @@ public class Board {
     @Column(name = "board_created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "picture_one")
     private String pictureOne;
 
+    @Column(name = "picture_two")
     private String pictureTwo;
 
+    @Column(name = "picture_three")
     private String pictureThree;
 
+    @Column(name = "picture_four")
     private String pictureFour;
 
+    @Column(name = "temp_nickname")
     private String tempNickname; //익명 닉네임
 
-    private Long viewCount;  //조회수
+    @Column(name = "view_count")
+    private long viewCount;  //조회수
 
-    private boolean isCommented;    //댓글 유무
+    @Column(name = "is_commented")
+    private Boolean isCommented;    //댓글 유무
 
     @Enumerated(EnumType.STRING)
     private BoardType boardType; //ALL, HOSPITAL, GROUP
