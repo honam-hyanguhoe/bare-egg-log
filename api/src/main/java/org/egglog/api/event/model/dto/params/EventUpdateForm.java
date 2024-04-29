@@ -21,4 +21,6 @@ public class EventUpdateForm {
     private LocalDateTime startDate;
 
     private LocalDateTime endDate;
+
+    private Long calendarGroupId;
 }

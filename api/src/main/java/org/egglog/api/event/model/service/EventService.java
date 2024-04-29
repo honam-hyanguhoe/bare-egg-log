@@ -1,6 +1,10 @@
 package org.egglog.api.event.model.service;
 
 import lombok.RequiredArgsConstructor;
+import org.egglog.api.calendargroup.exception.CalendarGroupErrorCode;
+import org.egglog.api.calendargroup.exception.CalendarGroupException;
+import org.egglog.api.calendargroup.model.entity.CalendarGroup;
+import org.egglog.api.calendargroup.repository.jpa.CalendarGroupRepository;
 import org.egglog.api.event.model.dto.params.EventForm;
 import org.egglog.api.event.model.dto.params.EventUpdateForm;
 import org.egglog.api.event.model.dto.response.EventListOutputSpec;
@@ -17,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 @Service
@@ -26,6 +31,7 @@ public class EventService {
     private final EventRepository eventRepository;
 
     private final UserJpaRepository userJpaRepository;
+    private final CalendarGroupRepository calendarGroupRepository;
 
     /**
      * 개인 일정 등록
@@ -38,12 +44,17 @@ public class EventService {
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
 
+        CalendarGroup calendarGroup = calendarGroupRepository.findById(eventForm.getCalendarGroupId()).orElseThrow(
+                () -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP)
+        );
+
         Event event = Event.builder()
                 .eventTitle(eventForm.getEventTitle())
                 .eventContent(eventForm.getEventContent())
                 .startDate(eventForm.getStartDate())
                 .endDate(eventForm.getEndDate())
-                .user(user)
+                .user(user)     //사용자
+                .calendarGroup(calendarGroup)   //캘린더 그룹
                 .build();
 
         eventRepository.save(event);
@@ -70,6 +81,7 @@ public class EventService {
                     .eventContent(event.getEventContent())
                     .startDate(event.getStartDate())
                     .endDate(event.getEndDate())
+                    .calendarGroupId(event.getCalendarGroup().getId())
                     .build();
 
             eventListOutputSpecList.add(eventListOutputSpec);
@@ -91,6 +103,7 @@ public class EventService {
                 .eventContent(event.getEventContent())
                 .startDate(event.getStartDate())
                 .endDate(event.getEndDate())
+                .calendarGroupId(event.getCalendarGroup().getId())
                 .build();
     }
 
@@ -113,6 +126,7 @@ public class EventService {
                 .eventContent(eventUpdateForm.getEventContent())
                 .startDate(eventUpdateForm.getStartDate())
                 .endDate(eventUpdateForm.getEndDate())
+                .calendarGroupId(eventUpdateForm.getCalendarGroupId())
                 .build();
     }
 

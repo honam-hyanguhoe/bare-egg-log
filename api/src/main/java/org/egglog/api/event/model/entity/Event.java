@@ -2,6 +2,7 @@ package org.egglog.api.event.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.user.model.entity.User;
 
 import java.time.LocalDateTime;
@@ -34,4 +35,8 @@ public class Event {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "calendar_group_id")
+    private CalendarGroup calendarGroup;
 }

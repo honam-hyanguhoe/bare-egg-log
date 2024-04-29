@@ -364,7 +364,7 @@ public class BoardService {
                     .boardLikeCount(likeCnt)
                     .isLiked(isUserLiked)
                     .isCommented(isCommented)
-                    .isHospitalAuth(user.getIsHospitalAuth())
+//                    .isHospitalAuth(user.getIsHospitalAuth())
                     .build();
 
         } catch (DataAccessException e) {

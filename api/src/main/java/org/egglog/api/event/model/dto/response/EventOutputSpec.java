@@ -24,4 +24,5 @@ public class EventOutputSpec {
 
     private LocalDateTime endDate;
 
+    private Long calendarGroupId;
 }
