@@ -88,6 +88,8 @@ import com.org.egglog.client.ui.molecules.radioButtons.DayRadioButton
 import com.org.egglog.client.ui.molecules.radioButtons.WorkRadioButton
 import com.org.egglog.client.ui.molecules.listItems.AlarmListItem
 import com.org.egglog.client.ui.molecules.swiper.Swiper
+import com.org.egglog.client.ui.organisms.calendars.GroupCalenar
+import com.org.egglog.client.ui.organisms.calendars.MonthlyCalendar
 import com.org.egglog.client.ui.organisms.calendars.WeeklyCalendar
 import com.org.egglog.client.ui.organisms.calendars.weeklyData.WeeklyDataSource
 import com.org.egglog.client.ui.organisms.calendars.weeklyData.WeeklyUiModel
@@ -105,6 +107,7 @@ import com.org.egglog.client.utils.heightPercent
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.util.Calendar
 
 
 class MainActivity : ComponentActivity() {
@@ -921,56 +924,69 @@ fun CalendarTest() {
             .padding(horizontal = 20.dp, vertical = 10.dp)
     ) {
         Column {
-            Text(text = "[ 메인 페이지 캘린더 ]")
+            Text(text = "[ monthly calendar ]")
 
-            val dataSource = WeeklyDataSource()
-            var calendarUiModel by remember { mutableStateOf(dataSource.getData(lastSelectedDate = dataSource.today)) }
+            Spacer(modifier = Modifier.height(20.dp))
 
-            val onDateClick: (WeeklyUiModel.Date) -> Unit = { date ->
-                calendarUiModel = calendarUiModel
-                        .copy(
-                                selectedDate = date,
-                                visibleDates = calendarUiModel.visibleDates.map {
-                                    it.copy(
-                                            isSelected = it.date.isEqual(date.date)
-                                    )
-                                })
-                // ** TODO **
-                // 클릭한 날짜에 대한 근무 인원 정보 받아오기
-                println("선택한 날짜는 ${date.date}")
+            var currentYear = remember { mutableStateOf(Calendar.getInstance().get(Calendar.YEAR)) }
+            var currentMonth = remember { mutableStateOf(Calendar.getInstance().get(Calendar.MONTH) + 1) }
+            var selectedDate =  remember { mutableStateOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH)) } // 선택된 날짜를 저장하는 상태
+
+            val onDateClicked: (Int) -> Unit = { clickedDate ->
+                // 클릭된 날짜 처리하는 로직을 여기에 작성
+                selectedDate.value = clickedDate
+                //println("선택한 날짜는 ${clickedDate}")
             }
 
-            val onPrevClick: (LocalDate) -> Unit = { startDate ->
-                val finalStartDate = startDate.minusDays(1)
-                calendarUiModel = dataSource.getData(startDate = finalStartDate, lastSelectedDate = finalStartDate)
-                // ** TODO **
-                // 클릭한 날짜에 대한 근무 인원 정보 받아오기
-                println("선택한 날짜는 ${finalStartDate}")}
-
-            val onNextClick: (LocalDate) -> Unit = { endDate ->
-                val finalStartDate = endDate.plusDays(2)
-                calendarUiModel = dataSource.getData(startDate = finalStartDate, lastSelectedDate = finalStartDate.minusDays(1))
-                // ** TODO **
-                // 클릭한 날짜에 대한 근무 인원 정보 받아오기
-                println("선택한 날짜는 ${finalStartDate.minusDays(1)}")
+            val onPrevMonthClick = {
+                if (currentMonth.value == 1) {
+                    currentMonth.value = 12
+                    currentYear.value--
+                } else {
+                    currentMonth.value--
+                }
             }
 
-            WeeklyCalendar(type = "group", calendarUiModel, onDateClick, onPrevClick, onNextClick)
+            val onNextMonthClick = {
+                if (currentMonth.value == 12) {
+                    currentMonth.value = 1
+                    currentYear.value++
+                } else {
+                    currentMonth.value++
+                }
+            }
+//            MonthlyCalendar(currentYear, currentMonth, onDateClicked, onPrevMonthClick, onNextMonthClick)
 
-            ////////////////////////////////////////////////////////////
-            Text(text = "[ 그룹 페이지 캘린더 ]")
+            Spacer(modifier = Modifier.height(20.dp))
 
-            var calendarUiModel2 by remember { mutableStateOf(dataSource.getData(lastSelectedDate = dataSource.today)) }
-            val lastSelectedDate = LocalDate.now()
-            val visibleDates = dataSource.getData(lastSelectedDate = lastSelectedDate).visibleDates
-            val startDate = visibleDates.first()
-            val endDtate = visibleDates.last()
-            // ** TODO **
-            // startDate와 endDate로 이번주 근무 타입을 List<String>으로 받아오기
-            val tempLabels: List<String> = listOf("Night", "Day", "휴가", "보건", "Off", "Eve", "Eve")
+            Text(text = "[ Group Calendar ]")
 
-            WeeklyCalendar(type = "main", calendarUiModel2, labels = tempLabels)
+            Spacer(modifier = Modifier.height(10.dp))
 
+            val myWorkList = mapOf(
+                    "김다희" to mapOf(
+                    "2024-04-01" to "Day",
+                    "2024-04-02" to "Eve",
+                    "2024-04-03" to "Off",
+                    "2024-04-04" to "None"
+                    )
+            )
+            val groupWorkList = mapOf(
+                    "김형민" to mapOf(
+                            "2024-04-01" to "Night",
+                            "2024-04-02" to "Day",
+                            "2024-04-03" to "휴가",
+                            "2024-04-04" to "None"
+                    ),
+                    "김아현" to mapOf(
+                            "2024-04-01" to "Night",
+                            "2024-04-02" to "Eve",
+                            "2024-04-03" to "보건",
+                            "2024-04-04" to "None"
+                    )
+            )
+            val workList = myWorkList + groupWorkList
+            GroupCalenar(currentYear = currentYear, currentMonth = currentMonth, workList)
         }
     }
 }
