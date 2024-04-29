@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 
 const StyledTitle = styled.h2`
-  font-size: 2em;
+  font-size: 1.8em;
   font-weight: bold;
   color: #000;
   font-family: "Line-Seed-Sans-App";

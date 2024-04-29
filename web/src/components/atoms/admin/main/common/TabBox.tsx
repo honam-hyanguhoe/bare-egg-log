@@ -7,7 +7,7 @@ interface TabBoxProps {
 
 const StyledTabBox = styled.h2<{ isActive:boolean }>`
   font-size: 1.2em;
-  font-weight: 400;
+  font-weight: 600;
   font-family: "Line-Seed-Sans-App";
   color: #000;
   text-align: center;
