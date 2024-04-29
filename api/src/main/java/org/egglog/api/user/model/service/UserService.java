@@ -9,7 +9,6 @@ import org.egglog.api.hospital.model.entity.HospitalAuth;
 import org.egglog.api.hospital.repository.jpa.HospitalAuthJpaRepository;
 import org.egglog.api.hospital.repository.jpa.HospitalAuthQueryRepository;
 import org.egglog.api.hospital.repository.jpa.HospitalJpaRepository;
-import org.egglog.api.hospital.repository.jpa.HospitalQueryRepository;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.dto.request.JoinUserRequest;
@@ -43,7 +42,7 @@ public class UserService {
     }
     @Transactional(readOnly = true)
     public UserResponse find(User loginUser){
-        Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUsersAndHospital(loginUser, loginUser.getSelectedHospital());
+        Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(loginUser, loginUser.getSelectedHospital());
         if (hospitalAuth.isPresent()){
             return loginUser.toResponse(hospitalAuth.get());
         }
@@ -75,7 +74,7 @@ public class UserService {
     @Transactional
     public UserResponse updateUser(User loginUser, UpdateUserRequest request){
         User updateUser = userJpaRepository.save(loginUser.updateInfo(request.getUserName(), request.getProfileImgUrl()));
-        Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUsersAndHospital(updateUser, updateUser.getSelectedHospital());
+        Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(updateUser, updateUser.getSelectedHospital());
         if (hospitalAuth.isPresent()){
             return updateUser.toResponse(hospitalAuth.get());
         }
@@ -91,7 +90,7 @@ public class UserService {
     @Transactional
     public UserResponse updateUser(User loginUser, UpdateFcmRequest request){
         User updateUser = userJpaRepository.save(loginUser.updateFcmToken(request.getFcmToken()));
-        Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUsersAndHospital(updateUser, updateUser.getSelectedHospital());
+        Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(updateUser, updateUser.getSelectedHospital());
         if (hospitalAuth.isPresent()){
             return updateUser.toResponse(hospitalAuth.get());
         }
@@ -111,7 +110,7 @@ public class UserService {
                 .orElseThrow(() -> new HospitalException(HospitalErrorCode.NOT_FOUND));
         //유저 병원 업데이트
         User updateUser = userJpaRepository.save(loginUser.updateHospital(selectHospital, request.getEmpNo()));
-        Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUsersAndHospital(updateUser, selectHospital);
+        Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(updateUser, selectHospital);
         if (hospitalAuth.isPresent()){
             return updateUser.toResponse(hospitalAuth.get());
         }

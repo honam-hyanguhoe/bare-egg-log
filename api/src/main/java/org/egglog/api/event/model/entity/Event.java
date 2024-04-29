@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(indexes = @Index(name = "idx_calendar_group_id", columnList = "calendar_group_id"))
 @Builder(toBuilder = true)
 public class Event {
 
