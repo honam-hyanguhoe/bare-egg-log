@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.user.model.entity.User;
+import org.egglog.api.work.model.dto.response.WorkResponse;
 import org.egglog.api.worktype.model.entity.WorkType;
 
 import java.time.LocalDate;
@@ -48,4 +49,13 @@ public class Work {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    public WorkResponse toResponse(){
+        return WorkResponse.builder()
+                .workId(this.id)
+                .workDate(this.workDate)
+                .workType(this.workType.toResponse())
+                .calendarGroup(this.calendarGroup.toResponse())
+                .build();
+    }
 }
