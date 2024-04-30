@@ -1,12 +1,10 @@
 package org.egglog.api.event.repository.jpa;
 
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.egglog.api.event.model.entity.Event;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -48,12 +46,14 @@ public class EventCustomQueryImpl implements EventCustomQuery {
      * @param userId
      * @return
      */
-    public Optional<List<Event>> findByMonthAndUserId(LocalDateTime startDate, LocalDateTime endDate, Long userId) {
+    @Override
+    public Optional<List<Event>> findEventsByMonthAndUserId(LocalDateTime startDate, LocalDateTime endDate, Long userId, Long calendarGroupId) {
         return Optional.ofNullable(jpaQueryFactory
                 .selectFrom(event)
                 .join(event.user, user)
                 .where(
                         user.id.eq(userId),
+                        event.calendarGroup.id.eq(calendarGroupId),
                         event.startDate.between(startDate, endDate)
                                 .or(event.endDate.between(startDate, endDate))
                 )
