@@ -1,29 +1,41 @@
 package org.egglog.api.scheduler;
 
+import com.google.api.gax.paging.Page;
+import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.Storage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.board.exception.BoardErrorCode;
 import org.egglog.api.board.exception.BoardException;
 import org.egglog.api.board.model.entity.Board;
 import org.egglog.api.board.repository.jpa.BoardJpaRepository;
 import org.egglog.api.board.repository.jpa.BoardQueryRepository;
+import org.egglog.api.calendar.exception.CalendarErrorCode;
+import org.egglog.api.calendar.exception.CalendarException;
+import org.egglog.api.calendar.model.service.CalendarService;
 import org.egglog.api.global.util.RedisViewCountUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.google.cloud.storage.Blob;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class BoardScheduler {
+
+    private final Bucket bucket;
 
     private final RedisViewCountUtil redisUtil;
     private final BoardQueryRepository boardQueryRepository;
     private final BoardJpaRepository boardJpaRepository;
     private final StringRedisTemplate redisTemplate;  // String 데이터를 저장하기에 적합한 RedisTemplate
+    private final CalendarService calendarService;
 
 
     /**
@@ -90,6 +102,29 @@ public class BoardScheduler {
 
         }
 
+    }
+    /**
+     * 매일 ics 파일 업데이트<br>
+     */
+    @Scheduled(cron = "0 2 * * *")
+    public void updateIcsFile(){
+        Iterator<Blob> blobIterator=null;
+        try {
+            Page<Blob> blobs = bucket.list();
+            blobIterator = (Iterator<Blob>) blobs.iterateAll();
+        }catch (Exception e){
+            throw new CalendarException(CalendarErrorCode.DATABASE_CONNECTION_FAILED);
+        }
+        while (blobIterator.hasNext()) {
+            Blob blob = blobIterator.next();
+            try {
+                // 사용자 id 가져오기
+                Long userId = Long.parseLong(blob.getBlobId().getName());
+                calendarService.updateIcs(userId);
+            }catch (Exception e){
+                log.warn(e.getMessage());
+            }
+        }
     }
 
 }

@@ -22,11 +22,4 @@ public class CalendarController {
         Long groupId = 1L;
         return ResponseEntity.ok().body(MessageUtils.success(calendarService.getIcsLink(user,groupId)));
     }
-//    @PostMapping("")
-//    public ResponseEntity<?> registerSchedule(@RequestBody ScheduleForm scheduleForm) {
-////        TODO @AuthenticationPrincipal User user
-//        Long userId = 1L;
-//        calendarService.
-//        return ResponseEntity.ok().body(MessageUtils.success());
-//    }
 }

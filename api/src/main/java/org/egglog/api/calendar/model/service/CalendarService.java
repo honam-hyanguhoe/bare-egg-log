@@ -1,6 +1,6 @@
 package org.egglog.api.calendar.model.service;
 
-import com.google.cloud.storage.Blob;
+
 import com.google.cloud.storage.Bucket;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -90,5 +90,9 @@ public class CalendarService {
             throw new CalendarException(CalendarErrorCode.DATABASE_CONNECTION_FAILED);
         }
         return blob;
+    }
+
+    public void updateIcs(Long userId) {
+
     }
 }
