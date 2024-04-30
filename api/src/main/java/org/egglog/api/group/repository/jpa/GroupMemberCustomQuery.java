@@ -14,6 +14,8 @@ public interface GroupMemberCustomQuery {
 
     Optional<GroupMember> findGroupMemberByGroupIdAndUserId(Long groupId, Long userId);
 
+    List<GroupMember> findGroupMemberAllByGroupId(Long groupId);
+
     Integer countGroupMember(Long groupId);
 }
 
