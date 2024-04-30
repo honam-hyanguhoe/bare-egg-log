@@ -19,14 +19,14 @@ public class BoardController {
     private final BoardService boardService;
 
     @GetMapping("/hot")
-    public ResponseEntity<?> getHotBoardList(@RequestParam("hospital_id") Long hospitalId, @RequestParam("group_id") Long groupId, @AuthenticationPrincipal User user) {
-        return ResponseEntity.ok().body(MessageUtils.success(boardService.getHotBoardList(hospitalId, groupId, user.getId())));
+    public ResponseEntity<?> getHotBoardList(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(MessageUtils.success(boardService.getHotBoardList(user)));
     }
 
 
     @GetMapping("")
-    public ResponseEntity<?> getBoardList(@RequestParam("hospital_id") Long hospitalId, @RequestParam("group_id") Long groupId,
-                                          @RequestParam("search_word") String searchWord, @RequestParam("last_board_id") Long lastBoardId,
+    public ResponseEntity<?> getBoardList(@RequestParam(value = "hospital_id", required = false) Long hospitalId, @RequestParam(value = "group_id", required = false) Long groupId,
+                                          @RequestParam(value = "search_word", required = false) String searchWord, @RequestParam(value = "last_board_id", required = false) Long lastBoardId,
                                           @AuthenticationPrincipal User user) {
         BoardListForm boardListForm = BoardListForm.builder()
                 .hospitalId(hospitalId)
