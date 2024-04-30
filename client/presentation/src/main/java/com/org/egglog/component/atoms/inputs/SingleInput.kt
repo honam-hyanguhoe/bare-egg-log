@@ -19,8 +19,8 @@ import com.org.egglog.utils.widthPercent
 @Composable
 fun SingleInput(
     text: String,
-    placeholder: String,
-    onValueChange: (String) -> Unit,
+        placeholder: String,
+        onValueChange: (String) -> Unit,
     focusManager: FocusManager,
     keyboardOptions: KeyboardOptions = KeyboardOptions()
 ) {
