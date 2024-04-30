@@ -18,6 +18,8 @@ import org.egglog.api.user.model.dto.request.UpdateUserRequest;
 import org.egglog.api.user.model.dto.response.UserResponse;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.repository.jpa.UserJpaRepository;
+import org.egglog.api.worktype.model.entity.WorkTag;
+import org.egglog.api.worktype.model.entity.WorkType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,8 +60,14 @@ public class UserService {
         Hospital hospital = hospitalJpaRepository.findById(request.getHospitalId())
                 .orElseThrow(() -> new HospitalException(HospitalErrorCode.NOT_FOUND));
         //todo 1. 기본 태그 자동 생성
-
-        //todo 2. 캘린더 그룹 자동 생성
+        WorkType.builder()
+                .title("DAY")
+                .color("F4D567")
+                .workTag(WorkTag.DAY)
+                .startTime()
+                .endTime()
+                .build();
+        //todo 2. 근무 일정 캘린더 그룹 자동 생성
 
         return userJpaRepository.save(loginUser.join(request.getUserName(), hospital, request.getEmpNo(), request.getFcmToken()))
                 .toResponse();
