@@ -106,7 +106,7 @@ public class BoardScheduler {
     /**
      * 매일 ics 파일 업데이트<br>
      */
-    @Scheduled(cron = "0 2 * * * ?")
+    @Scheduled(cron = "0 2 * * * ?:")
     public void updateIcsFile(){
         Iterator<Blob> blobIterator=null;
         try {

@@ -3,15 +3,13 @@ package org.egglog.api.work.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.user.model.entity.User;
-import org.egglog.api.work.model.dto.request.CreateWorkListRequest;
-import org.egglog.api.work.model.dto.request.EditAndDeleteWorkListRequest;
-import org.egglog.api.work.model.dto.request.EditAndDeleteWorkRequest;
-import org.egglog.api.work.model.dto.request.FindWorkListRequest;
+import org.egglog.api.work.model.dto.request.*;
 import org.egglog.api.work.model.service.WorkService;
 import org.egglog.utility.utils.MessageUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
 
 
 /**
@@ -37,7 +35,7 @@ public class WorkController {
     public ResponseEntity<MessageUtils> createWork(
             @AuthenticationPrincipal User loginUser,
             @RequestBody CreateWorkListRequest request
-            ){
+    ){
         workService.createWork(loginUser, request);
         return ResponseEntity.ok().body(
                 MessageUtils.success());
@@ -47,7 +45,7 @@ public class WorkController {
     public ResponseEntity<MessageUtils> updateWork(
             @AuthenticationPrincipal User loginUser,
             @RequestBody EditAndDeleteWorkListRequest request
-            ){
+    ){
         workService.updateWork(loginUser, request);
         return ResponseEntity.ok().body(MessageUtils.success());
     }
@@ -56,8 +54,17 @@ public class WorkController {
     public ResponseEntity<MessageUtils> findWorkList(
             @AuthenticationPrincipal User loginUser,
             @ModelAttribute FindWorkListRequest request
-            ){
+    ){
         return ResponseEntity.ok().body(
                 MessageUtils.success(workService.findWorkList(loginUser, request)));
+    }
+
+    @GetMapping("/find/user")
+    public ResponseEntity<MessageUtils> findGroupUserWorkList(
+            @AuthenticationPrincipal User loginUser,
+            @ModelAttribute FindGroupUserWorkListRequest request
+    ){
+        return ResponseEntity.ok().body(
+                MessageUtils.success(workService.findGroupUserWorkList(loginUser, request)));
     }
 }
