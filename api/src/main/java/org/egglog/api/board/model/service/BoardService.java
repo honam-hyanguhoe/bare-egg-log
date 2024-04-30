@@ -273,7 +273,11 @@ public class BoardService {
      * @return
      */
     private boolean isNotLiked(Long userId, Long boardId) {
-        return boardQueryRepository.getUserBoardLike(boardId, userId).isEmpty();
+        BoardLike userBoardLike = boardQueryRepository.getUserBoardLike(boardId, userId).orElseThrow(
+                () -> new BoardException(BoardErrorCode.ALREADY_LIKE)
+        );
+
+        return true;
     }
 
 
@@ -493,25 +497,18 @@ public class BoardService {
                 () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
         );
 
-        try {
-            //아직 좋아요 안눌렀다면
-            if (isNotLiked(userId, likeForm.getBoardId())) {
-                BoardLike boardLike = BoardLike.builder()
-                        .id(likeForm.getBoardId())
-                        .board(board)
-                        .user(user)
-                        .build();
+        //아직 좋아요 안눌렀다면
+        if (isNotLiked(userId, board.getId())) {
+            BoardLike boardLike = BoardLike.builder()
+                    .id(likeForm.getBoardId())
+                    .board(board)
+                    .user(user)
+                    .build();
 
-                boardLikeJpaRepository.save(boardLike);
-            }
-
-        } catch (DataAccessException e) {
-            throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new BoardException(BoardErrorCode.UNKNOWN_ERROR);
+            boardLikeJpaRepository.save(boardLike);
         }
     }
+
 
     /**
      * 공감(좋아요) 취소 메서드<br/>
@@ -519,22 +516,22 @@ public class BoardService {
      * - LikeForm: 좋아요 취소 하려는 boardId를 담고있음.<br/>
      * - boardId를 가지고 공감을 취소 시킨다.
      *
-     * @param likeForm
+     * @param boardId
      * @param userId
      */
-    public void deleteLike(LikeForm likeForm, Long userId) {
+    public void deleteLike(Long boardId, Long userId) {
         User user = userQueryRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
 
-        Board board = boardQueryRepository.findById(likeForm.getBoardId()).orElseThrow(
+        Board board = boardQueryRepository.findById(boardId).orElseThrow(
                 () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
         );
 
         try {
             //이미 좋아요를 눌렀다면
-            if (!isNotLiked(userId, likeForm.getBoardId())) {
-                Optional<BoardLike> boardLike = boardLikeQueryRepository.getBoardLikeByBoardId(likeForm.getBoardId());
+            if (!isNotLiked(userId, boardId)) {
+                Optional<BoardLike> boardLike = boardLikeQueryRepository.getBoardLikeByBoardId(boardId);
                 boardLikeJpaRepository.delete(boardLike.get());
             }
         } catch (DataAccessException e) {

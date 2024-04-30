@@ -67,9 +67,9 @@ public class BoardController {
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }
 
-    @DeleteMapping("/unlike")
-    public ResponseEntity<?> deleteLike(@RequestBody LikeForm likeForm, @AuthenticationPrincipal User user) {
-        boardService.deleteLike(likeForm, user.getId());
+    @DeleteMapping("/unlike/{board_id}")
+    public ResponseEntity<?> deleteLike(@PathVariable("board_id") Long boardId, @AuthenticationPrincipal User user) {
+        boardService.deleteLike(boardId, user.getId());
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
     }
 }
