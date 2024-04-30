@@ -30,7 +30,7 @@ public class CalendarGroup {
 
     public CalendarGroupResponse toResponse(){
         return CalendarGroupResponse.builder()
-                .CalendarGroupId(this.id)
+                .calendarGroupId(this.id)
                 .alias(this.alias)
                 .url(this.url)
                 .build();

@@ -23,6 +23,9 @@ public class WorkType {
     @Column(name = "work_type_title")
     private String title;        //Day, Eve, Night, 교육, Off, 보건, None 등
 
+    @Enumerated(EnumType.STRING)
+    private WorkTag workTag; //Day, Eve, Night, 교육, Off, 보건, None 등
+
     @Column(name = "work_type_color")
     private String color;       //색상
 

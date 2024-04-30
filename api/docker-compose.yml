@@ -8,6 +8,8 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
+    environment:
+      - TZ=Asia/Seoul
     ports:
       - "8010:8010"
     networks:
