@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -57,23 +58,23 @@ public class CommentServiceImpl implements CommentService {
         List<CommentListOutputSpec> commentList = new ArrayList<>();
 
         try {
-            List<Comment> comments = commentQueryRepository.getCommentListByBoardId(boardId);
-            if (comments != null) {
+            Optional<List<Comment>> commentResult = commentQueryRepository.getCommentListByBoardId(boardId);
+            if (commentResult.isPresent()) {
                 //댓글이 있다면
-                for (Comment comment : comments) {
+                for (Comment comment : commentResult.get()) {
                     List<RecommentOutputSpec> recomments = new ArrayList<>();
-                    List<Comment> recommentList = commentQueryRepository.getRecommentListByCommentId(comment.getId());
+                    Optional<List<Comment>> recommentResult = commentQueryRepository.getRecommentListByCommentId(comment.getId());
 
                     //대댓글이 있다면
-                    if (recommentList != null) {
-                        for (Comment recomment : recommentList) {
+                    if (recommentResult.isPresent()) {
+                        for (Comment recomment : recommentResult.get()) {
                             RecommentOutputSpec recommentListOutputSpec = RecommentOutputSpec.builder()
                                     .commentId(recomment.getId())
                                     .commentContent(recomment.getContent())
-//                                    .hospitalName(recomment.getUser().getHospital().getHospitalName())
+                                    .hospitalName(recomment.getUser().getSelectedHospital().getHospitalName())
                                     .userId(recomment.getUser().getId())
                                     .tempNickname(recomment.getTempNickname())
-                                    .commentCreateAt(recomment.getCreatedAt())
+//                                    .commentCreateAt(recomment.getCreatedAt())
                                     .profileImgUrl(recomment.getUser().getProfileImgUrl())
                                     .build();
 
@@ -83,10 +84,10 @@ public class CommentServiceImpl implements CommentService {
                     CommentListOutputSpec commentListOutputSpec = CommentListOutputSpec.builder()
                             .commentId(comment.getId())
                             .commentContent(comment.getContent())
-//                            .hospitalName(comment.getUser().getHospital().getHospitalName())
+                            .hospitalName(comment.getUser().getSelectedHospital().getHospitalName())
                             .userId(comment.getUser().getId())
                             .tempNickname(comment.getTempNickname())
-                            .commentCreateAt(comment.getCreatedAt())
+//                            .commentCreateAt(comment.getCreatedAt())
                             .profileImgUrl(comment.getUser().getProfileImgUrl())
                             .recomments(recomments)
                             .build();
@@ -133,6 +134,8 @@ public class CommentServiceImpl implements CommentService {
                 .user(user)
                 .board(board)
                 .build();
+
+        board.setIsCommented(true);     //댓글 생김
 
         try {
             commentJpaRepository.save(comment);
