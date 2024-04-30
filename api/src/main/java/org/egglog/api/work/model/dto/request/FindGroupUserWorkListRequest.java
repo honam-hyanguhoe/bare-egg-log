@@ -22,8 +22,9 @@ import java.time.LocalDate;
 @Setter
 @Builder
 public class FindGroupUserWorkListRequest {
-    private Long calendarGroupId;
-    private Long groupUserId;
+    private Long userGroupId;
+    private Long targetUserId;
+
     private LocalDate startDate;
     private LocalDate endDate;
 }
