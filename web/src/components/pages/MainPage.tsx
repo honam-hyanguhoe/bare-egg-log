@@ -31,6 +31,8 @@ import MailInputBox from "../atoms/admin/main/inquiry/MailInputBox";
 import CategoryListBox from "../atoms/admin/sidebar/CategoryListBox";
 import LogoutButton from "../atoms/admin/sidebar/LogoutButton";
 import SideBar from "../organisms/admin/sidebar/SideBar";
+import TabBar from "../molecules/admin/main/common/TabBar";
+import InfoDetailList from "../molecules/admin/main/confirm/InfoDetailList";
 
 const MainPage = () => {
   const handleLoginClick = () => {
@@ -72,10 +74,7 @@ const MainPage = () => {
    imageSecond: ConfirmDefaultImage02
   }
 
-  const defaultInfoDetailElement : InfoDetailElement = {
-    item: "항목",
-    desc: "동그란병원"
-  }
+
 
   return (
     <>
@@ -83,8 +82,7 @@ const MainPage = () => {
       <LoginInputBox type={"email"} />
       <LoginInputBox type={"password"} />
       <LoginButton onClick={handleLoginClick} />
-      <TabBox isActive={true} text={"선택1"} />
-        <TabBox isActive={false} text={"선택2"} />
+
         <Title title={"소제목"} />
         <UserInfo user={defaultUser} />
         <InquiryUserListBox inquiry={defaultInquiryUserTrue} />
@@ -94,12 +92,12 @@ const MainPage = () => {
         <ChangeStatusButton id={new BigNumber(1)} />
         <MailSendButton email={defaultUser.email} />
         {/*<ConfirmImageBox images={defaultImages}/>*/}
-        <ContentTitle title={"문의사항"} />
-        <InfoDetailTitle title={"병원 정보"}/>
-      <InfoDetailListElement infoDetailElement={defaultInfoDetailElement}/>
       <InquiryDetail content={defaultInquiryTrue.content}/>
+        <ContentTitle title={"문의사항"} />
+      <InfoDetailList/>
+
+      <TabBar/>
       <MailInputBox/>
-      <LogoutButton/>
       <SideBar/>
     </>
   );

@@ -10,6 +10,15 @@ const StyledSideBar = styled.div`
   flex-direction: column;
   justify-content: space-between;
   height: 30em;
+  width: 20vw;
+  min-width: 17em;
+  padding: 3em 1em 1em;
+  
+  & > .upperSideBar {
+    display: flex;
+    flex-direction: column;
+    gap: 5em;
+  }
 `;
 const SideBar = () => {
   return <StyledSideBar>

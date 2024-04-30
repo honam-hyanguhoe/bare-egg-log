@@ -9,10 +9,9 @@ const StyledTabBox = styled.h2<{ isActive:boolean }>`
   font-size: 1.2em;
   font-weight: 600;
   font-family: "Line-Seed-Sans-App";
-  color: #000;
+  color: ${props => props.isActive ? '#3C3C43' : '#98A2B3'};
   text-align: center;
-  padding-top: 0.8em;
-  padding-bottom: 0.8em;
+  padding: 0.8em 2em; 
   border-bottom: 2px ${props => props.isActive ? 'solid' : 'hidden'} #FEC84B; // 언더라인 설정
 `;
 
