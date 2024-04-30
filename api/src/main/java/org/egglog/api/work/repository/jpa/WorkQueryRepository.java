@@ -2,17 +2,17 @@ package org.egglog.api.work.repository.jpa;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.egglog.api.user.model.entity.User;
 import org.springframework.stereotype.Repository;
-import org.egglog.api.work.model.entity.QWork;
-import org.egglog.api.user.model.entity.QUser;
-import org.egglog.api.calendargroup.model.entity.QCalendarGroup;
-import org.egglog.api.worktype.model.entity.QWorkType;
 import org.egglog.api.work.model.entity.Work;
 
 import static org.egglog.api.work.model.entity.QWork.work;
 import static org.egglog.api.user.model.entity.QUser.user;
 import static org.egglog.api.calendargroup.model.entity.QCalendarGroup.calendarGroup;
 import static org.egglog.api.worktype.model.entity.QWorkType.workType;
+
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -72,5 +72,28 @@ public class WorkQueryRepository {
                 .where(work.id.eq(workId))
                 .fetchOne());
     }
+    /**
+     * 특정 캘린더 그룹의 일정 날짜 범위 내의 근무 일정을 조회합니다.
+     * @param calendarGroupId 캘린더 그룹 ID
+     * @param startDate 시작 날짜
+     * @param endDate 종료 날짜
+     * @return 조회된 근무 일정 목록
+     */
+    public List<Work> findWorkListWithWorkTypeByTime(Long calendarGroupId, LocalDate startDate, LocalDate endDate){
+        return jpaQueryFactory
+                .selectFrom(work)
+                .leftJoin(work.workType, workType).fetchJoin() // WorkType과 함께 조인
+                .where(work.calendarGroup.id.eq(calendarGroupId) // 캘린더 그룹 ID 필터
+                        .and(work.workDate.between(startDate, endDate))) // 날짜 범위 필터
+                .fetch();
+    }
 
+    public List<Work> findWorkListWithWorkTypeByTimeAndTargetUser(Long targetUserId, LocalDate startDate, LocalDate endDate){
+        return jpaQueryFactory
+                .selectFrom(work)
+                .leftJoin(work.workType, workType).fetchJoin() // WorkType과 함께 조인
+                .where(work.user.id.eq(targetUserId)
+                        .and(work.workDate.between(startDate, endDate))) // 날짜 범위 필터
+                .fetch();
+    }
 }

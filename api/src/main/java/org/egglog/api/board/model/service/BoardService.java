@@ -34,6 +34,19 @@ import java.util.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+/**
+ * ## ${NAME}
+ * * packageName    : ${PACKAGE_NAME}
+ * * fileName       : ${NAME}
+ * author         : ${USER}
+ * date           : ${DATE}
+ * description    :
+ * ===========================================================
+ * DATE              AUTHOR             NOTE
+ * -----------------------------------------------------------
+ * ${DATE}        ${USER}       최초 생성
+ */
+
 public class BoardService {
 
     //사용자

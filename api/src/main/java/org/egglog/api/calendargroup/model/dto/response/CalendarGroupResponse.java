@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CalendarGroupResponse {
-    private Long CalendarGroupId;
+    private Long calendarGroupId;
     private String url;
     private String alias;
 }

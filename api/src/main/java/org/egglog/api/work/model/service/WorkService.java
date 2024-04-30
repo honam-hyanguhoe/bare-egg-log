@@ -6,12 +6,17 @@ import org.egglog.api.calendargroup.exception.CalendarGroupErrorCode;
 import org.egglog.api.calendargroup.exception.CalendarGroupException;
 import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.calendargroup.repository.jpa.CalendarGroupRepository;
+import org.egglog.api.group.model.entity.GroupMember;
+import org.egglog.api.group.repository.jpa.GroupMemberRepository;
+import org.egglog.api.user.exception.UserErrorCode;
+import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
+import org.egglog.api.user.repository.jpa.UserJpaRepository;
 import org.egglog.api.work.exception.WorkErrorCode;
 import org.egglog.api.work.exception.WorkException;
-import org.egglog.api.work.model.dto.request.CreateWorkListRequest;
-import org.egglog.api.work.model.dto.request.EditAndDeleteWorkListRequest;
-import org.egglog.api.work.model.dto.request.EditAndDeleteWorkRequest;
+import org.egglog.api.work.model.dto.request.*;
+import org.egglog.api.work.model.dto.response.WorkListResponse;
+import org.egglog.api.work.model.dto.response.WorkResponse;
 import org.egglog.api.work.model.entity.Work;
 import org.egglog.api.work.repository.jpa.WorkJpaRepository;
 import org.egglog.api.work.repository.jpa.WorkQueryRepository;
@@ -47,6 +52,8 @@ public class WorkService {
     private final WorkQueryRepository workQueryRepository;
     private final CalendarGroupRepository calendarGroupRepository;
     private final WorkTypeJpaRepository workTypeJpaRepository;
+    private final GroupMemberRepository groupMemberRepository;
+    private final UserJpaRepository userJpaRepository;
 
     @Transactional
     public void createWork(User loginUser, CreateWorkListRequest request){
@@ -84,6 +91,45 @@ public class WorkService {
             }
         }).collect(Collectors.toList()));
     }
+
+    @Transactional(readOnly = true)
+    public WorkListResponse findWorkList(User loginUser, FindWorkListRequest request){
+        CalendarGroup calendarGroup = calendarGroupRepository.findCalendarGroupWithUserById(request.getCalendarGroupId())
+                .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
+        if (calendarGroup.getUser().getId()!=loginUser.getId()) throw new WorkException(WorkErrorCode.ACCESS_DENIED);
+        List<WorkResponse> workResponses = workQueryRepository.findWorkListWithWorkTypeByTime(request.getCalendarGroupId(), request.getStartDate(), request.getEndDate())
+                .stream()
+                .map(Work::toResponse)
+                .collect(Collectors.toList());
+        return WorkListResponse.builder()
+                .calendarGroup(calendarGroup.toResponse())
+                .workList(workResponses)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<WorkResponse> findGroupUserWorkList(User loginUser, FindGroupUserWorkListRequest request){
+        User targetUser = userJpaRepository.findById(request.getTargetUserId()).orElseThrow(() -> new UserException(UserErrorCode.NOT_EXISTS_USER));
+
+        // 그룹 멤버 목록 조회
+        List<GroupMember> groupMembers = groupMemberRepository.findGroupMemberAllByGroupId(request.getUserGroupId());
+
+        // 로그인한 사용자와 대상 사용자가 같은 그룹에 있는지 확인
+        boolean isLoginUserInGroup = groupMembers.stream()
+                .anyMatch(member -> member.getUser().getId().equals(loginUser.getId()));
+        boolean isTargetUserInGroup = groupMembers.stream()
+                .anyMatch(member -> member.getUser().getId().equals(targetUser.getId()));
+        if (!isLoginUserInGroup || !isTargetUserInGroup) throw new WorkException(WorkErrorCode.ACCESS_DENIED);
+
+
+        return workQueryRepository
+                .findWorkListWithWorkTypeByTimeAndTargetUser(targetUser.getId(), request.getStartDate(), request.getEndDate())
+                .stream()
+                .map(Work::toResponse)
+                .collect(Collectors.toList());
+    }
+
+
 
 
 }
