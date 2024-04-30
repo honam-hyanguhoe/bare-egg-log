@@ -274,4 +274,8 @@ public class GroupService {
             throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
         }
     }
+
+//    public GroupDutySummary getGroupDuty(User user, String date) {
+//        return groupMemberService.getGroupDutySummary(user)
+//    }
 }

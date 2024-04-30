@@ -117,7 +117,8 @@ public class GroupController {
     }
 
     @GetMapping("/duty/{groupId}")
-    public ResponseEntity getGroupDuty(@AuthenticationPrincipal User user){
+    public ResponseEntity getGroupDuty(@AuthenticationPrincipal User user, @RequestParam("date") String date){
+        groupService.getGroupDuty(user,date);
         return ResponseEntity.ok().body(MessageUtils.success());
     }
 }
