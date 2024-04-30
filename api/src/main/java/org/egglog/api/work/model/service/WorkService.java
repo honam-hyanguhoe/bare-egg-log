@@ -12,6 +12,9 @@ import org.egglog.api.work.exception.WorkException;
 import org.egglog.api.work.model.dto.request.CreateWorkListRequest;
 import org.egglog.api.work.model.dto.request.EditAndDeleteWorkListRequest;
 import org.egglog.api.work.model.dto.request.EditAndDeleteWorkRequest;
+import org.egglog.api.work.model.dto.request.FindWorkListRequest;
+import org.egglog.api.work.model.dto.response.WorkListResponse;
+import org.egglog.api.work.model.dto.response.WorkResponse;
 import org.egglog.api.work.model.entity.Work;
 import org.egglog.api.work.repository.jpa.WorkJpaRepository;
 import org.egglog.api.work.repository.jpa.WorkQueryRepository;
@@ -84,6 +87,23 @@ public class WorkService {
             }
         }).collect(Collectors.toList()));
     }
+
+    @Transactional(readOnly = true)
+    public WorkListResponse findWorkList(User loginUser, FindWorkListRequest request){
+        CalendarGroup calendarGroup = calendarGroupRepository.findCalendarGroupWithUserById(request.getCalendarGroupId())
+                .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
+        if (calendarGroup.getUser().getId()!=loginUser.getId()) throw new WorkException(WorkErrorCode.ACCESS_DENIED);
+        List<WorkResponse> workResponses = workQueryRepository.findWorkListAllByTime(request.getCalendarGroupId(), request.getStartDate(), request.getEndDate())
+                .stream()
+                .map(Work::toResponse)
+                .collect(Collectors.toList());
+        return WorkListResponse.builder()
+                .calendarGroup(calendarGroup.toResponse())
+                .workList(workResponses)
+                .build();
+    }
+
+
 
 
 }

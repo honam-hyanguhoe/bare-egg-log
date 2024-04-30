@@ -6,6 +6,7 @@ import org.egglog.api.user.model.entity.User;
 import org.egglog.api.work.model.dto.request.CreateWorkListRequest;
 import org.egglog.api.work.model.dto.request.EditAndDeleteWorkListRequest;
 import org.egglog.api.work.model.dto.request.EditAndDeleteWorkRequest;
+import org.egglog.api.work.model.dto.request.FindWorkListRequest;
 import org.egglog.api.work.model.service.WorkService;
 import org.egglog.utility.utils.MessageUtils;
 import org.springframework.http.ResponseEntity;
@@ -49,5 +50,14 @@ public class WorkController {
             ){
         workService.updateWork(loginUser, request);
         return ResponseEntity.ok().body(MessageUtils.success());
+    }
+
+    @GetMapping("/find")
+    public ResponseEntity<MessageUtils> findWorkList(
+            @AuthenticationPrincipal User loginUser,
+            @ModelAttribute FindWorkListRequest request
+            ){
+        return ResponseEntity.ok().body(
+                MessageUtils.success(workService.findWorkList(loginUser, request)));
     }
 }

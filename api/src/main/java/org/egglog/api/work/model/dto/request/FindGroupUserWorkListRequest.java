@@ -1,5 +1,9 @@
 package org.egglog.api.work.model.dto.request;
 
+import lombok.*;
+
+import java.time.LocalDate;
+
 /**
  * ```
  * ===================[Info]=========================
@@ -12,10 +16,14 @@ package org.egglog.api.work.model.dto.request;
  * |:---:|:---:|:---:|
  * |2024-04-29|김형민|최초 생성|
  */
-//@AllArgsConstructor
-//@NoArgsConstructor
-//@Getter
-//@Setter
-//@Builder
-public class FindMonthlyGroupUserWorkListRequest {
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder
+public class FindGroupUserWorkListRequest {
+    private Long calendarGroupId;
+    private Long groupUserId;
+    private LocalDate startDate;
+    private LocalDate endDate;
 }
