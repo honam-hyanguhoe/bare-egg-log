@@ -53,4 +53,14 @@ public class WorkType {
                 .endTime(this.endTime)
                 .build();
     }
+
+    public WorkType edit(String title, WorkTag workTag, String color, String workTypeImgUrl, LocalTime startTime, LocalTime endTime){
+        this.title = title;
+        this.workTag = workTag;
+        this.color = color;
+        this.workTypeImgUrl = workTypeImgUrl;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        return this;
+    }
 }
