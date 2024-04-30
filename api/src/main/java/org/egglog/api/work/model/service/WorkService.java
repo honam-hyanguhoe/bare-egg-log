@@ -19,7 +19,6 @@ import org.egglog.api.work.model.dto.response.WorkListResponse;
 import org.egglog.api.work.model.dto.response.WorkResponse;
 import org.egglog.api.work.model.entity.Work;
 import org.egglog.api.work.repository.jpa.WorkJpaRepository;
-import org.egglog.api.work.repository.jpa.WorkQueryRepository;
 import org.egglog.api.worktype.model.entity.WorkType;
 import org.egglog.api.worktype.repository.jpa.WorkTypeJpaRepository;
 import org.springframework.stereotype.Service;
@@ -49,7 +48,6 @@ import java.util.stream.Stream;
 public class WorkService {
 
     private final WorkJpaRepository workJpaRepository;
-    private final WorkQueryRepository workQueryRepository;
     private final CalendarGroupRepository calendarGroupRepository;
     private final WorkTypeJpaRepository workTypeJpaRepository;
     private final GroupMemberRepository groupMemberRepository;
@@ -97,7 +95,7 @@ public class WorkService {
         CalendarGroup calendarGroup = calendarGroupRepository.findCalendarGroupWithUserById(request.getCalendarGroupId())
                 .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
         if (calendarGroup.getUser().getId()!=loginUser.getId()) throw new WorkException(WorkErrorCode.ACCESS_DENIED);
-        List<WorkResponse> workResponses = workQueryRepository.findWorkListWithWorkTypeByTime(request.getCalendarGroupId(), request.getStartDate(), request.getEndDate())
+        List<WorkResponse> workResponses = workJpaRepository.findWorkListWithWorkTypeByTime(request.getCalendarGroupId(), request.getStartDate(), request.getEndDate())
                 .stream()
                 .map(Work::toResponse)
                 .collect(Collectors.toList());
@@ -122,7 +120,7 @@ public class WorkService {
         if (!isLoginUserInGroup || !isTargetUserInGroup) throw new WorkException(WorkErrorCode.ACCESS_DENIED);
 
 
-        return workQueryRepository
+        return workJpaRepository
                 .findWorkListWithWorkTypeByTimeAndTargetUser(targetUser.getId(), request.getStartDate(), request.getEndDate())
                 .stream()
                 .map(Work::toResponse)

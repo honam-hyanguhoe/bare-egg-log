@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface HospitalAuthJpaRepository extends JpaRepository<HospitalAuth, Long> {
+public interface HospitalAuthJpaRepository extends JpaRepository<HospitalAuth, Long>, HospitalAuthQueryRepository {
 
     Optional<HospitalAuth> findByUserAndHospital(User user, Hospital userSelectHospital);
 

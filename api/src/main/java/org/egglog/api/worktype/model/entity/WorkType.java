@@ -21,10 +21,10 @@ public class WorkType {
     private Long id;
 
     @Column(name = "work_type_title")
-    private String title;        //Day, Eve, Night, 교육, Off, 보건, None 등
+    private String title;        //태그 이름
 
     @Enumerated(EnumType.STRING)
-    private WorkTag workTag; //Day, Eve, Night, 교육, Off, 보건, None 등
+    private WorkTag workTag; //Day, Eve, Night, Off, ETC 태그 속성
 
     @Column(name = "work_type_color")
     private String color;       //색상
@@ -46,6 +46,7 @@ public class WorkType {
         return WorkTypeResponse.builder()
                 .workTypeId(this.id)
                 .title(this.title)
+                .workTag(this.workTag)
                 .color(this.color)
                 .workTypeImgUrl(this.workTypeImgUrl)
                 .startTime(this.startTime)

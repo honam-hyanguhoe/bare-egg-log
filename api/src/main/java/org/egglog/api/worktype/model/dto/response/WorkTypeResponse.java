@@ -1,6 +1,8 @@
 package org.egglog.api.worktype.model.dto.response;
 
 import lombok.*;
+import org.egglog.api.worktype.model.entity.WorkTag;
+
 import java.time.LocalTime;
 
 /**
@@ -22,9 +24,10 @@ import java.time.LocalTime;
 @Builder
 public class WorkTypeResponse {
     private Long workTypeId;
-    private String title;        //Day, Eve, Night, 교육, Off, 보건, None 등
+    private String title;
     private String color;       //색상
     private String workTypeImgUrl;      //근무 이미지
+    private WorkTag workTag; //Day, Eve, Night, Off, ETC 태그 속성
     private LocalTime startTime;       //시작시간
     private LocalTime endTime;     //종료 시간
 }

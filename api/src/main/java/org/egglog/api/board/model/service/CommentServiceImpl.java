@@ -18,7 +18,8 @@ import org.egglog.api.board.repository.jpa.CommentQueryRepository;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
-import org.egglog.api.user.repository.jpa.UserQueryRepository;
+import org.egglog.api.user.repository.jpa.UserJpaRepository;
+import org.egglog.api.user.repository.jpa.UserQueryRepositoryImpl;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +33,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
-    private final UserQueryRepository userQueryRepository;
+    private final UserJpaRepository userJpaRepository;
 
     private final BoardQueryRepository boardQueryRepository;
 
@@ -118,7 +119,7 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public void registComment(CommentForm commentForm, Long userId) {
-        User user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userJpaRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
 
@@ -159,7 +160,7 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public void deleteComment(Long commentId, Long userId) {
-        User user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userJpaRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
 

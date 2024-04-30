@@ -7,7 +7,7 @@ import org.egglog.api.hospital.exception.HospitalException;
 import org.egglog.api.hospital.model.entity.Hospital;
 import org.egglog.api.hospital.model.entity.HospitalAuth;
 import org.egglog.api.hospital.repository.jpa.HospitalAuthJpaRepository;
-import org.egglog.api.hospital.repository.jpa.HospitalAuthQueryRepository;
+import org.egglog.api.hospital.repository.jpa.HospitalAuthQueryRepositoryImpl;
 import org.egglog.api.hospital.repository.jpa.HospitalJpaRepository;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
@@ -18,7 +18,6 @@ import org.egglog.api.user.model.dto.request.UpdateUserRequest;
 import org.egglog.api.user.model.dto.response.UserResponse;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.repository.jpa.UserJpaRepository;
-import org.egglog.api.user.repository.jpa.UserQueryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,14 +28,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserJpaRepository userJpaRepository;
-    private final UserQueryRepository userQueryRepository;
     private final HospitalJpaRepository hospitalJpaRepository;
     private final HospitalAuthJpaRepository hospitalAuthJpaRepository;
-    private final HospitalAuthQueryRepository hospitalAuthQueryRepository;
 
     @Transactional(readOnly = true)
     public UserResponse findById(Long id){
-        return userQueryRepository.findByIdWithHospital(id)
+        return userJpaRepository.findByIdWithHospital(id)
                 .orElseThrow(()->new UserException(UserErrorCode.NOT_EXISTS_USER))
                 .toResponse();
     }
@@ -60,6 +57,10 @@ public class UserService {
     public UserResponse joinUser(User loginUser, JoinUserRequest request){
         Hospital hospital = hospitalJpaRepository.findById(request.getHospitalId())
                 .orElseThrow(() -> new HospitalException(HospitalErrorCode.NOT_FOUND));
+        //todo 1. 기본 태그 자동 생성
+
+        //todo 2. 캘린더 그룹 자동 생성
+
         return userJpaRepository.save(loginUser.join(request.getUserName(), hospital, request.getEmpNo(), request.getFcmToken()))
                 .toResponse();
     }

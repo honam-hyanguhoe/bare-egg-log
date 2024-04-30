@@ -55,7 +55,6 @@ public class Work {
                 .workId(this.id)
                 .workDate(this.workDate)
                 .workType(this.workType.toResponse())
-//                .calendarGroup(this.calendarGroup.toResponse())
                 .build();
     }
 }
