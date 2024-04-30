@@ -2,6 +2,7 @@ package org.egglog.api.calendargroup.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.egglog.api.calendargroup.model.dto.response.CalendarGroupResponse;
 import org.egglog.api.user.model.entity.User;
 
 @Entity
@@ -26,4 +27,12 @@ public class CalendarGroup {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    public CalendarGroupResponse toResponse(){
+        return CalendarGroupResponse.builder()
+                .CalendarGroupId(this.id)
+                .alias(this.alias)
+                .url(this.url)
+                .build();
+    }
 }
