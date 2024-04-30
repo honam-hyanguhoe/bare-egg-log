@@ -115,4 +115,9 @@ public class GroupController {
         groupService.generateGroup(groupForm,user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }
+
+    @GetMapping("/duty/{groupId}")
+    public ResponseEntity getGroupDuty(@AuthenticationPrincipal User user){
+        return ResponseEntity.ok().body(MessageUtils.success());
+    }
 }
