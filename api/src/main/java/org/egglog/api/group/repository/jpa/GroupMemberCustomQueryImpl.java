@@ -23,6 +23,15 @@ public class GroupMemberCustomQueryImpl implements GroupMemberCustomQuery{
                 .where(groupMember.group.id.eq(groupId).and(groupMember.isAdmin.isFalse()))
                 .fetch());
     }
+
+    @Override
+    public List<GroupMember> findGroupMemberAllByGroupId(Long groupId) {
+        return jpaQueryFactory
+                .selectFrom(groupMember)
+                .where(groupMember.group.id.eq(groupId))
+                .fetch();
+    }
+
     @Override
     public Optional<GroupMember> findGroupBossMemberByGroupId(Long groupId) {
         return Optional.ofNullable(jpaQueryFactory
