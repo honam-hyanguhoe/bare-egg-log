@@ -1,6 +1,5 @@
 package org.egglog.api.calendar.model.service;
 
-
 import com.google.cloud.storage.Bucket;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,18 +17,48 @@ import org.egglog.api.calendar.exception.CalendarErrorCode;
 import org.egglog.api.calendar.exception.CalendarException;
 import org.egglog.api.user.model.entity.User;
 import org.springframework.stereotype.Service;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.ZoneId;
 import java.time.temporal.Temporal;
 import java.util.Date;
+import org.egglog.api.calendar.model.dto.params.CalendarMonthRequest;
+import org.egglog.api.calendar.model.dto.response.CalendarListResponse;
+import org.egglog.api.calendargroup.exception.CalendarGroupErrorCode;
+import org.egglog.api.calendargroup.exception.CalendarGroupException;
+import org.egglog.api.calendargroup.model.dto.response.CalendarGroupResponse;
+import org.egglog.api.calendargroup.model.entity.CalendarGroup;
+import org.egglog.api.calendargroup.repository.jpa.CalendarGroupRepository;
+import org.egglog.api.event.model.dto.response.EventListOutputSpec;
+import org.egglog.api.event.model.entity.Event;
+import org.egglog.api.event.model.service.EventService;
+import org.egglog.api.event.repository.jpa.EventCustomQueryImpl;
+import org.egglog.api.event.repository.jpa.EventRepository;
+import org.egglog.api.work.model.dto.response.WorkListResponse;
+import org.egglog.api.work.model.dto.response.WorkResponse;
+import org.egglog.api.work.model.entity.Work;
+import org.egglog.api.work.repository.jpa.WorkQueryRepository;
+import org.egglog.api.worktype.model.dto.response.WorkTypeResponse;
+import org.egglog.api.worktype.model.entity.WorkType;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class CalendarService {
     private final Bucket bucket;
+
+    private final EventRepository eventRepository;
+
+    private final WorkQueryRepository workQueryRepository;
+
+    private final CalendarGroupRepository calendarGroupRepository;
+
 
     public void createCalendar() {
         Calendar calendar = new Calendar();
@@ -67,29 +96,105 @@ public class CalendarService {
 
         return calendar;
     }
-
 //    public Calendar getCalendar() {
 //
 //    }
-    public String getIcsLink(User user, Long calendarGroupId){
+    public String getIcsLink(User user, Long calendarGroupId) {
         //TODO data query
-        String blob = "/ics/"+user.getId()+"/"+calendarGroupId+"/calendar.ics";
+        String blob = "/ics/" + user.getId() + "/" + calendarGroupId + "/calendar.ics";
         Calendar calendar = createEmptyCalendar();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
             new CalendarOutputter().output(calendar, outputStream);
             // 파일을 바이트 배열로 변환
             byte[] bytes = outputStream.toByteArray();
-            if(bucket.get(blob) != null) {
+            if (bucket.get(blob) != null) {
                 bucket.get(blob).delete();
             }
             // Firebase Storage에 파일 업로드
             bucket.create(blob, bytes, "text/calendar");
-        }catch (IOException e){
+        } catch (IOException e) {
             log.warn("here");
             throw new CalendarException(CalendarErrorCode.DATABASE_CONNECTION_FAILED);
         }
         return blob;
+    }
+    /**
+     * 한달 조회
+     * 개인 일정 + 근무
+     *
+     * @param calendarMonthRequest
+     * @return
+     */
+    public CalendarListResponse getCalendarListByMonth(CalendarMonthRequest calendarMonthRequest) {
+        LocalDateTime startDate = calendarMonthRequest.getStartDate();
+        LocalDateTime endDate = calendarMonthRequest.getEndDate();
+        Long calendarGroupId = calendarMonthRequest.getCalendarGroupId();
+        Long userId = calendarMonthRequest.getUserId();
+
+        CalendarGroup calendarGroup = calendarGroupRepository.findById(calendarGroupId).orElseThrow(
+                () -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP)
+        );
+
+        List<Work> workList = workQueryRepository.findWorkListWithWorkTypeByTime(calendarMonthRequest.getCalendarGroupId(), startDate.toLocalDate(), endDate.toLocalDate());
+        Optional<List<Event>> eventsByMonthAndUserId = eventRepository.findEventsByMonthAndUserId(startDate, endDate, userId, calendarGroupId);
+
+        List<WorkResponse> workResponseList = new ArrayList<>();
+//        private List<WorkResponse> workList;
+//        private CalendarGroupResponse calendarGroup;
+        List<EventListOutputSpec> eventListOutputSpecList = new ArrayList<>();
+
+        for (Work work : workList) {
+            WorkType workType = work.getWorkType();
+            WorkTypeResponse workTypeResponse = WorkTypeResponse.builder()
+                    .workTypeId(workType.getId())
+                    .workTypeImgUrl(workType.getWorkTypeImgUrl())
+                    .color(workType.getColor())
+                    .title(workType.getTitle())
+                    .startTime(workType.getStartTime())
+                    .endTime(workType.getEndTime())
+                    .build();
+
+            WorkResponse workResponse = WorkResponse.builder()
+                    .workId(work.getId())
+                    .workDate(work.getWorkDate())
+                    .workType(workTypeResponse)
+                    .build();
+
+            workResponseList.add(workResponse);
+        }
+
+        CalendarGroupResponse calendarGroupResponse = CalendarGroupResponse.builder()
+                .calendarGroupId(calendarGroupId)
+                .url(calendarGroup.getUrl())
+                .alias(calendarGroup.getAlias())
+                .build();
+
+        WorkListResponse workListResponse = WorkListResponse.builder()
+                .workList(workResponseList)
+                .calendarGroup(calendarGroupResponse)
+                .build();
+
+        if (eventsByMonthAndUserId.isPresent()) {
+            for (Event event : eventsByMonthAndUserId.get()) {
+                EventListOutputSpec eventListOutputSpec = EventListOutputSpec.builder()
+                        .eventId(event.getId())
+                        .eventTitle(event.getEventTitle())
+                        .eventContent(event.getEventContent())
+                        .startDate(event.getStartDate())
+                        .endDate(event.getEndDate())
+                        .calendarGroupId(event.getCalendarGroup().getId())
+                        .build();
+
+                eventListOutputSpecList.add(eventListOutputSpec);
+            }
+        }
+        CalendarListResponse calendarListResponse = CalendarListResponse.builder()
+                .workList(workListResponse)
+                .eventList(eventListOutputSpecList)
+                .build();
+        
+        return calendarListResponse;
     }
 
     public void updateIcs(Long userId) {

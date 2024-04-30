@@ -55,10 +55,7 @@ public class Work {
                 .workId(this.id)
                 .workDate(this.workDate)
                 .workType(this.workType.toResponse())
-<<<<<<< HEAD
 //                .calendarGroup(this.calendarGroup.toResponse())
-=======
->>>>>>> 6446004cc79cca3e80e7a4e4727e6e3849eca788
                 .build();
     }
 }
