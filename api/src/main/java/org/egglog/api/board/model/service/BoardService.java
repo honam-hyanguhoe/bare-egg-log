@@ -10,6 +10,9 @@ import org.egglog.api.board.model.dto.params.*;
 import org.egglog.api.board.model.dto.response.*;
 import org.egglog.api.board.model.entity.*;
 import org.egglog.api.board.repository.jpa.*;
+import org.egglog.api.hospital.model.entity.HospitalAuth;
+import org.egglog.api.hospital.repository.jpa.HospitalAuthJpaRepository;
+import org.egglog.api.hospital.repository.jpa.HospitalAuthQueryRepository;
 import org.egglog.api.search.domain.document.BoardDocument;
 import org.egglog.api.search.repository.elasticsearch.SearchRepository;
 import org.egglog.api.global.util.RedisViewCountUtil;
@@ -50,6 +53,7 @@ public class BoardService {
 
     //병원
     private final HospitalQueryRepository hospitalQueryRepository;
+    private final HospitalAuthJpaRepository hospitalAuthJpaRepository;
 
     //검색
     private final SearchRepository searchRepository;
@@ -292,8 +296,8 @@ public class BoardService {
         try {
             //작성자가 같다면
             if (board.getUser().getId().equals(userId)) {
-                List<Comment> commentListByBoardId = commentQueryRepository.getCommentListByBoardId(boardId);
-                commentJpaRepository.deleteAll(commentListByBoardId);
+                Optional<List<Comment>> commentListByBoardId = commentQueryRepository.getCommentListByBoardId(boardId);
+                commentListByBoardId.ifPresent(commentJpaRepository::deleteAll);
                 boardJpaRepository.delete(board); //삭제
 
             }
@@ -395,6 +399,8 @@ public class BoardService {
         Board board = boardQueryRepository.findById(boardId).orElseThrow(
                 () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
         );
+
+
         BoardOutputSpec boardOutputSpec = null;
 
         try {
@@ -418,6 +424,10 @@ public class BoardService {
             if (!isNotLiked(userId, board.getId())) {
                 isUserLiked = true;
             }
+            //사용자의 병원 인증 정보
+            Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(user, user.getSelectedHospital());
+
+            //게시물에 대한 댓글(댓글이 없다면 빈 리스트로 리턴)
             List<CommentListOutputSpec> commentList = commentService.getCommentList(boardId);
 
             boardOutputSpec = BoardOutputSpec.builder()
@@ -430,18 +440,28 @@ public class BoardService {
                     .pictureThree(board.getPictureThree())
                     .pictureFour(board.getPictureFour())
                     .viewCount(hitCnt)
-                    .groupId(board.getGroup().getId())
+//                    .groupId(board.getGroup().getId())
                     .userId(user.getId())
                     .tempNickname(board.getTempNickname())
                     .profileImgUrl(user.getProfileImgUrl())
                     .commentCount(commentCnt)
                     .boardLikeCount(likeCnt)
-                    .hospitalName(board.getHospital().getHospitalName())
+//                    .hospitalName(board.getHospital().getHospitalName())
                     .isLiked(isUserLiked)
                     .isCommented(isCommented)
-//                    .isAuth(user.getIsAuth())   //인증 여부
+//                    .isHospitalAuth(hospitalAuth.get().getAuth())   //인증 여부
                     .comments(commentList)
                     .build();
+
+            if (hospitalAuth.isPresent()) {
+                boardOutputSpec.setIsHospitalAuth(hospitalAuth.get().getAuth());
+            }
+            if (board.getGroup() != null) {
+                boardOutputSpec.setGroupId(board.getGroup().getId());
+            }
+            if (board.getHospital() != null) {
+                boardOutputSpec.setHospitalName(board.getHospital().getHospitalName());
+            }
 
         } catch (DataAccessException e) {
             throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);

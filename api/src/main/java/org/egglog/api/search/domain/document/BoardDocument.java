@@ -37,15 +37,36 @@ public class BoardDocument {
     private LocalDateTime createdAt;    //생성일
 
     public static BoardDocument from(Board board) {
-        return BoardDocument.builder()
-                .id(board.getId())
-                .title(board.getTitle())
-                .content(board.getContent())
-                .tempNickname(board.getTempNickname())
-                .hospitalId(board.getHospital().getId())
-                .groupId(board.getGroup().getId())
-                .createdAt(board.getCreatedAt())
-                .build();
+        BoardDocument boardDocument = null;
+
+        if (board.getHospital() == null && board.getGroup() == null) {
+            boardDocument = BoardDocument.builder()
+                    .id(board.getId())
+                    .title(board.getTitle())
+                    .content(board.getContent())
+                    .tempNickname(board.getTempNickname())
+                    .createdAt(board.getCreatedAt())
+                    .build();
+        } else if (board.getHospital() != null) {
+            boardDocument = BoardDocument.builder()
+                    .id(board.getId())
+                    .title(board.getTitle())
+                    .content(board.getContent())
+                    .tempNickname(board.getTempNickname())
+                    .hospitalId(board.getHospital().getId())
+                    .createdAt(board.getCreatedAt())
+                    .build();
+        } else if (board.getGroup() != null) {
+            boardDocument = BoardDocument.builder()
+                    .id(board.getId())
+                    .title(board.getTitle())
+                    .content(board.getContent())
+                    .tempNickname(board.getTempNickname())
+                    .groupId(board.getGroup().getId())
+                    .createdAt(board.getCreatedAt())
+                    .build();
+        }
+        return boardDocument;
     }
 
 }

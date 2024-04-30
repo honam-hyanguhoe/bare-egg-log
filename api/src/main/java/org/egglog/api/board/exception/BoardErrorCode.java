@@ -18,7 +18,7 @@ public enum BoardErrorCode implements ErrorFormat {
     UNKNOWN_ERROR("미등록 에러가 발생했습니다.",HttpStatus.INTERNAL_SERVER_ERROR),
 
     //좋아요
-    NO_EXIST_BOARD_LIKE("좋아요를 누르지 않았습니다", HttpStatus.BAD_REQUEST)
+    NO_EXIST_BOARD_LIKE("좋아요를 누르지 않았습니다", HttpStatus.BAD_REQUEST),
 
     ;
 

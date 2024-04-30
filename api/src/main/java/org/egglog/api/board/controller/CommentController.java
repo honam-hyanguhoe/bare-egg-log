@@ -5,6 +5,7 @@ import org.egglog.api.board.model.service.CommentService;
 import org.egglog.api.board.model.dto.params.CommentForm;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.utility.utils.MessageUtils;
+import org.egglog.utility.utils.SuccessType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -24,12 +25,12 @@ public class CommentController {
     @PostMapping("/comment")
     public ResponseEntity<?> registComment(@RequestBody CommentForm commentForm, @AuthenticationPrincipal User user) {
         commentService.registComment(commentForm, user.getId());
-        return ResponseEntity.ok().body(MessageUtils.success());
+        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }
 
     @DeleteMapping("/comment/{commentId}")
     public ResponseEntity<?> deleteComment(@PathVariable Long commentId, @AuthenticationPrincipal User user) {
         commentService.deleteComment(commentId, user.getId());
-        return ResponseEntity.ok().body(MessageUtils.success());
+        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
     }
 }

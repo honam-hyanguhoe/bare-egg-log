@@ -6,9 +6,10 @@ import org.egglog.api.board.model.entity.Comment;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
+import java.util.Optional;
 
 import static org.egglog.api.board.model.entity.QComment.comment;
+
 
 @Repository
 @RequiredArgsConstructor
@@ -26,18 +27,18 @@ public class CommentQueryRepository {
         return count;
     }
 
-    public List<Comment> getCommentListByBoardId(Long boardId) {
-        return jpaQueryFactory
+    public Optional<List<Comment>> getCommentListByBoardId(Long boardId) {
+        return Optional.ofNullable(jpaQueryFactory
                 .selectFrom(comment)
                 .where(comment.board.id.eq(boardId))
-                .fetch();
+                .fetch());
     }
 
-    public List<Comment> getRecommentListByCommentId(Long commentId) {
-        return jpaQueryFactory
-                .select(comment)
+    public Optional<List<Comment>> getRecommentListByCommentId(Long commentId) {
+        return Optional.ofNullable(jpaQueryFactory
+                .selectFrom(comment)
                 .where(comment.parentId.eq(commentId))
-                .fetch();
+                .fetch());
 
     }
 }

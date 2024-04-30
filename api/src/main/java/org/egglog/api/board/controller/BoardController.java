@@ -41,7 +41,7 @@ public class BoardController {
     @PostMapping("")
     public ResponseEntity<?> registerBoard(@RequestBody BoardForm boardForm, @AuthenticationPrincipal User user) {
         boardService.registerBoard(boardForm, user.getId());
-        return ResponseEntity.ok().body(MessageUtils.success());
+        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }
 
     @GetMapping("/{board_id}")
@@ -64,12 +64,12 @@ public class BoardController {
     @PostMapping("/like")
     public ResponseEntity<?> registerLike(@RequestBody LikeForm likeForm, @AuthenticationPrincipal User user) {
         boardService.registerLike(likeForm, user.getId());
-        return ResponseEntity.ok().body(MessageUtils.success());
+        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }
 
     @DeleteMapping("/unlike")
     public ResponseEntity<?> deleteLike(@RequestBody LikeForm likeForm, @AuthenticationPrincipal User user) {
         boardService.deleteLike(likeForm, user.getId());
-        return ResponseEntity.ok().body(MessageUtils.success());
+        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
     }
 }

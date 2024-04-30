@@ -17,6 +17,7 @@ import static org.egglog.api.user.model.entity.QUser.user;
 public class CalendarGroupCustomQueryImpl implements CalendarGroupCustomQuery {
 
     private final JPAQueryFactory jpaQueryFactory;
+
     /**
      * CalendarGroup의 ID를 사용하여 CalendarGroup 엔티티와 연결된 User 정보를 함께 조회합니다.
      * @Creator 김형민
@@ -32,4 +33,5 @@ public class CalendarGroupCustomQueryImpl implements CalendarGroupCustomQuery {
                         .where(calendarGroup.id.eq(calendarGroupId))
                         .fetchOne());  // 결과를 Optional로 감싸서 반환
     }
+
 }
