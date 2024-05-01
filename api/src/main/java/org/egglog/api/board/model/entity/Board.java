@@ -2,6 +2,8 @@ package org.egglog.api.board.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.egglog.api.global.util.BaseEntity;
 import org.egglog.api.group.model.entity.Group;
 import org.egglog.api.hospital.model.entity.Hospital;
 import org.egglog.api.user.model.entity.User;
@@ -13,8 +15,8 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder(toBuilder = true)
-public class Board {
+@SuperBuilder(toBuilder = true)
+public class Board extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,9 +28,6 @@ public class Board {
 
     @Column(name = "board_content", nullable = false)
     private String content;
-
-    @Column(name = "board_created_at")
-    private LocalDateTime createdAt;
 
     @Column(name = "picture_one")
     private String pictureOne;
@@ -48,7 +47,7 @@ public class Board {
     @Column(name = "view_count")
     private long viewCount;  //조회수
 
-    @Column(name = "is_commented")
+    @Column(name = "is_commented", columnDefinition = "boolean default false")
     private Boolean isCommented;    //댓글 유무
 
     @Enumerated(EnumType.STRING)
