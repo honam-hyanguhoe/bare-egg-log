@@ -27,7 +27,7 @@ public class BoardDocument {
 
     private String tempNickname;    //익명 닉네임
 
-    private Long viewCount;     //조회수
+    private long viewCount;     //조회수
 
     private Long groupId;    //그룹 아이디
 
@@ -47,6 +47,7 @@ public class BoardDocument {
                     .tempNickname(board.getTempNickname())
                     .createdAt(board.getCreatedAt())
                     .build();
+
         } else if (board.getHospital() != null) {
             boardDocument = BoardDocument.builder()
                     .id(board.getId())

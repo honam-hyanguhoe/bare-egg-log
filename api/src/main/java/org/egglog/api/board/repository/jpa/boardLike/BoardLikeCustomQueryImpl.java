@@ -1,4 +1,4 @@
-package org.egglog.api.board.repository.jpa;
+package org.egglog.api.board.repository.jpa.boardLike;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -9,12 +9,25 @@ import java.util.Optional;
 
 import static org.egglog.api.board.model.entity.QBoardLike.boardLike;
 
+/**
+ * ```
+ * ===================[Info]=========================
+ * packageName    : org.egglog.api.board.repository.jpa
+ * fileName      : BoardLikeCustomQueryImpl
+ * description    :
+ * =================================================
+ * ```
+ * |DATE|AUTHOR|NOTE|
+ * |:---:|:---:|:---:|
+ * |2024-04-30|김도휘|최초 생성|
+ */
 @Repository
 @RequiredArgsConstructor
-public class BoardLikeQueryRepository {
+public class BoardLikeCustomQueryImpl implements BoardLikeCustomQuery {
 
     private final JPAQueryFactory jpaQueryFactory;
 
+    @Override
     public Optional<BoardLike> getBoardLikeByBoardId(Long boardId) {
         return Optional.ofNullable(jpaQueryFactory
                 .selectFrom(boardLike)

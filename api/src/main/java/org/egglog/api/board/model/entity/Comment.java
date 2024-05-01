@@ -2,6 +2,8 @@ package org.egglog.api.board.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.egglog.api.global.util.BaseEntity;
 import org.egglog.api.user.model.entity.User;
 
 import java.time.LocalDateTime;
@@ -11,8 +13,8 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder(toBuilder = true)
-public class Comment {
+@SuperBuilder(toBuilder = true)
+public class Comment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,9 +31,6 @@ public class Comment {
     private int depth;  //댓글 깊이
 
     private String tempNickname;    //익명 닉네임
-
-    @Column(name = "comment_created_at")
-    private LocalDateTime createdAt;  //작성일
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
