@@ -5,9 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.immutable.ImmutableCalScale;
@@ -20,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.ZoneId;
-import java.time.temporal.Temporal;
 import java.util.Date;
 import org.egglog.api.calendar.model.dto.params.CalendarMonthRequest;
 import org.egglog.api.calendar.model.dto.response.CalendarListResponse;
@@ -31,18 +28,15 @@ import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.calendargroup.repository.jpa.CalendarGroupRepository;
 import org.egglog.api.event.model.dto.response.EventListOutputSpec;
 import org.egglog.api.event.model.entity.Event;
-import org.egglog.api.event.model.service.EventService;
-import org.egglog.api.event.repository.jpa.EventCustomQueryImpl;
 import org.egglog.api.event.repository.jpa.EventRepository;
 import org.egglog.api.work.model.dto.response.WorkListResponse;
 import org.egglog.api.work.model.dto.response.WorkResponse;
 import org.egglog.api.work.model.entity.Work;
-import org.egglog.api.work.repository.jpa.WorkQueryRepository;
+import org.egglog.api.work.repository.jpa.WorkQueryRepositoryImpl;
 import org.egglog.api.worktype.model.dto.response.WorkTypeResponse;
 import org.egglog.api.worktype.model.entity.WorkType;
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -55,7 +49,7 @@ public class CalendarService {
 
     private final EventRepository eventRepository;
 
-    private final WorkQueryRepository workQueryRepository;
+    private final WorkQueryRepositoryImpl workQueryRepositoryImpl;
 
     private final CalendarGroupRepository calendarGroupRepository;
 
@@ -136,7 +130,7 @@ public class CalendarService {
                 () -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP)
         );
 
-        List<Work> workList = workQueryRepository.findWorkListWithWorkTypeByTime(calendarMonthRequest.getCalendarGroupId(), startDate.toLocalDate(), endDate.toLocalDate());
+        List<Work> workList = workQueryRepositoryImpl.findWorkListWithWorkTypeByTime(calendarMonthRequest.getCalendarGroupId(), startDate.toLocalDate(), endDate.toLocalDate());
         Optional<List<Event>> eventsByMonthAndUserId = eventRepository.findEventsByMonthAndUserId(startDate, endDate, userId, calendarGroupId);
 
         List<WorkResponse> workResponseList = new ArrayList<>();
@@ -152,7 +146,7 @@ public class CalendarService {
                     .color(workType.getColor())
                     .title(workType.getTitle())
                     .startTime(workType.getStartTime())
-                    .endTime(workType.getEndTime())
+                    .workTime(workType.getWorkTime())
                     .build();
 
             WorkResponse workResponse = WorkResponse.builder()

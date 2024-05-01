@@ -25,7 +25,7 @@ import java.util.*;
 @Entity
 @Getter
 @Setter
-@Table(name = "users")
+@Table(name = "Users")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)

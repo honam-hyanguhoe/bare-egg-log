@@ -23,7 +23,7 @@ public class CommentController {
     }
 
     @PostMapping("/comment")
-    public ResponseEntity<?> registComment(@RequestBody CommentForm commentForm, @AuthenticationPrincipal User user) {
+    public ResponseEntity<?> registerComment(@RequestBody CommentForm commentForm, @AuthenticationPrincipal User user) {
         commentService.registComment(commentForm, user.getId());
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }

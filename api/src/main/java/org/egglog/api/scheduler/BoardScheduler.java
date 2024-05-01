@@ -2,15 +2,13 @@ package org.egglog.api.scheduler;
 
 import com.google.api.gax.paging.Page;
 import com.google.cloud.storage.Bucket;
-import com.google.cloud.storage.Storage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.board.exception.BoardErrorCode;
 import org.egglog.api.board.exception.BoardException;
 import org.egglog.api.board.model.entity.Board;
-import org.egglog.api.board.repository.jpa.BoardJpaRepository;
-import org.egglog.api.board.repository.jpa.BoardQueryRepository;
+import org.egglog.api.board.repository.jpa.board.BoardRepository;
 import org.egglog.api.calendar.exception.CalendarErrorCode;
 import org.egglog.api.calendar.exception.CalendarException;
 import org.egglog.api.calendar.model.service.CalendarService;
@@ -32,8 +30,7 @@ public class BoardScheduler {
     private final Bucket bucket;
 
     private final RedisViewCountUtil redisUtil;
-    private final BoardQueryRepository boardQueryRepository;
-    private final BoardJpaRepository boardJpaRepository;
+    private final BoardRepository boardRepository;
     private final StringRedisTemplate redisTemplate;  // String 데이터를 저장하기에 적합한 RedisTemplate
     private final CalendarService calendarService;
 
@@ -49,7 +46,7 @@ public class BoardScheduler {
                 Long boardId = Long.parseLong(Objects.requireNonNull(tuple.getValue())); //boardId
                 Long score = Objects.requireNonNull(tuple.getScore()).longValue(); //조회수
 
-                Board board = boardQueryRepository.findById(boardId).orElseThrow(
+                Board board = boardRepository.findById(boardId).orElseThrow(
                         () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
                 );
                 Long viewCnt = board.getViewCount() + score;    // DB 조회수 + 하루 동안의 조회수
@@ -75,13 +72,13 @@ public class BoardScheduler {
             for (ZSetOperations.TypedTuple<String> tuple : redisUtil.getAllViewedBoards()) {
                 Long boardId = Long.parseLong(Objects.requireNonNull(tuple.getValue())); //boardId
 
-                Board board = boardQueryRepository.findById(boardId).orElseThrow(
+                Board board = boardRepository.findById(boardId).orElseThrow(
                         () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
                 );
                 //그룹 && 병원 == null -> 전체 게시판
                 if (board.getGroup() == null && board.getHospital() == null) { //전체 게시판이라면
                     Long viewCount = Objects.requireNonNull(tuple.getScore()).longValue(); //조회수
-                    Long likeCount = boardQueryRepository.getLikeCount(boardId); //좋아요 개수
+                    Long likeCount = boardRepository.getLikeCount(boardId); //좋아요 개수
 
                     boardViewCounts.put(boardId, viewCount + likeCount);
                 }
@@ -97,7 +94,7 @@ public class BoardScheduler {
             redisTemplate.opsForValue().set("hotBoards", hotBoardIds.toString(), 1, TimeUnit.HOURS);
 
         } else {  //최근 게시물 2개
-            List<Long> recentBoardIds = boardJpaRepository.findTop2ByOrderByCreatedAtDesc();
+            List<Long> recentBoardIds = boardRepository.findTop2ByOrderByCreatedAtDesc();
             redisTemplate.opsForValue().set("hotBoards", recentBoardIds.toString(), 1, TimeUnit.HOURS);
 
         }

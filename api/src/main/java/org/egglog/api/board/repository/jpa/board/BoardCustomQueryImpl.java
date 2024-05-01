@@ -1,4 +1,4 @@
-package org.egglog.api.board.repository.jpa;
+package org.egglog.api.board.repository.jpa.board;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.Expressions;
@@ -17,18 +17,23 @@ import static org.egglog.api.board.model.entity.QBoard.board;
 import static org.egglog.api.board.model.entity.QBoardLike.boardLike;
 import static org.egglog.api.board.model.entity.QComment.comment;
 
+/**
+ * ```
+ * ===================[Info]=========================
+ * packageName    : org.egglog.api.board.repository.jpa
+ * fileName      : BoardCustomQueryImpl
+ * description    :
+ * =================================================
+ * ```
+ * |DATE|AUTHOR|NOTE|
+ * |:---:|:---:|:---:|
+ * |2024-04-30|김도휘|최초 생성|
+ */
 @Repository
 @RequiredArgsConstructor
-public class BoardQueryRepository {
+public class BoardCustomQueryImpl implements BoardCustomQuery {
 
     private final JPAQueryFactory jpaQueryFactory;
-
-    public Optional<Board> findById(Long boardId) {
-        return Optional.ofNullable(jpaQueryFactory
-                .selectFrom(board)
-                .where(board.id.eq(boardId))
-                .fetchOne());
-    }
 
     /**
      * 급상승 게시판<br>
@@ -38,6 +43,7 @@ public class BoardQueryRepository {
      * @param hospitalId
      * @return
      */
+    @Override
     public List<Board> findBoardHotList(Long groupId, Long hospitalId) {
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -80,6 +86,7 @@ public class BoardQueryRepository {
      * @param boardId
      * @return
      */
+    @Override
     public Long getLikeCount(Long boardId) {
         Long count = jpaQueryFactory
                 .select(boardLike.count())
@@ -90,6 +97,7 @@ public class BoardQueryRepository {
         return count;
     }
 
+    @Override
     public Optional<BoardLike> getUserBoardLike(Long boardId, Long userId) {
         return Optional.ofNullable(jpaQueryFactory
                 .selectFrom(boardLike)
@@ -100,7 +108,4 @@ public class BoardQueryRepository {
                 .fetchOne());
 
     }
-
-
-
 }

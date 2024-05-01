@@ -16,7 +16,8 @@ import org.egglog.api.board.exception.BoardException;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
-import org.egglog.api.user.repository.jpa.UserQueryRepository;
+import org.egglog.api.user.repository.jpa.UserJpaRepository;
+import org.egglog.api.user.repository.jpa.UserQueryRepositoryImpl;
 import org.egglog.api.worktype.exception.WorkTypeErrorCode;
 import org.egglog.api.worktype.exception.WorkTypeException;
 import org.egglog.api.worktype.model.entity.WorkType;
@@ -35,12 +36,12 @@ public class AlarmService {
 
     private final AlarmRepository alarmRepository;
 
-    private final UserQueryRepository userQueryRepository;
+    private final UserJpaRepository userJpaRepository;
 
     private final WorkTypeJpaRepository workTypeJpaRepository;
 
     public List<AlarmListOutputSpec> getAlarmList(Long userId) {
-        User user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userJpaRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
         List<AlarmListOutputSpec> alarmListOutputSpecList = new ArrayList<>();
@@ -79,7 +80,7 @@ public class AlarmService {
      */
     @Transactional
     public AlarmOutputSpec modifyAlarmStatus(AlarmStatusModifyForm alarmStatusModifyForm, Long userId) {
-        User user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userJpaRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
         Alarm alarm = alarmRepository.findById(alarmStatusModifyForm.getAlarmId()).orElseThrow(
@@ -107,7 +108,7 @@ public class AlarmService {
         WorkType workType = workTypeJpaRepository.findById(alarmForm.getWorkTypeId()).orElseThrow(
                 () -> new WorkTypeException(WorkTypeErrorCode.NO_EXIST_WORKTYPE)
         );
-        User user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userJpaRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
 
@@ -128,7 +129,7 @@ public class AlarmService {
         WorkType workType = workTypeJpaRepository.findById(alarmModifyForm.getWorkTypeId()).orElseThrow(
                 () -> new WorkTypeException(WorkTypeErrorCode.NO_EXIST_WORKTYPE)
         );
-        User user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userJpaRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
         Alarm alarm = alarmRepository.findById(alarmModifyForm.getAlarmId()).orElseThrow(
