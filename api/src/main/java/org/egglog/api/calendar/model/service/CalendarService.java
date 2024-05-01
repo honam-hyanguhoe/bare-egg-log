@@ -146,7 +146,7 @@ public class CalendarService {
                     .color(workType.getColor())
                     .title(workType.getTitle())
                     .startTime(workType.getStartTime())
-                    .endTime(workType.getEndTime())
+                    .workTime(workType.getWorkTime())
                     .build();
 
             WorkResponse workResponse = WorkResponse.builder()

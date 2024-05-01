@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.worktype.model.dto.request.CreateWorkTypeRequest;
 import org.egglog.api.worktype.model.dto.request.EditWorkTypeRequest;
-import org.egglog.api.worktype.model.dto.request.WorkTypeForm;
-import org.egglog.api.worktype.model.dto.request.WorkTypeModifyForm;
 import org.egglog.api.worktype.model.service.WorkTypeService;
 import org.egglog.utility.utils.MessageUtils;
 import org.egglog.utility.utils.SuccessType;

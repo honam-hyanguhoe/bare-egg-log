@@ -25,9 +25,8 @@ import java.time.LocalTime;
 public class EditWorkTypeRequest {
     private Long workTypeId;
     private String title;        //태그 이름
-    private WorkTag workTag; //Day, Eve, Night, Off, ETC 태그 속성
     private String color;       //색상
     private String workTypeImgUrl;      //근무 이미지
-    private LocalTime startTime;       //시작시간
-    private LocalTime endTime;     //종료 시간
+    private LocalTime startTime;       //시작 시각
+    private LocalTime workTime;     //근무 시간
 }

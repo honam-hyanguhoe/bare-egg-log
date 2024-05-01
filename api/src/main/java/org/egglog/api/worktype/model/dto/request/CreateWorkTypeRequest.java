@@ -28,20 +28,19 @@ import java.time.LocalTime;
 public class CreateWorkTypeRequest {
 
     private String title;        //태그 이름
-    private WorkTag workTag; //Day, Eve, Night, Off, ETC 태그 속성
     private String color;       //색상
     private String workTypeImgUrl;      //근무 이미지
     private LocalTime startTime;       //시작시간
-    private LocalTime endTime;     //종료 시간
+    private LocalTime workTime;     //시간
 
     public WorkType toEntity(User loginUser){
         return WorkType.builder()
                 .title(this.title)
                 .color(this.color)
-                .workTag(this.workTag)
+                .workTag(WorkTag.ETC)
                 .workTypeImgUrl(this.workTypeImgUrl)
                 .startTime(this.startTime)
-                .endTime(this.endTime)
+                .workTime(this.workTime)
                 .user(loginUser)
                 .build();
     }

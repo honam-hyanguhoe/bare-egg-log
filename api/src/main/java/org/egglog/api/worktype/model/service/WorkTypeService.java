@@ -7,6 +7,7 @@ import org.egglog.api.worktype.exception.WorkTypeException;
 import org.egglog.api.worktype.model.dto.request.CreateWorkTypeRequest;
 import org.egglog.api.worktype.model.dto.request.EditWorkTypeRequest;
 import org.egglog.api.worktype.model.dto.response.WorkTypeResponse;
+import org.egglog.api.worktype.model.entity.WorkTag;
 import org.egglog.api.worktype.model.entity.WorkType;
 import org.egglog.api.worktype.repository.jpa.WorkTypeJpaRepository;
 import org.springframework.stereotype.Service;
@@ -35,9 +36,10 @@ public class WorkTypeService {
     public WorkTypeResponse editWorkType(User loginUser, EditWorkTypeRequest request){
         WorkType workType = workTypeJpaRepository.findWithUserById(request.getWorkTypeId())
                 .orElseThrow(() -> new WorkTypeException(NO_EXIST_WORKTYPE));
-        if (workType.getUser().getId()!=loginUser.getId()) throw new WorkTypeException(ACCESS_DENIED);
+        if (workType.getWorkTag().name() != WorkTag.ETC.name()) throw new WorkTypeException(ACCESS_DENIED);
+        if (workType.getUser().getId() != loginUser.getId()) throw new WorkTypeException(ACCESS_DENIED);
         return workTypeJpaRepository.save(workType
-                    .edit(request.getTitle(), request.getWorkTag(), request.getColor(), request.getWorkTypeImgUrl(), request.getStartTime(), request.getEndTime()))
+                    .edit(request.getTitle(), request.getColor(), request.getWorkTypeImgUrl(), request.getStartTime(), request.getWorkTime()))
                 .toResponse();
     }
 

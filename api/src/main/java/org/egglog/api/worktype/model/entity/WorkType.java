@@ -35,8 +35,8 @@ public class WorkType {
     @Column(name = "work_start_time")
     private LocalTime startTime;       //시작시간
 
-    @Column(name = "work_end_time")
-    private LocalTime endTime;     //종료 시간
+    @Column(name = "work_time")
+    private LocalTime workTime;     //근무 시간
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -50,17 +50,17 @@ public class WorkType {
                 .color(this.color)
                 .workTypeImgUrl(this.workTypeImgUrl)
                 .startTime(this.startTime)
-                .endTime(this.endTime)
+                .workTime(this.workTime)
                 .build();
     }
 
-    public WorkType edit(String title, WorkTag workTag, String color, String workTypeImgUrl, LocalTime startTime, LocalTime endTime){
+    public WorkType edit(String title, String color, String workTypeImgUrl, LocalTime startTime, LocalTime workTime){
         this.title = title;
-        this.workTag = workTag;
+        this.workTag = WorkTag.ETC;
         this.color = color;
         this.workTypeImgUrl = workTypeImgUrl;
         this.startTime = startTime;
-        this.endTime = endTime;
+        this.workTime = workTime;
         return this;
     }
 }
