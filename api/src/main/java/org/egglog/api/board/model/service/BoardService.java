@@ -12,6 +12,10 @@ import org.egglog.api.board.model.entity.*;
 import org.egglog.api.board.repository.jpa.board.BoardRepository;
 import org.egglog.api.board.repository.jpa.boardLike.BoardLikeRepository;
 import org.egglog.api.board.repository.jpa.comment.CommentRepository;
+import org.egglog.api.group.exception.GroupErrorCode;
+import org.egglog.api.group.exception.GroupException;
+import org.egglog.api.group.model.entity.Group;
+import org.egglog.api.group.repository.jpa.GroupRepository;
 import org.egglog.api.hospital.model.entity.HospitalAuth;
 import org.egglog.api.hospital.repository.jpa.HospitalAuthJpaRepository;
 import org.egglog.api.search.domain.document.BoardDocument;
@@ -66,6 +70,9 @@ public class BoardService {
     //병원
     private final HospitalQueryRepository hospitalQueryRepository;
     private final HospitalAuthJpaRepository hospitalAuthJpaRepository;
+
+    //그룹
+    private final GroupRepository groupRepository;
 
     //검색
     private final SearchRepository searchRepository;
@@ -127,6 +134,7 @@ public class BoardService {
                         .isCommented(isCommented)   //댓글 유무
                         .build();
 
+                //병원 인증배지가 있다면
                 if (hospitalAuth.isPresent()) {
                     boardListOutputSpec.setIsHospitalAuth(hospitalAuth.get().getAuth());
                 }
@@ -199,6 +207,7 @@ public class BoardService {
                             .isCommented(isCommented)
                             .build();
 
+                    //병원 인증배지가 있다면
                     if (hospitalAuth.isPresent()) {
                         boardListOutputSpec.setIsHospitalAuth(hospitalAuth.get().getAuth());
                     }
@@ -252,11 +261,11 @@ public class BoardService {
 
         } else if (boardForm.getGroupId() != null && boardForm.getHospitalId() == null) {
             //그룹 게시판
-//            Group group = groupQueryRepository.findById(boardForm.getGroupId()).orElseThrow(
-//                    () -> new GroupException(GroupErrorCode.NOT_FOUND)
-//            );
+            Group group = groupRepository.findById(boardForm.getGroupId()).orElseThrow(
+                    () -> new GroupException(GroupErrorCode.NOT_FOUND)
+            );
             board.setBoardType(BoardType.GROUP);
-//            board.setGroup(group);
+            board.setGroup(group);
 
         } else if (boardForm.getGroupId() == null && boardForm.getHospitalId() != null) {
             // 병원 게시판
@@ -323,13 +332,10 @@ public class BoardService {
      * [로직]<br/>
      *
      * @param boardUpdateForm
-     * @param userId
+     * @param user
      */
     @Transactional
-    public BoardModifyOutputSpec modifyBoard(Long boardId, BoardUpdateForm boardUpdateForm, Long userId) {
-        User user = userQueryRepository.findById(userId).orElseThrow(
-                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-        );
+    public BoardModifyOutputSpec modifyBoard(Long boardId, BoardUpdateForm boardUpdateForm, User user) {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
         );
@@ -343,6 +349,9 @@ public class BoardService {
             board.setPictureThree(boardUpdateForm.getPictureThree());
             board.setPictureFour(boardUpdateForm.getPictureFour());
 
+            //사용자의 병원 인증 정보
+            Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(user, user.getSelectedHospital());
+
             long viewCount = redisViewCountUtil.getViewCount(String.valueOf(board.getId())); //하루 동안의 조회수
             Long hitCnt = viewCount + board.getViewCount();     // DB + redis
             Long commentCnt = commentRepository.getCommentCount(board.getId());
@@ -355,7 +364,7 @@ public class BoardService {
                 isCommented = true;
             }
             //사용자가 이미 좋아요를 눌렀는지
-            if (!isNotLiked(userId, board.getId())) {
+            if (!isNotLiked(user.getId(), board.getId())) {
                 isUserLiked = true;
             }
             boardOutputSpec = BoardModifyOutputSpec.builder()
@@ -376,9 +385,11 @@ public class BoardService {
                     .boardLikeCount(likeCnt)
                     .isLiked(isUserLiked)
                     .isCommented(isCommented)
-//                    .isHospitalAuth(user.getIsHospitalAuth())
                     .build();
 
+            if (hospitalAuth.isPresent()) {
+                boardOutputSpec.setIsHospitalAuth(hospitalAuth.get().getAuth());
+            }
         } catch (DataAccessException e) {
             throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
         } catch (Exception e) {

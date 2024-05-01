@@ -58,7 +58,7 @@ public class BoardController {
     @PatchMapping("/{board_id}")
     public ResponseEntity<?> modifyBoard(@PathVariable("board_id") Long boardId, @RequestBody BoardUpdateForm boardUpdateForm, @AuthenticationPrincipal User user) {
 
-        return ResponseEntity.ok().body(MessageUtils.success(boardService.modifyBoard(boardId, boardUpdateForm, user.getId())));
+        return ResponseEntity.ok().body(MessageUtils.success(boardService.modifyBoard(boardId, boardUpdateForm, user)));
     }
 
     @PostMapping("/like")
