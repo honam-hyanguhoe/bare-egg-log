@@ -15,6 +15,7 @@ import org.egglog.api.user.repository.jpa.UserJpaRepository;
 import org.egglog.api.work.exception.WorkErrorCode;
 import org.egglog.api.work.exception.WorkException;
 import org.egglog.api.work.model.dto.request.*;
+import org.egglog.api.work.model.dto.response.completed.CompletedWorkCountWeekResponse;
 import org.egglog.api.work.model.dto.response.upcoming.UpComingCountWorkResponse;
 import org.egglog.api.work.model.dto.response.WorkListResponse;
 import org.egglog.api.work.model.dto.response.WorkResponse;
@@ -30,6 +31,9 @@ import org.threeten.extra.DayOfMonth;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.IsoFields;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Map;
@@ -147,8 +151,36 @@ public class WorkService {
     }
 
     @Transactional(readOnly = true)
-    public CompletedWorkCountResponse findCompletedWorkCount(User loginUser, LocalDate today){
+    public List<CompletedWorkCountResponse> findCompletedWorkCount(User loginUser, LocalDate today) {
+        List<Work> works = workJpaRepository.findWorksBeforeDate(loginUser.getId(), today);
 
+        Map<YearMonth, Map<Integer, Map<String, Integer>>> groupedData = works.stream()
+                .collect(Collectors.groupingBy(
+                        work -> YearMonth.from(work.getWorkDate()), // 월별 그룹화
+                        Collectors.groupingBy(
+                                work -> {
+                                    LocalDate firstDay = work.getWorkDate().with(TemporalAdjusters.firstDayOfMonth());
+                                    LocalDate firstMonday = firstDay.getDayOfWeek() == DayOfWeek.MONDAY ? firstDay : firstDay.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+                                    long weeksBetween = ChronoUnit.WEEKS.between(firstMonday, work.getWorkDate()) + 1;
+                                    return (int) weeksBetween; // 주차별 그룹화
+                                },
+                                Collectors.groupingBy(
+                                        work -> work.getWorkType().getTitle(),
+                                        Collectors.summingInt(work -> 1) // 근무 유형별 카운팅
+                                )
+                        )
+                ));
+
+        return groupedData.entrySet().stream()
+                .map(monthEntry -> {
+                    YearMonth month = monthEntry.getKey();
+                    List<CompletedWorkCountWeekResponse> weeks = monthEntry.getValue().entrySet().stream()
+                            .sorted(Map.Entry.comparingByKey())
+                            .map(weekEntry -> new CompletedWorkCountWeekResponse(weekEntry.getKey(), weekEntry.getValue()))
+                            .collect(Collectors.toList());
+                    return new CompletedWorkCountResponse(month.toString(), weeks);
+                })
+                .collect(Collectors.toList());
     }
 
 

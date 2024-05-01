@@ -113,4 +113,12 @@ public class WorkQueryRepositoryImpl implements WorkQueryRepository{
                 .groupBy(workType.title, workType.color)
                 .fetch();
     }
+
+    public List<Work> findWorksBeforeDate(Long userId, LocalDate date) {
+        return jpaQueryFactory
+                .selectFrom(work)
+                .leftJoin(work.workType, workType).fetchJoin() // WorkType과 함께 조인
+                .where(work.user.id.eq(userId).and(work.workDate.lt(date))) // 오늘 날짜 이전
+                .fetch();
+    }
 }

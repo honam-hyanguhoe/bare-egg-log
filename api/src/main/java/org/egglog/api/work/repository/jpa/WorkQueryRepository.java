@@ -15,4 +15,5 @@ public interface WorkQueryRepository {
     List<Work> findWorkListWithWorkTypeByTime(Long calendarGroupId, LocalDate startDate, LocalDate endDate);
     List<Work> findWorkListWithWorkTypeByTimeAndTargetUser(Long targetUserId, LocalDate startDate, LocalDate endDate);
     List<UpComingCountWorkResponse> findUpComingCountWork(Long userId, LocalDate today, LocalDate startDate, LocalDate endDate);
+    List<Work> findWorksBeforeDate(Long userId, LocalDate date);
 }
