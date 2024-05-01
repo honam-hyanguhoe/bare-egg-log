@@ -43,7 +43,7 @@ public class UserController {
             @RequestBody UpdateFcmRequest request
     ){
         return ResponseEntity.ok().body(
-                MessageUtils.success(userService.updateUser(loginUser, request)));
+                MessageUtils.success(userService.updateFcmUser(loginUser, request)));
     }
     @PatchMapping("/info-modify")
     public ResponseEntity<MessageUtils> modifyUserInfo(
@@ -51,7 +51,7 @@ public class UserController {
             @RequestBody UpdateUserRequest request
             ){
         return ResponseEntity.ok().body(
-                MessageUtils.success(userService.updateUser(loginUser, request)));
+                MessageUtils.success(userService.updateUserInfo(loginUser, request)));
     }
 
     @PatchMapping("/hospital/info-modify")
