@@ -4,12 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.work.model.dto.request.*;
+import org.egglog.api.work.model.dto.response.upcoming.enums.DateType;
 import org.egglog.api.work.model.service.WorkService;
 import org.egglog.utility.utils.MessageUtils;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 
 
 /**
@@ -66,5 +69,26 @@ public class WorkController {
     ){
         return ResponseEntity.ok().body(
                 MessageUtils.success(workService.findGroupUserWorkList(loginUser, request)));
+    }
+
+    @GetMapping("/find/upcoming/{dateType}")
+    public ResponseEntity<MessageUtils> findUpcomingCountWorkList(
+            @AuthenticationPrincipal User loginUser,
+            @RequestParam("today")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate today,
+            @PathVariable DateType dateType
+            ){
+        return ResponseEntity.ok().body(
+                MessageUtils.success(workService.findUpComingWorkCount(loginUser, today, dateType)));
+    }
+
+    @GetMapping("/find/completed")
+    public ResponseEntity<MessageUtils> findCompletedCountWorkList(
+            @AuthenticationPrincipal User loginUser,
+            @RequestParam("today")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate today
+    ){
+        return ResponseEntity.ok().body(
+                MessageUtils.success(workService.findCompletedWorkCount(loginUser, today)));
     }
 }

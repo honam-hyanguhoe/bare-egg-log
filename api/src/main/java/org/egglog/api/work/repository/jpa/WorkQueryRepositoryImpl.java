@@ -2,7 +2,9 @@ package org.egglog.api.work.repository.jpa;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.egglog.api.work.model.dto.response.upcoming.UpComingCountWorkResponse;
 import org.springframework.stereotype.Repository;
+import com.querydsl.core.types.Projections;
 import org.egglog.api.work.model.entity.Work;
 
 import static org.egglog.api.work.model.entity.QWork.work;
@@ -93,6 +95,22 @@ public class WorkQueryRepositoryImpl implements WorkQueryRepository{
                 .leftJoin(work.workType, workType).fetchJoin() // WorkType과 함께 조인
                 .where(work.user.id.eq(targetUserId)
                         .and(work.workDate.between(startDate, endDate))) // 날짜 범위 필터
+                .fetch();
+    }
+
+
+    public List<UpComingCountWorkResponse> findUpComingCountWork(Long userId, LocalDate today, LocalDate startDate, LocalDate endDate){
+        return jpaQueryFactory
+                .select(Projections.constructor(UpComingCountWorkResponse.class,
+                        workType.title.as("name"),
+                        workType.color,
+                        work.id.count().as("value")))
+                .from(work)
+                .join(work.workType, workType)
+                .where(work.user.id.eq(userId)
+                        .and(work.workDate.between(startDate, endDate))
+                        .and(work.workDate.goe(today)))
+                .groupBy(workType.title, workType.color)
                 .fetch();
     }
 }
