@@ -17,8 +17,11 @@ orbit = "6.1.0"
 coil = "2.6.0"
 paging = "3.2.1"
 coroutines-core = "1.7.1"
+room = "2.6.1"
+annotation = "1.7.1"
 
 [libraries]
+androidx-lifecycle-service = { group = "androidx.lifecycle", name = "lifecycle-service", version.ref = "lifecycle-runtime-ktx"}
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
@@ -63,6 +66,11 @@ paging-common = { group="androidx.paging", name="paging-common", version.ref="pa
 paging-compose = { group="androidx.paging", name="paging-compose", version.ref="paging" }
 
 coroutines-core = { group="org.jetbrains.kotlinx", name="kotlinx-coroutines-core", version.ref="coroutines-core" }
+
+room-runtime = { group = "androidx.room", name = "room-ktx", version.ref = "room"}
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room"}
+room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room"}
+annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotation" }
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }

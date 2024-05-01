@@ -59,4 +59,19 @@ dependencies {
     // hilt
     implementation(libs.hilt)
     kapt(libs.hilt.compiler)
+
+    // datastore
+    implementation(libs.datastore)
+
+    // lifecycle service
+    implementation(libs.androidx.lifecycle.service)
+
+    // paging3
+    implementation(libs.paging.runtime)
+
+    // room
+    implementation(libs.room.runtime)
+    implementation(libs.room.paging)
+    kapt(libs.room.compiler)
+
 }
