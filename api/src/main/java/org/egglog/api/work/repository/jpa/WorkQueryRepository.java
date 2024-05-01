@@ -13,4 +13,5 @@ public interface WorkQueryRepository {
     Optional<Work> findWorkWithWorkTypeByWorkId(Long workId);
     List<Work> findWorkListWithWorkTypeByTime(Long calendarGroupId, LocalDate startDate, LocalDate endDate);
     List<Work> findWorkListWithWorkTypeByTimeAndTargetUser(Long targetUserId, LocalDate startDate, LocalDate endDate);
+    List<Work> findAllWorkWithWorkTypeByUser(Long userId);
 }

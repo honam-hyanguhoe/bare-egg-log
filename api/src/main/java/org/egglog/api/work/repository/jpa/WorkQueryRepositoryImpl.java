@@ -95,4 +95,17 @@ public class WorkQueryRepositoryImpl implements WorkQueryRepository{
                         .and(work.workDate.between(startDate, endDate))) // 날짜 범위 필터
                 .fetch();
     }
+
+    /**
+     * 사용자의 모든 일정 조회
+     * @param userId
+     * @return
+     */
+    public List<Work> findAllWorkWithWorkTypeByUser(Long userId){
+        return jpaQueryFactory
+                .selectFrom(work)
+                .leftJoin(work.workType,workType).fetchJoin()
+                .where(work.user.id.eq(userId))
+                .fetch();
+    }
 }

@@ -21,10 +21,9 @@ public class CalendarController {
 
     private final CalendarService calendarService;
 
-    @GetMapping("/{groupId}")
-    public ResponseEntity getCalendarUrl(@AuthenticationPrincipal User user) {
-        Long groupId = 1L;
-        return ResponseEntity.ok().body(MessageUtils.success(calendarService.getIcsLink(user, groupId)));
+    @GetMapping("/link")
+    public ResponseEntity<?> getCalendarUrl(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(MessageUtils.success(calendarService.getIcsLink(user)));
     }
 
     @GetMapping("")
