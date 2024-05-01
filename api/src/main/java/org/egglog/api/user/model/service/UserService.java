@@ -79,7 +79,7 @@ public class UserService {
         List<WorkType> defaultWorkTypes = new ArrayList<>();
         defaultWorkTypes.add(WorkType.builder()
                 .title("DAY")
-                .color("18C5B5")
+                .color("#18C5B5")
                 .workTag(WorkTag.DAY)
                 .startTime(LocalTime.of(6,0))//오전 6시 ~ 오후 2시 | 오후 2시 ~ 10시 | 오후 10시 + 익일 오전 6시
                 .workTime(LocalTime.of(8,0))//8시간
@@ -87,7 +87,7 @@ public class UserService {
                 .build());
         defaultWorkTypes.add(WorkType.builder()
                 .title("EVE")
-                .color("F4D567")
+                .color("#F4D567")
                 .workTag(WorkTag.EVE)
                 .startTime(LocalTime.of(2,0))//오전 6시 ~ 오후 2시 | 오후 2시 ~ 10시 | 오후 10시 + 익일 오전 6시
                 .workTime(LocalTime.of(8,0))//8시간
@@ -95,7 +95,7 @@ public class UserService {
                 .build());
         defaultWorkTypes.add(WorkType.builder()
                 .title("NIGHT")
-                .color("E55555")
+                .color("#E55555")
                 .workTag(WorkTag.NIGHT)
                 .startTime(LocalTime.of(2,0))//오전 6시 ~ 오후 2시 | 오후 2시 ~ 10시 | 오후 10시 + 익일 오전 6시
                 .workTime(LocalTime.of(8,0))//8시간
@@ -103,10 +103,10 @@ public class UserService {
                 .build());
         defaultWorkTypes.add(WorkType.builder()
                 .title("OFF")
-                .color("9B8AFB")
+                .color("#9B8AFB")
                 .workTag(WorkTag.OFF)
-                .startTime(LocalTime.of(2,0))//오전 6시 ~ 오후 2시 | 오후 2시 ~ 10시 | 오후 10시 + 익일 오전 6시
-                .workTime(LocalTime.of(8,0))//8시간
+                .startTime(LocalTime.of(0,0))//오전 6시 ~ 오후 2시 | 오후 2시 ~ 10시 | 오후 10시 + 익일 오전 6시
+                .workTime(LocalTime.of(1,0))//8시간
                 .user(loginUser)
                 .build());
         return defaultWorkTypes;
@@ -120,7 +120,7 @@ public class UserService {
      * @author 김형민
      */
     @Transactional
-    public UserResponse updateUser(User loginUser, UpdateUserRequest request){
+    public UserResponse updateUserInfo(User loginUser, UpdateUserRequest request){
         User updateUser = userJpaRepository.save(loginUser.updateInfo(request.getUserName(), request.getProfileImgUrl()));
         Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(updateUser, updateUser.getSelectedHospital());
         if (hospitalAuth.isPresent()){
@@ -136,7 +136,7 @@ public class UserService {
      * @author 김형민
      */
     @Transactional
-    public UserResponse updateUser(User loginUser, UpdateFcmRequest request){
+    public UserResponse updateFcmUser(User loginUser, UpdateFcmRequest request){
         User updateUser = userJpaRepository.save(loginUser.updateFcmToken(request.getFcmToken()));
         Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(updateUser, updateUser.getSelectedHospital());
         if (hospitalAuth.isPresent()){
