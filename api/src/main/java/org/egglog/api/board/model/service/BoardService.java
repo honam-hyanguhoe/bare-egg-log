@@ -18,17 +18,18 @@ import org.egglog.api.group.model.entity.Group;
 import org.egglog.api.group.repository.jpa.GroupRepository;
 import org.egglog.api.hospital.model.entity.HospitalAuth;
 import org.egglog.api.hospital.repository.jpa.HospitalAuthJpaRepository;
+import org.egglog.api.hospital.repository.jpa.HospitalJpaRepository;
 import org.egglog.api.search.domain.document.BoardDocument;
 import org.egglog.api.search.repository.elasticsearch.SearchRepository;
 import org.egglog.api.global.util.RedisViewCountUtil;
 import org.egglog.api.hospital.exception.HospitalErrorCode;
 import org.egglog.api.hospital.exception.HospitalException;
 import org.egglog.api.hospital.model.entity.Hospital;
-import org.egglog.api.hospital.repository.jpa.HospitalQueryRepository;
+import org.egglog.api.hospital.repository.jpa.HospitalQueryRepositoryImpl;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
-import org.egglog.api.user.repository.jpa.UserQueryRepository;
+import org.egglog.api.user.repository.jpa.UserJpaRepository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -56,7 +57,7 @@ import java.util.*;
 public class BoardService {
 
     //사용자
-    private final UserQueryRepository userQueryRepository;
+    private final UserJpaRepository userJpaRepository;
 
     //게시판
     private final BoardRepository boardRepository;
@@ -68,8 +69,8 @@ public class BoardService {
     private final CommentRepository commentRepository;
 
     //병원
-    private final HospitalQueryRepository hospitalQueryRepository;
     private final HospitalAuthJpaRepository hospitalAuthJpaRepository;
+    private final HospitalJpaRepository hospitalJpaRepository;
 
     //그룹
     private final GroupRepository groupRepository;
@@ -91,7 +92,7 @@ public class BoardService {
      * @return
      */
     public List<BoardListOutputSpec> getBoardList(BoardListForm boardListForm, Long userId) {
-        User user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userJpaRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
 
@@ -239,7 +240,7 @@ public class BoardService {
      */
     @Transactional
     public void registerBoard(BoardForm boardForm, Long userId) {
-        User user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userJpaRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
 
@@ -269,7 +270,7 @@ public class BoardService {
 
         } else if (boardForm.getGroupId() == null && boardForm.getHospitalId() != null) {
             // 병원 게시판
-            Hospital hospital = hospitalQueryRepository.findById(boardForm.getHospitalId()).orElseThrow(
+            Hospital hospital = hospitalJpaRepository.findById(boardForm.getHospitalId()).orElseThrow(
                     () -> new HospitalException(HospitalErrorCode.NOT_FOUND)
             );
             board.setBoardType(BoardType.HOSPITAL);
@@ -303,7 +304,7 @@ public class BoardService {
      * @param userId
      */
     public void deleteBoard(Long boardId, Long userId) {
-        User user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userJpaRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
         Board board = boardRepository.findById(boardId).orElseThrow(
@@ -412,7 +413,7 @@ public class BoardService {
      * @return
      */
     public BoardOutputSpec getBoard(Long boardId, Long userId) {
-        User user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userJpaRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
         Board board = boardRepository.findById(boardId).orElseThrow(
@@ -505,7 +506,7 @@ public class BoardService {
      * @param userId
      */
     public void registerLike(LikeForm likeForm, Long userId) {
-        User user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userJpaRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
         Board board = boardRepository.findById(likeForm.getBoardId()).orElseThrow(
@@ -538,7 +539,7 @@ public class BoardService {
      * @param userId
      */
     public void deleteLike(Long boardId, Long userId) {
-        User user = userQueryRepository.findById(userId).orElseThrow(
+        User user = userJpaRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );
 

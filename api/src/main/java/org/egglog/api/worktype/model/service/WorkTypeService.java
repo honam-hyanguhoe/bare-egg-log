@@ -1,29 +1,23 @@
 package org.egglog.api.worktype.model.service;
 
-import jakarta.persistence.PersistenceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.egglog.api.board.exception.BoardErrorCode;
-import org.egglog.api.board.exception.BoardException;
-import org.egglog.api.user.exception.UserErrorCode;
-import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
-import org.egglog.api.user.repository.jpa.UserQueryRepository;
-
-import org.egglog.api.worktype.exception.WorkTypeErrorCode;
 import org.egglog.api.worktype.exception.WorkTypeException;
-import org.egglog.api.worktype.model.dto.params.WorkTypeForm;
-import org.egglog.api.worktype.model.dto.params.WorkTypeModifyForm;
-import org.egglog.api.worktype.model.dto.response.WorkTypeListOutputSpec;
-import org.egglog.api.worktype.model.dto.response.WorkTypeOutputSpec;
+import org.egglog.api.worktype.model.dto.request.CreateWorkTypeRequest;
+import org.egglog.api.worktype.model.dto.request.EditWorkTypeRequest;
+import org.egglog.api.worktype.model.dto.response.WorkTypeResponse;
+import org.egglog.api.worktype.model.entity.WorkTag;
 import org.egglog.api.worktype.model.entity.WorkType;
 import org.egglog.api.worktype.repository.jpa.WorkTypeJpaRepository;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.egglog.api.worktype.exception.WorkTypeErrorCode.*;
+import static org.egglog.api.worktype.exception.WorkTypeErrorCode.ACCESS_DENIED;
 
 @Slf4j
 @Service
@@ -32,93 +26,36 @@ public class WorkTypeService {
 
     private final WorkTypeJpaRepository workTypeJpaRepository;
 
-    private final UserQueryRepository userQueryRepository;
 
-    public List<WorkTypeListOutputSpec> getWorkTypeList(Long userId) {
-        List<WorkTypeListOutputSpec> workTypeListOutputSpecList = new ArrayList<>();
-        List<WorkType> workTypesByUserId = workTypeJpaRepository.findWorkTypesByUserId(userId);
-
-        for (WorkType workType : workTypesByUserId) {
-            WorkTypeListOutputSpec workTypeListOutputSpec = WorkTypeListOutputSpec.builder()
-                    .id(workType.getId())
-                    .title(workType.getTitle())
-                    .imgUrl(workType.getWorkTypeImgUrl())
-                    .color(workType.getColor())
-                    .startTime(workType.getStartTime())
-                    .endTime(workType.getEndTime())
-                    .build();
-
-            workTypeListOutputSpecList.add(workTypeListOutputSpec);
-        }
-        return workTypeListOutputSpecList;
-    }
-
-
-    public void registerBoard(WorkTypeForm workTypeForm) {
-        User user = userQueryRepository.findById(workTypeForm.getUserId()).orElseThrow(
-                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-        );
-
-        WorkType workType = WorkType.builder()
-                .title(workTypeForm.getTitle())
-                .color(workTypeForm.getColor())
-                .workTypeImgUrl(workTypeForm.getImgUrl())
-                .startTime(workTypeForm.getStartTime())
-                .endTime(workTypeForm.getEndTime())
-                .user(user)
-                .build();
-
-        try {
-            workTypeJpaRepository.save(workType);    //저장
-
-        } catch (PersistenceException e) {
-            throw new BoardException(BoardErrorCode.TRANSACTION_ERROR);
-        } catch (DataAccessException e) {
-            throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new BoardException(BoardErrorCode.UNKNOWN_ERROR);
-        }
+    @Transactional
+    public WorkTypeResponse createWorkType(User loginUser, CreateWorkTypeRequest request){
+        return workTypeJpaRepository.save(request.toEntity(loginUser)).toResponse();
     }
 
     @Transactional
-    public WorkTypeOutputSpec modifyBoard(Long workTypeId, WorkTypeModifyForm workTypeModifyForm) {
-        User user = userQueryRepository.findById(workTypeModifyForm.getUserId()).orElseThrow(
-                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-        );
-        WorkType workType = workTypeJpaRepository.findById(workTypeModifyForm.getId()).orElseThrow(
-                () -> new WorkTypeException(WorkTypeErrorCode.NO_EXIST_WORKTYPE)
-        );
-
-        WorkTypeOutputSpec workTypeOutputSpec = WorkTypeOutputSpec.builder()
-                .id(workTypeModifyForm.getId())
-                .title(workTypeModifyForm.getTitle())
-                .imgUrl(workType.getWorkTypeImgUrl())
-                .color(workTypeModifyForm.getColor())
-                .startTime(workTypeModifyForm.getStartTime())
-                .endTime(workTypeModifyForm.getEndTime())
-                .build();
-
-        workType.setTitle(workTypeModifyForm.getTitle());
-        workType.setColor(workTypeModifyForm.getColor());
-
-        return workTypeOutputSpec;
+    public WorkTypeResponse editWorkType(User loginUser, EditWorkTypeRequest request){
+        WorkType workType = workTypeJpaRepository.findWithUserById(request.getWorkTypeId())
+                .orElseThrow(() -> new WorkTypeException(NO_EXIST_WORKTYPE));
+        if (workType.getWorkTag().name() != WorkTag.ETC.name()) throw new WorkTypeException(ACCESS_DENIED);
+        if (workType.getUser().getId() != loginUser.getId()) throw new WorkTypeException(ACCESS_DENIED);
+        return workTypeJpaRepository.save(workType
+                    .edit(request.getTitle(), request.getColor(), request.getWorkTypeImgUrl(), request.getStartTime(), request.getWorkTime()))
+                .toResponse();
     }
 
     @Transactional
-    public void deleteWorkType(Long workTypeId) {
-        WorkType workType = workTypeJpaRepository.findById(workTypeId).orElseThrow(
-                () -> new WorkTypeException(WorkTypeErrorCode.NO_EXIST_WORKTYPE)
-        );
+    public void deleteWorkType(User loginUser, Long workTypeId){
+        WorkType workType = workTypeJpaRepository.findWithUserById(workTypeId)
+                .orElseThrow(() -> new WorkTypeException(NO_EXIST_WORKTYPE));
+        if (workType.getUser().getId()!=loginUser.getId()) throw new WorkTypeException(ACCESS_DENIED);
+        workTypeJpaRepository.delete(workType);
+    }
 
-        try {
-            workTypeJpaRepository.delete(workType);
-
-        } catch (DataAccessException e) {
-            throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new BoardException(BoardErrorCode.UNKNOWN_ERROR);
-        }
+    @Transactional
+    public List<WorkTypeResponse> getWorkTypeList(User loginUser){
+        return workTypeJpaRepository.findWorkTypesByUserId(loginUser.getId())
+                .stream()
+                .map(WorkType::toResponse)
+                .collect(Collectors.toList());
     }
 }
