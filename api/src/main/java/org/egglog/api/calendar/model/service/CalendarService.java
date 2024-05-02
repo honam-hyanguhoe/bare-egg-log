@@ -8,11 +8,14 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.*;
 import net.fortuna.ical4j.model.component.CalendarComponent;
+import net.fortuna.ical4j.model.component.Standard;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VTimeZone;
-import net.fortuna.ical4j.model.property.ProdId;
+import net.fortuna.ical4j.model.property.*;
 import net.fortuna.ical4j.model.property.immutable.ImmutableCalScale;
 import net.fortuna.ical4j.model.property.immutable.ImmutableVersion;
+import net.fortuna.ical4j.util.RandomUidGenerator;
+import net.fortuna.ical4j.util.UidGenerator;
 import org.egglog.api.calendar.exception.CalendarErrorCode;
 import org.egglog.api.calendar.exception.CalendarException;
 import org.egglog.api.user.model.entity.User;
@@ -38,6 +41,7 @@ import org.egglog.api.worktype.model.dto.response.WorkTypeResponse;
 import org.egglog.api.worktype.model.entity.WorkType;
 
 import java.time.LocalDateTime;
+//import java.util.TimeZone;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -88,9 +92,8 @@ public class CalendarService {
                 log.debug("no bucket");
                 updateIcs(user.getId());
             }
-            log.debug(String.valueOf(blob.getBlobId()));
         } catch (Exception e) {
-            log.warn("firebase storage 연결 오류");
+            e.printStackTrace();
             throw new CalendarException(CalendarErrorCode.DATABASE_CONNECTION_FAILED);
         }
         return blobPath;
@@ -179,16 +182,14 @@ public class CalendarService {
         calendar.add(new ProdId("-//Ben Fortuna//iCal4j 4.0//EN"));
         calendar.add(ImmutableVersion.VERSION_2_0);
         calendar.add(ImmutableCalScale.GREGORIAN);
-
+//        System.setProperty("net.fortuna.ical4j.timezone.data", "/static/asia");
         // 아시아/서울 시간대 생성
         TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
-        log.debug("timezone");
         TimeZone timezone = registry.getTimeZone("Asia/Seoul");
         VTimeZone tz = timezone.getVTimeZone();
 
-        // 시간대를 캘린더에 추가
-        calendar.getComponents().add(tz);
         try {
+            log.debug("get schedules from database");
             //사용자의 모든 근무 일정 가져오기
             List<Work> workList = workQueryRepositoryImpl.findAllWorkWithWorkTypeByUser(userId);
             //사용자의 모든 개인 일정 가져오기
@@ -197,19 +198,35 @@ public class CalendarService {
             if(workList.isEmpty()&&eventList.isEmpty()){
                 throw new CalendarException(CalendarErrorCode.SCHEDULE_NOT_FOUND);
             }
+            //Uid 생성기
+            UidGenerator ug = new RandomUidGenerator();
             //일정을 기록할 캘린더 객체 생성
             List<CalendarComponent> calendarWorkComponentList = workList.stream().map(
                     work -> {
                         //시작 시간와 근무 이름을 통해 새로운 VEvent 생성
-                        return new VEvent(work.getWorkDate(),work.getWorkType().getTitle());
+                        VEvent workEvent = new VEvent(work.getWorkDate(),work.getWorkType().getTitle())
+                                .withProperty(tz.getTimeZoneId().get())
+                                        .withProperty(ug.generateUid())
+                                .getFluentTarget();
+                        return workEvent;
                     }).collect(Collectors.toList());
             List<CalendarComponent> calendarEventComponentList = eventList.stream()
                     .filter(event -> event.getStartDate()!=null) //start date가 존재하는 경우만 처리
                     .map(event -> {
                         if(event.getEndDate()==null){ //end date 없는 경우 처리
-                            return new VEvent(event.getStartDate(),event.getEventTitle());
+                            Uid uid = ug.generateUid();
+                            VEvent usualEvent =  new VEvent(event.getStartDate(),event.getEventTitle())
+                                    .withProperty(tz.getTimeZoneId().get())
+                                    .withProperty(ug.generateUid())
+                                    .getFluentTarget();
+                            return usualEvent;
                         }else {
-                            return new VEvent(event.getStartDate(), event.getEndDate(), event.getEventTitle());
+                            Uid uid = ug.generateUid();
+                            VEvent usualEvent =  new VEvent(event.getStartDate(), event.getEndDate(), event.getEventTitle())
+                                    .withProperty(tz.getTimeZoneId().get())
+                                    .withProperty(ug.generateUid())
+                                    .getFluentTarget();
+                            return usualEvent;
                         }
                     }).collect(Collectors.toList());
             //캘린더 객체에 일정 추가
