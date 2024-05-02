@@ -7,6 +7,7 @@ import org.egglog.api.work.model.dto.request.*;
 import org.egglog.api.work.model.dto.response.upcoming.enums.DateType;
 import org.egglog.api.work.model.service.WorkService;
 import org.egglog.utility.utils.MessageUtils;
+import org.egglog.utility.utils.SuccessType;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,6 +27,8 @@ import java.time.LocalDate;
  * |DATE|AUTHOR|NOTE|
  * |:---:|:---:|:---:|
  * |2024-04-29|김형민|최초 생성|
+ * |2024-05-01|김형민|통계 조회 추가|
+ * |2024-05-02|김형민|주석 추가|
  */
 @RestController
 @RequiredArgsConstructor
@@ -34,25 +37,44 @@ import java.time.LocalDate;
 public class WorkController {
     private final WorkService workService;
 
+    /**
+     * 근무 일정 생성
+     * @param loginUser 로그인한 유저(JWT 토큰)
+     * @param request 캘린더 그룹 ID, List[{근무 타입 ID, 근무 일}]
+     * @return 생성된 근무 일정 객체 응답 리스트
+     * @author 김형민
+     */
     @PostMapping("/create")
     public ResponseEntity<MessageUtils> createWork(
             @AuthenticationPrincipal User loginUser,
             @RequestBody CreateWorkListRequest request
     ){
-        workService.createWork(loginUser, request);
         return ResponseEntity.ok().body(
-                MessageUtils.success());
+                MessageUtils.success(workService.createWork(loginUser, request)));
     }
 
+    /**
+     * 근무 일정 수정 및 삭제
+     * @param loginUser 로그인한 유저(JWT 토큰)
+     * @param request 캘린더 그룹 ID, List[{변경할 근무 ID, 근무 일,  근무 타입 ID, 삭제 여부}]
+     * @return 수정된 근무 일정 객체 응답 리스트
+     * @author 김형민
+     */
     @PatchMapping("/update")
     public ResponseEntity<MessageUtils> updateWork(
             @AuthenticationPrincipal User loginUser,
             @RequestBody EditAndDeleteWorkListRequest request
     ){
-        workService.updateWork(loginUser, request);
-        return ResponseEntity.ok().body(MessageUtils.success());
+        return ResponseEntity.ok().body(MessageUtils.success(workService.updateWork(loginUser, request)));
     }
 
+    /**
+     * 근무 일정 조회
+     * @param loginUser 로그인한 유저(JWT 토큰)
+     * @param request  캘린더 그룹 ID, 조회할 시작 일, 조회할 마지막 일
+     * @return 조회 된 근무 일정 객체 응답 리스트
+     * @author 김형민
+     */
     @GetMapping("/find")
     public ResponseEntity<MessageUtils> findWorkList(
             @AuthenticationPrincipal User loginUser,
@@ -62,6 +84,13 @@ public class WorkController {
                 MessageUtils.success(workService.findWorkList(loginUser, request)));
     }
 
+    /**
+     * 같은 그룹 유저의 근무 일정 조회
+     * @param loginUser 로그인한 유저(JWT 토큰)
+     * @param request userGroupId(현재 유저 그룹 ID), targetUserId(조회할 유저의 ID), startDate(조회할 시작 일), endDate(조회할 마지막 일)
+     * @return 조회 된 근무 일정 객체 응답 리스트
+     * @author 김형민
+     */
     @GetMapping("/find/user")
     public ResponseEntity<MessageUtils> findGroupUserWorkList(
             @AuthenticationPrincipal User loginUser,
@@ -71,6 +100,14 @@ public class WorkController {
                 MessageUtils.success(workService.findGroupUserWorkList(loginUser, request)));
     }
 
+    /**
+     * 주, 월의 이번주 남은 근무 당 개수
+     * @param loginUser 로그인한 유저(JWT 토큰)
+     * @param today 오늘(YYYY-MM-DD)
+     * @param dateType WEEK, MONTH
+     * @return 리스트 [ 근무이름, 해당 남은 근무의 개수, 해당 근무의 색 ]
+     * @author 김형민
+     */
     @GetMapping("/find/upcoming/{dateType}")
     public ResponseEntity<MessageUtils> findUpcomingCountWorkList(
             @AuthenticationPrincipal User loginUser,
@@ -82,6 +119,15 @@ public class WorkController {
                 MessageUtils.success(workService.findUpComingWorkCount(loginUser, today, dateType)));
     }
 
+
+    /**
+     * 이제까지 수행한 근무의 통계
+     * @param loginUser 로그인한 유저(JWT 토큰)
+     * @param today 오늘(YYYY-MM-DD)
+     * @param month 조회할 타겟 월(YYYY-MM-DD)
+     * @return CompletedWorkCountResponse
+     * @author 김형민
+     */
     @GetMapping("/find/completed")
     public ResponseEntity<MessageUtils> findCompletedCountWorkList(
             @AuthenticationPrincipal User loginUser,

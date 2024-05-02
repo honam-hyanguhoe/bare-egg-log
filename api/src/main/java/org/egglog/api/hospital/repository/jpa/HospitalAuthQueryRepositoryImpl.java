@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+
 import static org.egglog.api.hospital.model.entity.QHospitalAuth.hospitalAuth;
 import static org.egglog.api.hospital.model.entity.QHospital.hospital;
 import static org.egglog.api.user.model.entity.QUser.user;
@@ -49,4 +50,12 @@ public class HospitalAuthQueryRepositoryImpl implements HospitalAuthQueryReposit
                 .where(hospitalAuth.hospital.id.eq(hospitalId))
                 .fetch();
     }
+    public List<HospitalAuth> findAuthListWithUser(Boolean authType){
+        return jpaQueryFactory
+                .selectFrom(hospitalAuth)
+                .leftJoin(hospitalAuth.user, user).fetchJoin()
+                .leftJoin(hospitalAuth.hospital, hospital).fetchJoin()
+                .where(hospitalAuth.auth.eq(authType))
+                .fetch();
+    };
 }

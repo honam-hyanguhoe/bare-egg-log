@@ -2,6 +2,7 @@ package org.egglog.api.worktype.model.dto.request;
 
 import lombok.*;
 import org.egglog.api.worktype.model.entity.WorkTag;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalTime;
 
@@ -27,6 +28,8 @@ public class EditWorkTypeRequest {
     private String title;        //태그 이름
     private String color;       //색상
     private String workTypeImgUrl;      //근무 이미지
+    @DateTimeFormat(pattern = "HH:mm")
     private LocalTime startTime;       //시작 시각
+    @DateTimeFormat(pattern = "HH:mm")
     private LocalTime workTime;     //근무 시간
 }
