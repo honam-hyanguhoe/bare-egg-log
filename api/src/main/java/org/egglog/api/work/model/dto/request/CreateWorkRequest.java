@@ -1,6 +1,7 @@
 package org.egglog.api.work.model.dto.request;
 
 import lombok.*;
+import net.fortuna.ical4j.util.UidGenerator;
 import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.work.model.entity.Work;
