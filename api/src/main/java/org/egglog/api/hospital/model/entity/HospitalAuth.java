@@ -75,6 +75,16 @@ public class HospitalAuth {
         return this;
     }
 
+    public HospitalAuthResponse toResponse(String empNo){
+        return HospitalAuthResponse.builder()
+                .empNo(empNo)
+                .auth(this.auth)
+                .authRequestTime(this.authRequestTime)
+                .confirmTime(this.confirmTime!=null ? this.confirmTime : null)
+                .nurseCertificationImgUrl(this.nurseCertificationImgUrl)
+                .hospitalCertificationImgUrl(this.hospitalCertificationImgUrl)
+                .build();
+    }
     public HospitalAuthResponse toResponse(){
         return HospitalAuthResponse.builder()
                 .auth(this.auth)

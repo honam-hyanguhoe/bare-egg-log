@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
  * 2024-04-26        김형민       최초 생성
+ * 2024-05-02        김형민       인증 확인, 요청 리스트 조회 추가
  */
 @Service
 @RequiredArgsConstructor
@@ -41,7 +42,7 @@ public class HospitalAuthService {
                 .findByUserAndHospital(loginUser, loginUser.getSelectedHospital())
                 .map(auth -> auth.create(loginUser, request.getNurseCertificationImgUrl(), request.getHospitalCertificationImgUrl()))
                 .orElseGet(() -> new HospitalAuth().create(loginUser, request.getNurseCertificationImgUrl(), request.getHospitalCertificationImgUrl())))
-                .toResponse();
+                .toResponse(loginUser.getEmpNo());
     }
 
 }
