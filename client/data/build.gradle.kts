@@ -42,12 +42,9 @@ dependencies {
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)
-    implementation(project(":presentation"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
-
-    implementation(project(":domain"))
 
     // serialization
     implementation(libs.kotlinx.serialization.json)
@@ -76,9 +73,8 @@ dependencies {
     implementation(libs.kakao.auth)
 
     // google
-    implementation(libs.google.services)
-//    implementation(libs.firebase.auth)
-//    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(platform(libs.firebase.bom))
     implementation(libs.play.services.auth)
 
     // room
@@ -86,4 +82,6 @@ dependencies {
     implementation(libs.room.paging)
     kapt(libs.room.compiler)
 
+    implementation(project(":presentation"))
+    implementation(project(":domain"))
 }

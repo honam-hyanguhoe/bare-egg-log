@@ -70,9 +70,8 @@ paging-compose = { group="androidx.paging", name="paging-compose", version.ref="
 
 coroutines-core = { group="org.jetbrains.kotlinx", name="kotlinx-coroutines-core", version.ref="coroutines-core" }
 
-google-services = { group="com.google.gms", name="google-services", version="4.4.1" }
-#firebase-auth = { group="com.google.firebase", name="firebase-auth", version="22.3.1" }
-#firebase-bom = { group="com.google.firebase", name="firebase-bom", version="32.8.1" }
+firebase-auth = { group="com.google.firebase", name="firebase-auth", version="22.3.1" }
+firebase-bom = { group="com.google.firebase", name="firebase-bom", version="32.8.1" }
 play-services-auth = { group="com.google.android.gms", name="play-services-auth", version="21.1.0" }
 
 
@@ -82,6 +81,7 @@ room-paging = { group = "androidx.room", name = "room-paging", version.ref = "ro
 annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotation" }
 
 [plugins]
+com-google-gms = { id="com.google.gms.google-services", version="4.4.1" }
 com-android-application = { id = "com.android.application", version.ref = "agp" }
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref="org-jetbrains-kotlin-android" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "org-jetbrains-kotlin-android" }

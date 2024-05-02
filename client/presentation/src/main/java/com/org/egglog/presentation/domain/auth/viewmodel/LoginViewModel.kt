@@ -1,9 +1,12 @@
 package com.org.egglog.presentation.domain.auth.viewmodel
 
+import android.app.Activity
 import androidx.lifecycle.ViewModel
+import com.org.egglog.domain.auth.usecase.GetGoogleUseCase
 import com.org.egglog.domain.auth.usecase.GetKakaoUseCase
 import com.org.egglog.domain.auth.usecase.LoginUseCase
 import com.org.egglog.domain.auth.usecase.SetTokenUseCase
+import com.org.egglog.presentation.domain.auth.activity.LoginActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
@@ -20,7 +23,7 @@ class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val setTokenUseCase: SetTokenUseCase,
     private val getKakaoUseCase: GetKakaoUseCase,
-    private val googleUtil: GoogleUtil
+    private val getGoogleUseCase: GetGoogleUseCase
 ): ViewModel(), ContainerHost<LoginState, LoginSideEffect> {
     override val container: Container<LoginState, LoginSideEffect> = container(
         initialState = LoginState(),
@@ -38,14 +41,8 @@ class LoginViewModel @Inject constructor(
         if(type === "KAKAO") {
             getKakaoUseCase()
         } else if(type === "GOOGLE") {
-//            googleUtil.loginGoogle(activity)
+            getGoogleUseCase()
         }
-//        val tokens = loginUseCase(type).getOrThrow()
-//        Log.e("token?: ", tokens.toString())
-//        if (tokens != null) {
-//            setTokenUseCase(accessToken = tokens.accessToken, refreshToken =  tokens.refreshToken)
-//        }
-//        postSideEffect(LoginSideEffect.NavigateToMainActivity)
     }
 }
 
