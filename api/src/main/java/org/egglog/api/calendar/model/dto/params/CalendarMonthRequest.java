@@ -31,7 +31,5 @@ public class CalendarMonthRequest {
 
     private LocalDateTime endDate;
 
-    private Long userId;
-
     private Long calendarGroupId;
 }
