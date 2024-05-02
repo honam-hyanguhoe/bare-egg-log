@@ -51,19 +51,33 @@ public class HospitalAuthController {
 
     /**
      * 인증 요청 리스트 조회 API
-     * @param masterUser 관리자 jwt 토큰
+     * @param adminUser 관리자 jwt 토큰
+     * @param authType T : 인증된 리스트 F : 인증되지 않은 리스트
      * @author 김형민
      * @return
      */
     @GetMapping("/list/{authType}")
     public ResponseEntity<MessageUtils> findAuthList(
-            @AuthenticationPrincipal User masterUser,
+            @AuthenticationPrincipal User adminUser,
             @PathVariable Boolean authType
 
     ){
         return ResponseEntity.ok().body(
-                MessageUtils.success(hospitalAuthService.findHospitalAuthList(masterUser, authType)));
+                MessageUtils.success(hospitalAuthService.findHospitalAuthList(adminUser, authType)));
     }
 
-
+    /**
+     * 인증 하기 API
+     * @param adminUser 관리자 jwt 토큰
+     * @param authHospitalId 인증할 병원인증요청 id
+     * @return
+     */
+    @PatchMapping("/cert/{authHospitalId}")
+    public ResponseEntity<MessageUtils> cert(
+            @AuthenticationPrincipal User adminUser,
+            @PathVariable Long authHospitalId
+    ){
+        return ResponseEntity.ok().body(
+                MessageUtils.success(hospitalAuthService.certHospitalAuth(adminUser, authHospitalId)));
+    }
 }

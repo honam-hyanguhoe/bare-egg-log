@@ -39,6 +39,10 @@ public class HospitalAuth {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "admin_id")
+    private User certAdminUser;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hospital_id")
     private Hospital hospital;
 
@@ -59,9 +63,10 @@ public class HospitalAuth {
 
 
 
-    public HospitalAuth confirm(){
+    public HospitalAuth confirm(User adminUser){
         this.auth = true;
         this.confirmTime = LocalDateTime.now();
+        this.certAdminUser = adminUser;
         return this;
     }
 

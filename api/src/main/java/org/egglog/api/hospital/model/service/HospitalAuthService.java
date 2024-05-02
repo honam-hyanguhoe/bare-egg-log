@@ -2,6 +2,8 @@ package org.egglog.api.hospital.model.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.egglog.api.hospital.exception.HospitalErrorCode;
+import org.egglog.api.hospital.exception.HospitalException;
 import org.egglog.api.hospital.model.dto.request.CreateHospitalAuthRequest;
 import org.egglog.api.hospital.model.dto.response.HospitalAuthListResponse;
 import org.egglog.api.hospital.model.dto.response.HospitalAuthResponse;
@@ -69,6 +71,13 @@ public class HospitalAuthService {
                         .build()
                 )
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public HospitalAuthResponse certHospitalAuth(User adminUser, Long authHospitalId){
+        HospitalAuth hospitalAuth = hospitalAuthJpaRepository.findByIdWithHospitalAndUser(authHospitalId)
+                .orElseThrow(() -> new HospitalException(HospitalErrorCode.AUTH_NOT_FOUND));
+        return hospitalAuthJpaRepository.save(hospitalAuth.confirm(adminUser)).toResponse();
     }
 
 }
