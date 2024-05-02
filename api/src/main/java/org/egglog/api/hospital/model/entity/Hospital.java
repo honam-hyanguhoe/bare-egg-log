@@ -57,7 +57,7 @@ public class Hospital {
 
     public UserHospitalResponse toUserHospitalResponse(){
         return UserHospitalResponse.builder()
-                .id(this.id)
+                .hospitalId(this.id)
                 .lat(this.lat)
                 .lng(this.lng)
                 .address(this.address)

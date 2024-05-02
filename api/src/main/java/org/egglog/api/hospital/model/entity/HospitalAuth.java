@@ -83,6 +83,7 @@ public class HospitalAuth {
                 .confirmTime(this.confirmTime!=null ? this.confirmTime : null)
                 .nurseCertificationImgUrl(this.nurseCertificationImgUrl)
                 .hospitalCertificationImgUrl(this.hospitalCertificationImgUrl)
+                .hospitalInfo(this.hospital != null ? this.hospital.toUserHospitalResponse() : null)
                 .build();
     }
     public HospitalAuthResponse toResponse(){
@@ -92,6 +93,7 @@ public class HospitalAuth {
                 .confirmTime(this.confirmTime!=null ? this.confirmTime : null)
                 .nurseCertificationImgUrl(this.nurseCertificationImgUrl)
                 .hospitalCertificationImgUrl(this.hospitalCertificationImgUrl)
+                .hospitalInfo(this.hospital != null ? this.hospital.toUserHospitalResponse() : null)
                 .build();
     }
 }
