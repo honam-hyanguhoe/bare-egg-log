@@ -2,23 +2,29 @@ package com.org.egglog.presentation.domain.auth.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.kakao.sdk.common.KakaoSdk
+import com.kakao.sdk.common.util.Utility
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
-import com.org.egglog.presentation.domain.auth.screen.MainActivity
 import com.org.egglog.presentation.domain.auth.screen.SplashScreen
 import com.org.egglog.presentation.theme.ClientTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.org.egglog.presentation.R
 
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
     @Inject lateinit var getTokenUseCase: GetTokenUseCase
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        KakaoSdk.init(this, getString(R.string.kakao_native_app_key))
+//        val keyHash = Utility.getKeyHash(this)
+//        Log.e("Hash", keyHash)
         setContent{
             ClientTheme {
                 SplashScreen()

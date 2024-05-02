@@ -99,5 +99,10 @@ dependencies {
     // splash
     implementation(libs.splash)
 
+    // kakao
+    implementation(libs.kakao.user)
+    implementation(libs.kakao.share)
+    implementation(libs.kakao.auth)
+
     implementation(project(":domain"))
 }

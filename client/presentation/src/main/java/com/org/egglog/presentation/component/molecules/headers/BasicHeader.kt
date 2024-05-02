@@ -26,6 +26,7 @@ import com.org.egglog.presentation.component.atoms.buttons.IconTextButton
 import com.org.egglog.presentation.component.atoms.linearIndicator.LinearIndicator
 import com.org.egglog.presentation.component.atoms.menus.ScrollableMenus
 import com.org.egglog.presentation.theme.*
+import com.org.egglog.presentation.utils.heightPercent
 
 @Composable
 fun BasicHeader(
@@ -49,6 +50,7 @@ fun BasicHeader(
         modifier = Modifier
             .fillMaxWidth()
             .background(NaturalWhite)
+            .padding(top = 12.heightPercent(LocalContext.current).dp)
     ) {
         Column {
             BasicHeaderContents(

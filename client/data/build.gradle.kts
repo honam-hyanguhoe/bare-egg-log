@@ -69,6 +69,11 @@ dependencies {
     // paging3
     implementation(libs.paging.runtime)
 
+    // kakao
+    implementation(libs.kakao.user)
+    implementation(libs.kakao.share)
+    implementation(libs.kakao.auth)
+
     // room
     implementation(libs.room.runtime)
     implementation(libs.room.paging)
