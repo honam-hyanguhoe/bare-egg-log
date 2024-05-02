@@ -114,11 +114,21 @@ public class WorkQueryRepositoryImpl implements WorkQueryRepository{
                 .fetch();
     }
 
-    public List<Work> findWorksBeforeDate(Long userId, LocalDate date) {
+    public List<Work> findWorksBeforeDate(Long userId, LocalDate today, LocalDate targetMonth) {
+        // month의 첫날과 마지막날 계산
+        LocalDate startOfMonth = targetMonth.withDayOfMonth(1);
+        LocalDate endOfMonth = targetMonth.withDayOfMonth(targetMonth.lengthOfMonth());
+
+        // 조건 설정: today가 month의 달에 포함되는지 확인
+        if (today.getMonth() == targetMonth.getMonth() && today.getYear() == targetMonth.getYear()) endOfMonth = today;
+
+
         return jpaQueryFactory
                 .selectFrom(work)
                 .leftJoin(work.workType, workType).fetchJoin() // WorkType과 함께 조인
-                .where(work.user.id.eq(userId).and(work.workDate.lt(date))) // 오늘 날짜 이전
+                .where(work.user.id.eq(userId)
+                        .and(work.workDate.goe(startOfMonth))
+                        .and(work.workDate.loe(endOfMonth)))
                 .fetch();
     }
 }
