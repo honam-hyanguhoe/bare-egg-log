@@ -39,3 +39,4 @@ application.yml
 gradle.properties
 ./lib/
 *.hprof
+!**/node_modules/
