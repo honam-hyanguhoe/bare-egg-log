@@ -10,5 +10,6 @@ public interface HospitalAuthQueryRepository {
     Optional<HospitalAuth> findByUserIdAndHospitalIdWithHospitalAndUser(Long userId, Long hospitalId);
     List<HospitalAuth> findListByUserIdWithHospital(Long userId);
     List<HospitalAuth> findListByHospitalIdWithUser(Long hospitalId);
+    List<HospitalAuth> findAuthListWithUser(Boolean authType);
 
 }

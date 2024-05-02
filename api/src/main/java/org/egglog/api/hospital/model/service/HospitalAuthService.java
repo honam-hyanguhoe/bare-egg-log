@@ -2,13 +2,24 @@ package org.egglog.api.hospital.model.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.egglog.api.hospital.exception.HospitalErrorCode;
+import org.egglog.api.hospital.exception.HospitalException;
 import org.egglog.api.hospital.model.dto.request.CreateHospitalAuthRequest;
+import org.egglog.api.hospital.model.dto.response.HospitalAuthListResponse;
 import org.egglog.api.hospital.model.dto.response.HospitalAuthResponse;
 import org.egglog.api.hospital.model.entity.HospitalAuth;
 import org.egglog.api.hospital.repository.jpa.HospitalAuthJpaRepository;
+import org.egglog.api.security.exception.JwtErrorCode;
+import org.egglog.api.security.exception.JwtException;
+import org.egglog.api.user.exception.UserErrorCode;
+import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
+import org.egglog.api.user.model.entity.enums.UserRole;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * packageName    : org.egglog.api.hospital.model.service
@@ -20,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
  * 2024-04-26        김형민       최초 생성
+ * 2024-05-02        김형민       인증 확인, 요청 리스트 조회 추가
  */
 @Service
 @RequiredArgsConstructor
@@ -41,7 +53,31 @@ public class HospitalAuthService {
                 .findByUserAndHospital(loginUser, loginUser.getSelectedHospital())
                 .map(auth -> auth.create(loginUser, request.getNurseCertificationImgUrl(), request.getHospitalCertificationImgUrl()))
                 .orElseGet(() -> new HospitalAuth().create(loginUser, request.getNurseCertificationImgUrl(), request.getHospitalCertificationImgUrl())))
-                .toResponse();
+                .toResponse(loginUser.getEmpNo());
+    }
+
+    @Transactional(readOnly = true)
+    public List<HospitalAuthListResponse> findHospitalAuthList(User masterUser, Boolean authType){
+        if (masterUser.getUserRole()!= UserRole.ADMIN) throw new UserException(UserErrorCode.ACCESS_DENIED);
+        return hospitalAuthJpaRepository.findAuthListWithUser(authType).stream()
+                .map(auth -> HospitalAuthListResponse.builder()
+                        .userId(auth.getUser().getId())
+                        .hospitalAuthId(auth.getId())
+                        .userName(auth.getUser().getName())
+                        .userEmail(auth.getUser().getEmail())
+                        .userStatus(auth.getUser().getUserStatus())
+                        .selectHospital(auth.getUser().getSelectedHospital().toUserHospitalResponse())
+                        .hospitalAuth(auth.toResponse())
+                        .build()
+                )
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public HospitalAuthResponse certHospitalAuth(User adminUser, Long authHospitalId){
+        HospitalAuth hospitalAuth = hospitalAuthJpaRepository.findByIdWithHospitalAndUser(authHospitalId)
+                .orElseThrow(() -> new HospitalException(HospitalErrorCode.AUTH_NOT_FOUND));
+        return hospitalAuthJpaRepository.save(hospitalAuth.confirm(adminUser)).toResponse();
     }
 
 }

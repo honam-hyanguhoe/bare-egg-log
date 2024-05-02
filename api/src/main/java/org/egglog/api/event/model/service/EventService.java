@@ -39,13 +39,9 @@ public class EventService {
      * 개인 일정 등록
      *
      * @param eventForm
-     * @param userId
+     * @param user
      */
-    public void registerEvent(EventForm eventForm, Long userId) {
-        User user = userJpaRepository.findById(userId).orElseThrow(
-                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-        );
-
+    public void registerEvent(EventForm eventForm, User user) {
         CalendarGroup calendarGroup = calendarGroupRepository.findById(eventForm.getCalendarGroupId()).orElseThrow(
                 () -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP)
         );

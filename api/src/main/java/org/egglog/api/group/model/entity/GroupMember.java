@@ -11,6 +11,7 @@ import org.egglog.api.user.model.entity.User;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@Table(indexes = @Index(name = "idx_user_id", columnList = "user_id"))
 public class GroupMember {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

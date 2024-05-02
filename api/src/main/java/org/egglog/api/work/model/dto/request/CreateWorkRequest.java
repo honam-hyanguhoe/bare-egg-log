@@ -6,6 +6,7 @@ import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.work.model.entity.Work;
 import org.egglog.api.worktype.model.entity.WorkType;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -29,6 +30,7 @@ import java.util.Map;
 @Setter
 @Builder
 public class CreateWorkRequest {
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate workDate;
     private Long workTypeId;
 

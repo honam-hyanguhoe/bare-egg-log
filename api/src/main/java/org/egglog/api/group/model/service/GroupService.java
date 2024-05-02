@@ -274,4 +274,11 @@ public class GroupService {
             throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
         }
     }
+
+    public GroupDutySummary getGroupDuty(Long groupId, User user, String date) {
+        if(!groupMemberService.isGroupMember(groupId,user.getId())){
+            throw new GroupException(GroupErrorCode.GROUP_ROLE_NOT_MATCH);
+        }
+        return groupMemberService.getGroupDutySummary(groupId, date);
+    }
 }
