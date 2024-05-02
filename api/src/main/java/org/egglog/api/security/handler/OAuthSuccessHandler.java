@@ -6,10 +6,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.egglog.api.security.exception.JwtErrorCode;
+import org.egglog.api.security.exception.JwtException;
 import org.egglog.api.security.model.service.TokenService;
+import org.egglog.api.user.exception.UserErrorCode;
+import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
+import org.egglog.api.user.model.entity.enums.UserStatus;
 import org.egglog.api.user.repository.jpa.UserJpaRepository;
-import org.egglog.api.user.repository.jpa.UserQueryRepository;
+import org.egglog.api.user.repository.jpa.UserQueryRepositoryImpl;
 import org.egglog.utility.utils.MessageUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -25,7 +30,6 @@ import java.util.Optional;
 public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final TokenService tokenService;
     private final UserJpaRepository userJpaRepository;
-    private final UserQueryRepository userQueryRepository;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -37,10 +41,11 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_OK);
         //회원 가입 일 경우
-        Optional<User> optionalUser = userQueryRepository.findByEmailWithHospital(oauth2user.getEmail());
+        Optional<User> optionalUser = userJpaRepository.findByEmailWithHospital(oauth2user.getEmail());
         if (optionalUser.isPresent()){
             //로그인인 경우
             User user = optionalUser.get();
+            if (user.getUserStatus()!= UserStatus.ACTIVE) throw new UserException(UserErrorCode.DELETED_USER);
             userJpaRepository.save(user.doLogin());
             response.getWriter().write(objectMapper.writeValueAsString(
                     MessageUtils.success(tokenService.generatedToken(user.getId(), user.getUserRole().name()))

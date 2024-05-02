@@ -39,6 +39,10 @@ public class HospitalAuth {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "admin_id")
+    private User certAdminUser;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hospital_id")
     private Hospital hospital;
 
@@ -59,9 +63,10 @@ public class HospitalAuth {
 
 
 
-    public HospitalAuth confirm(){
+    public HospitalAuth confirm(User adminUser){
         this.auth = true;
         this.confirmTime = LocalDateTime.now();
+        this.certAdminUser = adminUser;
         return this;
     }
 
@@ -75,6 +80,17 @@ public class HospitalAuth {
         return this;
     }
 
+    public HospitalAuthResponse toResponse(String empNo){
+        return HospitalAuthResponse.builder()
+                .empNo(empNo)
+                .auth(this.auth)
+                .authRequestTime(this.authRequestTime)
+                .confirmTime(this.confirmTime!=null ? this.confirmTime : null)
+                .nurseCertificationImgUrl(this.nurseCertificationImgUrl)
+                .hospitalCertificationImgUrl(this.hospitalCertificationImgUrl)
+                .hospitalInfo(this.hospital != null ? this.hospital.toUserHospitalResponse() : null)
+                .build();
+    }
     public HospitalAuthResponse toResponse(){
         return HospitalAuthResponse.builder()
                 .auth(this.auth)
@@ -82,6 +98,7 @@ public class HospitalAuth {
                 .confirmTime(this.confirmTime!=null ? this.confirmTime : null)
                 .nurseCertificationImgUrl(this.nurseCertificationImgUrl)
                 .hospitalCertificationImgUrl(this.hospitalCertificationImgUrl)
+                .hospitalInfo(this.hospital != null ? this.hospital.toUserHospitalResponse() : null)
                 .build();
     }
 }

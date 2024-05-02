@@ -2,14 +2,31 @@ package org.egglog.api.worktype.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.egglog.api.user.model.entity.User;
-import org.egglog.api.worktype.model.dto.params.WorkTypeForm;
-import org.egglog.api.worktype.model.dto.params.WorkTypeModifyForm;
+import org.egglog.api.worktype.model.dto.request.CreateWorkTypeRequest;
+import org.egglog.api.worktype.model.dto.request.EditWorkTypeRequest;
+import org.egglog.api.worktype.model.entity.WorkTag;
 import org.egglog.api.worktype.model.service.WorkTypeService;
 import org.egglog.utility.utils.MessageUtils;
 import org.egglog.utility.utils.SuccessType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalTime;
+/**
+ * ```
+ * ===================[Info]=========================
+ * packageName    : org.egglog.api.workType.cotroller
+ * fileName       : WorkTypeController
+ * description    : 근무 타입 컨트롤러
+ * =================================================
+ * ```
+ * |DATE|AUTHOR|NOTE|
+ * |:---:|:---:|:---:|
+ * |2024-04-24|김도휘|최초 생성|
+ * |2024-04-30|김형민|코드 리펙토링|
+ * |2024-05-02|김형민|주석 추가|
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/worktypes")
@@ -17,45 +34,64 @@ public class WorkTypeController {
 
     private final WorkTypeService workTypeService;
 
-    @GetMapping("")
-    public ResponseEntity<?> getWorkTypeList() {
-//        TODO @AuthenticationPrincipal User user
-        Long userId = 1L;
-        return ResponseEntity.ok().body(MessageUtils.success(workTypeService.getWorkTypeList(userId)));
+
+    /**
+     * 리스트 조회
+     * @param loginUser 로그인한 유저(JWT 토큰)
+     * @return 리스트[근무타입ID, 이름, 색상, 근무 이미지, 태그 속성, 시작시각, 근무시간]
+     * @author 김형민
+     */
+    @GetMapping("/list")
+    public ResponseEntity<MessageUtils> getWorkTypeList(
+            @AuthenticationPrincipal User loginUser
+    ) {
+        return ResponseEntity.ok()
+                .body(MessageUtils.success(workTypeService.getWorkTypeList(loginUser)));
     }
 
     /**
-     * 등록
-     *
-     * @param workTypeForm
-     * @return
+     * 생성
+     * @param loginUser 로그인한 유저(JWT 토큰)
+     * @param request 이름, 색상, 근무 이미지, 시작시각, 근무시간
+     * @return 근무타입ID, 이름, 색상, 근무 이미지, 태그 속성, 시작시각, 근무시간
+     * @author 김형민
      */
-    @PostMapping("")
-    public ResponseEntity<?> registerWorkType(@RequestBody WorkTypeForm workTypeForm) {
-//        TODO @AuthenticationPrincipal User user
-        Long userId = 1L;
-        workTypeService.registerBoard(workTypeForm);
-        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
+    @PostMapping("/create")
+    public ResponseEntity<MessageUtils> registerWorkType(
+            @AuthenticationPrincipal User loginUser,
+            @RequestBody CreateWorkTypeRequest request) {
+        return ResponseEntity.ok()
+                .body(MessageUtils.success(workTypeService.createWorkType(loginUser, request)));
     }
 
-
-    @DeleteMapping("/{work_type_id}")
-    public ResponseEntity deleteWorkType(@PathVariable("work_type_id") Long workTypeId
-//            TODO @AuthenticationPrincipal User user
+    /**
+     * 삭제
+     * @param loginUser 로그인한 유저(JWT 토큰)
+     * @param workTypeId 삭제할 근무 유형 아이디
+     * @return deleted massage
+     * @author 김형민
+     */
+    @DeleteMapping("/{workTypeId}")
+    public ResponseEntity<MessageUtils> deleteWorkType(
+            @AuthenticationPrincipal User loginUser,
+            @PathVariable Long workTypeId
     ) {
-        User user = null;
-        workTypeService.deleteWorkType(workTypeId);
+        workTypeService.deleteWorkType(loginUser, workTypeId);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
     }
 
-
-    @PatchMapping("/{work_type_id}")
-    public ResponseEntity updateWorkType(@PathVariable("work_type_id") Long workTypeId,
-            @RequestBody WorkTypeModifyForm workTypeModifyForm
-//            TODO @AuthenticationPrincipal User user
+    /**
+     * 수정 (덮어 쓰기)
+     * @param loginUser 로그인 한 유저(jwt 토큰)
+     * @param request 근무타입ID, 이름, 색상, 근무 이미지, 태그 속성, 시작시각, 근무시간
+     * @return 수정된 근무타입ID, 이름, 색상, 근무 이미지, 태그 속성, 시작시각, 근무시간
+     */
+    @PutMapping("/edit")
+    public ResponseEntity<MessageUtils> updateWorkType(
+            @AuthenticationPrincipal User loginUser,
+            @RequestBody EditWorkTypeRequest request
     ) {
-        Long userId = 1L;
         return ResponseEntity.ok().body(
-                MessageUtils.success(workTypeService.modifyBoard(workTypeId, workTypeModifyForm)));
+                MessageUtils.success(workTypeService.editWorkType(loginUser, request)));
     }
 }

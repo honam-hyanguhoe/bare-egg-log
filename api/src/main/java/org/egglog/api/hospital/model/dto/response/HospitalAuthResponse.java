@@ -32,4 +32,5 @@ public class HospitalAuthResponse {
     private LocalDateTime confirmTime;
     private String nurseCertificationImgUrl;
     private String hospitalCertificationImgUrl;
+    private UserHospitalResponse hospitalInfo;
 }

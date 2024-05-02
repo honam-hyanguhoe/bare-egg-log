@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.*;
 import org.egglog.utility.utils.MessageUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+<<<<<<< HEAD
+=======
+
+import java.util.Calendar;
+>>>>>>> fff4995bb882dc6f5ae5997bf8f81c3b3325af08
 
 @RestController
 @RequiredArgsConstructor
@@ -26,8 +31,8 @@ public class CalendarController {
     }
 
     @GetMapping("/month")
-    public ResponseEntity<?> getCalendarByMonth(@ModelAttribute CalendarMonthRequest calendarMonthRequest) {
-        return ResponseEntity.ok().body(MessageUtils.success(calendarService.getCalendarListByMonth(calendarMonthRequest)));
+    public ResponseEntity<?> getCalendarByMonth(@ModelAttribute CalendarMonthRequest calendarMonthRequest, @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(MessageUtils.success(calendarService.getCalendarListByMonth(calendarMonthRequest, user)));
     }
 
 }

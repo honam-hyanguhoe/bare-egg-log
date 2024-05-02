@@ -2,12 +2,14 @@ package org.egglog.api.user.model.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.egglog.api.calendargroup.model.entity.CalendarGroup;
+import org.egglog.api.calendargroup.repository.jpa.CalendarGroupRepository;
 import org.egglog.api.hospital.exception.HospitalErrorCode;
 import org.egglog.api.hospital.exception.HospitalException;
 import org.egglog.api.hospital.model.entity.Hospital;
 import org.egglog.api.hospital.model.entity.HospitalAuth;
 import org.egglog.api.hospital.repository.jpa.HospitalAuthJpaRepository;
-import org.egglog.api.hospital.repository.jpa.HospitalAuthQueryRepository;
+import org.egglog.api.hospital.repository.jpa.HospitalAuthQueryRepositoryImpl;
 import org.egglog.api.hospital.repository.jpa.HospitalJpaRepository;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
@@ -18,10 +20,15 @@ import org.egglog.api.user.model.dto.request.UpdateUserRequest;
 import org.egglog.api.user.model.dto.response.UserResponse;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.repository.jpa.UserJpaRepository;
-import org.egglog.api.user.repository.jpa.UserQueryRepository;
+import org.egglog.api.worktype.model.entity.WorkTag;
+import org.egglog.api.worktype.model.entity.WorkType;
+import org.egglog.api.worktype.repository.jpa.WorkTypeJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,14 +36,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserJpaRepository userJpaRepository;
-    private final UserQueryRepository userQueryRepository;
     private final HospitalJpaRepository hospitalJpaRepository;
     private final HospitalAuthJpaRepository hospitalAuthJpaRepository;
-    private final HospitalAuthQueryRepository hospitalAuthQueryRepository;
+    private final WorkTypeJpaRepository workTypeJpaRepository;
+    private final CalendarGroupRepository calendarGroupRepository;
 
     @Transactional(readOnly = true)
     public UserResponse findById(Long id){
-        return userQueryRepository.findByIdWithHospital(id)
+        return userJpaRepository.findByIdWithHospital(id)
                 .orElseThrow(()->new UserException(UserErrorCode.NOT_EXISTS_USER))
                 .toResponse();
     }
@@ -60,8 +67,49 @@ public class UserService {
     public UserResponse joinUser(User loginUser, JoinUserRequest request){
         Hospital hospital = hospitalJpaRepository.findById(request.getHospitalId())
                 .orElseThrow(() -> new HospitalException(HospitalErrorCode.NOT_FOUND));
+        //todo 1. 기본 태그 자동 생성
+        workTypeJpaRepository.saveAll(getDefaultWorkTypes(loginUser));
+        //todo 2. 근무 일정 캘린더 그룹 자동 생성
+        calendarGroupRepository.save(CalendarGroup.builder().alias("근무 일정").user(loginUser).build());
         return userJpaRepository.save(loginUser.join(request.getUserName(), hospital, request.getEmpNo(), request.getFcmToken()))
                 .toResponse();
+    }
+
+    private List<WorkType> getDefaultWorkTypes(User loginUser) {
+        List<WorkType> defaultWorkTypes = new ArrayList<>();
+        defaultWorkTypes.add(WorkType.builder()
+                .title("DAY")
+                .color("#18C5B5")
+                .workTag(WorkTag.DAY)
+                .startTime(LocalTime.of(6,0))//오전 6시 ~ 오후 2시 | 오후 2시 ~ 10시 | 오후 10시 + 익일 오전 6시
+                .workTime(LocalTime.of(8,0))//8시간
+                .user(loginUser)
+                .build());
+        defaultWorkTypes.add(WorkType.builder()
+                .title("EVE")
+                .color("#F4D567")
+                .workTag(WorkTag.EVE)
+                .startTime(LocalTime.of(2,0))//오전 6시 ~ 오후 2시 | 오후 2시 ~ 10시 | 오후 10시 + 익일 오전 6시
+                .workTime(LocalTime.of(8,0))//8시간
+                .user(loginUser)
+                .build());
+        defaultWorkTypes.add(WorkType.builder()
+                .title("NIGHT")
+                .color("#E55555")
+                .workTag(WorkTag.NIGHT)
+                .startTime(LocalTime.of(2,0))//오전 6시 ~ 오후 2시 | 오후 2시 ~ 10시 | 오후 10시 + 익일 오전 6시
+                .workTime(LocalTime.of(8,0))//8시간
+                .user(loginUser)
+                .build());
+        defaultWorkTypes.add(WorkType.builder()
+                .title("OFF")
+                .color("#9B8AFB")
+                .workTag(WorkTag.OFF)
+                .startTime(LocalTime.of(0,0))//오전 6시 ~ 오후 2시 | 오후 2시 ~ 10시 | 오후 10시 + 익일 오전 6시
+                .workTime(LocalTime.of(1,0))//8시간
+                .user(loginUser)
+                .build());
+        return defaultWorkTypes;
     }
 
     /**
@@ -72,7 +120,7 @@ public class UserService {
      * @author 김형민
      */
     @Transactional
-    public UserResponse updateUser(User loginUser, UpdateUserRequest request){
+    public UserResponse updateUserInfo(User loginUser, UpdateUserRequest request){
         User updateUser = userJpaRepository.save(loginUser.updateInfo(request.getUserName(), request.getProfileImgUrl()));
         Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(updateUser, updateUser.getSelectedHospital());
         if (hospitalAuth.isPresent()){
@@ -88,7 +136,7 @@ public class UserService {
      * @author 김형민
      */
     @Transactional
-    public UserResponse updateUser(User loginUser, UpdateFcmRequest request){
+    public UserResponse updateFcmUser(User loginUser, UpdateFcmRequest request){
         User updateUser = userJpaRepository.save(loginUser.updateFcmToken(request.getFcmToken()));
         Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(updateUser, updateUser.getSelectedHospital());
         if (hospitalAuth.isPresent()){
