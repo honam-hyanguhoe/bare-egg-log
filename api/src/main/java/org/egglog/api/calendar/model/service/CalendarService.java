@@ -140,8 +140,6 @@ public class CalendarService {
         Optional<List<Event>> eventsByMonthAndUserId = eventRepository.findEventsByMonthAndUserId(startDate, endDate, userId, calendarGroupId);
 
         List<WorkResponse> workResponseList = new ArrayList<>();
-//        private List<WorkResponse> workList;
-//        private CalendarGroupResponse calendarGroup;
         List<EventListOutputSpec> eventListOutputSpecList = new ArrayList<>();
 
         for (Work work : workList) {
