@@ -14,3 +14,8 @@
 .cxx
 local.properties
 java_pid*.hprof
+
+/app/src/main/res/values/kakao_strings.xml
+/app/src/main/res/values/google_strings.xml
+/presentation/src/main/res/values/kakao_strings.xml
+/presentation/src/main/res/values/google_strings.xml
