@@ -35,23 +35,23 @@ public class BoardController {
                 .lastBoardId(lastBoardId)
                 .build();
 
-        return ResponseEntity.ok().body(MessageUtils.success(boardService.getBoardList(boardListForm, user.getId())));
+        return ResponseEntity.ok().body(MessageUtils.success(boardService.getBoardList(boardListForm, user)));
     }
 
     @PostMapping("")
     public ResponseEntity<?> registerBoard(@RequestBody BoardForm boardForm, @AuthenticationPrincipal User user) {
-        boardService.registerBoard(boardForm, user.getId());
+        boardService.registerBoard(boardForm, user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }
 
     @GetMapping("/{board_id}")
     public ResponseEntity<?> getBoard(@PathVariable("board_id") Long boardId, @AuthenticationPrincipal User user) {
-        return ResponseEntity.ok().body(MessageUtils.success(boardService.getBoard(boardId, user.getId())));
+        return ResponseEntity.ok().body(MessageUtils.success(boardService.getBoard(boardId, user)));
     }
 
     @DeleteMapping("/{board_id}")
     public ResponseEntity<?> deleteBoard(@PathVariable("board_id") Long boardId, @AuthenticationPrincipal User user) {
-        boardService.deleteBoard(boardId, user.getId());
+        boardService.deleteBoard(boardId, user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
     }
 
@@ -63,13 +63,13 @@ public class BoardController {
 
     @PostMapping("/like")
     public ResponseEntity<?> registerLike(@RequestBody LikeForm likeForm, @AuthenticationPrincipal User user) {
-        boardService.registerLike(likeForm, user.getId());
+        boardService.registerLike(likeForm, user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }
 
     @DeleteMapping("/unlike/{board_id}")
     public ResponseEntity<?> deleteLike(@PathVariable("board_id") Long boardId, @AuthenticationPrincipal User user) {
-        boardService.deleteLike(boardId, user.getId());
+        boardService.deleteLike(boardId, user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
     }
 }
