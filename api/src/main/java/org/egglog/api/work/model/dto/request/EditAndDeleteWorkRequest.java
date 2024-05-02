@@ -1,6 +1,7 @@
 package org.egglog.api.work.model.dto.request;
 
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
@@ -23,6 +24,7 @@ import java.time.LocalDate;
 @Builder
 public class EditAndDeleteWorkRequest {
     private Long workId;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate workDate;
     private Long workTypeId;
     private Boolean isDeleted;
