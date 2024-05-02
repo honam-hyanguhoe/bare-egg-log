@@ -1,4 +1,4 @@
-package com.org.egglog.presentation.domain.auth.viewmodel.extend
+package com.org.egglog.data.auth.ext
 
 import android.content.Context
 import android.util.Log

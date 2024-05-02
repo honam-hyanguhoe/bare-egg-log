@@ -1,6 +1,5 @@
 package com.org.egglog.presentation.domain.auth.screen
 
-import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -55,13 +54,12 @@ fun LoginScreen(
             }
         }
     }
-    LoginScreen(context, viewModel::onAuthClick)
+    LoginScreen(viewModel::onAuthClick)
 }
 
 @Composable
 fun LoginScreen(
-    context: Context,
-    onAuthClick: (Context, String) -> Unit
+    onAuthClick: (String) -> Unit
 ) {
     Surface {
         Column (
@@ -82,11 +80,11 @@ fun LoginScreen(
                 Text(text = "SIGN WITH ___________________", color = Gray700, style = Typography.displayMedium)
                 Spacer(modifier = Modifier.height(36.heightPercent(LocalContext.current).dp))
                 Row{
-                    AuthButton(type = "kakao", onClick = { onAuthClick(context, "KAKAO") })
+                    AuthButton(type = "kakao", onClick = { onAuthClick("KAKAO") })
                     Spacer(modifier = Modifier.width(16.widthPercent(LocalContext.current).dp))
-                    AuthButton(type = "naver", onClick = { onAuthClick(context, "NAVER") })
+                    AuthButton(type = "naver", onClick = { onAuthClick("NAVER") })
                     Spacer(modifier = Modifier.width(16.widthPercent(LocalContext.current).dp))
-                    AuthButton(type = "google", onClick = { onAuthClick(context, "GOOGLE") })
+                    AuthButton(type = "google", onClick = { onAuthClick("GOOGLE") })
                 }
             }
         }

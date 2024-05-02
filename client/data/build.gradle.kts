@@ -42,6 +42,7 @@ dependencies {
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)
+    implementation(project(":presentation"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -73,6 +74,12 @@ dependencies {
     implementation(libs.kakao.user)
     implementation(libs.kakao.share)
     implementation(libs.kakao.auth)
+
+    // google
+    implementation(libs.google.services)
+//    implementation(libs.firebase.auth)
+//    implementation(platform(libs.firebase.bom))
+    implementation(libs.play.services.auth)
 
     // room
     implementation(libs.room.runtime)

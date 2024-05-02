@@ -104,5 +104,11 @@ dependencies {
     implementation(libs.kakao.share)
     implementation(libs.kakao.auth)
 
+    // google
+    implementation(libs.google.services)
+//    implementation(libs.firebase.auth)
+//    implementation(platform(libs.firebase.bom))
+    implementation(libs.play.services.auth)
+
     implementation(project(":domain"))
 }
