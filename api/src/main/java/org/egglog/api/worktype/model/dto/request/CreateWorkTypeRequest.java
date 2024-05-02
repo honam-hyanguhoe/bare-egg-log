@@ -5,6 +5,7 @@ import lombok.*;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.worktype.model.entity.WorkTag;
 import org.egglog.api.worktype.model.entity.WorkType;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalTime;
 
@@ -30,7 +31,10 @@ public class CreateWorkTypeRequest {
     private String title;        //태그 이름
     private String color;       //색상
     private String workTypeImgUrl;      //근무 이미지
+
+    @DateTimeFormat(pattern = "HH:mm")
     private LocalTime startTime;       //시작시간
+    @DateTimeFormat(pattern = "HH:mm")
     private LocalTime workTime;     //시간
 
     public WorkType toEntity(User loginUser){

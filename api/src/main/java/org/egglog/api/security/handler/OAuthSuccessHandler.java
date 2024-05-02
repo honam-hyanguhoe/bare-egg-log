@@ -6,8 +6,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.egglog.api.security.exception.JwtErrorCode;
+import org.egglog.api.security.exception.JwtException;
 import org.egglog.api.security.model.service.TokenService;
+import org.egglog.api.user.exception.UserErrorCode;
+import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
+import org.egglog.api.user.model.entity.enums.UserStatus;
 import org.egglog.api.user.repository.jpa.UserJpaRepository;
 import org.egglog.api.user.repository.jpa.UserQueryRepositoryImpl;
 import org.egglog.utility.utils.MessageUtils;
@@ -40,6 +45,7 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         if (optionalUser.isPresent()){
             //로그인인 경우
             User user = optionalUser.get();
+            if (user.getUserStatus()!= UserStatus.ACTIVE) throw new UserException(UserErrorCode.DELETED_USER);
             userJpaRepository.save(user.doLogin());
             response.getWriter().write(objectMapper.writeValueAsString(
                     MessageUtils.success(tokenService.generatedToken(user.getId(), user.getUserRole().name()))

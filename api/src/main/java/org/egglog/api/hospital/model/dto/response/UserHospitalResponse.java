@@ -1,7 +1,5 @@
 package org.egglog.api.hospital.model.dto.response;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
 /**
@@ -22,7 +20,7 @@ import lombok.*;
 @NoArgsConstructor
 public class UserHospitalResponse {
 
-    private Long id;
+    private Long hospitalId;
     private String sidoCode;
     private String sido;
     private String gunguCode;
