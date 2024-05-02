@@ -86,9 +86,11 @@ public class WorkController {
     public ResponseEntity<MessageUtils> findCompletedCountWorkList(
             @AuthenticationPrincipal User loginUser,
             @RequestParam("today")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate today
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate today,
+            @RequestParam("month")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate month
     ){
         return ResponseEntity.ok().body(
-                MessageUtils.success(workService.findCompletedWorkCount(loginUser, today)));
+                MessageUtils.success(workService.findCompletedWorkCount(loginUser, today, month)));
     }
 }
