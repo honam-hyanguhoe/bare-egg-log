@@ -40,6 +40,8 @@ import org.egglog.api.work.repository.jpa.WorkQueryRepositoryImpl;
 import org.egglog.api.worktype.model.dto.response.WorkTypeResponse;
 import org.egglog.api.worktype.model.entity.WorkType;
 
+import java.io.InputStream;
+import java.net.URL;
 import java.time.LocalDateTime;
 //import java.util.TimeZone;
 import java.util.ArrayList;
@@ -65,17 +67,48 @@ public class CalendarService {
      * 파일이 내부에 존재하는 경우를 가정한 예제 코드
      * @param filePath
      */
-    public void readCalendarFile(String filePath){
+    public void readCalendarFile(String path) {
+        InputStream inputStream = null;
+
         try {
-            FileInputStream fileInputStream =new FileInputStream(filePath);
+            // URL인지 확인
+            if (path.startsWith("http://") || path.startsWith("https://")) {
+                URL url = new URL(path);
+                inputStream = url.openStream(); // URL에서 스트림 열기
+            } else {
+                inputStream = new FileInputStream(path); // 파일 경로에서 스트림 열기
+            }
+
             CalendarBuilder builder = new CalendarBuilder();
-            Calendar calendar = builder.build(fileInputStream);
+            Calendar calendar = builder.build(inputStream);
             List<CalendarComponent> events = calendar.getComponents(Component.VEVENT);
+
             for (CalendarComponent event : events) {
-                log.info(event.toString());
+                log.error("event.toString()={}",event.toString());
+                log.error("===================================");
+                log.error("event.getName()={}",event.getName());
+                log.error("===================================");
+                log.error("event.getProperties()={}",event.getProperties());
+                for (Property property : event.getProperties()) {
+                    log.error("===================================");
+                    log.error("property={}",property);
+                    log.error("property.getName()={}",property.getName());
+                    log.error("property.getValue()={}",property.getValue());
+                }
+                log.error("===================================");
+                log.error("event={}",event);
+                log.error("===================================");
             }
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("Error reading calendar file: " + e.getMessage());
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close(); // 스트림 닫기
+                } catch (Exception e) {
+                    log.error("Error closing stream: " + e.getMessage());
+                }
+            }
         }
     }
     public String getIcsLink(User user) {

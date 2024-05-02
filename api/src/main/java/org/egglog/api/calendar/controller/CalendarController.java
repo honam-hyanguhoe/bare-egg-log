@@ -20,6 +20,12 @@ public class CalendarController {
 
     private final CalendarService calendarService;
 
+    @GetMapping("/test")
+    public ResponseEntity<MessageUtils> test(){
+        calendarService.readCalendarFile("https://calendar-ics.kakao.com/lehl0QARJebd4kZiSCuLchCKk92LP_NdBaB0U_WJTHU/talk.ics");
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/link")
     public ResponseEntity<?> getCalendarUrl(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(MessageUtils.success(calendarService.getIcsLink(user)));
