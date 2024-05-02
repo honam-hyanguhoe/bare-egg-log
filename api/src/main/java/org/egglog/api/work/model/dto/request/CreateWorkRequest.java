@@ -1,6 +1,7 @@
 package org.egglog.api.work.model.dto.request;
 
 import lombok.*;
+import net.fortuna.ical4j.util.RandomUidGenerator;
 import net.fortuna.ical4j.util.UidGenerator;
 import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.user.model.entity.User;
@@ -35,11 +36,13 @@ public class CreateWorkRequest {
     private Long workTypeId;
 
     public Work toEntity(User user, Map<Long, WorkType> userWorkTypeMap, CalendarGroup calendarGroup){
+        UidGenerator ug = new RandomUidGenerator();
         return Work.builder()
                 .user(user)
                 .workType(userWorkTypeMap.get(this.workTypeId))
                 .calendarGroup(calendarGroup)
                 .workDate(this.workDate)
+                .uuid(ug.generateUid().getValue())
                 .build();
     }
 }
