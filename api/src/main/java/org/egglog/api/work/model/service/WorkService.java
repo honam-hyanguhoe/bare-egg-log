@@ -15,8 +15,12 @@ import org.egglog.api.user.repository.jpa.UserJpaRepository;
 import org.egglog.api.work.exception.WorkErrorCode;
 import org.egglog.api.work.exception.WorkException;
 import org.egglog.api.work.model.dto.request.*;
+import org.egglog.api.work.model.dto.response.completed.CompletedWorkCountWeekResponse;
+import org.egglog.api.work.model.dto.response.upcoming.UpComingCountWorkResponse;
 import org.egglog.api.work.model.dto.response.WorkListResponse;
 import org.egglog.api.work.model.dto.response.WorkResponse;
+import org.egglog.api.work.model.dto.response.completed.CompletedWorkCountResponse;
+import org.egglog.api.work.model.dto.response.upcoming.enums.DateType;
 import org.egglog.api.work.model.entity.Work;
 import org.egglog.api.work.repository.jpa.WorkJpaRepository;
 import org.egglog.api.worktype.model.entity.WorkType;
@@ -24,6 +28,12 @@ import org.egglog.api.worktype.repository.jpa.WorkTypeJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.IsoFields;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -119,12 +129,47 @@ public class WorkService {
                 .anyMatch(member -> member.getUser().getId().equals(targetUser.getId()));
         if (!isLoginUserInGroup || !isTargetUserInGroup) throw new WorkException(WorkErrorCode.ACCESS_DENIED);
 
-
         return workJpaRepository
                 .findWorkListWithWorkTypeByTimeAndTargetUser(targetUser.getId(), request.getStartDate(), request.getEndDate())
                 .stream()
                 .map(Work::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<UpComingCountWorkResponse> findUpComingWorkCount(User loginUser, LocalDate today, DateType dateType){
+        if (dateType == DateType.WEEK) {
+            LocalDate startOfWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+            LocalDate endOfWeek = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+            return workJpaRepository.findUpComingCountWork(loginUser.getId(), today, startOfWeek, endOfWeek);
+        } else if (dateType == DateType.MONTH) {
+            LocalDate startOfMonth = today.with(TemporalAdjusters.firstDayOfMonth());
+            LocalDate endOfMonth = today.with(TemporalAdjusters.lastDayOfMonth());
+            return workJpaRepository.findUpComingCountWork(loginUser.getId(), today, startOfMonth, endOfMonth);
+        } else throw new WorkException(WorkErrorCode.FORMAT_NOT_SUPPORTED);
+    }
+
+    @Transactional(readOnly = true)
+    public CompletedWorkCountResponse findCompletedWorkCount(User loginUser, LocalDate today, LocalDate targetMonth) {
+        return CompletedWorkCountResponse.builder()
+                .month(YearMonth.from(targetMonth).toString())
+                .weeks(workJpaRepository.findWorksBeforeDate(loginUser.getId(), today, targetMonth)
+                        .stream()
+                        .collect(Collectors.groupingBy(
+                                work -> {
+                                    LocalDate firstDay = work.getWorkDate().with(TemporalAdjusters.firstDayOfMonth());
+                                    LocalDate firstMonday = firstDay.getDayOfWeek() == DayOfWeek.MONDAY ? firstDay : firstDay.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+                                    return (int) ChronoUnit.WEEKS.between(firstMonday, work.getWorkDate()) + 1;
+                                },
+                                Collectors.groupingBy(
+                                        work -> work.getWorkType().getTitle(),
+                                        Collectors.summingInt(work -> 1) // 근무 유형별 카운팅
+                                )
+                        )).entrySet().stream()
+                        .sorted(Map.Entry.comparingByKey())
+                        .map(weekEntry -> new CompletedWorkCountWeekResponse(weekEntry.getKey(), weekEntry.getValue()))
+                        .collect(Collectors.toList()))
+                .build();
     }
 
 
