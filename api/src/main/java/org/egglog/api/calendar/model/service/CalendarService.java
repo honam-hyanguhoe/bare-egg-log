@@ -1,31 +1,25 @@
 package org.egglog.api.calendar.model.service;
 
+import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
-import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.*;
 import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.property.ProdId;
-import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.immutable.ImmutableCalScale;
 import net.fortuna.ical4j.model.property.immutable.ImmutableVersion;
-import net.fortuna.ical4j.util.RandomUidGenerator;
 import org.egglog.api.calendar.exception.CalendarErrorCode;
 import org.egglog.api.calendar.exception.CalendarException;
 import org.egglog.api.user.model.entity.User;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.time.ZoneId;
-import java.util.Date;
 import org.egglog.api.calendar.model.dto.params.CalendarMonthRequest;
 import org.egglog.api.calendar.model.dto.response.CalendarListResponse;
 import org.egglog.api.calendargroup.exception.CalendarGroupErrorCode;
@@ -61,30 +55,7 @@ public class CalendarService {
 
     private final CalendarGroupRepository calendarGroupRepository;
 
-    /**
-     * 새로운 캘린더 객체 생성 메서드
-     * @return
-     */
-    public Calendar createCalendar() {
-        Calendar calendar = new Calendar();
-        try {
-            calendar.add(new ProdId("-//Ben Fortuna//iCal4j 4.0//EN"));
-            calendar.add(ImmutableVersion.VERSION_2_0);
-            calendar.add(ImmutableCalScale.GREGORIAN);
 
-            // 아시아/서울 시간대 생성
-            TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
-            TimeZone timezone = registry.getTimeZone("Asia/Seoul");
-            VTimeZone tz = timezone.getVTimeZone();
-
-            // 시간대를 캘린더에 추가
-            calendar.getComponents().add(tz);
-        }catch (Exception e){
-            log.warn(e.getMessage());
-        }
-
-        return calendar;
-    }
 
     /**
      * 파일이 내부에 존재하는 경우를 가정한 예제 코드
@@ -105,16 +76,24 @@ public class CalendarService {
     }
     public String getIcsLink(User user) {
         //TODO data query
-        String blob = "/ics/" + user.getId() + "/calendar.ics";
+        String blobPath = "ics/" + user.getId() + "/calendar.ics";
+//        String blobPath = "ics/" + user.getId() + "/tree.txt";
         try {
-            if (bucket.get(blob) == null) {
+            log.debug("test");
+            Blob blob = null;
+            try {
+                blob = bucket.get(blobPath);
+                log.debug(String.valueOf(blob.exists()));
+            }catch (NullPointerException e){
+                log.debug("no bucket");
                 updateIcs(user.getId());
             }
+            log.debug(String.valueOf(blob.getBlobId()));
         } catch (Exception e) {
             log.warn("firebase storage 연결 오류");
             throw new CalendarException(CalendarErrorCode.DATABASE_CONNECTION_FAILED);
         }
-        return blob;
+        return blobPath;
     }
     /**
      * 한달 조회
@@ -195,12 +174,29 @@ public class CalendarService {
     }
 
     public void updateIcs(Long userId) {
-        Calendar calendar = createCalendar();
+        log.debug("update");
+        Calendar calendar = new Calendar();
+        calendar.add(new ProdId("-//Ben Fortuna//iCal4j 4.0//EN"));
+        calendar.add(ImmutableVersion.VERSION_2_0);
+        calendar.add(ImmutableCalScale.GREGORIAN);
+
+        // 아시아/서울 시간대 생성
+        TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
+        log.debug("timezone");
+        TimeZone timezone = registry.getTimeZone("Asia/Seoul");
+        VTimeZone tz = timezone.getVTimeZone();
+
+        // 시간대를 캘린더에 추가
+        calendar.getComponents().add(tz);
         try {
             //사용자의 모든 근무 일정 가져오기
             List<Work> workList = workQueryRepositoryImpl.findAllWorkWithWorkTypeByUser(userId);
             //사용자의 모든 개인 일정 가져오기
             List<Event> eventList = eventRepository.findAllByUserId(userId);
+            //일정이 없다면 에러 처리
+            if(workList.isEmpty()&&eventList.isEmpty()){
+                throw new CalendarException(CalendarErrorCode.SCHEDULE_NOT_FOUND);
+            }
             //일정을 기록할 캘린더 객체 생성
             List<CalendarComponent> calendarWorkComponentList = workList.stream().map(
                     work -> {
