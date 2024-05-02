@@ -1,4 +1,4 @@
-package com.org.egglog.presentation.component.screens
+package com.org.egglog.presentation.domain.auth.screen
 
 import android.content.res.Configuration
 import android.os.Bundle

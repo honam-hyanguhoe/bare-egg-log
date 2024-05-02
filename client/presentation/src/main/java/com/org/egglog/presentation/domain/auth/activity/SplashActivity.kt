@@ -2,11 +2,15 @@ package com.org.egglog.presentation.domain.auth.activity
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
-import com.org.egglog.presentation.component.screens.MainActivity
+import com.org.egglog.presentation.domain.auth.screen.MainActivity
+import com.org.egglog.presentation.domain.auth.screen.SplashScreen
+import com.org.egglog.presentation.theme.ClientTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,8 +19,14 @@ class SplashActivity : AppCompatActivity() {
     @Inject lateinit var getTokenUseCase: GetTokenUseCase
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContent{
+            ClientTheme {
+                SplashScreen()
+            }
+        }
 
         lifecycleScope.launch {
+            delay(2000L)
             val isLoggedIn = !getTokenUseCase().first.isNullOrEmpty() || !getTokenUseCase().second.isNullOrEmpty()
 
             if (isLoggedIn) {

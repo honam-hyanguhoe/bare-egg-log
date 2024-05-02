@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.Client" parent="@style/Theme.AppCompat.NoActionBar" />
+    <style name="Theme.Client" parent="@style/Theme.AppCompat.NoActionBar">
+        <!-- 기존 스플레시 스크린 삭제 -->
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
 </resources>

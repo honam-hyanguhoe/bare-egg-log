@@ -96,5 +96,8 @@ dependencies {
     implementation(libs.orbit.compose)
     implementation(libs.orbit.viewmodel)
 
+    // splash
+    implementation(libs.splash)
+
     implementation(project(":domain"))
 }

@@ -93,6 +93,9 @@ dependencies {
     implementation(libs.hilt)
     kapt(libs.hilt.compiler)
 
+    // splash
+    implementation(libs.splash)
+
     implementation(project(":domain"))
     implementation(project(":data"))
     implementation(project(":presentation"))
