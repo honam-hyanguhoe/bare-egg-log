@@ -1,6 +1,8 @@
 package org.egglog.api.event.model.service;
 
 import lombok.RequiredArgsConstructor;
+import net.fortuna.ical4j.util.RandomUidGenerator;
+import net.fortuna.ical4j.util.UidGenerator;
 import org.egglog.api.calendargroup.exception.CalendarGroupErrorCode;
 import org.egglog.api.calendargroup.exception.CalendarGroupException;
 import org.egglog.api.calendargroup.model.entity.CalendarGroup;
@@ -45,7 +47,7 @@ public class EventService {
         CalendarGroup calendarGroup = calendarGroupRepository.findById(eventForm.getCalendarGroupId()).orElseThrow(
                 () -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP)
         );
-
+        UidGenerator ug = new RandomUidGenerator();
         Event event = Event.builder()
                 .eventTitle(eventForm.getEventTitle())
                 .eventContent(eventForm.getEventContent())
@@ -53,6 +55,7 @@ public class EventService {
                 .endDate(eventForm.getEndDate())
                 .user(user)     //사용자
                 .calendarGroup(calendarGroup)   //캘린더 그룹
+                .uuid(ug.generateUid().getValue())
                 .build();
 
         eventRepository.save(event);

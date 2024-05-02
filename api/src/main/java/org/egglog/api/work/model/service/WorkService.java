@@ -67,9 +67,12 @@ public class WorkService {
     public List<WorkResponse> createWork(User loginUser, CreateWorkListRequest request){
         CalendarGroup calendarGroup = calendarGroupRepository.findById(request.getCalendarGroupId())
                 .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
+
         if (calendarGroup.getUser().getId()!=loginUser.getId()) throw new WorkException(WorkErrorCode.ACCESS_DENIED);
+
         Map<Long, WorkType> userWorkTypeMap = workTypeJpaRepository
                 .findByUser(loginUser).stream().collect(Collectors.toMap(WorkType::getId, wt -> wt));
+
         return workJpaRepository.saveAll(
                 request.getWorkTypes().stream()
                         .map(value-> value.toEntity(loginUser, userWorkTypeMap, calendarGroup))

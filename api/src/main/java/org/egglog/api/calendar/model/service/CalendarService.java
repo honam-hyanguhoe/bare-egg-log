@@ -166,12 +166,11 @@ public class CalendarService {
                 eventListOutputSpecList.add(eventListOutputSpec);
             }
         }
-        CalendarListResponse calendarListResponse = CalendarListResponse.builder()
+
+        return CalendarListResponse.builder()
                 .workList(workListResponse)
                 .eventList(eventListOutputSpecList)
                 .build();
-
-        return calendarListResponse;
     }
 
     public void updateIcs(Long userId) {
@@ -197,34 +196,28 @@ public class CalendarService {
                 throw new CalendarException(CalendarErrorCode.SCHEDULE_NOT_FOUND);
             }
             //Uid 생성기
-            UidGenerator ug = new RandomUidGenerator();
             //일정을 기록할 캘린더 객체 생성
             List<CalendarComponent> calendarWorkComponentList = workList.stream().map(
                     work -> {
                         //시작 시간와 근무 이름을 통해 새로운 VEvent 생성
-                        VEvent workEvent = new VEvent(work.getWorkDate(),work.getWorkType().getTitle())
+                        return new VEvent(work.getWorkDate(),work.getWorkType().getTitle())
                                 .withProperty(tz.getTimeZoneId().get())
-                                        .withProperty(ug.generateUid())
-                                .getFluentTarget();
-                        return workEvent;
+                                        .withProperty(new Uid(work.getUuid()))
+                                .<VEvent>getFluentTarget();
                     }).collect(Collectors.toList());
             List<CalendarComponent> calendarEventComponentList = eventList.stream()
                     .filter(event -> event.getStartDate()!=null) //start date가 존재하는 경우만 처리
                     .map(event -> {
                         if(event.getEndDate()==null){ //end date 없는 경우 처리
-                            Uid uid = ug.generateUid();
-                            VEvent usualEvent =  new VEvent(event.getStartDate(),event.getEventTitle())
+                            return new VEvent(event.getStartDate(),event.getEventTitle())
                                     .withProperty(tz.getTimeZoneId().get())
-                                    .withProperty(ug.generateUid())
-                                    .getFluentTarget();
-                            return usualEvent;
+                                    .withProperty(new Uid(event.getUuid()))
+                                    .<VEvent>getFluentTarget();
                         }else {
-                            Uid uid = ug.generateUid();
-                            VEvent usualEvent =  new VEvent(event.getStartDate(), event.getEndDate(), event.getEventTitle())
+                            return new VEvent(event.getStartDate(), event.getEndDate(), event.getEventTitle())
                                     .withProperty(tz.getTimeZoneId().get())
-                                    .withProperty(ug.generateUid())
+                                    .withProperty(new Uid(event.getUuid()))
                                     .getFluentTarget();
-                            return usualEvent;
                         }
                     }).collect(Collectors.toList());
             //캘린더 객체에 일정 추가
@@ -232,6 +225,7 @@ public class CalendarService {
             calendar.getComponents().addAll(calendarEventComponentList);
         }catch (Exception e){
             log.warn(e.getMessage());
+            throw new CalendarException(CalendarErrorCode.CREATE_FAIL);
         }
         try{
             //업로드
@@ -242,7 +236,7 @@ public class CalendarService {
     }
     public void uploadCalendar(Long userId, Calendar calendar){
         //TODO data query
-        String blob = "/ics/" + userId + "/calendar.ics";
+        String blob = "ics/" + userId + "/calendar.ics";
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             new CalendarOutputter().output(calendar, outputStream);
