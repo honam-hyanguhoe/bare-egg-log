@@ -1,18 +1,18 @@
 package org.egglog.api.calendar.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.egglog.api.calendar.model.dto.params.CalendarMonthRequest;
 import org.egglog.api.calendar.model.service.CalendarService;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.utility.utils.MessageUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 import org.egglog.utility.utils.MessageUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Calendar;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,8 +27,9 @@ public class CalendarController {
         return ResponseEntity.ok().body(MessageUtils.success(calendarService.getIcsLink(user, groupId)));
     }
 
-    @GetMapping("")
-    public ResponseEntity<?> getCalendarByMonth(@PathVariable Long boardId) {
-        return ResponseEntity.ok().body(MessageUtils.success());
+    @GetMapping("/month")
+    public ResponseEntity<?> getCalendarByMonth(@ModelAttribute CalendarMonthRequest calendarMonthRequest, @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(MessageUtils.success(calendarService.getCalendarListByMonth(calendarMonthRequest, user)));
     }
+
 }
