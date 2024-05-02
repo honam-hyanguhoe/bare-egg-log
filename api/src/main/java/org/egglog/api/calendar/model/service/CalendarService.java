@@ -120,11 +120,11 @@ public class CalendarService {
      * @param calendarMonthRequest
      * @return
      */
-    public CalendarListResponse getCalendarListByMonth(CalendarMonthRequest calendarMonthRequest, User user) {
+    public CalendarListResponse getCalendarListByMonth(CalendarMonthRequest calendarMonthRequest) {
         LocalDateTime startDate = calendarMonthRequest.getStartDate();
         LocalDateTime endDate = calendarMonthRequest.getEndDate();
         Long calendarGroupId = calendarMonthRequest.getCalendarGroupId();
-        Long userId = user.getId();
+        Long userId = calendarMonthRequest.getUserId();
 
         CalendarGroup calendarGroup = calendarGroupRepository.findById(calendarGroupId).orElseThrow(
                 () -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP)
@@ -134,6 +134,8 @@ public class CalendarService {
         Optional<List<Event>> eventsByMonthAndUserId = eventRepository.findEventsByMonthAndUserId(startDate, endDate, userId, calendarGroupId);
 
         List<WorkResponse> workResponseList = new ArrayList<>();
+//        private List<WorkResponse> workList;
+//        private CalendarGroupResponse calendarGroup;
         List<EventListOutputSpec> eventListOutputSpecList = new ArrayList<>();
 
         for (Work work : workList) {
