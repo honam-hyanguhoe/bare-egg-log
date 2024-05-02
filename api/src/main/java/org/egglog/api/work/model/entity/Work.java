@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@Table(indexes = @Index(name = "idx_user_id", columnList = "user_id"))
 public class Work {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

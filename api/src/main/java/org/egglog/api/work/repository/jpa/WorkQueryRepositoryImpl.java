@@ -98,6 +98,18 @@ public class WorkQueryRepositoryImpl implements WorkQueryRepository{
                 .fetch();
     }
 
+    /**
+     * 사용자의 모든 일정 조회
+     * @param userId
+     * @return
+     */
+    public List<Work> findAllWorkWithWorkTypeByUser(Long userId) {
+        return jpaQueryFactory
+                .selectFrom(work)
+                .leftJoin(work.workType, workType).fetchJoin()
+                .where(work.user.id.eq(userId))
+                .fetch();
+    }
 
     public List<UpComingCountWorkResponse> findUpComingCountWork(Long userId, LocalDate today, LocalDate startDate, LocalDate endDate){
         return jpaQueryFactory
