@@ -2,7 +2,9 @@ package org.egglog.api.work.repository.jpa;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.egglog.api.work.model.dto.response.upcoming.UpComingCountWorkResponse;
 import org.springframework.stereotype.Repository;
+import com.querydsl.core.types.Projections;
 import org.egglog.api.work.model.entity.Work;
 
 import static org.egglog.api.work.model.entity.QWork.work;
@@ -101,11 +103,44 @@ public class WorkQueryRepositoryImpl implements WorkQueryRepository{
      * @param userId
      * @return
      */
-    public List<Work> findAllWorkWithWorkTypeByUser(Long userId){
+    public List<Work> findAllWorkWithWorkTypeByUser(Long userId) {
         return jpaQueryFactory
                 .selectFrom(work)
-                .leftJoin(work.workType,workType).fetchJoin()
+                .leftJoin(work.workType, workType).fetchJoin()
                 .where(work.user.id.eq(userId))
+                .fetch();
+    }
+
+    public List<UpComingCountWorkResponse> findUpComingCountWork(Long userId, LocalDate today, LocalDate startDate, LocalDate endDate){
+        return jpaQueryFactory
+                .select(Projections.constructor(UpComingCountWorkResponse.class,
+                        workType.title.as("name"),
+                        workType.color,
+                        work.id.count().as("value")))
+                .from(work)
+                .join(work.workType, workType)
+                .where(work.user.id.eq(userId)
+                        .and(work.workDate.between(startDate, endDate))
+                        .and(work.workDate.goe(today)))
+                .groupBy(workType.title, workType.color)
+                .fetch();
+    }
+
+    public List<Work> findWorksBeforeDate(Long userId, LocalDate today, LocalDate targetMonth) {
+        // month의 첫날과 마지막날 계산
+        LocalDate startOfMonth = targetMonth.withDayOfMonth(1);
+        LocalDate endOfMonth = targetMonth.withDayOfMonth(targetMonth.lengthOfMonth());
+
+        // 조건 설정: today가 month의 달에 포함되는지 확인
+        if (today.getMonth() == targetMonth.getMonth() && today.getYear() == targetMonth.getYear()) endOfMonth = today;
+
+
+        return jpaQueryFactory
+                .selectFrom(work)
+                .leftJoin(work.workType, workType).fetchJoin() // WorkType과 함께 조인
+                .where(work.user.id.eq(userId)
+                        .and(work.workDate.goe(startOfMonth))
+                        .and(work.workDate.loe(endOfMonth)))
                 .fetch();
     }
 }

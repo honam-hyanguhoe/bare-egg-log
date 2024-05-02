@@ -1,5 +1,6 @@
 package org.egglog.api.work.repository.jpa;
 
+import org.egglog.api.work.model.dto.response.upcoming.UpComingCountWorkResponse;
 import org.egglog.api.work.model.entity.Work;
 
 import java.time.LocalDate;
@@ -14,4 +15,6 @@ public interface WorkQueryRepository {
     List<Work> findWorkListWithWorkTypeByTime(Long calendarGroupId, LocalDate startDate, LocalDate endDate);
     List<Work> findWorkListWithWorkTypeByTimeAndTargetUser(Long targetUserId, LocalDate startDate, LocalDate endDate);
     List<Work> findAllWorkWithWorkTypeByUser(Long userId);
+    List<UpComingCountWorkResponse> findUpComingCountWork(Long userId, LocalDate today, LocalDate startDate, LocalDate endDate);
+    List<Work> findWorksBeforeDate(Long userId, LocalDate date, LocalDate targetMonth);
 }
