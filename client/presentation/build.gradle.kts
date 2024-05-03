@@ -108,7 +108,6 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(platform(libs.firebase.bom))
     implementation(libs.play.services.auth)
-    implementation(libs.com.google.gms)
 
     implementation(project(":domain"))
 }

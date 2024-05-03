@@ -30,14 +30,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.Scope
 import com.google.firebase.Firebase
-import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
-import com.google.firebase.initialize
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.presentation.theme.ClientTheme
 import com.org.egglog.presentation.R
@@ -86,7 +82,7 @@ fun LoginScreen(
     val launcher = rememberFirebaseAuthLauncher(
         onAuthComplete = { result ->
 //            user = result.user
-                         Log.e("result: ", result.toString())
+                         Log.e("result: ", result.user?.email.toString())
         },
         onAuthError = {
 //            user = null
@@ -139,33 +135,27 @@ private fun LoginScreenPreview() {
     }
 }
 
-
-
-
 @Composable
 fun rememberFirebaseAuthLauncher(
     onAuthComplete: (AuthResult) -> Unit,
     onAuthError: (ApiException) -> Unit
 ): ManagedActivityResultLauncher<Intent, ActivityResult> {
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     return rememberLauncherForActivityResult(
-        ActivityResultContracts
-        .StartActivityForResult()) { result ->
-
-        try {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            val account = task.getResult(ApiException::class.java)!!
-            val credential = GoogleAuthProvider
-                .getCredential(account.idToken!!, null)
-            Log.e("GoogleAuth", "${account.idToken}")
-            scope.launch {
-                val authResult = FirebaseAuth.getInstance().signInWithCredential(credential).await()
-                onAuthComplete(authResult)
+        ActivityResultContracts.StartActivityForResult()) { result ->
+            try {
+                val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+                val account = task.getResult(ApiException::class.java)!!
+                val credential = GoogleAuthProvider
+                    .getCredential(account.idToken!!, null)
+                Log.e("GoogleAuth", "${account.idToken}")
+                scope.launch {
+                    val authResult = Firebase.auth.signInWithCredential(credential).await()
+                    onAuthComplete(authResult)
+                }
+            } catch (e: ApiException) {
+                Log.e("GoogleAuth", e.toString())
+                onAuthError(e)
             }
-        } catch (e: ApiException) {
-            Log.e("GoogleAuth", e.toString())
-            onAuthError(e)
-        }
     }
 }

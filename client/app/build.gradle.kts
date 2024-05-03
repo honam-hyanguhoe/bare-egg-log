@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     id("kotlin-kapt")
     alias(libs.plugins.hilt)
+    alias(libs.plugins.com.google.gms)
 }
 
 android {
@@ -105,7 +106,6 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(platform(libs.firebase.bom))
     implementation(libs.play.services.auth)
-    implementation(libs.com.google.gms)
 
     implementation(project(":domain"))
     implementation(project(":data"))

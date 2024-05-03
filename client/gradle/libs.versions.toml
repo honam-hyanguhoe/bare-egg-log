@@ -72,9 +72,8 @@ coroutines-core = { group="org.jetbrains.kotlinx", name="kotlinx-coroutines-core
 
 firebase-auth = { group="com.google.firebase", name="firebase-auth", version="23.0.0" }
 firebase-auth-ktx = { group="com.google.firebase", name="firebase-auth-ktx" }
-firebase-bom = { group="com.google.firebase", name="firebase-bom", version="32.3.1" }
-play-services-auth = { group="com.google.android.gms", name="play-services-auth", version="20.7.0" }
-com-google-gms = { group="com.google.gms", name="google-services", version="4.4.1" }
+firebase-bom = { group="com.google.firebase", name="firebase-bom", version="32.8.1" }
+play-services-auth = { group="com.google.android.gms", name="play-services-auth", version="21.1.0" }
 
 
 room-runtime = { group = "androidx.room", name = "room-ktx", version.ref = "room"}
@@ -83,7 +82,7 @@ room-paging = { group = "androidx.room", name = "room-paging", version.ref = "ro
 annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotation" }
 
 [plugins]
-com-google-gms = { id="com.google.gms.google-services", version="4.4.1" }
+com-google-gms = { id="com.google.gms.google-services", version="4.3.8" }
 com-android-application = { id = "com.android.application", version.ref = "agp" }
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref="org-jetbrains-kotlin-android" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "org-jetbrains-kotlin-android" }
