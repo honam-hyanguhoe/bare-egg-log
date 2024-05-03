@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.egglog.api.calendargroup.exception.CalendarGroupErrorCode;
 import org.egglog.api.calendargroup.exception.CalendarGroupException;
 import org.egglog.api.calendargroup.model.dto.params.CalendarGroupForm;
+import org.egglog.api.calendargroup.model.dto.params.CalendarGroupListRequest;
+import org.egglog.api.calendargroup.model.dto.response.CalendarGroupEventListResponse;
+import org.egglog.api.calendargroup.model.dto.response.CalendarGroupEventResponse;
 import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.calendargroup.repository.jpa.CalendarGroupRepository;
 import org.egglog.api.event.model.entity.Event;
@@ -14,6 +17,8 @@ import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.repository.jpa.UserJpaRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,6 +66,47 @@ public class CalendarGroupService {
             //캘린더 그룹에 속한 일정들 삭제
             eventList.ifPresent(eventRepository::deleteAll);
         }
+    }
+
+    public List<CalendarGroupEventListResponse> getEventListByCalenderIds(CalendarGroupListRequest calendarGroupListRequest, User user) {
+        List<Long> calendarGroupIds = calendarGroupListRequest.getCalendarGroupList();      //캘린더그룹 아이디
+
+        List<CalendarGroupEventListResponse> calendarGroupEventListResponseList = new ArrayList<>();
+        List<CalendarGroupEventResponse> calendarGroupEventResponseList = new ArrayList<>();
+
+        for (Long calendarGroupId : calendarGroupIds) {
+            CalendarGroup calendarGroup = calendarGroupRepository.findById(calendarGroupId).orElseThrow(
+                    () -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP)
+            );
+            //로그인한 사용자가 캘린더 그룹에 속한 사용자가 아닐 경우
+            if (!calendarGroup.getUser().getId().equals(user.getId())) {
+                throw new CalendarGroupException(CalendarGroupErrorCode.NOT_SAME_CALENDAR_GROUP_USER);
+            }
+            //캘린더그룹에 속한 일정들
+            Optional<List<Event>> eventsByCalendarGroupId = eventRepository.findEventsByCalendarGroupId(calendarGroupId);
+
+            if (eventsByCalendarGroupId.isPresent()) {
+                for (Event event : eventsByCalendarGroupId.get()) {
+                    CalendarGroupEventResponse calendarGroupEventResponse = CalendarGroupEventResponse.builder()
+                            .eventId(event.getId())
+                            .eventTitle(event.getEventTitle())
+                            .eventContent(event.getEventContent())
+                            .startDate(event.getStartDate())
+                            .endDate(event.getEndDate())
+                            .build();
+
+                    calendarGroupEventResponseList.add(calendarGroupEventResponse);
+                }
+
+                CalendarGroupEventListResponse calendarGroupEventListResponse1 = CalendarGroupEventListResponse.builder()
+                        .calendarGroupId(calendarGroupId)
+                        .calendarGroupEventResponseList(calendarGroupEventResponseList)
+                        .build();
+
+                calendarGroupEventListResponseList.add(calendarGroupEventListResponse1);
+            }
+        }
+        return calendarGroupEventListResponseList;
     }
 
 
