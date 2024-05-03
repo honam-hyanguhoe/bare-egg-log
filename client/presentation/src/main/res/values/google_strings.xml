@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="google_client_id">886259420666-0r9j7u6ht4b1b8eoq6oh0l2g07asun4u.apps.googleusercontent.com</string>
+    <string name="google_client_id">663782815412-ah6s7c8ovh7ltnq2q4jb6n1dj0pishda.apps.googleusercontent.com</string>
+    <string name="google_web_client_id">663782815412-ah6s7c8ovh7ltnq2q4jb6n1dj0pishda.apps.googleusercontent.com</string>
 </resources>

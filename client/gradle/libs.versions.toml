@@ -70,9 +70,11 @@ paging-compose = { group="androidx.paging", name="paging-compose", version.ref="
 
 coroutines-core = { group="org.jetbrains.kotlinx", name="kotlinx-coroutines-core", version.ref="coroutines-core" }
 
-firebase-auth = { group="com.google.firebase", name="firebase-auth", version="22.3.1" }
-firebase-bom = { group="com.google.firebase", name="firebase-bom", version="32.8.1" }
-play-services-auth = { group="com.google.android.gms", name="play-services-auth", version="21.1.0" }
+firebase-auth = { group="com.google.firebase", name="firebase-auth", version="23.0.0" }
+firebase-auth-ktx = { group="com.google.firebase", name="firebase-auth-ktx" }
+firebase-bom = { group="com.google.firebase", name="firebase-bom", version="32.3.1" }
+play-services-auth = { group="com.google.android.gms", name="play-services-auth", version="20.7.0" }
+com-google-gms = { group="com.google.gms", name="google-services", version="4.4.1" }
 
 
 room-runtime = { group = "androidx.room", name = "room-ktx", version.ref = "room"}

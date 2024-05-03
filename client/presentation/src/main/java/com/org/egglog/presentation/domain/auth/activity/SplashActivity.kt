@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.google.firebase.FirebaseApp
 import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.util.Utility
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
@@ -22,6 +23,7 @@ class SplashActivity : AppCompatActivity() {
     @Inject lateinit var getTokenUseCase: GetTokenUseCase
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
         KakaoSdk.init(this, getString(R.string.kakao_native_app_key))
 //        val keyHash = Utility.getKeyHash(this)
 //        Log.e("Hash", keyHash)
