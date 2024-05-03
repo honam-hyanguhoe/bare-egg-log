@@ -11,7 +11,6 @@ import dagger.hilt.android.AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Set content using Jetpack Compose
         setContent {
             ClientTheme {
                 LoginScreen()

@@ -14,7 +14,8 @@ import com.org.egglog.presentation.R
 import javax.inject.Inject
 
 class GetGoogleUseCaseImpl @Inject constructor(
-    private val context: Context
+    private val context: Context,
+
 ): GetGoogleUseCase {
     private var googleLoginClient: GoogleSignInClient? = null
     private val REQ_GOOGLE_LOGIN = 1001

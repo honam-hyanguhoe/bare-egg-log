@@ -37,12 +37,8 @@ class LoginViewModel @Inject constructor(
         }
     )
 
-    fun onAuthClick(type: String) = intent {
-        if(type === "KAKAO") {
-            getKakaoUseCase()
-        } else if(type === "GOOGLE") {
-            getGoogleUseCase()
-        }
+    fun onKakaoClick() = intent {
+        getKakaoUseCase()
     }
 }
 

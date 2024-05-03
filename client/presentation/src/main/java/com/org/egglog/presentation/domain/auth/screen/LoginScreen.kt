@@ -1,7 +1,12 @@
 package com.org.egglog.presentation.domain.auth.screen
 
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,23 +19,34 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.Scope
+import com.google.firebase.Firebase
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.auth
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.presentation.theme.ClientTheme
 import com.org.egglog.presentation.R
 import com.org.egglog.presentation.component.atoms.buttons.AuthButton
-import com.org.egglog.presentation.domain.auth.activity.LoginActivity
 import com.org.egglog.presentation.domain.auth.activity.MainActivity
 import com.org.egglog.presentation.domain.auth.viewmodel.LoginSideEffect
 import com.org.egglog.presentation.domain.auth.viewmodel.LoginViewModel
 import com.org.egglog.presentation.theme.*
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
@@ -55,13 +71,26 @@ fun LoginScreen(
             }
         }
     }
-    LoginScreen(viewModel::onAuthClick)
+    LoginScreen(viewModel::onKakaoClick)
 }
 
 @Composable
 fun LoginScreen(
-    onAuthClick: (String) -> Unit
+    onKakaoClick: () -> Unit
 ) {
+    val token = stringResource(id = R.string.google_client_id)
+    val context = LocalContext.current
+    val launcher = rememberFirebaseAuthLauncher(
+        onAuthComplete = { result ->
+//            user = result.user
+                         Log.e("result: ", result.toString())
+        },
+        onAuthError = {
+//            user = null
+            Log.e("result: ", "hi...")
+        }
+    )
+
     Surface {
         Column (
             modifier = Modifier
@@ -81,11 +110,22 @@ fun LoginScreen(
                 Text(text = "SIGN WITH ___________________", color = Gray700, style = Typography.displayMedium)
                 Spacer(modifier = Modifier.height(36.heightPercent(LocalContext.current).dp))
                 Row{
-                    AuthButton(type = "kakao", onClick = { onAuthClick("KAKAO") })
+                    AuthButton(type = "kakao", onClick = { onKakaoClick() })
                     Spacer(modifier = Modifier.width(16.widthPercent(LocalContext.current).dp))
-                    AuthButton(type = "naver", onClick = { onAuthClick("NAVER") })
+                    AuthButton(type = "naver", onClick = {  })
                     Spacer(modifier = Modifier.width(16.widthPercent(LocalContext.current).dp))
-                    AuthButton(type = "google", onClick = { onAuthClick("GOOGLE") })
+                    AuthButton(type = "google", onClick = {
+                        val gso: GoogleSignInOptions =
+                            GoogleSignInOptions
+                                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                                .requestScopes(Scope("https://www.googleapis.com/auth/pubsub"))
+                                .requestServerAuthCode(token)
+                                .requestIdToken(token)
+                                .requestEmail()
+                                .build()
+                        val googleSignInClient = GoogleSignIn.getClient(context, gso)
+                        launcher.launch(googleSignInClient.signInIntent)
+                    })
                 }
             }
         }
@@ -97,5 +137,37 @@ fun LoginScreen(
 private fun LoginScreenPreview() {
     ClientTheme {
         LoginScreen()
+    }
+}
+
+
+
+
+@Composable
+fun rememberFirebaseAuthLauncher(
+    onAuthComplete: (AuthResult) -> Unit,
+    onAuthError: (ApiException) -> Unit
+): ManagedActivityResultLauncher<Intent, ActivityResult> {
+    val scope = rememberCoroutineScope()
+    return rememberLauncherForActivityResult(
+        ActivityResultContracts
+        .StartActivityForResult()) { result ->
+        val task = GoogleSignIn
+            .getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task
+                .getResult(ApiException::class.java)!!
+            Log.e("GoogleAuth", "account $account")
+            val credential = GoogleAuthProvider
+                .getCredential(account.idToken!!, null)
+            scope.launch {
+                val authResult = Firebase
+                    .auth.signInWithCredential(credential).await()
+                onAuthComplete(authResult)
+            }
+        } catch (e: ApiException) {
+            Log.e("GoogleAuth", e.toString())
+            onAuthError(e)
+        }
     }
 }
