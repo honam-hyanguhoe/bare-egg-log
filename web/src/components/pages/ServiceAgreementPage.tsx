@@ -2,7 +2,8 @@ import React from "react";
 import styled from "styled-components";
 
 const PageBody = styled.div`
-  font-family: Arial, sans-serif;
+  font-family: "Line-Seed-Sans-App";
+  font-weight: 600;
   padding: 20px;
   @media (max-width: 768px) {
     padding: 10px;
@@ -11,7 +12,7 @@ const PageBody = styled.div`
 
 const PageTitle = styled.p`
   font-size: 2rem;
-  font-weight: bold;
+  font-weight: 800;
   color: #333;
   margin-top: 20px;
   margin-bottom: 10px;
@@ -20,8 +21,8 @@ const PageTitle = styled.p`
   }
 `;
 const SectionTitle = styled.p`
-  font-size: 1.6rem;
-  font-weight: bold;
+  font-size: 1.5rem;
+  font-weight: 800;
   color: #333;
   margin-top: 20px;
   margin-bottom: 10px;
@@ -32,6 +33,7 @@ const SectionTitle = styled.p`
 
 const Article = styled.p`
   color: #666;
+  font-weight: 400;
   margin-bottom: 10px;
   @media (max-width: 768px) {
     font-size: 0.9rem;
@@ -42,7 +44,7 @@ const ListUl = styled.ul``;
 
 const ListItem = styled.li`
   margin-bottom: 10px;
-
+  font-weight: 400;
   @media (max-width: 768px) {
     font-size: 0.8rem;
   }
