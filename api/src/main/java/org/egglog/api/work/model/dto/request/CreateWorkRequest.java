@@ -1,10 +1,13 @@
 package org.egglog.api.work.model.dto.request;
 
 import lombok.*;
+import net.fortuna.ical4j.util.RandomUidGenerator;
+import net.fortuna.ical4j.util.UidGenerator;
 import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.work.model.entity.Work;
 import org.egglog.api.worktype.model.entity.WorkType;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -28,15 +31,18 @@ import java.util.Map;
 @Setter
 @Builder
 public class CreateWorkRequest {
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate workDate;
     private Long workTypeId;
 
     public Work toEntity(User user, Map<Long, WorkType> userWorkTypeMap, CalendarGroup calendarGroup){
+        UidGenerator ug = new RandomUidGenerator();
         return Work.builder()
                 .user(user)
                 .workType(userWorkTypeMap.get(this.workTypeId))
                 .calendarGroup(calendarGroup)
                 .workDate(this.workDate)
+                .uuid(ug.generateUid().getValue())
                 .build();
     }
 }

@@ -64,27 +64,33 @@ public class WorkService {
     private final UserJpaRepository userJpaRepository;
 
     @Transactional
-    public void createWork(User loginUser, CreateWorkListRequest request){
+    public List<WorkResponse> createWork(User loginUser, CreateWorkListRequest request){
         CalendarGroup calendarGroup = calendarGroupRepository.findById(request.getCalendarGroupId())
                 .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
+
         if (calendarGroup.getUser().getId()!=loginUser.getId()) throw new WorkException(WorkErrorCode.ACCESS_DENIED);
+
         Map<Long, WorkType> userWorkTypeMap = workTypeJpaRepository
                 .findByUser(loginUser).stream().collect(Collectors.toMap(WorkType::getId, wt -> wt));
-        workJpaRepository.saveAll(
+
+        return workJpaRepository.saveAll(
                 request.getWorkTypes().stream()
                         .map(value-> value.toEntity(loginUser, userWorkTypeMap, calendarGroup))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toList()))
+                .stream()
+                .map(Work::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Transactional
-    public void updateWork(User loginUser, EditAndDeleteWorkListRequest request){
+    public List<WorkResponse> updateWork(User loginUser, EditAndDeleteWorkListRequest request){
         CalendarGroup calendarGroup = calendarGroupRepository.findCalendarGroupWithUserById(request.getCalendarGroupId())
                 .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
         if (calendarGroup.getUser().getId()!=loginUser.getId()) throw new WorkException(WorkErrorCode.ACCESS_DENIED);
         Map<Long, WorkType> userWorkTypeMap = workTypeJpaRepository
                 .findByUser(loginUser).stream().collect(Collectors.toMap(WorkType::getId, wt -> wt));
         //EditAndDeleteWorkListRequest 내에 있는 EditAndDeleteWorkRequest의 isDeleted이 true 이면 삭제, 그게 아니라면 새 데이터 저장
-        workJpaRepository.saveAll(request.getEditWorkList().stream().flatMap(editRequest -> {
+        return workJpaRepository.saveAll(request.getEditWorkList().stream().flatMap(editRequest -> {
             if (editRequest.getIsDeleted()) {
                 workJpaRepository.deleteById(editRequest.getWorkId());
                 return Stream.empty(); // 삭제는 여기서 처리하고, 스트림에서는 빈 결과를 반환
@@ -97,7 +103,11 @@ public class WorkService {
                         })
                         .stream(); //유효한 업데이트가 있는 경우에만 스트림에 추가
             }
-        }).collect(Collectors.toList()));
+        })
+        .collect(Collectors.toList()))
+                .stream()
+                .map(Work::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)

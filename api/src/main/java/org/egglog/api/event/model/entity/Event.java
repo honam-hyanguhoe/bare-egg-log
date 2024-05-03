@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(indexes = @Index(name = "idx_calendar_group_id", columnList = "calendar_group_id"))
+@Table(indexes = {@Index(name = "idx_calendar_group_id", columnList = "calendar_group_id"),@Index(name = "index_event_uuid",columnList = "event_uuid")})
 @Builder(toBuilder = true)
 public class Event {
 
@@ -40,4 +40,7 @@ public class Event {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "calendar_group_id")
     private CalendarGroup calendarGroup;
+
+    @Column(name = "event_uuid")
+    private String uuid;
 }

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.egglog.utility.utils.MessageUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-
 import java.util.Calendar;
 
 @RestController
@@ -21,10 +20,9 @@ public class CalendarController {
 
     private final CalendarService calendarService;
 
-    @GetMapping("/{groupId}")
-    public ResponseEntity getCalendarUrl(@AuthenticationPrincipal User user) {
-        Long groupId = 1L;
-        return ResponseEntity.ok().body(MessageUtils.success(calendarService.getIcsLink(user, groupId)));
+    @GetMapping("/link")
+    public ResponseEntity<?> getCalendarUrl(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(MessageUtils.success(calendarService.getIcsLink(user)));
     }
 
     @GetMapping("/month")

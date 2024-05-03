@@ -42,13 +42,13 @@ import java.util.*;
  * ## ${NAME}
  * * packageName    : ${PACKAGE_NAME}
  * * fileName       : ${NAME}
- * author         : ${USER}
+ * author         : 김도휘
  * date           : ${DATE}
  * description    :
  * ===========================================================
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
- * ${DATE}        ${USER}       최초 생성
+ * ${DATE}          김도휘             최초 생성
  */
 
 @Slf4j
@@ -88,19 +88,16 @@ public class BoardService {
      * 게시판 글 목록
      *
      * @param boardListForm
-     * @param userId
+     * @param user
      * @return
      */
-    public List<BoardListOutputSpec> getBoardList(BoardListForm boardListForm, Long userId) {
-        User user = userJpaRepository.findById(userId).orElseThrow(
-                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-        );
-
+    public List<BoardListOutputSpec> getBoardList(BoardListForm boardListForm, User user) {
         List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
         int size = 10;
 
         try {
             List<BoardDocument> boardDocuments = searchRepository.searchBoard(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getLastBoardId(), size);
+            log.info("boardDocument: {}", boardDocuments);
 
             for (BoardDocument board : boardDocuments) {
                 Long commentCnt = commentRepository.getCommentCount(board.getId());
@@ -118,7 +115,7 @@ public class BoardService {
                     isCommented = true;
                 }
                 //사용자가 이미 좋아요를 눌렀는지
-                if (!isNotLiked(userId, board.getId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
+                if (!isNotLiked(user.getId(), board.getId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
                     isUserLiked = true;
                 }
 
@@ -236,14 +233,10 @@ public class BoardService {
      * - boardForm를 Board객체로 변경<br/>
      *
      * @param boardForm
-     * @param userId
+     * @param user
      */
     @Transactional
-    public void registerBoard(BoardForm boardForm, Long userId) {
-        User user = userJpaRepository.findById(userId).orElseThrow(
-                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-        );
-
+    public void registerBoard(BoardForm boardForm, User user) {
         Board board = Board.builder()
                 .title(boardForm.getBoardTitle())
                 .content(boardForm.getBoardContent())
@@ -301,19 +294,16 @@ public class BoardService {
      * - 게시판 아이디와 현재 삭제 버튼을 클릭한 유저 아이디를 토대로 게시글을 삭제한다.
      *
      * @param boardId
-     * @param userId
+     * @param user
      */
-    public void deleteBoard(Long boardId, Long userId) {
-        User user = userJpaRepository.findById(userId).orElseThrow(
-                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-        );
+    public void deleteBoard(Long boardId, User user) {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
         );
 
         try {
             //작성자가 같다면
-            if (board.getUser().getId().equals(userId)) {
+            if (board.getUser().getId().equals(user.getId())) {
                 Optional<List<Comment>> commentListByBoardId = commentRepository.getCommentListByBoardId(boardId);
                 commentListByBoardId.ifPresent(commentRepository::deleteAll);
                 boardRepository.delete(board); //삭제
@@ -409,23 +399,19 @@ public class BoardService {
      * - Board 정보를 가져온다.
      *
      * @param boardId
-     * @param userId
+     * @param user
      * @return
      */
-    public BoardOutputSpec getBoard(Long boardId, Long userId) {
-        User user = userJpaRepository.findById(userId).orElseThrow(
-                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-        );
+    public BoardOutputSpec getBoard(Long boardId, User user) {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
         );
-
 
         BoardOutputSpec boardOutputSpec = null;
 
         try {
             //조회수 증가해도 되는지 검증
-            if (redisViewCountUtil.checkAndIncrementViewCount(String.valueOf(boardId), String.valueOf(userId))) {
+            if (redisViewCountUtil.checkAndIncrementViewCount(String.valueOf(boardId), String.valueOf(user.getId()))) {
                 redisViewCountUtil.incrementViewCount(String.valueOf(boardId));
             }
             long viewCount = redisViewCountUtil.getViewCount(String.valueOf(boardId)); //하루 동안의 조회수
@@ -441,7 +427,7 @@ public class BoardService {
                 isCommented = true;
             }
             //사용자가 이미 좋아요를 눌렀는지
-            if (!isNotLiked(userId, board.getId())) {
+            if (!isNotLiked(user.getId(), board.getId())) {
                 isUserLiked = true;
             }
             //사용자의 병원 인증 정보
@@ -503,18 +489,15 @@ public class BoardService {
      * - boardId를 가지고 공감을 시킨다.
      *
      * @param likeForm
-     * @param userId
+     * @param user
      */
-    public void registerLike(LikeForm likeForm, Long userId) {
-        User user = userJpaRepository.findById(userId).orElseThrow(
-                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-        );
+    public void registerLike(LikeForm likeForm, User user) {
         Board board = boardRepository.findById(likeForm.getBoardId()).orElseThrow(
                 () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
         );
 
         //아직 좋아요 안눌렀다면
-        if (isNotLiked(userId, board.getId())) {
+        if (isNotLiked(user.getId(), board.getId())) {
             BoardLike boardLike = BoardLike.builder()
                     .id(likeForm.getBoardId())
                     .board(board)
@@ -536,20 +519,16 @@ public class BoardService {
      * - boardId를 가지고 공감을 취소 시킨다.
      *
      * @param boardId
-     * @param userId
+     * @param user
      */
-    public void deleteLike(Long boardId, Long userId) {
-        User user = userJpaRepository.findById(userId).orElseThrow(
-                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-        );
-
+    public void deleteLike(Long boardId, User user) {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
         );
 
         try {
             //이미 좋아요를 눌렀다면
-            if (!isNotLiked(userId, boardId)) {
+            if (!isNotLiked(user.getId(), boardId)) {
                 Optional<BoardLike> boardLike = boardLikeRepository.getBoardLikeByBoardId(boardId);
                 boardLikeRepository.delete(boardLike.get());
             } else {

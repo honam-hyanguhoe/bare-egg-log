@@ -3,10 +3,12 @@ package org.egglog.api.group.model.service;
 import lombok.RequiredArgsConstructor;
 import org.egglog.api.group.exception.GroupMemberErrorCode;
 import org.egglog.api.group.exception.GroupMemberException;
+import org.egglog.api.group.model.dto.response.GroupDutySummary;
 import org.egglog.api.group.model.entity.GroupMember;
 import org.egglog.api.group.repository.jpa.GroupMemberRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -22,8 +24,7 @@ public class GroupMemberService {
 
     public List<GroupMember> getGroupMeberList(Long groupId) {
         List<GroupMember> groupMemberList = groupMemberRepository
-                .findGroupMemberByGroupId(groupId)
-                .orElseThrow(() -> new GroupMemberException(GroupMemberErrorCode.NOT_FOUND));
+                .findGroupMemberByGroupId(groupId);
         return groupMemberList;
     }
 
@@ -80,5 +81,15 @@ public class GroupMemberService {
             throw new GroupMemberException(GroupMemberErrorCode.NOT_FOUND);
         }
         return count;
+    }
+
+    /**
+     *
+     */
+    public GroupDutySummary getGroupDutySummary(Long groupId,String date){
+        String[] parsedDate=date.split("-");
+        LocalDate targetDate = LocalDate.of(Integer.parseInt(parsedDate[0]),Integer.parseInt(parsedDate[1]),Integer.parseInt(parsedDate[2]));
+        GroupDutySummary groupDutySummary = groupMemberRepository.getGroupDutySummary(groupId,targetDate);
+        return groupDutySummary;
     }
 }

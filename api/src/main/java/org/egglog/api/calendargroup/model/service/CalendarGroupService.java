@@ -28,11 +28,7 @@ public class CalendarGroupService {
     private final EventRepository eventRepository;
 
 
-    public void registerCalendarGroup(CalendarGroupForm calendarGroupForm, Long userId) {
-        User user = userJpaRepository.findById(userId).orElseThrow(
-                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-        );
-
+    public void registerCalendarGroup(CalendarGroupForm calendarGroupForm, User user) {
         CalendarGroup calendarGroup = CalendarGroup.builder()
                 .url(calendarGroupForm.getUrl())
                 .alias(calendarGroupForm.getAlias())

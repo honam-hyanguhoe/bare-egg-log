@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@Table(indexes = {@Index(name = "idx_user_id", columnList = "user_id"),@Index(name = "idx_work_uuid", columnList = "work_uuid")})
 public class Work {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,6 +50,9 @@ public class Work {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Column(name = "work_uuid")
+    private String uuid;
 
     public WorkResponse toResponse(){
         return WorkResponse.builder()

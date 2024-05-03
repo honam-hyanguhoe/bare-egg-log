@@ -27,8 +27,8 @@ public class EventController {
      */
     @PostMapping("")
     public ResponseEntity<?> registerEvent(@RequestBody EventForm eventForm, @AuthenticationPrincipal User user) {
-        eventService.registerEvent(eventForm, user.getId());
-        return ResponseEntity.ok().body(MessageUtils.success());
+        eventService.registerEvent(eventForm, user);
+        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }
 
     /**

@@ -71,5 +71,13 @@ public class EventCustomQueryImpl implements EventCustomQuery {
                 .fetch());
     }
 
+    @Override
+    public List<Event> findAllEventByUserId(Long userId){
+        return jpaQueryFactory
+                .selectFrom(event)
+                .where(event.user.id.eq(userId))
+                .fetch();
+    }
+
 
 }
