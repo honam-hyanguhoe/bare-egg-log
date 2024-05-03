@@ -1,8 +1,10 @@
 package org.egglog.api.calendar.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.C;
 import org.egglog.api.calendar.model.dto.params.CalendarMonthRequest;
 import org.egglog.api.calendar.model.service.CalendarService;
+import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.utility.utils.MessageUtils;
 import org.springframework.http.ResponseEntity;
@@ -20,11 +22,6 @@ public class CalendarController {
 
     private final CalendarService calendarService;
 
-    @GetMapping("/test")
-    public ResponseEntity<MessageUtils> test(){
-        calendarService.readCalendarFile("https://calendar-ics.kakao.com/lehl0QARJebd4kZiSCuLchCKk92LP_NdBaB0U_WJTHU/talk.ics");
-        return ResponseEntity.ok().build();
-    }
 
     @GetMapping("/link")
     public ResponseEntity<?> getCalendarUrl(@AuthenticationPrincipal User user) {

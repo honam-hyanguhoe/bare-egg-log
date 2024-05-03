@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(indexes = {@Index(name = "idx_calendar_group_id", columnList = "calendar_group_id"),@Index(name = "index_event_uuid",columnList = "event_uuid")})

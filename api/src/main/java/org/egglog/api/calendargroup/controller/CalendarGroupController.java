@@ -1,9 +1,8 @@
 package org.egglog.api.calendargroup.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.egglog.api.calendargroup.model.dto.params.CalendarGroupForm;
+import org.egglog.api.calendargroup.model.dto.request.CreateCalGroupRequest;
 import org.egglog.api.calendargroup.model.service.CalendarGroupService;
-import org.egglog.api.event.model.dto.params.EventForm;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.utility.utils.MessageUtils;
 import org.egglog.utility.utils.SuccessType;
@@ -21,9 +20,18 @@ public class CalendarGroupController {
 
     private final CalendarGroupService calendarGroupService;
 
-    @PostMapping("")
-    public ResponseEntity<?> registerCalendarGroup(@RequestBody CalendarGroupForm calendarGroupForm, @AuthenticationPrincipal User user) {
-        calendarGroupService.registerCalendarGroup(calendarGroupForm, user);
-        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
+    /**
+     * 캘린더 그룹 생성 API
+     * @param loginUser
+     * @param request 그룹 별칭, url(없다면 안보내도 됨)
+     * @return
+     */
+    @PostMapping("/create")
+    public ResponseEntity<MessageUtils> registerCalendarGroup(
+            @AuthenticationPrincipal User loginUser,
+            @RequestBody CreateCalGroupRequest request
+        ) {
+        return ResponseEntity.ok()
+                .body(MessageUtils.success(calendarGroupService.registerCalendarGroup(request, loginUser)));
     }
 }
