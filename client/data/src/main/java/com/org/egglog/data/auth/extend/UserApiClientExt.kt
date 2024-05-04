@@ -1,7 +1,6 @@
-package com.org.egglog.data.auth.ext
+package com.org.egglog.data.auth.extend
 
 import android.content.Context
-import android.util.Log
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
@@ -11,7 +10,7 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 suspend fun UserApiClient.Companion.loginWithKakao(context: Context): OAuthToken {
-    return if (instance.isKakaoTalkLoginAvailable(context)) {
+    return if(instance.isKakaoTalkLoginAvailable(context)) {
         try {
             UserApiClient.loginWithKakaoTalk(context)
         } catch (error: Throwable) {
@@ -19,8 +18,6 @@ suspend fun UserApiClient.Companion.loginWithKakao(context: Context): OAuthToken
             // 의도적인 로그인 취소로 보고 카카오계정으로 로그인 시도 없이 로그인 취소로 처리 (예: 뒤로 가기)
             // 그냥 에러를 올린다.
             if (error is ClientError && error.reason == ClientErrorCause.Cancelled) throw error
-
-            // 그렇지 않다면, 카카오 계정 로그인을 시도한다.
             UserApiClient.loginWithKakaoAccount(context)
         }
     } else {
@@ -50,14 +47,17 @@ suspend fun UserApiClient.Companion.loginWithKakaoTalk(context: Context): OAuthT
  */
 suspend fun UserApiClient.Companion.loginWithKakaoAccount(context: Context): OAuthToken {
     return suspendCoroutine<OAuthToken> { continuation ->
-        instance.loginWithKakaoAccount(context) { token, error ->
-            if (error != null) {
-                continuation.resumeWithException(error)
-            } else if (token != null) {
-                continuation.resume(token)
-            } else {
-                continuation.resumeWithException(RuntimeException("kakao access token을 받아오는데 실패함, 이유는 명확하지 않음."))
-            }
-        }
+        continuation.resumeWithException(Error("웹뷰를 띄우려 시도했습니다."))
     }
+//    return suspendCoroutine<OAuthToken> { continuation ->
+//        instance.loginWithKakaoAccount(context) { token, error ->
+//            if (error != null) {
+//                continuation.resumeWithException(error)
+//            } else if (token != null) {
+//                continuation.resume(token)
+//            } else {
+//                continuation.resumeWithException(RuntimeException("kakao access token을 받아오는데 실패함, 이유는 명확하지 않음."))
+//            }
+//        }
+//    }
 }

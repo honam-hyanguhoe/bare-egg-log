@@ -1,6 +1,7 @@
 package com.org.egglog.presentation.domain.auth.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.org.egglog.domain.auth.model.KakaoOauthToken
 import com.org.egglog.domain.auth.usecase.GetGoogleUseCase
 import com.org.egglog.domain.auth.usecase.GetKakaoUseCase
 import com.org.egglog.domain.auth.usecase.LoginUseCase
