@@ -99,5 +99,18 @@ dependencies {
     // splash
     implementation(libs.splash)
 
+    // kakao
+    implementation(libs.kakao.user)
+    implementation(libs.kakao.share)
+    implementation(libs.kakao.auth)
+
+    // google
+    implementation(libs.firebase.auth)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.play.services.auth)
+
+    // naver
+    implementation(libs.naver.oauth)
+
     implementation(project(":domain"))
 }

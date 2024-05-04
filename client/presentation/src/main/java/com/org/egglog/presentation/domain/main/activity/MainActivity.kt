@@ -1,4 +1,4 @@
-package com.org.egglog.presentation.domain.auth.activity
+package com.org.egglog.presentation.domain.main.activity
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
