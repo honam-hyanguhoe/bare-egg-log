@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.security.model.service.AuthService;
 import org.egglog.api.user.model.entity.User;
+import org.egglog.api.user.model.entity.enums.AuthProvider;
 import org.egglog.utility.utils.MessageUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -29,6 +30,15 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @PostMapping("/login/{provider}")
+    public ResponseEntity<MessageUtils> login(
+            @RequestHeader String accessToken,
+            @PathVariable AuthProvider authProvider
+            ){
+        return ResponseEntity.ok()
+                .body(MessageUtils.success(authService.login(accessToken, authProvider)));
+    }
+
 
     @PostMapping("/logout")
     public ResponseEntity<MessageUtils> logout(@AuthenticationPrincipal User user){
@@ -37,7 +47,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<MessageUtils> refresh(@RequestHeader("refresh") String refreshToken){
+    public ResponseEntity<MessageUtils> refresh(@RequestHeader String refreshToken){
         return ResponseEntity.ok().body(MessageUtils.success(authService.refresh(refreshToken)));
     }
 
