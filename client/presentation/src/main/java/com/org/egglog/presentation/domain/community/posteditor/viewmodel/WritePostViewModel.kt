@@ -1,8 +1,8 @@
-package com.org.egglog.presentation.domain.writing.viewmodel
+package com.org.egglog.presentation.domain.community.posteditor.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.org.egglog.domain.community.usecase.WritePostUseCase
+import com.org.egglog.domain.community.posteditor.usecase.WritePostUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent

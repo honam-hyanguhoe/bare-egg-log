@@ -1,7 +1,4 @@
-package com.org.egglog.domain.community.usecase
-
-import com.org.egglog.domain.community.model.Post
-import java.awt.Image
+package com.org.egglog.domain.community.posteditor.usecase
 
 interface WritePostUseCase {
     suspend operator fun invoke(

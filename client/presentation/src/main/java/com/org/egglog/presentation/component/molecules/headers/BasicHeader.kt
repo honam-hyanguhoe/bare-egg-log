@@ -50,11 +50,7 @@ fun BasicHeader(
         modifier = Modifier
             .fillMaxWidth()
             .background(NaturalWhite)
-<<<<<<< HEAD
             .padding(top = 16.heightPercent(LocalContext.current).dp)
-=======
-            .padding(top = 12.heightPercent(LocalContext.current).dp)
->>>>>>> 442a05c12ac3080f75ebf326130cea72025f6a40
     ) {
         Column {
             BasicHeaderContents(

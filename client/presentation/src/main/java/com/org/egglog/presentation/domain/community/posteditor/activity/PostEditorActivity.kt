@@ -1,21 +1,21 @@
-package com.org.egglog.presentation.domain.writing.activity
+package com.org.egglog.presentation.domain.community.posteditor.activity
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import com.org.egglog.presentation.domain.writing.navigation.WritingNavigationHost
+import com.org.egglog.presentation.domain.community.posteditor.navigation.PostNavigationHost
 import com.org.egglog.presentation.theme.ClientTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class WritingActivity : AppCompatActivity() {
+class PostEditorActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent{
             ClientTheme {
-                WritingNavigationHost{
+                PostNavigationHost{
                     finish() // activity 종료
                 }
             }

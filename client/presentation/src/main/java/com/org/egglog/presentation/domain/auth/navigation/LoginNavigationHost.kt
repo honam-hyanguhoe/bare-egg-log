@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.org.egglog.presentation.domain.auth.screen.AgreeScreen
 import com.org.egglog.presentation.domain.auth.screen.LoginScreen
-import com.org.egglog.presentation.domain.writing.viewmodel.WritePostViewModel
+import com.org.egglog.presentation.domain.community.posteditor.viewmodel.WritePostViewModel
 
 @Composable
 fun LoginNavigationHost() {

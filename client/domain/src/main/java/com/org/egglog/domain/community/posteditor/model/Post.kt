@@ -1,4 +1,4 @@
-package com.org.egglog.domain.community.model
+package com.org.egglog.domain.community.posteditor.model
 
 data class Post(
     val boardTitle : String,

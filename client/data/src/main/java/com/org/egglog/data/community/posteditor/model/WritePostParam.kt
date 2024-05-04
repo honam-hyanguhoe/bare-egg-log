@@ -1,4 +1,4 @@
-package com.org.egglog.data.community.model
+package com.org.egglog.data.community.posteditor.model
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString

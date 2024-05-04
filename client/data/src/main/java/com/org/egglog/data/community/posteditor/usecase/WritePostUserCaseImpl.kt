@@ -1,16 +1,16 @@
-package com.org.egglog.data.community.usecase
+package com.org.egglog.data.community.posteditor.usecase
 
 import android.content.Context
 import android.util.Log
-import com.org.egglog.data.community.model.WritePostParam
-import com.org.egglog.data.community.service.PostingService
-import com.org.egglog.domain.community.usecase.WritePostUseCase
+import com.org.egglog.data.community.posteditor.model.WritePostParam
+import com.org.egglog.data.community.posteditor.service.PostEditorService
+import com.org.egglog.domain.community.posteditor.usecase.WritePostUseCase
 import javax.inject.Inject
 
 class WritePostUserCaseImpl @Inject constructor(
     private val context : Context,
-    private val postingService: PostingService
-) : WritePostUseCase{
+    private val postingService: PostEditorService
+) : WritePostUseCase {
     override suspend fun invoke(
         boardTitle: String,
         boardContent: String,

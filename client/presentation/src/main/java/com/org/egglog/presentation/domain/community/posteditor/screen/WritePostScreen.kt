@@ -1,4 +1,4 @@
-package com.org.egglog.presentation.domain.writing.screen
+package com.org.egglog.presentation.domain.community.posteditor.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +23,7 @@ import com.org.egglog.presentation.component.atoms.buttons.BigButton
 import com.org.egglog.presentation.component.atoms.inputs.MultiInput
 import com.org.egglog.presentation.component.atoms.inputs.SingleInput
 import com.org.egglog.presentation.component.molecules.headers.BasicHeader
-import com.org.egglog.presentation.domain.writing.viewmodel.WritePostViewModel
+import com.org.egglog.presentation.domain.community.posteditor.viewmodel.WritePostViewModel
 import com.org.egglog.presentation.theme.ClientTheme
 import com.org.egglog.presentation.theme.Gray25
 import com.org.egglog.presentation.theme.Gray300
