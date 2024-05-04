@@ -39,5 +39,4 @@ class WritePostUserCaseImpl @Inject constructor(
             throw Exception("커뮤니티 writePost ${response.dataHeader.resultCode} : ${response.dataHeader.resultMessage}")
         }
     }
-
 }

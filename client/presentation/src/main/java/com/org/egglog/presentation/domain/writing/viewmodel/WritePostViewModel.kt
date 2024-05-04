@@ -1,4 +1,4 @@
-package com.org.egglog.presentation.domain.community.viewmodel
+package com.org.egglog.presentation.domain.writing.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
