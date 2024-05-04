@@ -52,10 +52,9 @@ public class CustomOAuth2Service implements OAuth2UserService<OAuth2UserRequest,
                 .getUri();
         String tokenValue = userRequest.getAccessToken().getTokenValue();
 
-        Map<String, Object> userAttributes = webClient.post()
+        Map<String, Object> userAttributes = webClient.get()
                 .uri(userInfoEndpointUri)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenValue)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED) // Content-Type 설정
                 .retrieve()
                 .bodyToMono(Map.class)
                 .block();
