@@ -5,6 +5,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.org.egglog.presentation.domain.auth.screen.AgreeScreen
 import com.org.egglog.presentation.domain.auth.screen.LoginScreen
 import com.org.egglog.presentation.domain.writing.viewmodel.WritePostViewModel
 
@@ -20,18 +21,8 @@ fun LoginNavigationHost() {
         composable(route = LoginRoute.LoginScreen.name) {
             LoginScreen()
         }
-//        composable(route = AuthRoute.SignUpScreen.name) {
-//            SignUpScreen(
-//                id = "",
-//                username = "",
-//                password1 = "",
-//                password2 = "",
-//                onIdChange = {},
-//                onUsernameChange = {},
-//                onPassword1Change = {},
-//                onPassword2Change = {},
-//                onSignUpClick = {}
-//            )
-//        }
+        composable(route = LoginRoute.AgreeScreen.name) {
+            AgreeScreen()
+        }
     }
 }

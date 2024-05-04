@@ -3,6 +3,7 @@ package com.org.egglog.data.retrofit
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.org.egglog.data.auth.service.AuthService
 import com.org.egglog.data.community.service.PostingService
+import com.org.egglog.data.auth.service.UserService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,7 +23,7 @@ private val json = Json {
 @InstallIn(SingletonComponent::class)
 class RetrofitModule {
     @Provides
-    fun provideOkHttpClient() : OkHttpClient {
+    fun provideOkHttpClient(): OkHttpClient {
         return OkHttpClient
             .Builder()
             .build()
@@ -30,7 +31,8 @@ class RetrofitModule {
 
     @Provides
     fun provideRetrofit(client: OkHttpClient): Retrofit {
-        val converterFactory = json.asConverterFactory("application/json; charset=UTF8".toMediaType())
+        val converterFactory =
+            json.asConverterFactory("application/json; charset=UTF8".toMediaType())
         return Retrofit.Builder()
             .baseUrl("$HOST/v1/")
             .addConverterFactory(converterFactory)
@@ -44,7 +46,12 @@ class RetrofitModule {
     }
 
     @Provides
-    fun providePostingService(retrofit: Retrofit):PostingService{
+    fun provideUserService(retrofit: Retrofit): UserService {
+        return retrofit.create(UserService::class.java)
+    }
+
+    @Provides
+    fun providePostingService(retrofit: Retrofit): PostingService {
         return retrofit.create(PostingService::class.java)
     }
 }
