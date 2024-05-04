@@ -58,7 +58,7 @@ public class CustomOAuth2Service implements OAuth2UserService<OAuth2UserRequest,
                 .retrieve()
                 .bodyToMono(Map.class)
                 .block();
-
+        log.debug("userAttributes={}",userAttributes.toString());
         if (userAttributes == null || userAttributes.isEmpty()) {
             throw new OAuth2AuthenticationException("User Info Endpoint did not return any information");
         }
