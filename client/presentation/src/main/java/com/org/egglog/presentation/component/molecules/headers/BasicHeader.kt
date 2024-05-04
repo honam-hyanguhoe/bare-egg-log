@@ -26,6 +26,7 @@ import com.org.egglog.presentation.component.atoms.buttons.IconTextButton
 import com.org.egglog.presentation.component.atoms.linearIndicator.LinearIndicator
 import com.org.egglog.presentation.component.atoms.menus.ScrollableMenus
 import com.org.egglog.presentation.theme.*
+import com.org.egglog.presentation.utils.heightPercent
 
 @Composable
 fun BasicHeader(
@@ -37,18 +38,19 @@ fun BasicHeader(
     hasInvitationButton: Boolean = false,
     hasProgressBar: Boolean = false,
     hasMore: Boolean = false,
-    onClickBack: () -> Unit,
-    onClickLink: () -> Unit,
-    onClickClose: () -> Unit,
-    onClickMenus: () -> Unit,
+    onClickBack: () -> Unit = {},
+    onClickLink: () -> Unit = {},
+    onClickClose: () -> Unit = {},
+    onClickMenus: () -> Unit = {},
     options: List<String> = listOf(""),
-    selectedOption: String?,
+    selectedOption: String? = null,
     onSelect: (String) -> Unit = {}
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(NaturalWhite)
+            .padding(top = 16.heightPercent(LocalContext.current).dp)
     ) {
         Column {
             BasicHeaderContents(
