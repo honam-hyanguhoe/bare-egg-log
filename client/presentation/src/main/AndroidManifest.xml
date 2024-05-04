@@ -25,5 +25,6 @@
         </activity>
         <activity android:name="com.org.egglog.presentation.domain.main.activity.MainActivity" />
         <activity android:name="com.org.egglog.presentation.domain.auth.activity.LoginActivity" />
+        <activity android:name="com.org.egglog.presentation.domain.community.posteditor.activity.PostEditorActivity" />
     </application>
 </manifest>

@@ -15,10 +15,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.org.egglog.presentation.R
+import com.org.egglog.presentation.component.atoms.buttons.CustomIconButton
 import com.org.egglog.presentation.utils.ArrowDown
 import com.org.egglog.presentation.utils.Notification
 import com.org.egglog.presentation.utils.Search
-import com.org.egglog.presentation.component.atoms.buttons.IconButton
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.presentation.component.atoms.menus.ScrollableMenus
 import com.org.egglog.presentation.theme.*
@@ -117,13 +117,13 @@ fun NoticeHeaderContents(
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (hasSearch) {
-                IconButton(
+                CustomIconButton(
                     size = 25.dp,
                     imageVector = Search,
                     color = NaturalBlack,
                     onClick = { onClickSearch })
             }
-            IconButton(
+            CustomIconButton(
                 size = 25.dp,
                 imageVector = Notification,
                 color = NaturalBlack,

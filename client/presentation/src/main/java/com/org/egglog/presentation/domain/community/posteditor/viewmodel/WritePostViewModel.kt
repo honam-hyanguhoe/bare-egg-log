@@ -44,7 +44,6 @@ class WritePostViewModel @Inject constructor(
     }
 }
 
-
 data class PostState(
     val title : String = "",
     val content :  String = ""

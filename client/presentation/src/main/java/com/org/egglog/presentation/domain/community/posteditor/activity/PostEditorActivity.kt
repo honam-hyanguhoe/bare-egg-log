@@ -1,6 +1,7 @@
 package com.org.egglog.presentation.domain.community.posteditor.activity
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import com.org.egglog.presentation.domain.community.posteditor.navigation.PostNavigationHost
@@ -16,7 +17,8 @@ class PostEditorActivity : AppCompatActivity() {
         setContent{
             ClientTheme {
                 PostNavigationHost{
-                    finish() // activity 종료
+                    Log.d("커뮤니티", "close 눌러써")
+                    finish()
                 }
             }
         }

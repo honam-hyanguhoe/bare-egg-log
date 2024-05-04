@@ -17,11 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.org.egglog.presentation.component.atoms.buttons.CustomIconButton
 import com.org.egglog.presentation.utils.ArrowLeft
 import com.org.egglog.presentation.utils.Close
 import com.org.egglog.presentation.utils.Link
 import com.org.egglog.presentation.utils.widthPercent
-import com.org.egglog.presentation.component.atoms.buttons.IconButton
 import com.org.egglog.presentation.component.atoms.buttons.IconTextButton
 import com.org.egglog.presentation.component.atoms.linearIndicator.LinearIndicator
 import com.org.egglog.presentation.component.atoms.menus.ScrollableMenus
@@ -105,17 +105,17 @@ fun BasicHeaderContents(
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (hasArrow) {
-            IconButton(
+            CustomIconButton(
                 size = 25.dp,
                 imageVector = ArrowLeft,
                 color = NaturalBlack,
-                onClick = { onClickBack })
+                onClick = onClickBack )
         } else if (hasLeftClose) {
-            IconButton(
+            CustomIconButton(
                 size = 25.dp,
                 imageVector = Close,
                 color = NaturalBlack,
-                onClick = { onClickClose })
+                onClick = onClickClose)
         } else {
             Box(modifier = Modifier.size(30.widthPercent(context).dp))
         }
@@ -137,7 +137,7 @@ fun BasicHeaderContents(
         ) {
             if (hasInvitationButton) {
                 IconTextButton(
-                    onClick = { onClickLink },
+                    onClick = onClickLink,
                     width = 80,
                     height = 30,
                     icon = Link,
@@ -147,11 +147,11 @@ fun BasicHeaderContents(
             }
 
             if (hasClose) {
-                IconButton(
+                CustomIconButton(
                     size = 25.dp,
                     imageVector = Close,
                     color = NaturalBlack,
-                    onClick = { onClickClose })
+                    onClick = onClickClose)
             } else if (hasMore) {
 
                 ScrollableMenus(
