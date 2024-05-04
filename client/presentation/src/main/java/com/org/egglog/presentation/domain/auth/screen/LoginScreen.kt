@@ -23,10 +23,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.presentation.R
 import com.org.egglog.presentation.component.atoms.buttons.AuthButton
-import com.org.egglog.presentation.domain.auth.activity.MainActivity
 import com.org.egglog.presentation.domain.auth.extend.rememberFirebaseAuthLauncher
 import com.org.egglog.presentation.domain.auth.viewmodel.LoginSideEffect
 import com.org.egglog.presentation.domain.auth.viewmodel.LoginViewModel
+import com.org.egglog.presentation.domain.main.activity.MainActivity
 import com.org.egglog.presentation.theme.*
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent

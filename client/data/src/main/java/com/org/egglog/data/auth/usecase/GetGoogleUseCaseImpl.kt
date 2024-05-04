@@ -15,7 +15,7 @@ class GetGoogleUseCaseImpl @Inject constructor(
 ): GetGoogleUseCase {
     override suspend fun invoke(): Result<Refresh> {
         return try {
-            Result.success(Refresh(refreshToken = "", accessToken = ""))
+            Result.success(Refresh(refreshToken = "test", accessToken = "test"))
         } catch(e: ApiException) {
             Result.failure(e)
         }

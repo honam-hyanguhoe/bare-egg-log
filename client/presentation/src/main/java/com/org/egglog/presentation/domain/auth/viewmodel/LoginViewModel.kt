@@ -60,7 +60,12 @@ class LoginViewModel @Inject constructor(
     }
 
     fun onKakaoClick() = intent {
-        getKakaoUseCase()
+        val tokens = getKakaoUseCase().getOrThrow()
+        if(tokens.accessToken.isNotEmpty() && tokens.refreshToken.isNotEmpty()) {
+            postSideEffect(LoginSideEffect.NavigateToMainActivity)
+        } else {
+            postSideEffect(LoginSideEffect.Toast("로그인에 실패했습니다."))
+        }
         postSideEffect(LoginSideEffect.NavigateToMainActivity)
     }
 
@@ -68,8 +73,12 @@ class LoginViewModel @Inject constructor(
         NaverIdLoginSDK.authenticate(context, oAuthLoginCallback)
         Log.e("naver Token: ", NaverIdLoginSDK.getAccessToken().orEmpty())
         oauthToken = NaverIdLoginSDK.getAccessToken().orEmpty()
-        getNaverUseCase()
-        postSideEffect(LoginSideEffect.NavigateToMainActivity)
+        val tokens = getNaverUseCase().getOrThrow()
+        if(tokens.accessToken.isNotEmpty() && tokens.refreshToken.isNotEmpty()) {
+            postSideEffect(LoginSideEffect.NavigateToMainActivity)
+        } else {
+            postSideEffect(LoginSideEffect.Toast("로그인에 실패했습니다."))
+        }
     }
 
     fun onGoogleAccountReceived(account: GoogleSignInAccount) {
@@ -84,8 +93,12 @@ class LoginViewModel @Inject constructor(
             .build()
         val googleSignInClient = GoogleSignIn.getClient(context, gso)
         launcher.launch(googleSignInClient.signInIntent)
-        getGoogleUseCase()
-        postSideEffect(LoginSideEffect.NavigateToMainActivity)
+        val tokens = getGoogleUseCase().getOrThrow()
+        if(tokens.accessToken.isNotEmpty() && tokens.refreshToken.isNotEmpty()) {
+            postSideEffect(LoginSideEffect.NavigateToMainActivity)
+        } else {
+            postSideEffect(LoginSideEffect.Toast("로그인에 실패했습니다."))
+        }
     }
 }
 

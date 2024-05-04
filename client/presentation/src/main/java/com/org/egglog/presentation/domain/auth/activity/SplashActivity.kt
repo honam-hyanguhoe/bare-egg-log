@@ -16,6 +16,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.org.egglog.presentation.R
+import com.org.egglog.presentation.domain.main.activity.MainActivity
 
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {

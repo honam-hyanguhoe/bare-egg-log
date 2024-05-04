@@ -17,7 +17,7 @@ class GetKakaoUseCaseImpl @Inject constructor(
         return try {
             val oAuthToken = UserApiClient.loginWithKakao(context)
             Log.e("MainActivity", "beanbean > $oAuthToken")
-            Result.success(Refresh(refreshToken = "", accessToken = ""))
+            Result.success(Refresh(refreshToken = "test", accessToken = "test"))
         } catch (error: Throwable) {
             if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
                 Log.e("MainActivity", "사용자가 명시적으로 취소")
