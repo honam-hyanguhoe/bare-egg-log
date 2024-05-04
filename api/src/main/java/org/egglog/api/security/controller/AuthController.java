@@ -33,7 +33,7 @@ public class AuthController {
     @PostMapping("/login/{provider}")
     public ResponseEntity<MessageUtils> login(
             @RequestHeader String accessToken,
-            @PathVariable AuthProvider authProvider
+            @PathVariable(name = "provider") AuthProvider authProvider
             ){
         return ResponseEntity.ok()
                 .body(MessageUtils.success(authService.login(accessToken, authProvider)));
