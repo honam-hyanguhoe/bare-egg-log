@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.security.model.entity.OAuthAttribute;
 import org.egglog.api.user.model.entity.enums.UserRole;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -51,9 +52,10 @@ public class CustomOAuth2Service implements OAuth2UserService<OAuth2UserRequest,
                 .getUri();
         String tokenValue = userRequest.getAccessToken().getTokenValue();
 
-        Map<String, Object> userAttributes = webClient.get()
+        Map<String, Object> userAttributes = webClient.post()
                 .uri(userInfoEndpointUri)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenValue)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED) // Content-Type 설정
                 .retrieve()
                 .bodyToMono(Map.class)
                 .block();
