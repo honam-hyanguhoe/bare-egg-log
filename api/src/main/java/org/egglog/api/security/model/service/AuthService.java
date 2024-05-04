@@ -41,9 +41,13 @@ public class AuthService {
     public TokenResponse login(String accessToken, AuthProvider provider){
         String registrationId = provider.name().toLowerCase(); // AuthProvider enum에서 registrationId를 도출
         ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(registrationId);
+        log.error("clientRegistration = {}", clientRegistration.toString());
         OAuth2AccessToken oAuth2AccessToken = new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER, accessToken, null, null);
+        log.error("oAuth2AccessToken = {}", oAuth2AccessToken.toString());
         OAuth2UserRequest userRequest = new OAuth2UserRequest(clientRegistration, oAuth2AccessToken);
+        log.error("userRequest = {}", userRequest.toString());
         OAuth2User oAuth2User = customOAuth2Service.loadUser(userRequest); // 사용자 정보 로드
+        log.error("oAuth2User = {}", oAuth2User.toString());
         User oauth2user = User.of(oAuth2User);
         //회원 가입 일 경우
         Optional<User> optionalUser = userJpaRepository.findByEmailWithHospital(oauth2user.getEmail());
