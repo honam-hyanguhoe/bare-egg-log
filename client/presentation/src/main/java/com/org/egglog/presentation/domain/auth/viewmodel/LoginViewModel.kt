@@ -1,12 +1,10 @@
 package com.org.egglog.presentation.domain.auth.viewmodel
 
-import android.app.Activity
 import androidx.lifecycle.ViewModel
 import com.org.egglog.domain.auth.usecase.GetGoogleUseCase
 import com.org.egglog.domain.auth.usecase.GetKakaoUseCase
 import com.org.egglog.domain.auth.usecase.LoginUseCase
 import com.org.egglog.domain.auth.usecase.SetTokenUseCase
-import com.org.egglog.presentation.domain.auth.activity.LoginActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
@@ -16,7 +14,6 @@ import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.viewmodel.container
 import javax.annotation.concurrent.Immutable
 import javax.inject.Inject
-import com.org.egglog.presentation.domain.auth.viewmodel.extend.GoogleUtil
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(

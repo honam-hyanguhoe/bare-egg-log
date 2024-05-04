@@ -28,9 +28,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.Firebase
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
@@ -39,6 +41,7 @@ import com.org.egglog.presentation.theme.ClientTheme
 import com.org.egglog.presentation.R
 import com.org.egglog.presentation.component.atoms.buttons.AuthButton
 import com.org.egglog.presentation.domain.auth.activity.MainActivity
+import com.org.egglog.presentation.domain.auth.extend.rememberFirebaseAuthLauncher
 import com.org.egglog.presentation.domain.auth.viewmodel.LoginSideEffect
 import com.org.egglog.presentation.domain.auth.viewmodel.LoginViewModel
 import com.org.egglog.presentation.theme.*
@@ -79,17 +82,7 @@ fun LoginScreen(
 ) {
     val token = stringResource(id = R.string.google_web_client_id)
     val context = LocalContext.current
-    val launcher = rememberFirebaseAuthLauncher(
-        onAuthComplete = { result ->
-//            user = result.user
-                         Log.e("result: ", result.user?.email.toString())
-        },
-        onAuthError = {
-//            user = null
-            Log.e("result: ", "bye...")
-        }
-    )
-
+    val launcher = rememberFirebaseAuthLauncher()
     Surface {
         Column (
             modifier = Modifier
@@ -124,38 +117,5 @@ fun LoginScreen(
                 }
             }
         }
-    }
-}
-
-@Preview
-@Composable
-private fun LoginScreenPreview() {
-    ClientTheme {
-        LoginScreen()
-    }
-}
-
-@Composable
-fun rememberFirebaseAuthLauncher(
-    onAuthComplete: (AuthResult) -> Unit,
-    onAuthError: (ApiException) -> Unit
-): ManagedActivityResultLauncher<Intent, ActivityResult> {
-    val scope = rememberCoroutineScope()
-    return rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()) { result ->
-            try {
-                val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-                val account = task.getResult(ApiException::class.java)!!
-                val credential = GoogleAuthProvider
-                    .getCredential(account.idToken!!, null)
-                Log.e("GoogleAuth", "${account.idToken}")
-                scope.launch {
-                    val authResult = Firebase.auth.signInWithCredential(credential).await()
-                    onAuthComplete(authResult)
-                }
-            } catch (e: ApiException) {
-                Log.e("GoogleAuth", e.toString())
-                onAuthError(e)
-            }
     }
 }
