@@ -46,18 +46,18 @@ suspend fun UserApiClient.Companion.loginWithKakaoTalk(context: Context): OAuthT
  * 카카오 계정으로 로그인 시도
  */
 suspend fun UserApiClient.Companion.loginWithKakaoAccount(context: Context): OAuthToken {
-    return suspendCoroutine<OAuthToken> { continuation ->
-        continuation.resumeWithException(Error("웹뷰를 띄우려 시도했습니다."))
-    }
 //    return suspendCoroutine<OAuthToken> { continuation ->
-//        instance.loginWithKakaoAccount(context) { token, error ->
-//            if (error != null) {
-//                continuation.resumeWithException(error)
-//            } else if (token != null) {
-//                continuation.resume(token)
-//            } else {
-//                continuation.resumeWithException(RuntimeException("kakao access token을 받아오는데 실패함, 이유는 명확하지 않음."))
-//            }
-//        }
+//        continuation.resumeWithException(Error("웹뷰를 띄우려 시도했습니다."))
 //    }
+    return suspendCoroutine<OAuthToken> { continuation ->
+        instance.loginWithKakaoAccount(context) { token, error ->
+            if (error != null) {
+                continuation.resumeWithException(error)
+            } else if (token != null) {
+                continuation.resume(token)
+            } else {
+                continuation.resumeWithException(RuntimeException("kakao access token을 받아오는데 실패함, 이유는 명확하지 않음."))
+            }
+        }
+    }
 }

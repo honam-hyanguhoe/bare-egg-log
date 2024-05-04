@@ -1,12 +1,7 @@
 package com.org.egglog.presentation.domain.auth.screen
 
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,25 +14,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
-import com.google.firebase.Firebase
-import com.google.firebase.auth.AuthCredential
-import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.auth
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
-import com.org.egglog.presentation.theme.ClientTheme
 import com.org.egglog.presentation.R
 import com.org.egglog.presentation.component.atoms.buttons.AuthButton
 import com.org.egglog.presentation.domain.auth.activity.MainActivity
@@ -47,8 +30,6 @@ import com.org.egglog.presentation.domain.auth.viewmodel.LoginViewModel
 import com.org.egglog.presentation.theme.*
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
@@ -58,6 +39,8 @@ fun LoginScreen(
 ) {
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
+    val token = stringResource(id = R.string.google_web_client_id)
+    val launcher = rememberFirebaseAuthLauncher(viewModel::onGoogleAccountReceived)
 
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
@@ -73,16 +56,19 @@ fun LoginScreen(
             }
         }
     }
-    LoginScreen(viewModel::onKakaoClick)
+    LoginScreen(
+        onKakaoClick = { viewModel.onKakaoClick() },
+        onNaverClick = { viewModel.onNaverClick(context) },
+        onGoogleClick = { viewModel.onGoogleClick(context, launcher, token) }
+    )
 }
 
 @Composable
 fun LoginScreen(
-    onKakaoClick: () -> Unit
+    onKakaoClick: () -> Unit,
+    onNaverClick: () -> Unit,
+    onGoogleClick: () -> Unit
 ) {
-    val token = stringResource(id = R.string.google_web_client_id)
-    val context = LocalContext.current
-    val launcher = rememberFirebaseAuthLauncher()
     Surface {
         Column (
             modifier = Modifier
@@ -102,18 +88,11 @@ fun LoginScreen(
                 Text(text = "SIGN WITH ___________________", color = Gray700, style = Typography.displayMedium)
                 Spacer(modifier = Modifier.height(36.heightPercent(LocalContext.current).dp))
                 Row{
-                    AuthButton(type = "kakao", onClick = { onKakaoClick() })
+                    AuthButton(type = "kakao", onClick = onKakaoClick)
                     Spacer(modifier = Modifier.width(16.widthPercent(LocalContext.current).dp))
-                    AuthButton(type = "naver", onClick = {  })
+                    AuthButton(type = "naver", onClick = onNaverClick)
                     Spacer(modifier = Modifier.width(16.widthPercent(LocalContext.current).dp))
-                    AuthButton(type = "google", onClick = {
-                        val gso: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                                .requestIdToken(token)
-                                .requestEmail()
-                                .build()
-                        val googleSignInClient = GoogleSignIn.getClient(context, gso)
-                        launcher.launch(googleSignInClient.signInIntent)
-                    })
+                    AuthButton(type = "google", onClick = onGoogleClick)
                 }
             }
         }

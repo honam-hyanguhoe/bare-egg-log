@@ -109,5 +109,8 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.play.services.auth)
 
+    // naver
+    implementation(libs.naver.oauth)
+
     implementation(project(":domain"))
 }

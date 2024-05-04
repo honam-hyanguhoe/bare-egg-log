@@ -77,6 +77,9 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.play.services.auth)
 
+    // naver
+    implementation(libs.naver.oauth)
+
     // room
     implementation(libs.room.runtime)
     implementation(libs.room.paging)

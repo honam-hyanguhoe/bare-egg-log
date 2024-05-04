@@ -1,18 +1,15 @@
 package com.org.egglog.data.auth.usecase
 
 import android.content.Context
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.org.egglog.domain.auth.model.Refresh
-import com.org.egglog.domain.auth.usecase.GetGoogleUseCase
-import com.org.egglog.presentation.R
-import com.org.egglog.presentation.domain.auth.extend.rememberFirebaseAuthLauncher
+import com.org.egglog.domain.auth.usecase.GetNaverUseCase
 import javax.inject.Inject
 
-class GetGoogleUseCaseImpl @Inject constructor(
+class GetNaverUseCaseImpl @Inject constructor(
     private val context: Context
-): GetGoogleUseCase {
+): GetNaverUseCase {
+
     override suspend fun invoke(): Result<Refresh> {
         return try {
             Result.success(Refresh(refreshToken = "", accessToken = ""))
