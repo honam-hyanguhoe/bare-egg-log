@@ -18,10 +18,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.org.egglog.presentation.component.atoms.buttons.BigButton
 import com.org.egglog.presentation.component.atoms.inputs.MultiInput
 import com.org.egglog.presentation.component.atoms.inputs.SingleInput
 import com.org.egglog.presentation.component.molecules.headers.BasicHeader
+import com.org.egglog.presentation.domain.community.viewmodel.WritePostViewModel
 import com.org.egglog.presentation.theme.ClientTheme
 import com.org.egglog.presentation.theme.Gray25
 import com.org.egglog.presentation.theme.Gray300
@@ -29,9 +31,33 @@ import com.org.egglog.presentation.theme.NaturalWhite
 import com.org.egglog.presentation.theme.Typography
 import com.org.egglog.presentation.theme.Warning300
 import com.org.egglog.presentation.utils.heightPercent
+import org.orbitmvi.orbit.compose.collectAsState
 
 @Composable
-fun PostEditorScreen() {
+fun WritePostScreen(
+    viewModel: WritePostViewModel = hiltViewModel(),
+    onCloseClick: () -> Unit
+) {
+    val state = viewModel.collectAsState().value
+    WritePostScreen(
+        title = state.title,
+        content = state.content,
+        onTitleChange = viewModel::onTitleChange,
+        onContentChange = viewModel::onContentChange,
+        onCloseClick = onCloseClick,
+        onPostClick = viewModel::onPostClick
+    )
+}
+
+@Composable
+private fun WritePostScreen(
+    title: String,
+    content: String,
+    onTitleChange: (String) -> Unit,
+    onContentChange: (String) -> Unit,
+    onCloseClick: () -> Unit,
+    onPostClick: () -> Unit
+) {
     val focusManager = LocalFocusManager.current
     Surface {
         BoxWithConstraints {
@@ -50,18 +76,29 @@ fun PostEditorScreen() {
                 ) {
                     BasicHeader(
                         hasLeftClose = true,
-                        onClickClose = { },
+                        onClickClose = onCloseClick,
                     )
-                    Column (
+                    Column(
                         modifier = Modifier.padding(top = 12.heightPercent(LocalContext.current).dp)
-                    ){
+                    ) {
                         Text(text = "제목", style = Typography.displayLarge)
                         Spacer(modifier = Modifier.height(12.heightPercent(LocalContext.current).dp))
-                        SingleInput(text = "", placeholder = "제목을 입력해주세요", onValueChange = {}, focusManager = focusManager)
+                        SingleInput(
+                            text = title,
+                            placeholder = "제목을 입력해주세요",
+                            onValueChange = onTitleChange,
+                            focusManager = focusManager
+                        )
                         Spacer(modifier = Modifier.height(24.heightPercent(LocalContext.current).dp))
                         Text(text = "내용", style = Typography.displayLarge)
                         Spacer(modifier = Modifier.height(12.heightPercent(LocalContext.current).dp))
-                        MultiInput(text = "", placeholder = "내용을 입력해주세요", onValueChange = {}, focusManager = focusManager, height = 150)
+                        MultiInput(
+                            text = content,
+                            placeholder = "내용을 입력해주세요",
+                            onValueChange = onContentChange,
+                            focusManager = focusManager,
+                            height = 150
+                        )
                         Spacer(modifier = Modifier.height(24.heightPercent(LocalContext.current).dp))
                         Text(text = "사진(선택)", style = Typography.displayLarge)
                         Spacer(modifier = Modifier.height(12.heightPercent(LocalContext.current).dp))
@@ -73,7 +110,8 @@ fun PostEditorScreen() {
                         containerColor = Warning300,
                         disabledContainerColor = Gray25,
                         disabledContentColor = Gray300
-                    ), onClick = { }) {
+                    ), onClick = onPostClick
+                ) {
                     Text(
                         style = Typography.bodyLarge,
                         text = "작성완료"
@@ -87,8 +125,14 @@ fun PostEditorScreen() {
 
 @Preview
 @Composable
-fun PostEditorPreviewScreen(){
+fun WritePostPreviewScreen() {
     ClientTheme {
-        PostEditorScreen()
+        WritePostScreen(
+            title = "",
+            content = "",
+            onTitleChange = {},
+            onContentChange = {},
+            onCloseClick = {},
+            onPostClick = {})
     }
 }
