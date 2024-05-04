@@ -1,5 +1,6 @@
 package com.org.egglog.domain.community.usecase
 
+import com.org.egglog.domain.community.model.Post
 import java.awt.Image
 
 interface WritePostUseCase {
@@ -10,6 +11,6 @@ interface WritePostUseCase {
         pictureTwo : String,
         pictureThree : String,
         pictureFour : String,
-    )
+    ) : Result<Boolean>
 }
 
