@@ -1,6 +1,7 @@
 package org.egglog.api.security.model.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.security.model.entity.OAuthAttribute;
 import org.egglog.api.user.model.entity.enums.UserRole;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -16,13 +17,16 @@ import java.util.Map;
 
 @Service
 @Transactional
+@Slf4j
 @RequiredArgsConstructor
 public class CustomOAuth2Service implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) {
+        log.debug("OAuth2UserRequest = {}", userRequest);
+
         OAuth2UserService<OAuth2UserRequest, OAuth2User> service = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = service.loadUser(userRequest); //OAuth2 정보를 가져온다.
-
+        
         Map<String, Object> originAttribute = oAuth2User.getAttributes(); // OAuth2User의 attribute
 
         // OAuth2 서비스 id (google, kakao, naver)
