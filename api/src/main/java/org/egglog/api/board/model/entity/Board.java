@@ -23,10 +23,10 @@ public class Board extends BaseEntity {
     @Column(name = "board_id")
     private Long id;
 
-    @Column(name = "board_title", nullable = false)
+    @Column(name = "board_title", nullable = false, columnDefinition = "TEXT")
     private String title;
 
-    @Column(name = "board_content", nullable = false)
+    @Column(name = "board_content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
     @Column(name = "picture_one")
