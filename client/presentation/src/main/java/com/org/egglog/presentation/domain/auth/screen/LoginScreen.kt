@@ -41,7 +41,7 @@ fun LoginScreen(
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
     val token = stringResource(id = R.string.google_web_client_id)
-    val launcher = rememberFirebaseAuthLauncher(viewModel::onGoogleAccountReceived)
+    val launcher = rememberFirebaseAuthLauncher(viewModel::onGoogleUserReceived)
 
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
@@ -67,7 +67,7 @@ fun LoginScreen(
         }
     }
     LoginScreen(
-        onKakaoClick = { viewModel.onKakaoClick() },
+        onKakaoClick = { viewModel.onKakaoClick(context) },
         onNaverClick = { viewModel.onNaverClick(context) },
         onGoogleClick = { viewModel.onGoogleClick(context, launcher, token) }
     )

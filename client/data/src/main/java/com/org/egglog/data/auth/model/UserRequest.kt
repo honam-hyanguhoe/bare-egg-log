@@ -7,9 +7,10 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 
 @Serializable
-data class testParam(
-    val loginId: String,
-    val password: String
+data class UserRequest(
+    val name: String,
+    val email: String,
+    val profileImgUrl: String
 ) {
     fun toRequestBody(): RequestBody {
         return Json.encodeToString(this).toRequestBody()

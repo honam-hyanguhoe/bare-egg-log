@@ -35,11 +35,10 @@ class SplashActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
-            delay(2000L)
-            val isLoggedIn = !getTokenUseCase().first.isNullOrEmpty() || !getTokenUseCase().second.isNullOrEmpty()
-
+            val tokens = getTokenUseCase()
+            val isLoggedIn = !tokens.first.isNullOrEmpty() && !tokens.second.isNullOrEmpty()
             if (isLoggedIn) {
-                // 로그인 되었을 떄
+
                 startActivity(
                     Intent(
                         this@SplashActivity, MainActivity::class.java

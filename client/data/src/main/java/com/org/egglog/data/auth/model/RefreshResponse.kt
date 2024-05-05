@@ -7,8 +7,8 @@ import kotlinx.serialization.Serializable
 @Entity
 @Serializable
 data class RefreshResponse(
-    val refreshToken: String,
-    val accessToken: String
+    val accessToken: String,
+    val refreshToken: String
 )
 
 fun RefreshResponse.toDomainModel(): Refresh {
@@ -16,5 +16,4 @@ fun RefreshResponse.toDomainModel(): Refresh {
         refreshToken = this.refreshToken,
         accessToken = this.accessToken
     )
-
 }

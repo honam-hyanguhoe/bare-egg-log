@@ -25,7 +25,7 @@ fun AuthButton(type: String, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
         modifier = Modifier.size(56.widthPercent(LocalContext.current).dp),
-        shape = RoundedCornerShape(10.widthPercent(LocalContext.current).dp)
+        shape = RoundedCornerShape(12.widthPercent(LocalContext.current).dp)
     ) {
         Image(
             painter = painterResource(id = imageResId),
