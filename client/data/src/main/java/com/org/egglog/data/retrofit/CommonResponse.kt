@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class DataHeader(
     val successCode: Int,
-    val resultCode: String,
+    var resultCode: String,
     val resultMessage: String?
 )
 

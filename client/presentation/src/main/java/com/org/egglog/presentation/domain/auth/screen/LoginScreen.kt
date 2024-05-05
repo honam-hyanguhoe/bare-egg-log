@@ -23,6 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.presentation.R
 import com.org.egglog.presentation.component.atoms.buttons.AuthButton
+import com.org.egglog.presentation.domain.auth.activity.PlusLoginActivity
 import com.org.egglog.presentation.domain.auth.extend.rememberFirebaseAuthLauncher
 import com.org.egglog.presentation.domain.auth.viewmodel.LoginSideEffect
 import com.org.egglog.presentation.domain.auth.viewmodel.LoginViewModel
@@ -40,7 +41,7 @@ fun LoginScreen(
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
     val token = stringResource(id = R.string.google_web_client_id)
-    val launcher = rememberFirebaseAuthLauncher(viewModel::onGoogleAccountReceived)
+    val launcher = rememberFirebaseAuthLauncher(viewModel::onGoogleUserReceived)
 
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
@@ -54,10 +55,19 @@ fun LoginScreen(
                     }
                 )
             }
+            LoginSideEffect.NavigateToPlusLoginActivity -> {
+                context.startActivity(
+                    Intent(
+                        context, PlusLoginActivity::class.java
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                )
+            }
         }
     }
     LoginScreen(
-        onKakaoClick = { viewModel.onKakaoClick() },
+        onKakaoClick = { viewModel.onKakaoClick(context) },
         onNaverClick = { viewModel.onNaverClick(context) },
         onGoogleClick = { viewModel.onGoogleClick(context, launcher, token) }
     )

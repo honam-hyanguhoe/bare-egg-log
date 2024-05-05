@@ -16,8 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import com.org.egglog.presentation.component.atoms.buttons.CustomIconButton
 import com.org.egglog.presentation.utils.ArrowLeft
-import com.org.egglog.presentation.component.atoms.buttons.IconButton
 import com.org.egglog.presentation.component.atoms.inputs.SearchInput
 import com.org.egglog.presentation.theme.*
 
@@ -55,7 +55,7 @@ fun SearchHeaderContents(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(
+        CustomIconButton(
             size = 25.dp,
             imageVector = ArrowLeft,
             color = NaturalBlack,
@@ -66,6 +66,7 @@ fun SearchHeaderContents(
         val pin = remember { mutableStateOf("") }
         val text3 = remember { mutableStateOf("") }
         SearchInput(
+            modifier = Modifier.fillMaxWidth(),
             text = text3.value,
             onValueChange = { text3.value = it },
             focusManager = focusManager,

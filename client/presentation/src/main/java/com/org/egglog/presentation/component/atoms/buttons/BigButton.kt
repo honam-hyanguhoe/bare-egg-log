@@ -14,7 +14,7 @@ import com.org.egglog.presentation.utils.widthPercent
 @Composable
 fun BigButton(modifier: Modifier = Modifier, colors: ButtonColors, onClick: () -> Unit, enabled: Boolean = true, content: @Composable () -> Unit) {
     BasicButton(
-        modifier = modifier.width(320.widthPercent(LocalContext.current).dp).height(50.heightPercent(LocalContext.current).dp),
+        modifier = modifier.width(340.widthPercent(LocalContext.current).dp).height(50.heightPercent(LocalContext.current).dp),
         onClick = onClick,
         colors = colors,
         shape = RoundedCornerShape(8.widthPercent(LocalContext.current).dp),

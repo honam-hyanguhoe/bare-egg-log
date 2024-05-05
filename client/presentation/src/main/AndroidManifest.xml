@@ -23,7 +23,9 @@
                     android:scheme="@string/kakao_redirection_scheme" />
             </intent-filter>
         </activity>
-        <activity android:name="com.org.egglog.presentation.domain.auth.activity.MainActivity" />
+        <activity android:name="com.org.egglog.presentation.domain.main.activity.MainActivity" />
         <activity android:name="com.org.egglog.presentation.domain.auth.activity.LoginActivity" />
+        <activity android:name="com.org.egglog.presentation.domain.community.posteditor.activity.PostEditorActivity" />
+        <activity android:name="com.org.egglog.presentation.domain.auth.activity.PlusLoginActivity" />
     </application>
 </manifest>

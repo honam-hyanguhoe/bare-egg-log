@@ -76,6 +76,7 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(platform(libs.firebase.bom))
     implementation(libs.play.services.auth)
+    implementation("com.google.firebase:firebase-storage-ktx")
 
     // naver
     implementation(libs.naver.oauth)

@@ -2,6 +2,7 @@ package com.org.egglog.data.retrofit
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.org.egglog.data.auth.service.AuthService
+import com.org.egglog.data.community.posteditor.service.PostEditorService
 import com.org.egglog.data.auth.service.UserService
 import dagger.Module
 import dagger.Provides
@@ -11,6 +12,8 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import javax.inject.Provider
+import javax.inject.Singleton
 
 const val HOST = "https://api.egg-log.org"
 
@@ -22,15 +25,20 @@ private val json = Json {
 @InstallIn(SingletonComponent::class)
 class RetrofitModule {
     @Provides
-    fun provideOkHttpClient() : OkHttpClient {
-        return OkHttpClient
-            .Builder()
+
+    fun provideOkHttpClient(
+        refreshTokenInterceptorProvider: Provider<RefreshTokenInterceptor>
+    ): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor { chain -> refreshTokenInterceptorProvider.get().intercept(chain) }
             .build()
     }
 
+
     @Provides
     fun provideRetrofit(client: OkHttpClient): Retrofit {
-        val converterFactory = json.asConverterFactory("application/json; charset=UTF8".toMediaType())
+        val converterFactory =
+            json.asConverterFactory("application/json; charset=UTF8".toMediaType())
         return Retrofit.Builder()
             .baseUrl("$HOST/v1/")
             .addConverterFactory(converterFactory)
@@ -46,5 +54,10 @@ class RetrofitModule {
     @Provides
     fun provideUserService(retrofit: Retrofit): UserService {
         return retrofit.create(UserService::class.java)
+    }
+
+    @Provides
+    fun providePostingService(retrofit: Retrofit): PostEditorService {
+        return retrofit.create(PostEditorService::class.java)
     }
 }
