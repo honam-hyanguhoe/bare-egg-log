@@ -1,5 +1,6 @@
 package com.org.egglog.domain.auth.model
 
+import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 
 data class UserDetail(
