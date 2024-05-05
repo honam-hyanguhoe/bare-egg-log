@@ -13,18 +13,12 @@ class WritePostUserCaseImpl @Inject constructor(
     private val postingService: PostEditorService,
     private val imageUploadUseCase: ImageUploadUseCase
 ) : WritePostUseCase {
+
     override suspend fun invoke(
         boardTitle: String,
         boardContent: String,
-//        pictureOne : String,
-//        pictureTwo : String,
-//        pictureThree : String,
-//        pictureFour : String,
         uploadImages: List<ByteArray>
     ): Result<Boolean> = kotlin.runCatching {
-//        imageData: List<ByteArray>, filePath: String
-//        val imageData = listOf<ByteArray>()
-
         // firebase 이미지 업로드 로직
         val result = imageUploadUseCase.uploadImage(uploadImages, "board")
         val urls: List<String>? = result.getOrNull()

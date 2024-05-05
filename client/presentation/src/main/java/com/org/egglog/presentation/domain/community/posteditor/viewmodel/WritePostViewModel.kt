@@ -34,19 +34,22 @@ class WritePostViewModel @Inject constructor(
     }
 
     fun onPostClick() = intent {
-        Log.d("커뮤니티", "제목 ${state.title} 내용 ${state.content} 사진 ${state.uploadImages}")
-        val byteImages = state.uploadImages.map {
-            bitmap ->  bitmapToByteArray(bitmap)
-        }
+        reduce { state.copy(isLoading = true) }
 
-        Log.d("커뮤니티", "onPostClick 제목 ${state.title} 내용 ${state.content} 사진 ${state.uploadImages}")
         val postResult = writePostUseCase(
             boardTitle = state.title,
             boardContent = state.content,
-            uploadImages = byteImages
+            uploadImages = state.uploadImages.map{
+                    bitmap ->  bitmapToByteArray(bitmap)
+            }
         )
-        Log.d("커뮤니티 writePostViewModel", "$postResult")
+        postResult.onSuccess {
+            reduce { state.copy(isLoading = false) }  // 로딩 종료
+        }.onFailure {
+            reduce { state.copy(isLoading = false) }  // 오류 발생 시 로딩 종료
+        }
     }
+
 
     fun handleImageSelection(context: Context, uri: Uri) = intent {
         Log.d("커뮤니티", "이미지 uri $uri")
@@ -65,11 +68,11 @@ class WritePostViewModel @Inject constructor(
 data class PostState(
     val title : String = "",
     val content :  String = "",
-    val uploadImages: List<Bitmap> = listOf()
+    val uploadImages: List<Bitmap> = listOf(),
+    val isLoading: Boolean = false,
 )
 
 
-//            pictureOne = "",
-//            pictureTwo = "",
-//            pictureThree = "",
-//            pictureFour = ""
+sealed class PostSideEffect {
+    object NavigateToNextScreen : PostSideEffect()
+}

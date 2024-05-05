@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -43,12 +44,6 @@ fun WritePostScreen(
 ) {
     val state = viewModel.collectAsState().value
     Log.d("커뮤니티", "writePostScreen 업로드 이미지 확인${state.uploadImages} ${state.title} ${state.content}")
-
-    DisposableEffect(key1 = state.uploadImages) {
-        Log.d("커뮤니티", "업로드 이미지 상태: ${state.uploadImages.size}")
-        onDispose { }
-    }
-
     WritePostScreen(
         title = state.title,
         content = state.content,
@@ -113,7 +108,7 @@ private fun WritePostScreen(
                         )
                         Spacer(modifier = Modifier.height(24.heightPercent(LocalContext.current).dp))
                         Text(text = "사진(선택)", style = Typography.displayLarge)
-                        Spacer(modifier = Modifier.height(12.heightPercent(LocalContext.current).dp))
+                        Spacer(modifier = Modifier.height(12.heightPercent(LocalContext.current).dp).width(20.dp))
                         ImageUploader(viewModel = viewModel)
                     }
                 }
