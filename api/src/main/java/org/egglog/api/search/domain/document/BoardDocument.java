@@ -69,5 +69,4 @@ public class BoardDocument {
         }
         return boardDocument;
     }
-
 }
