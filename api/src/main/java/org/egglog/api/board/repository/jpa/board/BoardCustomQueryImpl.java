@@ -1,6 +1,7 @@
 package org.egglog.api.board.repository.jpa.board;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.JPAExpressions;
@@ -108,4 +109,53 @@ public class BoardCustomQueryImpl implements BoardCustomQuery {
                 .fetchOne());
 
     }
+
+    @Override
+    public List<Board> findBoardList(String keyword, Long groupId, Long hospitalId, Long lastBoardId, int size) {
+//        sql = "SELECT * FROM Board b " +
+//                "WHERE MATCH (b.board_title, b.board_content) AGAINST (? IN BOOLEAN MODE) " +
+//                "AND b.group_id = ? AND b.hospital_id = ? AND  AND b.board_id < ? " +
+//                "ORDER BY b.board_id DESC LIMIT ?";
+//
+//        return jdbcTemplate.query(sql, this.mapBoard(), keyword, groupId, hospitalId, lastBoardId, size);
+
+        BooleanExpression whereClause = board.isNotNull(); // 기본 조건
+
+        // 마지막 게시물 ID보다 작은 경우
+        if (lastBoardId != null) {
+            whereClause = whereClause.and(board.group.id.eq(groupId));
+        }
+
+        // 그룹 ID가 주어진 경우 -> 그룹 게시판
+        if (groupId != null) {
+            whereClause = whereClause.and(board.hospital.id.eq(hospitalId));
+        }
+
+        // 병원 ID가 주어진 경우 -> 병원 게시판
+        if (hospitalId != null) {
+            whereClause = whereClause.and(board.id.lt(lastBoardId));
+        }
+
+        // 키워드가 제목 또는 내용에 있는 경우
+        if (keyword != null) {
+            whereClause = whereClause.and(searchKeyword(keyword));
+        }
+
+        List<Board> boards = jpaQueryFactory
+                .selectFrom(board)
+                .where(whereClause)
+                .orderBy(board.id.desc())
+                .limit(size)
+                .fetch();
+
+        return boards;
+    }
+
+    private BooleanExpression searchKeyword(String keyword) {
+        return Expressions.numberTemplate(Double.class,
+                        "function('match_against', {0}, {1}, {2})", board.title, board.content, "+" + keyword + "*")
+                .gt(0);
+
+    }
+
 }

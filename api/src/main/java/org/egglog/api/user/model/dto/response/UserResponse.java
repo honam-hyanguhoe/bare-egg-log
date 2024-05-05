@@ -1,10 +1,5 @@
 package org.egglog.api.user.model.dto.response;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import jakarta.persistence.Column;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.*;
 import org.egglog.api.hospital.model.dto.response.HospitalAuthResponse;
 import org.egglog.api.hospital.model.dto.response.UserHospitalResponse;

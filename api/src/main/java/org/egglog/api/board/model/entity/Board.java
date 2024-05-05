@@ -23,10 +23,10 @@ public class Board extends BaseEntity {
     @Column(name = "board_id")
     private Long id;
 
-    @Column(name = "board_title", nullable = false)
+    @Column(name = "board_title", nullable = false, columnDefinition = "TEXT")
     private String title;
 
-    @Column(name = "board_content", nullable = false)
+    @Column(name = "board_content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
     @Column(name = "picture_one")
@@ -50,6 +50,7 @@ public class Board extends BaseEntity {
     @Column(name = "is_commented", columnDefinition = "boolean default false")
     private Boolean isCommented;    //댓글 유무
 
+    @Column(name = "board_type")
     @Enumerated(EnumType.STRING)
     private BoardType boardType; //ALL, HOSPITAL, GROUP
 

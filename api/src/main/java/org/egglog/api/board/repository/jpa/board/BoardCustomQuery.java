@@ -13,4 +13,7 @@ public interface BoardCustomQuery {
     Long getLikeCount(Long boardId);
 
     Optional<BoardLike> getUserBoardLike(Long boardId, Long userId);
+
+    List<Board> findBoardList(String keyword, Long groupId, Long hospitalId, Long lastBoardId, int size);
+
 }

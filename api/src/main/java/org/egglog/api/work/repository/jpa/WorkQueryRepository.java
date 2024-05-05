@@ -12,7 +12,7 @@ public interface WorkQueryRepository {
     Optional<Work> findWorkWithAllByWorkId(Long workId);
     Optional<Work> findWorkWithCalendarGroupByWorkId(Long workId);
     Optional<Work> findWorkWithWorkTypeByWorkId(Long workId);
-    List<Work> findWorkListWithWorkTypeByTime(Long calendarGroupId, LocalDate startDate, LocalDate endDate);
+    List<Work> findWorkListWithAllByTime(Long calendarGroupId, LocalDate startDate, LocalDate endDate);
     List<Work> findWorkListWithWorkTypeByTimeAndTargetUser(Long targetUserId, LocalDate startDate, LocalDate endDate);
     List<Work> findAllWorkWithWorkTypeByUser(Long userId);
     List<UpComingCountWorkResponse> findUpComingCountWork(Long userId, LocalDate today, LocalDate startDate, LocalDate endDate);

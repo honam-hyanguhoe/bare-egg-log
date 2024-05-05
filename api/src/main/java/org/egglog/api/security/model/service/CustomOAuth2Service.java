@@ -15,6 +15,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.Map;
@@ -51,26 +53,37 @@ public class CustomOAuth2Service implements OAuth2UserService<OAuth2UserRequest,
                 .getUserInfoEndpoint()
                 .getUri();
         String tokenValue = userRequest.getAccessToken().getTokenValue();
+        try {
+            Map<String, Object> userAttributes = webClient.get()
+                    .uri(userInfoEndpointUri)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenValue)
+                    .retrieve()
+                    .onStatus(status -> status.isError(), response -> {
+                        return response.bodyToMono(String.class).flatMap(errorMessage -> {
+                            return Mono.error(new RuntimeException("Error from Server: " + errorMessage));
+                        });
+                    })
+                    .bodyToMono(Map.class)
+                    .block();
 
-        Map<String, Object> userAttributes = webClient.post()
-                .uri(userInfoEndpointUri)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenValue)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED) // Content-Type 설정
-                .retrieve()
-                .bodyToMono(Map.class)
-                .block();
+            log.debug("userAttributes={}",userAttributes.toString());
+            if (userAttributes == null || userAttributes.isEmpty()) {
+                throw new OAuth2AuthenticationException("User Info Endpoint did not return any information");
+            }
 
-        if (userAttributes == null || userAttributes.isEmpty()) {
-            throw new OAuth2AuthenticationException("User Info Endpoint did not return any information");
+            // OAuth2 서비스 id (google, kakao, naver)
+            String registrationId = userRequest.getClientRegistration().getRegistrationId();//소셜 정보를 가져온다.
+
+            OAuthAttribute oAuthAttribute = OAuthAttribute.of(registrationId, userAttributes);
+
+            return new DefaultOAuth2User(Collections.singleton(()-> UserRole.GENERAL_USER.name()),oAuthAttribute.convertToMap(),"email");
+        } catch (WebClientResponseException ex) {
+            log.error("WebClient Response Error: Status = {}, Body = {}", ex.getStatusCode(), ex.getResponseBodyAsString());
+            throw new OAuth2AuthenticationException("WebClient response error");
+        } catch (Exception ex) {
+            log.error("Unexpected error", ex);
+            throw new OAuth2AuthenticationException("Unexpected error when retrieving user information");
         }
-
-        // OAuth2 서비스 id (google, kakao, naver)
-        String registrationId = userRequest.getClientRegistration().getRegistrationId();//소셜 정보를 가져온다.
-
-        OAuthAttribute oAuthAttribute = OAuthAttribute.of(registrationId, userAttributes);
-
-        return new DefaultOAuth2User(Collections.singleton(()-> UserRole.GENERAL_USER.name()),oAuthAttribute.convertToMap(),"email");
-
     }
 
 }

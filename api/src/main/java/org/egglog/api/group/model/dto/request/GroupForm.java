@@ -8,7 +8,6 @@ import lombok.Data;
 
 @Data
 @Builder
-//@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GroupForm {
     private Integer groupImage;
     private String groupPassword;
