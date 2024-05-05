@@ -10,10 +10,10 @@ import okhttp3.RequestBody.Companion.toRequestBody
 data class WritePostParam(
     val boardTitle : String,
     val boardContent : String,
-    val pictureOne : String,
-    val pictureTwo : String,
-    val pictureThree : String,
-    val pictureFour : String,
+    val pictureOne : String = "",
+    val pictureTwo : String = "",
+    val pictureThree : String = "",
+    val pictureFour : String = "",
     val tempNickname : String = "",
     val groupId : String = "",
     val hospitalId : String = "",
@@ -22,6 +22,11 @@ data class WritePostParam(
     fun toRequestBody() : RequestBody{
         return Json.encodeToString(this).toRequestBody()
     }
+
+    override fun toString(): String {
+        return "WritePostParam(boardTitle='$boardTitle', boardContent='$boardContent', pictureOne='$pictureOne', pictureTwo='$pictureTwo', pictureThree='$pictureThree', pictureFour='$pictureFour', tempNickname='$tempNickname', groupId='$groupId', hospitalId='$hospitalId')"
+    }
+
 }
 
 

@@ -75,6 +75,7 @@ coroutines-core = { group="org.jetbrains.kotlinx", name="kotlinx-coroutines-core
 firebase-auth = { group="com.google.firebase", name="firebase-auth", version="23.0.0" }
 firebase-auth-ktx = { group="com.google.firebase", name="firebase-auth-ktx" }
 firebase-bom = { group="com.google.firebase", name="firebase-bom", version="32.8.1" }
+firebase-storage-ktx = { group="com.google.firebase", name="firebase-storage-ktx"}
 play-services-auth = { group="com.google.android.gms", name="play-services-auth", version="21.1.0" }
 
 

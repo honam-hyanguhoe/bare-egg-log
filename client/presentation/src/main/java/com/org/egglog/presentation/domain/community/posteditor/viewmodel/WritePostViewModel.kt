@@ -1,8 +1,13 @@
 package com.org.egglog.presentation.domain.community.posteditor.viewmodel
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.org.egglog.domain.community.posteditor.usecase.WritePostUseCase
+import com.org.egglog.presentation.utils.bitmapToByteArray
+import com.org.egglog.presentation.utils.resizeImage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
@@ -29,22 +34,42 @@ class WritePostViewModel @Inject constructor(
     }
 
     fun onPostClick() = intent {
-        Log.d("커뮤니티", "제목 ${state.title} 내용 ${state.content}")
-        println("커뮤니티 Title: ${state.title}, Content: ${state.content}")
+        Log.d("커뮤니티", "제목 ${state.title} 내용 ${state.content} 사진 ${state.uploadImages}")
+        val byteImages = state.uploadImages.map {
+            bitmap ->  bitmapToByteArray(bitmap)
+        }
+
+        Log.d("커뮤니티", "onPostClick 제목 ${state.title} 내용 ${state.content} 사진 ${state.uploadImages}")
         val postResult = writePostUseCase(
             boardTitle = state.title,
             boardContent = state.content,
-            pictureOne = "",
-            pictureTwo = "",
-            pictureThree = "",
-            pictureFour = ""
+            uploadImages = byteImages
         )
-
         Log.d("커뮤니티 writePostViewModel", "$postResult")
+    }
+
+    fun handleImageSelection(context: Context, uri: Uri) = intent {
+        Log.d("커뮤니티", "이미지 uri $uri")
+        val resizedImage = resizeImage(context, uri, 800, 600)
+        resizedImage?.let {
+            reduce {
+                state.copy(
+                    uploadImages = state.uploadImages + it
+                )
+            }
+            Log.d("커뮤니티", "handleImageSelection ${state.uploadImages} -  ${state.title}")
+        }
     }
 }
 
 data class PostState(
     val title : String = "",
-    val content :  String = ""
+    val content :  String = "",
+    val uploadImages: List<Bitmap> = listOf()
 )
+
+
+//            pictureOne = "",
+//            pictureTwo = "",
+//            pictureThree = "",
+//            pictureFour = ""
