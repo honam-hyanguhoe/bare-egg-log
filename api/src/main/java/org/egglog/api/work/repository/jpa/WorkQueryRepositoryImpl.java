@@ -80,10 +80,11 @@ public class WorkQueryRepositoryImpl implements WorkQueryRepository{
      * @param endDate 종료 날짜
      * @return 조회된 근무 일정 목록
      */
-    public List<Work> findWorkListWithWorkTypeByTime(Long calendarGroupId, LocalDate startDate, LocalDate endDate){
+    public List<Work> findWorkListWithAllByTime(Long calendarGroupId, LocalDate startDate, LocalDate endDate){
         return jpaQueryFactory
                 .selectFrom(work)
                 .leftJoin(work.workType, workType).fetchJoin() // WorkType과 함께 조인
+                .leftJoin(work.calendarGroup, calendarGroup).fetchJoin() // CalendarGroup도 함께 조인
                 .where(work.calendarGroup.id.eq(calendarGroupId) // 캘린더 그룹 ID 필터
                         .and(work.workDate.between(startDate, endDate))) // 날짜 범위 필터
                 .fetch();
