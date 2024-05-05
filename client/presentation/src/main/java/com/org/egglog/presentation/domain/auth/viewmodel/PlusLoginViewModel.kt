@@ -15,15 +15,15 @@ import javax.annotation.concurrent.Immutable
 import javax.inject.Inject
 
 @HiltViewModel
-class AddInfoViewModel @Inject constructor(
+class PlusLoginViewModel @Inject constructor(
 
-): ViewModel(), ContainerHost<AddInfoState, AddInfoSideEffect>{
-    override val container: Container<AddInfoState, AddInfoSideEffect> = container(
-        initialState = AddInfoState(),
+): ViewModel(), ContainerHost<PlusLoginState, PlusLoginSideEffect>{
+    override val container: Container<PlusLoginState, PlusLoginSideEffect> = container(
+        initialState = PlusLoginState(),
         buildSettings = {
             this.exceptionHandler = CoroutineExceptionHandler { _, throwable ->
                 intent {
-                    postSideEffect(AddInfoSideEffect.Toast(message = throwable.message.orEmpty()))
+                    postSideEffect(PlusLoginSideEffect.Toast(message = throwable.message.orEmpty()))
                 }
             }
         }
@@ -50,25 +50,26 @@ class AddInfoViewModel @Inject constructor(
         }
     }
 
-    /* TODO{
-        2. x 버튼 클릭 시 LoginActivity로 이동시키기
-        3. AgreeScreen에서 < 버튼 클릭 시 LoginActivity로 이동시키기
-        4. AddInfoScreen에서 < 버튼 클릭시 AgreeScreen으로 이동시키기(얘는 왜 안 됨???)
-        5. 병원 근무지 입력 어떻게 될지 함 확인하기
-        6. AddInfoScreen에서 회원가입 완료 버튼 클릭할 때 작동 로직 짜기
-    } */
+    fun goLoginActivity() = intent {
+        postSideEffect(PlusLoginSideEffect.NavigateToLoginActivity)
+    }
+
+    fun goMainActivity() = intent {
+        postSideEffect(PlusLoginSideEffect.NavigateToMainActivity)
+    }
 }
 
 
 @Immutable
-data class AddInfoState(
+data class PlusLoginState(
     val name: String = "",
     val hospital: String = "",
     val empNo: String = ""
 
 )
 
-sealed interface AddInfoSideEffect {
-    class Toast(val message: String): AddInfoSideEffect
-    data object NavigateToMainActivity: AddInfoSideEffect
+sealed interface PlusLoginSideEffect {
+    class Toast(val message: String): PlusLoginSideEffect
+    data object NavigateToMainActivity: PlusLoginSideEffect
+    data object NavigateToLoginActivity: PlusLoginSideEffect
 }

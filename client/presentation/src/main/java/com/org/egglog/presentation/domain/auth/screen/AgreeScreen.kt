@@ -1,5 +1,7 @@
 package com.org.egglog.presentation.domain.auth.screen
 
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,16 +21,57 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.org.egglog.presentation.component.atoms.buttons.BigButton
 import com.org.egglog.presentation.component.molecules.headers.BasicHeader
 import com.org.egglog.presentation.component.organisms.agreeList.AgreeList
+import com.org.egglog.presentation.domain.auth.activity.LoginActivity
+import com.org.egglog.presentation.domain.auth.viewmodel.PlusLoginSideEffect
+import com.org.egglog.presentation.domain.auth.viewmodel.PlusLoginViewModel
+import com.org.egglog.presentation.domain.main.activity.MainActivity
 import com.org.egglog.presentation.theme.*
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
+import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
 fun AgreeScreen(
+    viewModel: PlusLoginViewModel = hiltViewModel(),
     onNavigateToAddInfoScreen: () -> Unit
+) {
+    val context = LocalContext.current
+
+    viewModel.collectSideEffect { sideEffect ->
+        when (sideEffect) {
+            is PlusLoginSideEffect.Toast -> Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
+            PlusLoginSideEffect.NavigateToMainActivity -> {
+                context.startActivity(
+                    Intent(
+                        context, MainActivity::class.java
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                )
+            }
+            PlusLoginSideEffect.NavigateToLoginActivity -> {
+                context.startActivity(
+                    Intent(
+                        context, LoginActivity::class.java
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                )
+            }
+        }
+    }
+
+    AgreeScreen(onNavigateToAddInfoScreen, viewModel::goLoginActivity)
+}
+
+@Composable
+fun AgreeScreen(
+    onNavigateToAddInfoScreen: () -> Unit,
+    onNavigateToLoginActivity: () -> Unit
 ) {
     Surface {
         Column(
@@ -42,9 +85,9 @@ fun AgreeScreen(
                 hasArrow = true,
                 hasClose = true,
                 hasProgressBar = true,
-                onClickBack = { },
+                onClickBack = onNavigateToLoginActivity,
                 onClickLink = { },
-                onClickClose = { },
+                onClickClose = onNavigateToLoginActivity,
                 onClickMenus = { },
                 selectedOption = null
             )
@@ -77,6 +120,6 @@ fun AgreeScreen(
 @Composable
 fun AgreeScreenPreview() {
     ClientTheme {
-        AgreeScreen({})
+        AgreeScreen({}, {})
     }
 }

@@ -55,7 +55,7 @@ fun LoginScreen(
                     }
                 )
             }
-            LoginSideEffect.PlusLoginActivity -> {
+            LoginSideEffect.NavigateToPlusLoginActivity -> {
                 context.startActivity(
                     Intent(
                         context, PlusLoginActivity::class.java

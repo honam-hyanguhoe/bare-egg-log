@@ -17,6 +17,7 @@ import com.org.egglog.domain.auth.model.UserParam
 import com.org.egglog.domain.auth.usecase.GetUserUseCase
 import com.org.egglog.domain.auth.usecase.LoginUseCase
 import com.org.egglog.domain.auth.usecase.SetTokenUseCase
+import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
 import com.org.egglog.presentation.domain.auth.extend.authenticateAndGetUserProfile
 import com.org.egglog.presentation.domain.auth.extend.loginWithKakao
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,7 +34,8 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val setTokenUseCase: SetTokenUseCase,
-    private val getUserUseCase: GetUserUseCase
+    private val getUserUseCase: GetUserUseCase,
+    private val setUserStoreUseCase: SetUserStoreUseCase
 ): ViewModel(), ContainerHost<LoginState, LoginSideEffect> {
     override val container: Container<LoginState, LoginSideEffect> = container(
         initialState = LoginState(),
@@ -61,6 +63,7 @@ class LoginViewModel @Inject constructor(
                         refreshToken = tokens.refreshToken
                     )
                     val userDetail = getUserUseCase("Bearer ${tokens.accessToken}").getOrThrow()
+                    setUserStoreUseCase(userDetail)
                     if(userDetail?.hospitalAuth == null || userDetail.empNo == null) {
                         postSideEffect(LoginSideEffect.NavigateToPlusLoginActivity)
                     } else {
@@ -98,7 +101,7 @@ class LoginViewModel @Inject constructor(
                 refreshToken = tokens.refreshToken
             )
             val userDetail = getUserUseCase("Bearer ${tokens.accessToken}").getOrThrow()
-            Log.e("userDetail: ", userDetail?.userName.orEmpty())
+            setUserStoreUseCase(userDetail)
             if(userDetail?.hospitalAuth == null || userDetail.empNo == null) {
                 postSideEffect(LoginSideEffect.NavigateToPlusLoginActivity)
             } else {
@@ -121,6 +124,7 @@ class LoginViewModel @Inject constructor(
                 refreshToken = tokens.refreshToken
             )
             val userDetail = getUserUseCase("Bearer ${tokens.accessToken}").getOrThrow()
+            setUserStoreUseCase(userDetail)
             if(userDetail?.hospitalAuth == null || userDetail.empNo == null) {
                 postSideEffect(LoginSideEffect.NavigateToPlusLoginActivity)
             } else {

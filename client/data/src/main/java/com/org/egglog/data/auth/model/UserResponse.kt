@@ -6,7 +6,6 @@ import com.org.egglog.domain.auth.model.UserDetail
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 @Entity
 @Serializable

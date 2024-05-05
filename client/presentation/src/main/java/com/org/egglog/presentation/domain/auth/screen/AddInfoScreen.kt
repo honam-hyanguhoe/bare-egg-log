@@ -15,8 +15,6 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,8 +26,9 @@ import com.org.egglog.presentation.component.atoms.buttons.BigButton
 import com.org.egglog.presentation.component.atoms.inputs.SearchInput
 import com.org.egglog.presentation.component.atoms.inputs.SingleInput
 import com.org.egglog.presentation.component.molecules.headers.BasicHeader
-import com.org.egglog.presentation.domain.auth.viewmodel.AddInfoSideEffect
-import com.org.egglog.presentation.domain.auth.viewmodel.AddInfoViewModel
+import com.org.egglog.presentation.domain.auth.activity.LoginActivity
+import com.org.egglog.presentation.domain.auth.viewmodel.PlusLoginSideEffect
+import com.org.egglog.presentation.domain.auth.viewmodel.PlusLoginViewModel
 import com.org.egglog.presentation.domain.main.activity.MainActivity
 import com.org.egglog.presentation.theme.*
 import com.org.egglog.presentation.utils.heightPercent
@@ -39,7 +38,7 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
 fun AddInfoScreen(
-    viewModel: AddInfoViewModel = hiltViewModel(),
+    viewModel: PlusLoginViewModel = hiltViewModel(),
     onNavigateToAgreeScreen: () -> Unit
 ) {
     val state = viewModel.collectAsState().value
@@ -47,11 +46,20 @@ fun AddInfoScreen(
 
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
-            is AddInfoSideEffect.Toast -> Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
-            AddInfoSideEffect.NavigateToMainActivity -> {
+            is PlusLoginSideEffect.Toast -> Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
+            PlusLoginSideEffect.NavigateToMainActivity -> {
                 context.startActivity(
                     Intent(
                         context, MainActivity::class.java
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                )
+            }
+            PlusLoginSideEffect.NavigateToLoginActivity -> {
+                context.startActivity(
+                    Intent(
+                        context, LoginActivity::class.java
                     ).apply {
                         flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                     }
@@ -67,7 +75,9 @@ fun AddInfoScreen(
         empNo = state.empNo,
         onNameChange = viewModel::onNameChange,
         onHospitalChange = viewModel::onHospitalChange,
-        onEmpNoChange = viewModel::onEmpNoChange
+        onEmpNoChange = viewModel::onEmpNoChange,
+        onNavigateToMainActivity = viewModel::goMainActivity,
+        onNavigateToLoginActivity = viewModel::goLoginActivity
     )
 }
 
@@ -79,7 +89,9 @@ fun AddInfoScreen(
     empNo: String,
     onNameChange: (String) -> Unit,
     onHospitalChange: (String) -> Unit,
-    onEmpNoChange: (String) -> Unit
+    onEmpNoChange: (String) -> Unit,
+    onNavigateToMainActivity: () -> Unit,
+    onNavigateToLoginActivity: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     Surface {
@@ -96,7 +108,7 @@ fun AddInfoScreen(
                 hasProgressBar = true,
                 onClickBack = onNavigateToAgreeScreen,
                 onClickLink = { },
-                onClickClose = { },
+                onClickClose = onNavigateToLoginActivity,
                 onClickMenus = { },
                 selectedOption = null
             )
@@ -146,7 +158,8 @@ fun AddInfoScreen(
             Column(Modifier.fillMaxWidth(), Arrangement.Center, Alignment.CenterHorizontally) {
                 BigButton(
                     colors = ButtonColors(containerColor = Warning300, contentColor = NaturalWhite, disabledContainerColor = Gray300, disabledContentColor = NaturalWhite),
-                    onClick = {  }
+                    // TODO { 임시 처리 상태 }
+                    onClick = onNavigateToMainActivity
                 ) {
                     Text(text = "회원가입 완료하기", style = Typography.bodyMedium)
                 }
@@ -166,6 +179,9 @@ fun AddInfoScreenPreview() {
             empNo = "",
             onNameChange = { },
             onHospitalChange = { },
-            onEmpNoChange = { })
+            onEmpNoChange = { },
+            onNavigateToLoginActivity = { },
+            onNavigateToMainActivity = { }
+        )
     }
 }
