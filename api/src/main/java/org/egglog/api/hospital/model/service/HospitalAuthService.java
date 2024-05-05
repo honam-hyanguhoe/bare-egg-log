@@ -53,7 +53,7 @@ public class HospitalAuthService {
                 .findByUserAndHospital(loginUser, loginUser.getSelectedHospital())
                 .map(auth -> auth.create(loginUser, request.getNurseCertificationImgUrl(), request.getHospitalCertificationImgUrl()))
                 .orElseGet(() -> new HospitalAuth().create(loginUser, request.getNurseCertificationImgUrl(), request.getHospitalCertificationImgUrl())))
-                .toResponse(loginUser.getEmpNo());
+                .toResponse();
     }
 
     @Transactional(readOnly = true)
