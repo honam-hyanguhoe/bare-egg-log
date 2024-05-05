@@ -2,6 +2,7 @@ package org.egglog.api.security.model.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.egglog.api.security.model.dto.request.LoginRequest;
 import org.egglog.api.security.model.dto.response.TokenResponse;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
@@ -35,18 +36,10 @@ import java.util.Optional;
 @Service
 public class AuthService {
     private final TokenService tokenService;
-    private final ClientRegistrationRepository clientRegistrationRepository;
-    private final CustomOAuth2Service customOAuth2Service;
     private final UserJpaRepository userJpaRepository;
-    public TokenResponse login(String accessToken, AuthProvider provider){
-        String registrationId = provider.name().toLowerCase(); // AuthProvider enum에서 registrationId를 도출
-        ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(registrationId);
-        OAuth2AccessToken oAuth2AccessToken = new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER, accessToken, null, null);
-        OAuth2UserRequest userRequest = new OAuth2UserRequest(clientRegistration, oAuth2AccessToken);
-        OAuth2User oAuth2User = customOAuth2Service.loadUserByAccessToken(userRequest); // 사용자 정보 로드
-        User oauth2user = User.of(oAuth2User);
+    public TokenResponse login(LoginRequest request, AuthProvider provider){
         //회원 가입 일 경우
-        Optional<User> optionalUser = userJpaRepository.findByEmailWithHospital(oauth2user.getEmail());
+        Optional<User> optionalUser = userJpaRepository.findByEmailWithHospital(request.getEmail());
         if (optionalUser.isPresent()){
             //로그인인 경우
             User user = optionalUser.get();
@@ -56,7 +49,7 @@ public class AuthService {
         }
         else {
             //회원가입일 경우
-            User saveUser = userJpaRepository.save(oauth2user);
+            User saveUser = userJpaRepository.save(request.toEntity(provider));
             return tokenService.generatedToken(saveUser.getId(), saveUser.getUserRole().name());
         }
     }
