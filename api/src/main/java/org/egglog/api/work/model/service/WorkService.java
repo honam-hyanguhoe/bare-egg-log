@@ -114,7 +114,6 @@ public class WorkService {
     public WorkListResponse findWorkList(User loginUser, FindWorkListRequest request){
         CalendarGroup calendarGroup = calendarGroupRepository.findCalendarGroupWithUserById(request.getCalendarGroupId())
                 .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
-        log.error("calendarGroup.toString()={}",calendarGroup.toString());
         if (calendarGroup.getUser().getId()!=loginUser.getId()) throw new WorkException(WorkErrorCode.ACCESS_DENIED);
         List<WorkResponse> workResponses = workJpaRepository
                 .findWorkListWithAllByTime(calendarGroup.getId(), request.getStartDate(), request.getEndDate())
