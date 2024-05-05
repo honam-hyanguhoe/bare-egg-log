@@ -20,6 +20,7 @@ import com.org.egglog.presentation.utils.widthPercent
 
 @Composable
 fun SearchInput(
+    modifier: Modifier,
     text: String,
     placeholder: String,
     onValueChange: (String) -> Unit,
@@ -29,8 +30,7 @@ fun SearchInput(
 ) {
     val context = LocalContext.current
     OutlinedTextField(
-        modifier = Modifier
-            .width(320.widthPercent(context).dp),
+        modifier = modifier,
         shape = RoundedCornerShape(8.widthPercent(context).dp),
         colors = TextFieldDefaults.colors(
             unfocusedPlaceholderColor = Gray300,

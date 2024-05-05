@@ -70,7 +70,7 @@ fun BasicHeader(
                 onSelect = onSelect
             )
             if (hasProgressBar) {
-                Spacer(modifier = Modifier.height(5.dp))
+                Spacer(modifier = Modifier.height(10.dp))
                 LinearIndicator(0f, true)
             }
         }

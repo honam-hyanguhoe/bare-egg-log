@@ -1,13 +1,13 @@
 package com.org.egglog.data.auth.usecase
 
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
-import com.org.egglog.data.datastore.UserDataStore
+import com.org.egglog.data.datastore.TokenDataStore
 import javax.inject.Inject
 
 class GetTokenUseCaseImpl @Inject constructor(
-    private val userDataStore: UserDataStore
+    private val tokenDataStore: TokenDataStore
 ) : GetTokenUseCase {
     override suspend fun invoke(): Pair<String?, String?> {
-        return userDataStore.getToken()
+        return tokenDataStore.getToken()
     }
 }
