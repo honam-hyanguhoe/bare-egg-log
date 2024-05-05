@@ -70,7 +70,7 @@ fun BasicHeader(
                 onSelect = onSelect
             )
             if (hasProgressBar) {
-                Spacer(modifier = Modifier.height(5.dp))
+                Spacer(modifier = Modifier.height(10.dp))
                 LinearIndicator(0f, true)
             }
         }
@@ -109,13 +109,13 @@ fun BasicHeaderContents(
                 size = 25.dp,
                 imageVector = ArrowLeft,
                 color = NaturalBlack,
-                onClick = { onClickBack })
+                onClick = { onClickBack() })
         } else if (hasLeftClose) {
             IconButton(
                 size = 25.dp,
                 imageVector = Close,
                 color = NaturalBlack,
-                onClick = { onClickClose })
+                onClick = { onClickClose() })
         } else {
             Box(modifier = Modifier.size(30.widthPercent(context).dp))
         }
@@ -137,7 +137,7 @@ fun BasicHeaderContents(
         ) {
             if (hasInvitationButton) {
                 IconTextButton(
-                    onClick = { onClickLink },
+                    onClick = { onClickLink() },
                     width = 80,
                     height = 30,
                     icon = Link,
@@ -151,7 +151,7 @@ fun BasicHeaderContents(
                     size = 25.dp,
                     imageVector = Close,
                     color = NaturalBlack,
-                    onClick = { onClickClose })
+                    onClick = { onClickClose() })
             } else if (hasMore) {
 
                 ScrollableMenus(

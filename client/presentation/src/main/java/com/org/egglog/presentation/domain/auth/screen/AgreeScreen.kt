@@ -1,48 +1,74 @@
 package com.org.egglog.presentation.domain.auth.screen
 
-import android.annotation.SuppressLint
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.org.egglog.presentation.component.atoms.buttons.BigButton
 import com.org.egglog.presentation.component.molecules.headers.BasicHeader
 import com.org.egglog.presentation.component.organisms.agreeList.AgreeList
-import com.org.egglog.presentation.theme.ClientTheme
-import com.org.egglog.presentation.theme.Typography
+import com.org.egglog.presentation.theme.*
 import com.org.egglog.presentation.utils.heightPercent
+import com.org.egglog.presentation.utils.widthPercent
 
-@SuppressLint("RememberReturnType")
 @Composable
-fun AgreeScreen() {
+fun AgreeScreen(
+    onNavigateToAddInfoScreen: () -> Unit
+) {
     Surface {
-        Column {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = NaturalWhite)
+        ) {
             BasicHeader(
                 title = "약관동의",
                 hasTitle = true,
                 hasArrow = true,
                 hasClose = true,
                 hasProgressBar = true,
-                onClickBack = { /*TODO*/ },
-                onClickLink = { /*TODO*/ },
-                onClickClose = { /*TODO*/ },
-                onClickMenus = { /*TODO*/ },
+                onClickBack = { },
+                onClickLink = { },
+                onClickClose = { },
+                onClickMenus = { },
                 selectedOption = null
             )
-            Spacer(modifier = Modifier.height(100.heightPercent(LocalContext.current).dp))
-            Text(text = "이용 약관에 대한 동의가 필요해요", style = Typography.headlineMedium)
-            Spacer(modifier = Modifier.height(20.heightPercent(LocalContext.current).dp))
-            val (ageChecked, setAgeClick) = remember { mutableStateOf(false) }
-            val (agreeChecked, setAgreeClick) = remember { mutableStateOf(false) }
-            val (infoChecked, setInfoClick) = remember { mutableStateOf(false) }
-            AgreeList(ageChecked, setAgeClick, agreeChecked, setAgreeClick, infoChecked, setInfoClick)
+            Column(
+                Modifier.padding(horizontal = 6.widthPercent(LocalContext.current).dp)
+            ) {
+                Spacer(modifier = Modifier.height(80.heightPercent(LocalContext.current).dp))
+                Text(text = "이용 약관에 대한 동의가 필요해요", style = Typography.headlineMedium)
+                Spacer(modifier = Modifier.height(20.heightPercent(LocalContext.current).dp))
+                val (ageChecked, setAgeClick) = remember { mutableStateOf(false) }
+                val (agreeChecked, setAgreeClick) = remember { mutableStateOf(false) }
+                val (infoChecked, setInfoClick) = remember { mutableStateOf(false) }
+                AgreeList(ageChecked, setAgeClick, agreeChecked, setAgreeClick, infoChecked, setInfoClick)
+                Spacer(modifier = Modifier.height(80.heightPercent(LocalContext.current).dp))
+                Column(Modifier.fillMaxWidth(), Arrangement.Center, Alignment.CenterHorizontally) {
+                    BigButton(
+                        colors = ButtonColors(containerColor = Warning300, contentColor = NaturalWhite, disabledContainerColor = Gray300, disabledContentColor = NaturalWhite),
+                        onClick = { onNavigateToAddInfoScreen() },
+                        enabled = agreeChecked && ageChecked && infoChecked
+                    ) {
+                        Text(text = "다음", style = Typography.bodyLarge, color = NaturalWhite)
+                    }
+                }
+            }
         }
     }
 }
@@ -51,6 +77,6 @@ fun AgreeScreen() {
 @Composable
 fun AgreeScreenPreview() {
     ClientTheme {
-        AgreeScreen()
+        AgreeScreen({})
     }
 }

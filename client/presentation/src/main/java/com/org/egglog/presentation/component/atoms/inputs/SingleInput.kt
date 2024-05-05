@@ -1,5 +1,6 @@
 package com.org.egglog.presentation.component.atoms.inputs
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -18,6 +19,7 @@ import com.org.egglog.presentation.utils.widthPercent
 
 @Composable
 fun SingleInput(
+    modifier: Modifier,
     text: String,
         placeholder: String,
         onValueChange: (String) -> Unit,
@@ -26,8 +28,7 @@ fun SingleInput(
 ) {
     val context = LocalContext.current
     OutlinedTextField(
-        modifier = Modifier
-            .width(320.widthPercent(context).dp),
+        modifier = modifier,
         shape = RoundedCornerShape(8.widthPercent(context).dp),
         colors = TextFieldDefaults.colors(
             unfocusedPlaceholderColor = Gray300,

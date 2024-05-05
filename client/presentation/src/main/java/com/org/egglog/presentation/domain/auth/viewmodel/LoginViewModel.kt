@@ -75,7 +75,8 @@ class LoginViewModel @Inject constructor(
         oauthToken = NaverIdLoginSDK.getAccessToken().orEmpty()
         val tokens = getNaverUseCase().getOrThrow()
         if(tokens.accessToken.isNotEmpty() && tokens.refreshToken.isNotEmpty()) {
-            postSideEffect(LoginSideEffect.NavigateToMainActivity)
+//            postSideEffect(LoginSideEffect.NavigateToMainActivity)
+            postSideEffect(LoginSideEffect.PlusLoginActivity)
         } else {
             postSideEffect(LoginSideEffect.Toast("로그인에 실패했습니다."))
         }
@@ -110,4 +111,5 @@ data class LoginState(
 sealed interface LoginSideEffect {
     class Toast(val message: String) : LoginSideEffect
     data object NavigateToMainActivity:LoginSideEffect
+    data object PlusLoginActivity:LoginSideEffect
 }

@@ -23,6 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.presentation.R
 import com.org.egglog.presentation.component.atoms.buttons.AuthButton
+import com.org.egglog.presentation.domain.auth.activity.PlusLoginActivity
 import com.org.egglog.presentation.domain.auth.extend.rememberFirebaseAuthLauncher
 import com.org.egglog.presentation.domain.auth.viewmodel.LoginSideEffect
 import com.org.egglog.presentation.domain.auth.viewmodel.LoginViewModel
@@ -49,6 +50,15 @@ fun LoginScreen(
                 context.startActivity(
                     Intent(
                         context, MainActivity::class.java
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                )
+            }
+            LoginSideEffect.PlusLoginActivity -> {
+                context.startActivity(
+                    Intent(
+                        context, PlusLoginActivity::class.java
                     ).apply {
                         flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                     }

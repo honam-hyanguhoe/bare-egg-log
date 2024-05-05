@@ -66,6 +66,7 @@ fun SearchHeaderContents(
         val pin = remember { mutableStateOf("") }
         val text3 = remember { mutableStateOf("") }
         SearchInput(
+            modifier = Modifier.fillMaxWidth(),
             text = text3.value,
             onValueChange = { text3.value = it },
             focusManager = focusManager,
