@@ -1,5 +1,6 @@
 package org.egglog.api.worktype.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.worktype.model.dto.request.CreateWorkTypeRequest;
@@ -59,7 +60,7 @@ public class WorkTypeController {
     @PostMapping("/create")
     public ResponseEntity<MessageUtils> registerWorkType(
             @AuthenticationPrincipal User loginUser,
-            @RequestBody CreateWorkTypeRequest request) {
+            @RequestBody @Valid CreateWorkTypeRequest request) {
         return ResponseEntity.ok()
                 .body(MessageUtils.success(workTypeService.createWorkType(loginUser, request)));
     }
@@ -89,7 +90,7 @@ public class WorkTypeController {
     @PutMapping("/edit")
     public ResponseEntity<MessageUtils> updateWorkType(
             @AuthenticationPrincipal User loginUser,
-            @RequestBody EditWorkTypeRequest request
+            @RequestBody @Valid EditWorkTypeRequest request
     ) {
         return ResponseEntity.ok().body(
                 MessageUtils.success(workTypeService.editWorkType(loginUser, request)));

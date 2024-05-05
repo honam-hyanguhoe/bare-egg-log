@@ -1,5 +1,7 @@
 package org.egglog.api.work.model.dto.request;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -23,9 +25,13 @@ import java.time.LocalDate;
 @Setter
 @Builder
 public class FindWorkListRequest {
+    @NotNull(message = "calendarGroupId 는 필수 입니다.")
+    @Positive(message = "정확한 ID 값을 입력 해주세요.")
     private Long calendarGroupId;
+
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate startDate;
+
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate endDate;
 }

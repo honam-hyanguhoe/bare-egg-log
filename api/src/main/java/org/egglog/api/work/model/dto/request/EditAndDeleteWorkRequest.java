@@ -1,5 +1,7 @@
 package org.egglog.api.work.model.dto.request;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -23,9 +25,15 @@ import java.time.LocalDate;
 @Setter
 @Builder
 public class EditAndDeleteWorkRequest {
+    @NotNull(message = "workId 는 필수 입니다.")
+    @Positive(message = "정확한 ID 값을 입력 해주세요.")
     private Long workId;
+
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate workDate;
+
+    @NotNull(message = "workTypeId 는 필수 입니다.")
+    @Positive(message = "정확한 ID 값을 입력 해주세요.")
     private Long workTypeId;
     private Boolean isDeleted;
 }

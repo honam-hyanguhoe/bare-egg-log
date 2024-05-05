@@ -1,5 +1,7 @@
 package org.egglog.api.work.model.dto.request;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 import java.util.List;
@@ -23,6 +25,8 @@ import java.util.List;
 @Setter
 @Builder
 public class CreateWorkListRequest {
+    @NotNull(message = "캘린더 ID는 필수 입니다.")
+    @Positive(message = "정확한 ID값을 입력 해주세요.")
     private Long calendarGroupId;
     private List<CreateWorkRequest> workTypes;
 }

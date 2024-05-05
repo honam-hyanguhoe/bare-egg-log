@@ -1,5 +1,6 @@
 package org.egglog.api.work.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.user.model.entity.User;
@@ -47,7 +48,7 @@ public class WorkController {
     @PostMapping("/create")
     public ResponseEntity<MessageUtils> createWork(
             @AuthenticationPrincipal User loginUser,
-            @RequestBody CreateWorkListRequest request
+            @RequestBody @Valid CreateWorkListRequest request
     ){
         return ResponseEntity.ok().body(
                 MessageUtils.success(workService.createWork(loginUser, request)));
@@ -63,7 +64,7 @@ public class WorkController {
     @PatchMapping("/update")
     public ResponseEntity<MessageUtils> updateWork(
             @AuthenticationPrincipal User loginUser,
-            @RequestBody EditAndDeleteWorkListRequest request
+            @RequestBody @Valid EditAndDeleteWorkListRequest request
     ){
         return ResponseEntity.ok().body(MessageUtils.success(workService.updateWork(loginUser, request)));
     }
@@ -78,7 +79,7 @@ public class WorkController {
     @GetMapping("/find")
     public ResponseEntity<MessageUtils> findWorkList(
             @AuthenticationPrincipal User loginUser,
-            @ModelAttribute FindWorkListRequest request
+            @ModelAttribute @Valid FindWorkListRequest request
     ){
         return ResponseEntity.ok().body(
                 MessageUtils.success(workService.findWorkList(loginUser, request)));
@@ -94,7 +95,7 @@ public class WorkController {
     @GetMapping("/find/user")
     public ResponseEntity<MessageUtils> findGroupUserWorkList(
             @AuthenticationPrincipal User loginUser,
-            @ModelAttribute FindGroupUserWorkListRequest request
+            @ModelAttribute @Valid FindGroupUserWorkListRequest request
     ){
         return ResponseEntity.ok().body(
                 MessageUtils.success(workService.findGroupUserWorkList(loginUser, request)));

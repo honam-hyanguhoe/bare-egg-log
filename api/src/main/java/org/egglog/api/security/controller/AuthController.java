@@ -1,5 +1,6 @@
 package org.egglog.api.security.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.security.model.dto.request.LoginRequest;
@@ -33,7 +34,7 @@ public class AuthController {
 
     @PostMapping("/login/{provider}")
     public ResponseEntity<MessageUtils> login(
-            @RequestBody LoginRequest request,
+            @RequestBody @Valid LoginRequest request,
             @PathVariable(name = "provider") AuthProvider authProvider
             ){
         return ResponseEntity.ok()
