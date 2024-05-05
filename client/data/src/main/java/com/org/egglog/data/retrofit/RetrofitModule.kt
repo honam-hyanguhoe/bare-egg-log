@@ -25,17 +25,12 @@ private val json = Json {
 @InstallIn(SingletonComponent::class)
 class RetrofitModule {
     @Provides
-<<<<<<< HEAD
-    fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient
-            .Builder()
-=======
+
     fun provideOkHttpClient(
         refreshTokenInterceptorProvider: Provider<RefreshTokenInterceptor>
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor { chain -> refreshTokenInterceptorProvider.get().intercept(chain) }
->>>>>>> f46170b8b68da6f225201568164697c40591240f
             .build()
     }
 

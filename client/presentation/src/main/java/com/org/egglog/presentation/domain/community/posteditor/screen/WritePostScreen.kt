@@ -91,6 +91,7 @@ private fun WritePostScreen(
                         Text(text = "제목", style = Typography.displayLarge)
                         Spacer(modifier = Modifier.height(12.heightPercent(LocalContext.current).dp))
                         SingleInput(
+                            modifier = Modifier,
                             text = title,
                             placeholder = "제목을 입력해주세요",
                             onValueChange = onTitleChange,
