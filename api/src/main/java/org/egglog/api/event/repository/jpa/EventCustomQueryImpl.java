@@ -27,17 +27,6 @@ public class EventCustomQueryImpl implements EventCustomQuery {
     }
 
 
-//    public List<Event> findByMonthAndUserId(LocalDate date, Long userId) {
-//        return jpaQueryFactory
-//                .selectFrom(event)
-//                .join(event.user, user)
-//                .where(
-//                        user.id.eq(userId),
-//                        isStartDateEq(date).or(isEndDateEq(date))
-//                )
-//                .fetch();
-//    }
-
     /**
      * 한달 개인 일정 조회
      *

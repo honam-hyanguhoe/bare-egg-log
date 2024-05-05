@@ -8,6 +8,7 @@ import org.egglog.api.calendargroup.exception.CalendarGroupException;
 import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.calendargroup.repository.jpa.CalendarGroupRepository;
 import org.egglog.api.event.model.dto.params.EventForm;
+import org.egglog.api.event.model.dto.params.EventPeriodRequest;
 import org.egglog.api.event.model.dto.params.EventUpdateForm;
 import org.egglog.api.event.model.dto.response.EventListOutputSpec;
 import org.egglog.api.event.model.dto.response.EventOutputSpec;
@@ -106,6 +107,39 @@ public class EventService {
                 .endDate(event.getEndDate())
                 .calendarGroupId(event.getCalendarGroup().getId())
                 .build();
+    }
+
+    public List<EventListOutputSpec> getEventListByPeriod(EventPeriodRequest eventPeriodRequest, User user) {
+        LocalDateTime start = eventPeriodRequest.getStartDate();
+        LocalDateTime end = eventPeriodRequest.getEndDate();
+        Long userId = eventPeriodRequest.getUserId();
+        Long calendarGroupId = eventPeriodRequest.getCalendarGroupId();
+
+        CalendarGroup calendarGroup = calendarGroupRepository.findById(calendarGroupId).orElseThrow(
+                () -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP)
+        );
+        List<EventListOutputSpec> eventListOutputSpecList = new ArrayList<>();
+
+        //캘린더그룹 사용자와 로그인한 사용자가 다르다면
+        if (!user.getId().equals(calendarGroup.getUser().getId())) {
+            throw new CalendarGroupException(CalendarGroupErrorCode.NOT_SAME_CALENDAR_GROUP_USER);
+        }
+        Optional<List<Event>> eventsByMonthAndUserId = eventRepository.findEventsByMonthAndUserId(start, end, userId, calendarGroupId);
+
+        if (eventsByMonthAndUserId.isPresent()) {
+            for (Event event : eventsByMonthAndUserId.get()) {
+                EventListOutputSpec eventListOutputSpec = EventListOutputSpec.builder()
+                        .eventId(event.getId())
+                        .eventTitle(event.getEventTitle())
+                        .eventContent(event.getEventContent())
+                        .startDate(event.getStartDate())
+                        .endDate(event.getEndDate())
+                        .build();
+
+                eventListOutputSpecList.add(eventListOutputSpec);
+            }
+        }
+        return eventListOutputSpecList;
     }
 
     @Transactional

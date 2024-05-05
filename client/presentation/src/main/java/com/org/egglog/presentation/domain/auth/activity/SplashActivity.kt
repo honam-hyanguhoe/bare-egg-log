@@ -5,20 +5,29 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.google.firebase.FirebaseApp
+import com.kakao.sdk.common.KakaoSdk
+import com.navercorp.nid.NaverIdLoginSDK
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
-import com.org.egglog.presentation.domain.auth.screen.MainActivity
 import com.org.egglog.presentation.domain.auth.screen.SplashScreen
 import com.org.egglog.presentation.theme.ClientTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.org.egglog.presentation.R
+import com.org.egglog.presentation.domain.main.activity.MainActivity
 
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
     @Inject lateinit var getTokenUseCase: GetTokenUseCase
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
+        KakaoSdk.init(this, getString(R.string.kakao_native_app_key))
+        NaverIdLoginSDK.initialize(this, getString(R.string.naver_client_id), getString(R.string.naver_client_secret), getString(R.string.naver_client_name))
+//        val keyHash = Utility.getKeyHash(this)
+//        Log.e("Hash", keyHash)
         setContent{
             ClientTheme {
                 SplashScreen()
