@@ -31,6 +31,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class HospitalController {
 
     private final HospitalService hospitalService;
+
+    /**
+     * 병원 리스트 조회
+     * @param request 검색어 필수 x, 시작 인덱스, 항목 수
+     * @return
+     */
     @GetMapping("/list")
     public ResponseEntity<MessageUtils> findHospitalList(
             @Valid @ModelAttribute FindHospitalListRequest request
