@@ -157,11 +157,17 @@ fun AddInfoScreen(
             Spacer(modifier = Modifier.height(40.heightPercent(LocalContext.current).dp))
             Column(Modifier.fillMaxWidth(), Arrangement.Center, Alignment.CenterHorizontally) {
                 BigButton(
-                    colors = ButtonColors(containerColor = Warning300, contentColor = NaturalWhite, disabledContainerColor = Gray300, disabledContentColor = NaturalWhite),
+                    colors = ButtonColors(
+                        containerColor = Warning300,
+                        contentColor = NaturalWhite,
+                        disabledContainerColor = Gray300,
+                        disabledContentColor = NaturalWhite
+                    ),
+                    enabled = empNo.isNotEmpty() && hospital.isNotEmpty() && name.isNotEmpty(),
                     // TODO { 임시 처리 상태 }
                     onClick = onNavigateToMainActivity
                 ) {
-                    Text(text = "회원가입 완료하기", style = Typography.bodyMedium)
+                    Text(text = "회원가입 완료하기", style = Typography.bodyMedium, color = NaturalWhite)
                 }
             }
         }

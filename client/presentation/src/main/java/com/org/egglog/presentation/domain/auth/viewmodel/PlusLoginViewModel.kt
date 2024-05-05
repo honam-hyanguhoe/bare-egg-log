@@ -1,6 +1,11 @@
 package com.org.egglog.presentation.domain.auth.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.org.egglog.domain.auth.usecase.DeleteTokenUseCase
+import com.org.egglog.domain.auth.usecase.DeleteUserStoreUseCase
+import com.org.egglog.domain.auth.usecase.GetTokenUseCase
+import com.org.egglog.domain.auth.usecase.GetUserUseCase
+import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
@@ -16,7 +21,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PlusLoginViewModel @Inject constructor(
-
+    private val deleteUserStoreUseCase: DeleteUserStoreUseCase,
+    private val deleteTokenUseCase: DeleteTokenUseCase,
+    private val getUserUseCase: GetUserUseCase,
+    private val setUserStoreUseCase: SetUserStoreUseCase
 ): ViewModel(), ContainerHost<PlusLoginState, PlusLoginSideEffect>{
     override val container: Container<PlusLoginState, PlusLoginSideEffect> = container(
         initialState = PlusLoginState(),
@@ -51,10 +59,14 @@ class PlusLoginViewModel @Inject constructor(
     }
 
     fun goLoginActivity() = intent {
+        deleteTokenUseCase()
+        deleteUserStoreUseCase()
         postSideEffect(PlusLoginSideEffect.NavigateToLoginActivity)
     }
 
     fun goMainActivity() = intent {
+        // 1. user 조회
+        // 2. user 세팅
         postSideEffect(PlusLoginSideEffect.NavigateToMainActivity)
     }
 }

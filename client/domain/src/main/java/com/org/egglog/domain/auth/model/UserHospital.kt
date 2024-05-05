@@ -1,5 +1,8 @@
 package com.org.egglog.domain.auth.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class UserHospital(
     val hospitalId: Long,
     val sidoCode: String,
