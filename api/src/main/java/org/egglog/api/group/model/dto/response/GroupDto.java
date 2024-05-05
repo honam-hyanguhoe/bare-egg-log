@@ -13,7 +13,6 @@ import java.util.List;
 
 @Data
 @Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GroupDto {
     private Long id;
     private Boolean isAdmin;
