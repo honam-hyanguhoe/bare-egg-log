@@ -50,6 +50,7 @@ public class Board extends BaseEntity {
     @Column(name = "is_commented", columnDefinition = "boolean default false")
     private Boolean isCommented;    //댓글 유무
 
+    @Column(name = "board_type")
     @Enumerated(EnumType.STRING)
     private BoardType boardType; //ALL, HOSPITAL, GROUP
 
