@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.egglog.api.hospital.model.entity.Hospital;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -23,5 +24,21 @@ public class HospitalQueryRepositoryImpl implements HospitalQueryRepository {
                 .where(hospital.id.eq(hospitalId))
                 .fetchOne());
     }
+
+    public List<Hospital> findHospitals(String hospitalName, int offset, int limit) {
+        var query = jpaQueryFactory
+                .selectFrom(hospital);
+
+        if (hospitalName != null && !hospitalName.isEmpty()) {
+            query.where(hospital.hospitalName.containsIgnoreCase(hospitalName));
+        }
+
+        return query
+                .orderBy(hospital.hospitalName.asc())
+                .offset(offset)
+                .limit(limit)
+                .fetch();
+    }
+
 
 }
