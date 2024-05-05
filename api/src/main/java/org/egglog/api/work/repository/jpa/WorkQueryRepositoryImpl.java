@@ -116,8 +116,8 @@ public class WorkQueryRepositoryImpl implements WorkQueryRepository{
         return jpaQueryFactory
                 .select(Projections.constructor(UpComingCountWorkResponse.class,
                         workType.title.as("name"),
-                        workType.color,
-                        work.id.count().as("value")))
+                        work.id.count().as("value"),
+                        workType.color))
                 .from(work)
                 .join(work.workType, workType)
                 .where(work.user.id.eq(userId)

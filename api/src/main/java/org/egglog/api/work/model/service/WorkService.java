@@ -23,6 +23,7 @@ import org.egglog.api.work.model.dto.response.completed.CompletedWorkCountRespon
 import org.egglog.api.work.model.dto.response.upcoming.enums.DateType;
 import org.egglog.api.work.model.entity.Work;
 import org.egglog.api.work.repository.jpa.WorkJpaRepository;
+import org.egglog.api.worktype.model.entity.WorkTag;
 import org.egglog.api.worktype.model.entity.WorkType;
 import org.egglog.api.worktype.repository.jpa.WorkTypeJpaRepository;
 import org.springframework.stereotype.Service;
@@ -34,8 +35,10 @@ import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.IsoFields;
 import java.time.temporal.TemporalAdjusters;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -114,7 +117,6 @@ public class WorkService {
     public WorkListResponse findWorkList(User loginUser, FindWorkListRequest request){
         CalendarGroup calendarGroup = calendarGroupRepository.findCalendarGroupWithUserById(request.getCalendarGroupId())
                 .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
-        log.error("calendarGroup.toString()={}",calendarGroup.toString());
         if (calendarGroup.getUser().getId()!=loginUser.getId()) throw new WorkException(WorkErrorCode.ACCESS_DENIED);
         List<WorkResponse> workResponses = workJpaRepository
                 .findWorkListWithAllByTime(calendarGroup.getId(), request.getStartDate(), request.getEndDate())
@@ -163,6 +165,12 @@ public class WorkService {
 
     @Transactional(readOnly = true)
     public CompletedWorkCountResponse findCompletedWorkCount(User loginUser, LocalDate today, LocalDate targetMonth) {
+        Map<String, Integer> initialWorkCounts = Map.of(
+                WorkTag.DAY.name(), 0,
+                WorkTag.EVE.name(), 0,
+                WorkTag.NIGHT.name(), 0,
+                WorkTag.OFF.name(), 0
+        );
         return CompletedWorkCountResponse.builder()
                 .month(YearMonth.from(targetMonth).toString())
                 .weeks(workJpaRepository.findWorksBeforeDate(loginUser.getId(), today, targetMonth)
@@ -173,11 +181,17 @@ public class WorkService {
                                     LocalDate firstMonday = firstDay.getDayOfWeek() == DayOfWeek.MONDAY ? firstDay : firstDay.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
                                     return (int) ChronoUnit.WEEKS.between(firstMonday, work.getWorkDate()) + 1;
                                 },
-                                Collectors.groupingBy(
-                                        work -> work.getWorkType().getTitle(),
-                                        Collectors.summingInt(work -> 1) // 근무 유형별 카운팅
+                                Collector.of(
+                                        () -> new HashMap<>(initialWorkCounts),
+                                        (acc, work) -> acc.merge(work.getWorkType().getTitle(), 1, Integer::sum),
+                                        (acc1, acc2) -> {
+                                            acc2.forEach((key, value) -> acc1.merge(key, value, Integer::sum));
+                                            return acc1;
+                                        }
                                 )
-                        )).entrySet().stream()
+                        ))
+                        .entrySet()
+                        .stream()
                         .sorted(Map.Entry.comparingByKey())
                         .map(weekEntry -> new CompletedWorkCountWeekResponse(weekEntry.getKey(), weekEntry.getValue()))
                         .collect(Collectors.toList()))

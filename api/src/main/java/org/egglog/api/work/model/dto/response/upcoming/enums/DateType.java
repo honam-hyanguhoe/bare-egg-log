@@ -1,8 +1,8 @@
 package org.egglog.api.work.model.dto.response.upcoming.enums;
 
-import lombok.Getter;
+import org.egglog.api.global.util.converter.EnumToUpperCase;
 
-@Getter
+@EnumToUpperCase
 public enum DateType {
     WEEK, MONTH
 }

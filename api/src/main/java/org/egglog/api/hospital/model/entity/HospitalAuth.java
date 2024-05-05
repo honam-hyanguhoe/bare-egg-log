@@ -46,6 +46,9 @@ public class HospitalAuth {
     @JoinColumn(name = "hospital_id")
     private Hospital hospital;
 
+    @Column(length = 30, name = "emp_no")
+    private String empNo;
+
     @Column
     private Boolean auth;
 
@@ -75,24 +78,15 @@ public class HospitalAuth {
         this.authRequestTime = LocalDateTime.now();
         this.nurseCertificationImgUrl = nurseCertificationImgUrl;
         this.hospitalCertificationImgUrl = hospitalCertificationImgUrl;
+        this.empNo = user.getEmpNo();
         this.user = user;
         this.hospital = user.getSelectedHospital();
         return this;
     }
 
-    public HospitalAuthResponse toResponse(String empNo){
-        return HospitalAuthResponse.builder()
-                .empNo(empNo)
-                .auth(this.auth)
-                .authRequestTime(this.authRequestTime)
-                .confirmTime(this.confirmTime!=null ? this.confirmTime : null)
-                .nurseCertificationImgUrl(this.nurseCertificationImgUrl)
-                .hospitalCertificationImgUrl(this.hospitalCertificationImgUrl)
-                .hospitalInfo(this.hospital != null ? this.hospital.toUserHospitalResponse() : null)
-                .build();
-    }
     public HospitalAuthResponse toResponse(){
         return HospitalAuthResponse.builder()
+                .empNo(this.empNo)
                 .auth(this.auth)
                 .authRequestTime(this.authRequestTime)
                 .confirmTime(this.confirmTime!=null ? this.confirmTime : null)

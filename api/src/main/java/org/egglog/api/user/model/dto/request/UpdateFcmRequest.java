@@ -1,5 +1,6 @@
 package org.egglog.api.user.model.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 /**
@@ -19,5 +20,6 @@ import lombok.*;
 @Setter
 @Builder
 public class UpdateFcmRequest {
+    @NotBlank(message = "FCM 토큰은 필수 입니다.")
     private String fcmToken;
 }
