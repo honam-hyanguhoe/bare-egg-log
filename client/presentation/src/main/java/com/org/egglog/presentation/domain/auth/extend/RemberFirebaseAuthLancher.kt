@@ -12,13 +12,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 @Composable
-fun rememberFirebaseAuthLauncher(onAccountReceived: (GoogleSignInAccount) -> Unit): ManagedActivityResultLauncher<Intent, ActivityResult> {
+fun rememberFirebaseAuthLauncher(onUserReceived: (FirebaseUser?) -> Unit): ManagedActivityResultLauncher<Intent, ActivityResult> {
     val scope = rememberCoroutineScope()
     return rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()) { result ->
@@ -26,11 +27,11 @@ fun rememberFirebaseAuthLauncher(onAccountReceived: (GoogleSignInAccount) -> Uni
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             val account = task.getResult(ApiException::class.java)!!
             val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
-            onAccountReceived(account)
             scope.launch {
                 Firebase.auth.signInWithCredential(credential).await()
-//                val authResult = Firebase.auth.signInWithCredential(credential).await()
-//                Log.e("result: ", authResult.user?.email.toString())
+                val authResult = Firebase.auth.signInWithCredential(credential).await()
+                val user = authResult.user
+                onUserReceived(user)
             }
         } catch (e: ApiException) {
             Log.e("GoogleAuth", e.toString())

@@ -11,6 +11,8 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import javax.inject.Provider
+import javax.inject.Singleton
 
 const val HOST = "https://api.egg-log.org"
 
@@ -22,11 +24,14 @@ private val json = Json {
 @InstallIn(SingletonComponent::class)
 class RetrofitModule {
     @Provides
-    fun provideOkHttpClient() : OkHttpClient {
-        return OkHttpClient
-            .Builder()
+    fun provideOkHttpClient(
+        refreshTokenInterceptorProvider: Provider<RefreshTokenInterceptor>
+    ): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor { chain -> refreshTokenInterceptorProvider.get().intercept(chain) }
             .build()
     }
+
 
     @Provides
     fun provideRetrofit(client: OkHttpClient): Retrofit {
