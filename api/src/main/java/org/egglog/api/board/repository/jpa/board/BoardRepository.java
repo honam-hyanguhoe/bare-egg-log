@@ -11,6 +11,4 @@ public interface BoardRepository extends JpaRepository<Board, Long>, BoardCustom
     @Query("SELECT b.id FROM Board b ORDER BY b.createdAt DESC")
     List<Long> findTop2ByOrderByCreatedAtDesc();
 
-    @Query(value = "SELECT * FROM Board WHERE MATCH(content) AGAINST(:keyword IN BOOLEAN MODE)", nativeQuery = true)
-    List<Board> searchByKeyword(@Param("keyword") String keyword);
 }

@@ -19,15 +19,10 @@ import org.egglog.api.group.repository.jpa.GroupRepository;
 import org.egglog.api.hospital.model.entity.HospitalAuth;
 import org.egglog.api.hospital.repository.jpa.HospitalAuthJpaRepository;
 import org.egglog.api.hospital.repository.jpa.HospitalJpaRepository;
-import org.egglog.api.search.domain.document.BoardDocument;
-import org.egglog.api.search.repository.elasticsearch.SearchRepository;
 import org.egglog.api.global.util.RedisViewCountUtil;
 import org.egglog.api.hospital.exception.HospitalErrorCode;
 import org.egglog.api.hospital.exception.HospitalException;
 import org.egglog.api.hospital.model.entity.Hospital;
-import org.egglog.api.hospital.repository.jpa.HospitalQueryRepositoryImpl;
-import org.egglog.api.user.exception.UserErrorCode;
-import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.repository.jpa.UserJpaRepository;
 import org.springframework.dao.DataAccessException;
@@ -67,6 +62,7 @@ public class BoardService {
 
     //댓글
     private final CommentRepository commentRepository;
+    private final CommentService commentService;
 
     //병원
     private final HospitalAuthJpaRepository hospitalAuthJpaRepository;
@@ -75,89 +71,25 @@ public class BoardService {
     //그룹
     private final GroupRepository groupRepository;
 
-    //검색
-    private final SearchRepository searchRepository;
-
-    private final CommentService commentService;
-
     private final RedisViewCountUtil redisViewCountUtil;    //조회수
 
     private final StringRedisTemplate redisTemplate;    //급상승 게시물
 
-//    /**
-//     * 게시판 글 목록
-//     *
-//     * @param boardListForm
-//     * @param user
-//     * @return
-//     */
-//    public List<BoardListOutputSpec> getBoardList(BoardListForm boardListForm, User user) {
-//        List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
-//        int size = 10;
-//
-//        try {
-//            List<BoardDocument> boardDocuments = searchRepository.searchBoard(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getLastBoardId(), size);
-//            log.info("boardDocument: {}", boardDocuments);
-//
-//            for (BoardDocument board : boardDocuments) {
-//                Long commentCnt = commentRepository.getCommentCount(board.getId());
-//                Long likeCnt = boardRepository.getLikeCount(board.getId());
-//                long viewCount = redisViewCountUtil.getViewCount(String.valueOf(board.getId())); //하루 동안의 조회수
-//                Long hitCnt = viewCount + board.getViewCount();
-//
-//                //사용자의 병원 인증 정보
-//                Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(user, user.getSelectedHospital());
-//
-//                boolean isUserLiked = false;  //좋아요 누른 여부
-//                boolean isCommented = false;    //댓글 유무 여부
-//
-//                if (commentCnt != null) {
-//                    isCommented = true;
-//                }
-//                //사용자가 이미 좋아요를 눌렀는지
-//                if (!isNotLiked(user.getId(), board.getId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
-//                    isUserLiked = true;
-//                }
-//
-//                BoardListOutputSpec boardListOutputSpec = BoardListOutputSpec.builder()
-//                        .boardId(board.getId())
-//                        .boardTitle(board.getTitle())
-//                        .boardContent(board.getContent())
-//                        .boardCreatedAt(board.getCreatedAt())
-//                        .tempNickname(board.getTempNickname())
-//                        .viewCount(hitCnt)
-//                        .commentCount(commentCnt)
-//                        .likeCount(likeCnt)
-//                        .isLiked(isUserLiked)  //좋아요 여부
-//                        .isCommented(isCommented)   //댓글 유무
-//                        .build();
-//
-//                //병원 인증배지가 있다면
-//                if (hospitalAuth.isPresent()) {
-//                    boardListOutputSpec.setIsHospitalAuth(hospitalAuth.get().getAuth());
-//                }
-//
-//                boardListOutputSpecList.add(boardListOutputSpec);
-//            }
-//
-//        } catch (DataAccessException e) {
-//            throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            throw new BoardException(BoardErrorCode.UNKNOWN_ERROR);
-//        }
-//
-//        return boardListOutputSpecList;
-//    }
-
+    /**
+     * 게시판 조회
+     * 검색 포함
+     *
+     * @param boardListForm
+     * @param user
+     * @return
+     */
     public List<BoardListOutputSpec> getBoardList(BoardListForm boardListForm, User user) {
         List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
         int size = 10;
         try {
-            List<Board> boardList = searchRepository.searchFullText(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getLastBoardId(), size);
+            List<Board> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getLastBoardId(), size);
 
             for (Board board : boardList) {
-                log.info("board: {}", board);
                 Long commentCnt = commentRepository.getCommentCount(board.getId());
                 Long likeCnt = boardRepository.getLikeCount(board.getId());
                 long viewCount = redisViewCountUtil.getViewCount(String.valueOf(board.getId())); //하루 동안의 조회수
@@ -329,7 +261,6 @@ public class BoardService {
 
         try {
             boardRepository.save(board);  //저장
-            searchRepository.save(BoardDocument.from(board));   // ES에 저장
 
         } catch (PersistenceException e) {
             throw new BoardException(BoardErrorCode.TRANSACTION_ERROR);
@@ -500,16 +431,13 @@ public class BoardService {
                     .pictureThree(board.getPictureThree())
                     .pictureFour(board.getPictureFour())
                     .viewCount(hitCnt)
-//                    .groupId(board.getGroup().getId())
                     .userId(user.getId())
                     .tempNickname(board.getTempNickname())
                     .profileImgUrl(user.getProfileImgUrl())
                     .commentCount(commentCnt)
                     .boardLikeCount(likeCnt)
-//                    .hospitalName(board.getHospital().getHospitalName())
                     .isLiked(isUserLiked)
                     .isCommented(isCommented)
-//                    .isHospitalAuth(hospitalAuth.get().getAuth())   //인증 여부
                     .comments(commentList)
                     .build();
 
