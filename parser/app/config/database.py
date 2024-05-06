@@ -10,6 +10,7 @@ from sqlalchemy.orm import sessionmaker
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 SECRET_FILE = os.path.join(BASE_DIR, 'secrets.json')
+# SECRET_FILE = os.path.join(BASE_DIR, 'prodSecrets.json')
 secrets = json.loads(open(SECRET_FILE).read())
 db = secrets["DB"]
 

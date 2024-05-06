@@ -51,6 +51,9 @@ public class Hospital {
     @Column(name = "lng")
     private String lng;  //경도
 
+    @Column(name = "unique_code", unique = true)
+    private String uniqueCode;
+
     @OneToMany(mappedBy = "selectedHospital", fetch = FetchType.LAZY)
     @Builder.Default
     private List<User> users = new ArrayList<>();
