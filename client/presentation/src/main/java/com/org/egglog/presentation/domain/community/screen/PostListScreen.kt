@@ -1,5 +1,9 @@
 package com.org.egglog.presentation.domain.community.screen
 
+import android.app.ProgressDialog.show
+import android.content.Intent
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -40,6 +44,8 @@ import com.org.egglog.presentation.component.molecules.cards.PostInfo
 import com.org.egglog.presentation.component.molecules.headers.NoticeHeader
 import com.org.egglog.presentation.component.organisms.postCard.PostCard
 import com.org.egglog.presentation.data.PreviewPostInfo
+import com.org.egglog.presentation.domain.community.posteditor.activity.PostEditorActivity
+import com.org.egglog.presentation.domain.community.viewmodel.PostListSideEffect
 import com.org.egglog.presentation.domain.community.viewmodel.PostListViewModel
 import com.org.egglog.presentation.theme.BlueGray900
 import com.org.egglog.presentation.theme.NaturalBlack
@@ -51,12 +57,21 @@ import com.org.egglog.presentation.utils.Edit
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
 import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
 fun PostListScreen(
-    viewModel: PostListViewModel = hiltViewModel()
+    viewModel: PostListViewModel = hiltViewModel(),
+    onNavigateToDetailScreen: () -> Unit
 ) {
+    Log.e("PostListScreen", "${onNavigateToDetailScreen}")
     val state = viewModel.collectAsState().value
+    val context = LocalContext.current
+    viewModel.collectSideEffect { sideEffect -> when(sideEffect) {
+        is PostListSideEffect.Toast -> Toast.makeText(context , sideEffect.message, Toast.LENGTH_SHORT).show()
+        PostListSideEffect.NavigateToWriteScreen -> (context.startActivity(Intent(context, PostEditorActivity::class.java)))
+    }
+    }
     PostListScreen(
         postList = listOf(
             PreviewPostInfo(31, "test1", "test1", "2024-01-02 17:39:38", "익명의 구운란", 1, 5, 0, "https://picsum.photos/300", false, true, true, 1, "전남대병원"),
@@ -66,7 +81,7 @@ fun PostListScreen(
             PostInfo(1, "부서 골라주세요", "익명의 구운란", 100, 12, true),
             PostInfo(2, "부서 골라주세요", "익명의 구운란", 100, 12, true)
         ),
-        onClickPost = viewModel::onClickPost,
+        onClickPost = onNavigateToDetailScreen,
         onClickWriteButton = viewModel::onClickWriteButton
     )
 }
@@ -171,7 +186,7 @@ private fun PostListScreen(
         verticalArrangement = Arrangement.Bottom,
         horizontalAlignment = Alignment.End) {
         FloatingActionButton(
-            onClick = {},
+            onClick = onClickWriteButton,
             modifier = Modifier
                 .padding(5.dp),
             shape = FloatingActionButtonDefaults.largeShape,
@@ -182,13 +197,4 @@ private fun PostListScreen(
             Icon(imageVector = Edit, contentDescription = "fab Icon")
         }
     }
-}
-
-@Preview
-@Composable
-private fun PostListPreview() {
-    MaterialTheme {
-        PostListScreen()
-    }
-
 }

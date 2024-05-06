@@ -1,7 +1,9 @@
 package com.org.egglog.presentation.domain.community.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.org.egglog.domain.community.posteditor.model.Post
+import com.org.egglog.domain.community.usecase.GetHotPostListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
@@ -13,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PostListViewModel @Inject constructor(
-
+    private val getTokenUseCase: GetHotPostListUseCase
 ): ViewModel(), ContainerHost<PostListState, PostListSideEffect>{
     override val container: Container<PostListState, PostListSideEffect> = container(
         initialState = PostListState(),
@@ -28,14 +30,19 @@ class PostListViewModel @Inject constructor(
 
     fun onClickNotification() = intent { }
 
-    fun onClickPost() = intent { }
+    fun onClickPost() = intent {
+    }
 
-    fun onClickWriteButton() = intent { }
+    fun onClickWriteButton() = intent {
+        postSideEffect(PostListSideEffect.NavigateToWriteScreen)
+    }
 
 }
 
 class PostListState()
 
 sealed interface PostListSideEffect {
-    class Toast(val message: String): PostListSideEffect
+    class Toast(val message: String) : PostListSideEffect
+
+    data object NavigateToWriteScreen : PostListSideEffect
 }

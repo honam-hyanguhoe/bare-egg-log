@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.org.egglog.presentation.domain.community.screen.PostDetailScreen
 import com.org.egglog.presentation.domain.community.screen.PostListScreen
 
 @Composable
@@ -15,7 +16,17 @@ fun CommunityNavigationHost() {
         startDestination = CommunityRoute.PostListScreen.name
     ) {
         composable(route = CommunityRoute.PostListScreen.name) {
-            PostListScreen()
+            PostListScreen(
+                onNavigateToDetailScreen = {
+                    navController.navigate(
+                        route = CommunityRoute.PostDetailScreen.name
+                    )
+                }
+            )
+        }
+
+        composable(route = CommunityRoute.PostDetailScreen.name) {
+            PostDetailScreen()
         }
     }
 }

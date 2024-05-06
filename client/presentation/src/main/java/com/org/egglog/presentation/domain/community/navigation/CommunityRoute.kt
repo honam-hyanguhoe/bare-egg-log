@@ -3,9 +3,9 @@ package com.org.egglog.presentation.domain.community.navigation
 sealed class CommunityRoute(
     val name: String
 ){
-    object PostListScreen: CommunityRoute("PostListScreen")
+    data object PostListScreen: CommunityRoute("PostListScreen")
 
-    object SearchListScreen: CommunityRoute("SearchListScreen")
+    data object SearchListScreen: CommunityRoute("SearchListScreen")
 
-    object PostDetailScreen: CommunityRoute("PostDetailScreen")
+    data object PostDetailScreen: CommunityRoute("PostDetailScreen")
 }
