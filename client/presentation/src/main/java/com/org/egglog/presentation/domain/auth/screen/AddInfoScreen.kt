@@ -76,7 +76,7 @@ fun AddInfoScreen(
         onNameChange = viewModel::onNameChange,
         onHospitalChange = viewModel::onHospitalChange,
         onEmpNoChange = viewModel::onEmpNoChange,
-        onNavigateToMainActivity = viewModel::goMainActivity,
+        onClickJoin = viewModel::onClickJoin,
         onNavigateToLoginActivity = viewModel::goLoginActivity
     )
 }
@@ -90,7 +90,7 @@ fun AddInfoScreen(
     onNameChange: (String) -> Unit,
     onHospitalChange: (UserHospital) -> Unit,
     onEmpNoChange: (String) -> Unit,
-    onNavigateToMainActivity: () -> Unit,
+    onClickJoin: () -> Unit,
     onNavigateToLoginActivity: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
@@ -185,7 +185,7 @@ fun AddInfoScreen(
                         disabledContentColor = NaturalWhite
                     ),
                     enabled = empNo.isNotEmpty() && hospital != null && name.isNotEmpty(),
-                    onClick = onNavigateToMainActivity
+                    onClick = onClickJoin
                 ) {
                     Text(text = "회원가입 완료하기", style = Typography.bodyMedium, color = NaturalWhite)
                 }
@@ -207,7 +207,7 @@ fun AddInfoScreenPreview() {
             onHospitalChange = { },
             onEmpNoChange = { },
             onNavigateToLoginActivity = { },
-            onNavigateToMainActivity = { }
+            onClickJoin = { }
         )
     }
 }
