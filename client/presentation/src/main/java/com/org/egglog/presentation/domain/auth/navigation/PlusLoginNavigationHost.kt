@@ -18,12 +18,12 @@ fun PlusLoginNavigationHost() {
     ) {
         composable(route = PlusLoginRoute.AgreeScreen.name) {
             AgreeScreen(
-                onNavigateToAddInfoScreen = { navController.navigate(route = PlusLoginRoute.AddInfoScreen.name) }
-            )
-        }
-        composable(route = PlusLoginRoute.AddInfoScreen.name) {
-            AddInfoScreen(
-                onNavigateToAgreeScreen = { navController.navigate(route = PlusLoginRoute.AgreeScreen.name) }
+                        onNavigateToAddInfoScreen = { navController.navigate(route = PlusLoginRoute.AddInfoScreen.name) }
+                )
+                }
+                        composable(route = PlusLoginRoute.AddInfoScreen.name) {
+                    AddInfoScreen(
+                        onNavigateToAgreeScreen = { navController.navigate(route = PlusLoginRoute.AgreeScreen.name) }
             )
         }
 
