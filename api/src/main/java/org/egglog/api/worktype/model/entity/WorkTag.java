@@ -1,8 +1,8 @@
 package org.egglog.api.worktype.model.entity;
 
-import org.egglog.api.global.util.converter.EnumToUpperCase;
+import org.egglog.api.global.util.converter.NormalizeEnumCase;
 
-@EnumToUpperCase
+@NormalizeEnumCase
 public enum WorkTag {
     DAY, EVE, NIGHT, OFF, ETC
 }

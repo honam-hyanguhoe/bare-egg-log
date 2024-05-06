@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@Table(name = "hospital_auth")
+@Table(name = "Hospital_auth")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)

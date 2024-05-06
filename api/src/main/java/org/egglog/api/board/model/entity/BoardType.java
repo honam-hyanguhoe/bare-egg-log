@@ -1,8 +1,8 @@
 package org.egglog.api.board.model.entity;
 
-import org.egglog.api.global.util.converter.EnumToUpperCase;
+import org.egglog.api.global.util.converter.NormalizeEnumCase;
 
-@EnumToUpperCase
+@NormalizeEnumCase
 public enum BoardType {
     /**
      * 전체 커뮤니티
