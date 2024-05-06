@@ -51,9 +51,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class BoardService {
 
-    //사용자
-    private final UserJpaRepository userJpaRepository;
-
     //게시판
     private final BoardRepository boardRepository;
 
@@ -120,10 +117,15 @@ public class BoardService {
                         .likeCount(likeCnt)
                         .isLiked(isUserLiked)  //좋아요 여부
                         .isCommented(isCommented)   //댓글 유무
-                        .userId(board.getUser().getId())
+                        .userId(board.getUser().getId())    //작성자
+                        .hospitalName(user.getSelectedHospital().getHospitalName()) //병원명
                         .build();
 
-                //병원 인증배지가 있다면
+                //병원 인증배지가 없다면
+                if (hospitalAuth.isEmpty()) {
+                    boardListOutputSpec.setIsHospitalAuth(false);
+                }
+                //있다면
                 hospitalAuth.ifPresent(auth -> boardListOutputSpec.setIsHospitalAuth(auth.getAuth()));
 
                 boardListOutputSpecList.add(boardListOutputSpec);
@@ -193,9 +195,14 @@ public class BoardService {
                             .isLiked(isUserLiked)
                             .isCommented(isCommented)
                             .userId(board.getUser().getId())
+                            .hospitalName(user.getSelectedHospital().getHospitalName())
                             .build();
 
-                    //병원 인증배지가 있다면
+                    //병원 인증배지가 없다면
+                    if (hospitalAuth.isEmpty()) {
+                        boardListOutputSpec.setIsHospitalAuth(false);
+                    }
+                    //있다면
                     hospitalAuth.ifPresent(auth -> boardListOutputSpec.setIsHospitalAuth(auth.getAuth()));
 
                     boardListOutputSpecList.add(boardListOutputSpec);
@@ -364,6 +371,10 @@ public class BoardService {
                     .isCommented(isCommented)
                     .build();
 
+            //병원 인증배지가 없다면
+            if (hospitalAuth.isEmpty()) {
+                boardOutputSpec.setIsHospitalAuth(false);
+            }
             if (hospitalAuth.isPresent()) {
                 boardOutputSpec.setIsHospitalAuth(hospitalAuth.get().getAuth());
             }
@@ -448,6 +459,10 @@ public class BoardService {
                     .comments(commentList)
                     .build();
 
+            //병원 인증배지가 없다면
+            if (hospitalAuth.isEmpty()) {
+                boardOutputSpec.setIsHospitalAuth(false);
+            }
             if (hospitalAuth.isPresent()) {
                 boardOutputSpec.setIsHospitalAuth(hospitalAuth.get().getAuth());
             }
