@@ -10,7 +10,20 @@ import org.egglog.utility.utils.SuccessType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
+/**
+ * ```
+ * ===================[Info]=========================
+ * packageName    : org.egglog.api.calendargroup.controller
+ * fileName       : CalendarGroupController
+ * description    : 캘린더 그룹 컨트롤러
+ * =================================================
+ * ```
+ * |DATE|AUTHOR|NOTE|
+ * |:---:|:---:|:---:|
+ * |2024-04-20|김도휘|최초 생성|
+ * |2024-04-20|김도휘|캘린더 그룹으로 개인 일정 조회 추가|
+ * |2024-05-07|김형민|리스트조회, 생성, 삭제 추가|
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/calendargroups")
