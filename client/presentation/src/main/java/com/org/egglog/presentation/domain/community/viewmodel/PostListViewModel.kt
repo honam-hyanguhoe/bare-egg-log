@@ -30,6 +30,8 @@ class PostListViewModel @Inject constructor(
 
     fun onClickPost() = intent { }
 
+    fun onClickWriteButton() = intent { }
+
 }
 
 class PostListState()

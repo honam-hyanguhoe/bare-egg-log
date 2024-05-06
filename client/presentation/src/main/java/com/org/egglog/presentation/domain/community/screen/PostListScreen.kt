@@ -2,6 +2,7 @@ package com.org.egglog.presentation.domain.community.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,9 +15,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,6 +32,7 @@ import com.google.firebase.annotations.concurrent.Background
 import com.org.egglog.client.data.PostReactionInfo
 import com.org.egglog.client.data.Profile
 import com.org.egglog.presentation.R
+import com.org.egglog.presentation.component.atoms.buttons.FloatingButton
 import com.org.egglog.presentation.component.atoms.cards.BackgroundCard
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.presentation.component.molecules.cards.HotPostCard
@@ -35,10 +41,13 @@ import com.org.egglog.presentation.component.molecules.headers.NoticeHeader
 import com.org.egglog.presentation.component.organisms.postCard.PostCard
 import com.org.egglog.presentation.data.PreviewPostInfo
 import com.org.egglog.presentation.domain.community.viewmodel.PostListViewModel
+import com.org.egglog.presentation.theme.BlueGray900
 import com.org.egglog.presentation.theme.NaturalBlack
 import com.org.egglog.presentation.theme.NaturalWhite
 import com.org.egglog.presentation.theme.Typography
 import com.org.egglog.presentation.theme.Warning200
+import com.org.egglog.presentation.utils.Close
+import com.org.egglog.presentation.utils.Edit
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
 import org.orbitmvi.orbit.compose.collectAsState
@@ -57,7 +66,8 @@ fun PostListScreen(
             PostInfo(1, "부서 골라주세요", "익명의 구운란", 100, 12, true),
             PostInfo(2, "부서 골라주세요", "익명의 구운란", 100, 12, true)
         ),
-        onClickPost = viewModel::onClickPost
+        onClickPost = viewModel::onClickPost,
+        onClickWriteButton = viewModel::onClickWriteButton
     )
 }
 
@@ -65,7 +75,8 @@ fun PostListScreen(
 private fun PostListScreen(
     postList: List<PreviewPostInfo>,
     hotPostList: List<PostInfo>,
-    onClickPost: () -> Unit
+    onClickPost: () -> Unit,
+    onClickWriteButton: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -145,10 +156,31 @@ private fun PostListScreen(
                 val postInfo = com.org.egglog.client.data.PostInfo(postData.boardId, postData.boardTitle, postData.boardContent, postData.pictureOne)
                 val postReaction = PostReactionInfo(postData.boardId, postData.likeCount, postData.commentCount, postData.viewCount, postData.isLiked, postData.isCommented)
 
-                PostCard(profile = profile, postInfo = postInfo, postReaction = postReaction)
+                PostCard(profile = profile, postInfo = postInfo, postReaction = postReaction, onClick = onClickPost)
             }
         }
 
+
+
+    }
+
+    val fabInteractionSource = remember { MutableInteractionSource() }
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(horizontal = 10.dp, vertical = 10.dp),
+        verticalArrangement = Arrangement.Bottom,
+        horizontalAlignment = Alignment.End) {
+        FloatingActionButton(
+            onClick = {},
+            modifier = Modifier
+                .padding(5.dp),
+            shape = FloatingActionButtonDefaults.largeShape,
+            containerColor = BlueGray900,
+            contentColor = NaturalWhite,
+            elevation = FloatingActionButtonDefaults.elevation(),
+            interactionSource = fabInteractionSource) {
+            Icon(imageVector = Edit, contentDescription = "fab Icon")
+        }
     }
 }
 
