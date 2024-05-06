@@ -68,6 +68,7 @@ public class WorkService {
 
     @Transactional
     public List<WorkResponse> createWork(User loginUser, CreateWorkListRequest request){
+        if (loginUser.getWorkGroupId()!= request.getCalendarGroupId()) throw new CalendarGroupException(CalendarGroupErrorCode.WORK_GROUP_ACCESS_DENY);
         CalendarGroup calendarGroup = calendarGroupRepository.findById(request.getCalendarGroupId())
                 .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
 
@@ -87,6 +88,7 @@ public class WorkService {
 
     @Transactional
     public List<WorkResponse> updateWork(User loginUser, EditAndDeleteWorkListRequest request){
+        if (loginUser.getWorkGroupId()!= request.getCalendarGroupId()) throw new CalendarGroupException(CalendarGroupErrorCode.WORK_GROUP_ACCESS_DENY);
         CalendarGroup calendarGroup = calendarGroupRepository.findCalendarGroupWithUserById(request.getCalendarGroupId())
                 .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
         if (calendarGroup.getUser().getId()!=loginUser.getId()) throw new WorkException(WorkErrorCode.ACCESS_DENIED);
@@ -115,7 +117,7 @@ public class WorkService {
 
     @Transactional(readOnly = true)
     public WorkListResponse findWorkList(User loginUser, FindWorkListRequest request){
-        CalendarGroup calendarGroup = calendarGroupRepository.findCalendarGroupWithUserById(request.getCalendarGroupId())
+        CalendarGroup calendarGroup = calendarGroupRepository.findCalendarGroupWithUserById(loginUser.getWorkGroupId())
                 .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
         if (calendarGroup.getUser().getId()!=loginUser.getId()) throw new WorkException(WorkErrorCode.ACCESS_DENIED);
         List<WorkResponse> workResponses = workJpaRepository

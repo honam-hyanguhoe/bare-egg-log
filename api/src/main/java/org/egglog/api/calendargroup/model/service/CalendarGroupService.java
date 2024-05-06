@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.egglog.api.calendar.model.service.CalendarService;
 import org.egglog.api.calendargroup.exception.CalendarGroupErrorCode;
 import org.egglog.api.calendargroup.exception.CalendarGroupException;
-import org.egglog.api.calendargroup.model.dto.params.CalendarGroupForm;
 import org.egglog.api.calendargroup.model.dto.params.CalendarGroupListRequest;
 import org.egglog.api.calendargroup.model.dto.response.CalendarGroupEventListResponse;
 import org.egglog.api.calendargroup.model.dto.response.CalendarGroupEventResponse;
@@ -53,9 +52,10 @@ public class CalendarGroupService {
      * @param loginUser
      */
     public void deleteCalendarGroup(Long calendarGroupId, User loginUser) {
-        CalendarGroup calendarGroup = calendarGroupRepository.findById(calendarGroupId).orElseThrow(
-                () -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP)
-        );
+        if (loginUser.getWorkGroupId()==calendarGroupId) throw new CalendarGroupException(CalendarGroupErrorCode.NOT_CONTROL_WORKGROUP);
+        CalendarGroup calendarGroup = calendarGroupRepository.findCalendarGroupWithUserById(calendarGroupId)
+                .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
+        if (calendarGroup.getUser().equals(loginUser)) throw new UserException(UserErrorCode.ACCESS_DENIED);
         calendarGroupRepository.delete(calendarGroup);
     }
 
