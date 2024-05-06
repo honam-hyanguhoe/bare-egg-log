@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.org.egglog.presentation.domain.auth.screen.AddInfoScreen
 import com.org.egglog.presentation.domain.auth.screen.AgreeScreen
+import com.org.egglog.presentation.domain.auth.screen.TestScreen
 
 @Composable
 fun PlusLoginNavigationHost() {
@@ -17,12 +18,18 @@ fun PlusLoginNavigationHost() {
     ) {
         composable(route = PlusLoginRoute.AgreeScreen.name) {
             AgreeScreen(
-                onNavigateToAddInfoScreen = { navController.navigate(route = PlusLoginRoute.AddInfoScreen.name) }
+                        onNavigateToAddInfoScreen = { navController.navigate(route = PlusLoginRoute.AddInfoScreen.name) }
+                )
+                }
+                        composable(route = PlusLoginRoute.AddInfoScreen.name) {
+                    AddInfoScreen(
+                        onNavigateToAgreeScreen = { navController.navigate(route = PlusLoginRoute.AgreeScreen.name) }
             )
         }
-        composable(route = PlusLoginRoute.AddInfoScreen.name) {
-            AddInfoScreen(
-                onNavigateToAgreeScreen = { navController.navigate(route = PlusLoginRoute.AgreeScreen.name) }
+
+        composable(route = PlusLoginRoute.TestScreen.name) {
+            TestScreen(
+//                onNavigateToTestScreen = { navController.navigate(route = PlusLoginRoute.TestScreen.name) }
             )
         }
     }

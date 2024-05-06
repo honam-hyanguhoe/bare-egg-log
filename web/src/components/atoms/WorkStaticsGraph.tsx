@@ -67,7 +67,8 @@ const WorkStaticsGraph = ({ data }: WorkStaticsGraphProps) => {
 
     const barWidth = xScale.bandwidth() / dataRef.current[0].values.length;
 
-    ["day", "eve", "night", "off"].forEach((className, i) => {
+    ["DAY", "EVE", "NIGHT", "OFF"].forEach((className, i) => {
+      console.log(`className ${className} / ${i}`);
       barSvg
         .selectAll(`rect.${className}`)
         .data(dataRef.current)
