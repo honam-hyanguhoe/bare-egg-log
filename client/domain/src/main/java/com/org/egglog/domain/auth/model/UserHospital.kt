@@ -15,4 +15,8 @@ data class UserHospital(
     val hospitalName: String,
     val lat: String,
     val lng: String
-)
+) {
+    override fun toString(): String {
+        return hospitalName
+    }
+}

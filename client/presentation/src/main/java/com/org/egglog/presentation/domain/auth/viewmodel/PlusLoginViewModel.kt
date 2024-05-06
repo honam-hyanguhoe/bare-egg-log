@@ -1,6 +1,7 @@
 package com.org.egglog.presentation.domain.auth.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.org.egglog.domain.auth.model.UserHospital
 import com.org.egglog.domain.auth.usecase.DeleteTokenUseCase
 import com.org.egglog.domain.auth.usecase.DeleteUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
@@ -45,7 +46,7 @@ class PlusLoginViewModel @Inject constructor(
     }
 
     @OptIn(OrbitExperimental::class)
-    fun onHospitalChange(hospital: String) = blockingIntent {
+    fun onHospitalChange(hospital: UserHospital) = blockingIntent {
         reduce {
             state.copy(hospital = hospital)
         }
@@ -75,9 +76,8 @@ class PlusLoginViewModel @Inject constructor(
 @Immutable
 data class PlusLoginState(
     val name: String = "",
-    val hospital: String = "",
+    val hospital: UserHospital? = null,
     val empNo: String = ""
-
 )
 
 sealed interface PlusLoginSideEffect {
