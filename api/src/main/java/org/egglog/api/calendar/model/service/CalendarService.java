@@ -108,16 +108,24 @@ public class CalendarService {
                 try {
                     inputStream.close(); // 스트림 닫기
                 } catch (Exception e) {
-                    log.error("Error closing stream: " + e.getMessage());
+                    log.error("스트림 닫기 에러 = {}", e.getMessage());
                 }
             }
 
         }
     }
+    /**
+     * 유저가 버튼을 누르면 유저의 캘린더 그룹 중에서 url이 있는 것들은 동기화를 한다.
+     * @author 김형민
+     */
+    public void updateIcsEventsForSyncRequest(User loginUser){
+        List<CalendarGroup> urlNotNullList = calendarGroupRepository.findUrlNotNullListByUserId(loginUser.getId());
+
+    }
+
+
 
     private LocalDateTime icsTimeToLocalDateTime(String stringTime) throws DateTimeParseException {
-        log.debug("stringTime={}",stringTime);
-        log.debug("lenght={}",stringTime.length());
         if (stringTime.length() == 16) {
             // ISO 8601 확장 포멧 ("yyyyMMdd'T'HHmmss'Z'")
             return LocalDateTime.parse(stringTime, DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'"));

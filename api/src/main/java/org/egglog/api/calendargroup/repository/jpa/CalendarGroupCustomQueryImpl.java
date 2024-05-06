@@ -47,4 +47,19 @@ public class CalendarGroupCustomQueryImpl implements CalendarGroupCustomQuery {
                 .fetch();
     }
 
+    /**
+     * 사용자 ID를 기반으로 URL이 null이 아니고 비어있지 않은 CalendarGroup 목록을 조회합니다.
+     * @param userId 조회하고자 하는 User의 ID
+     * @return 해당 사용자의 URL이 설정된 CalendarGroup 리스트
+     * @Creator 김형민
+     */
+    public List<CalendarGroup> findUrlNotNullListByUserId(Long userId) {
+        return jpaQueryFactory
+                .selectFrom(calendarGroup)
+                .where(calendarGroup.user.id.eq(userId),
+                        calendarGroup.url.isNotNull(),
+                        calendarGroup.url.isNotEmpty())
+                .fetch();
+    }
+
 }

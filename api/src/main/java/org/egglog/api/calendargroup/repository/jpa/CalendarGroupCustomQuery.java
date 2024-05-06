@@ -9,4 +9,5 @@ public interface CalendarGroupCustomQuery {
     Optional<CalendarGroup> findCalendarGroupWithUserById(Long calendarGroupId);
 
     List<CalendarGroup> findListByUserId(Long userId);
+    List<CalendarGroup> findUrlNotNullListByUserId(Long userId);
 }
