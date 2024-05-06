@@ -38,7 +38,7 @@ public class Event {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "calendar_group_id")
     private CalendarGroup calendarGroup;
 

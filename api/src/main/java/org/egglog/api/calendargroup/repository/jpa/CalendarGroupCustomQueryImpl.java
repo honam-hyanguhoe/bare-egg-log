@@ -34,4 +34,17 @@ public class CalendarGroupCustomQueryImpl implements CalendarGroupCustomQuery {
                         .fetchOne());  // 결과를 Optional로 감싸서 반환
     }
 
+    /**
+     * 사용자 ID를 기반으로 모든 CalendarGroup 목록을 조회합니다.
+     * @param userId 조회하고자 하는 User의 ID
+     * @return 해당 사용자의 모든 CalendarGroup 리스트
+     * @Creator 김형민
+     */
+    public List<CalendarGroup> findListByUserId(Long userId) {
+        return jpaQueryFactory
+                .selectFrom(calendarGroup)
+                .where(calendarGroup.user.id.eq(userId))
+                .fetch();
+    }
+
 }

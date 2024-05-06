@@ -1,6 +1,7 @@
 package org.egglog.api.calendargroup.model.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.calendar.model.service.CalendarService;
 import org.egglog.api.calendargroup.exception.CalendarGroupErrorCode;
 import org.egglog.api.calendargroup.exception.CalendarGroupException;
@@ -23,13 +24,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CalendarGroupService {
 
     private final CalendarGroupRepository calendarGroupRepository;
-    private final UserJpaRepository userJpaRepository;
     private final EventRepository eventRepository;
     private final CalendarService calendarService;
 
@@ -50,13 +52,23 @@ public class CalendarGroupService {
      *
      * @param calendarGroupId
      * @param loginUser
+     * @author 김형민
      */
     public void deleteCalendarGroup(Long calendarGroupId, User loginUser) {
         if (loginUser.getWorkGroupId()==calendarGroupId) throw new CalendarGroupException(CalendarGroupErrorCode.NOT_CONTROL_WORKGROUP);
         CalendarGroup calendarGroup = calendarGroupRepository.findCalendarGroupWithUserById(calendarGroupId)
                 .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
         if (calendarGroup.getUser().equals(loginUser)) throw new UserException(UserErrorCode.ACCESS_DENIED);
+        long deletedCount = eventRepository.deleteAllByCalendarGroupId(calendarGroupId);
+        log.debug("캘린더 ID = {} 에 대한 값 삭제 관련 일정 = {} 개 삭제 완료",calendarGroupId, deletedCount);
         calendarGroupRepository.delete(calendarGroup);
+    }
+
+    public List<CalendarGroupResponse> findCalendarGroupList(User loginUser){
+        return calendarGroupRepository.findListByUserId(loginUser.getId())
+                .stream()
+                .map(CalendarGroup::toResponse)
+                .collect(Collectors.toList());
     }
 
     public List<CalendarGroupEventListResponse> getEventListByCalenderIds(CalendarGroupListRequest calendarGroupListRequest, User user) {
