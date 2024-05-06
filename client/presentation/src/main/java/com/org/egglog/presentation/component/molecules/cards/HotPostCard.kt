@@ -15,15 +15,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.org.egglog.client.data.PostReactionInfo
 import com.org.egglog.presentation.utils.CommentBorder
 import com.org.egglog.presentation.utils.Favorite
 import com.org.egglog.presentation.utils.FavoriteBorder
 import com.org.egglog.presentation.utils.widthPercent
 import com.org.egglog.presentation.component.atoms.cards.BackgroundCard
 import com.org.egglog.presentation.component.atoms.icons.Icon
+import com.org.egglog.presentation.component.molecules.postReaction.PostReaction
 import com.org.egglog.presentation.theme.*
 
-class PostInfo(val title: String,val name: String, val likeCnt: Int, val commentCnt: Int, val isLiked: Boolean)
+class PostInfo(val postId: Long, val title: String,val name: String, val likeCnt: Long, val commentCnt: Long, val isLiked: Boolean)
 
 @Composable
 fun HotPostCard(postInfo: PostInfo, onClickPost: () -> Unit) {
@@ -38,15 +40,7 @@ fun HotPostCard(postInfo: PostInfo, onClickPost: () -> Unit) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically) {
                 Text("${postInfo.name}", color= Gray500, style = Typography.labelSmall.copy(fontSize = 14.sp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(imageVector = if(postInfo.isLiked) Favorite else FavoriteBorder, Modifier.size(12.dp), color = Gray500)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("${postInfo.likeCnt}",color = Gray500, style = Typography.labelSmall)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Icon(imageVector = CommentBorder, Modifier.size(12.dp), color = Gray500)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("${postInfo.commentCnt}",color = Gray500, style = Typography.labelSmall)
-                }
+                PostReaction(postReactionInfo = PostReactionInfo(1, likeCnt = postInfo.likeCnt, commentCnt = postInfo.commentCnt, isLiked = postInfo.isLiked, isCommented = false, ))
             }
         }
     }
