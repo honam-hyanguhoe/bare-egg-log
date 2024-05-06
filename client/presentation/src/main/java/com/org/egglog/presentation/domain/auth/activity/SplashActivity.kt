@@ -12,6 +12,7 @@ import com.navercorp.nid.NaverIdLoginSDK
 import com.org.egglog.domain.auth.usecase.GetRefreshUseCase
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.auth.usecase.GetUserUseCase
+import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
 import com.org.egglog.presentation.domain.auth.screen.SplashScreen
 import com.org.egglog.presentation.theme.ClientTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,6 +29,7 @@ class SplashActivity : AppCompatActivity() {
     @Inject lateinit var getTokenUseCase: GetTokenUseCase
     @Inject lateinit var getRefreshUseCase: GetRefreshUseCase
     @Inject lateinit var getUserUseCase: GetUserUseCase
+    @Inject lateinit var setUserStoreUseCase: SetUserStoreUseCase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +47,10 @@ class SplashActivity : AppCompatActivity() {
             val tokens = getTokenUseCase()
             val isLoggedIn = !tokens.first.isNullOrEmpty() && !tokens.second.isNullOrEmpty()
             if (isLoggedIn) {
+                Log.e("SplashActivity > accessToken : ", tokens.first.orEmpty())
+                Log.e("SplashActivity > refreshToken : ", tokens.second.orEmpty())
                 val userDetail = getUserUseCase("Bearer ${tokens.second.orEmpty()}").getOrThrow()
+                setUserStoreUseCase(userDetail)
                 if(userDetail?.hospitalAuth == null || userDetail.empNo == null) {
                     startActivity(
                         Intent(

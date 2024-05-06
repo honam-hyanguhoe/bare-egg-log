@@ -8,7 +8,7 @@ import com.org.egglog.presentation.domain.auth.screen.AddInfoScreen
 import com.org.egglog.presentation.domain.auth.screen.AgreeScreen
 
 @Composable
-fun LoginNavigationHost() {
+fun PlusLoginNavigationHost() {
     val navController  = rememberNavController()
 
     NavHost(
