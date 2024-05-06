@@ -12,9 +12,9 @@ import lombok.*;
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class BoardUpdateForm {
 
-    private String boardContent;
+    private String boardTitle;
 
-    private String boardSubject;
+    private String boardContent;
 
     private String pictureOne;
 
