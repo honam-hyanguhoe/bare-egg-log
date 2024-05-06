@@ -9,9 +9,12 @@ pipeline {
         stage('Move .env File') {
             steps {
                 script{
+                    sh "cp ../environments/back/.env api/.env"
                     sh "mkdir -p api/src/main/resources"
                     // find 명령어를 사용하여 .yml 파일을  찾고, 각 파일에 대해 cp 명령어를 실행
                     sh "cp ../environments/back/egg-log-service.yml api/src/main/resources/application.yml"
+                    sh "cp ../environments/back/eggLogPrivateKey.jks api/src/main/resources/eggLogPrivateKey.jks"
+                    sh "cp ../environments/back/firebaseSocon.pem api/src/main/resources/firebaseSocon.pem"
                     sh "cp ../environments/gradle.properties api/gradle.properties"
                 }
             }

@@ -166,7 +166,7 @@ public class CalendarService {
                 () -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP)
         );
 
-        List<Work> workList = workQueryRepositoryImpl.findWorkListWithWorkTypeByTime(calendarMonthRequest.getCalendarGroupId(), startDate.toLocalDate(), endDate.toLocalDate());
+        List<Work> workList = workQueryRepositoryImpl.findWorkListWithAllByTime(calendarMonthRequest.getCalendarGroupId(), startDate.toLocalDate(), endDate.toLocalDate());
         Optional<List<Event>> eventsByMonthAndUserId = eventRepository.findEventsByMonthAndUserId(startDate, endDate, userId, calendarGroupId);
 
         List<WorkResponse> workResponseList = new ArrayList<>();

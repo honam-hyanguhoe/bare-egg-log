@@ -22,6 +22,7 @@ import com.org.egglog.presentation.utils.widthPercent
 fun MultiInput(
     text: String,
     placeholder: String,
+    height : Int = 300,
     onValueChange: (String) -> Unit,
     focusManager: FocusManager,
     keyboardOptions: KeyboardOptions = KeyboardOptions()
@@ -30,7 +31,7 @@ fun MultiInput(
     OutlinedTextField(
         modifier = Modifier
             .width(320.widthPercent(context).dp)
-            .height(300.heightPercent(context).dp),
+            .height(height.heightPercent(context).dp),
         shape = RoundedCornerShape(8.widthPercent(context).dp),
         colors = TextFieldDefaults.colors(
             unfocusedPlaceholderColor = Gray300,

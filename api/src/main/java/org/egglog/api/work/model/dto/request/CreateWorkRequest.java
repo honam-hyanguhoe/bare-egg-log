@@ -1,5 +1,7 @@
 package org.egglog.api.work.model.dto.request;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 import net.fortuna.ical4j.util.RandomUidGenerator;
 import net.fortuna.ical4j.util.UidGenerator;
@@ -24,6 +26,7 @@ import java.util.Map;
  * |DATE|AUTHOR|NOTE|
  * |:---:|:---:|:---:|
  * |2024-04-29|김형민|최초 생성|
+ * |2024-05-06|김형민|검증 추가|
  */
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,6 +36,9 @@ import java.util.Map;
 public class CreateWorkRequest {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate workDate;
+
+    @NotNull(message = "근무 타입은 필수 입니다..")
+    @Positive(message = "정확한 ID값을 입력 해주세요.")
     private Long workTypeId;
 
     public Work toEntity(User user, Map<Long, WorkType> userWorkTypeMap, CalendarGroup calendarGroup){

@@ -18,7 +18,6 @@ import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.repository.jpa.UserJpaRepository;
-import org.egglog.api.user.repository.jpa.UserQueryRepository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -113,7 +112,7 @@ public class CommentService {
      * @param commentForm
      * @param userId
      */
-    public void registComment(CommentForm commentForm, Long userId) {
+    public void registerComment(CommentForm commentForm, Long userId) {
         User user = userJpaRepository.findById(userId).orElseThrow(
                 () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
         );

@@ -1,5 +1,6 @@
 package org.egglog.api.user.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -58,7 +59,7 @@ public class UserController {
     @PatchMapping("/join")
     public ResponseEntity<MessageUtils> joinUser(
             @AuthenticationPrincipal User loginUser,
-            @RequestBody JoinUserRequest request
+            @RequestBody @Valid JoinUserRequest request
             ){
         return ResponseEntity.ok().body(
                 MessageUtils.success(userService.joinUser(loginUser, request)));
@@ -74,7 +75,7 @@ public class UserController {
     @PatchMapping("/fcm-modify")
     public ResponseEntity<MessageUtils> modifyUserFcm(
             @AuthenticationPrincipal User loginUser,
-            @RequestBody UpdateFcmRequest request
+            @RequestBody @Valid UpdateFcmRequest request
     ){
         return ResponseEntity.ok().body(
                 MessageUtils.success(userService.updateFcmUser(loginUser, request)));
@@ -90,7 +91,7 @@ public class UserController {
     @PatchMapping("/info-modify")
     public ResponseEntity<MessageUtils> modifyUserInfo(
             @AuthenticationPrincipal User loginUser,
-            @RequestBody UpdateUserRequest request
+            @RequestBody @Valid UpdateUserRequest request
             ){
         return ResponseEntity.ok().body(
                 MessageUtils.success(userService.updateUserInfo(loginUser, request)));
@@ -106,7 +107,7 @@ public class UserController {
     @PatchMapping("/hospital/info-modify")
     public ResponseEntity<MessageUtils> modifyHospitalUserInfo(
             @AuthenticationPrincipal User loginUser,
-            @RequestBody UpdateUserHospitalRequest request
+            @RequestBody @Valid UpdateUserHospitalRequest request
     ){
         return ResponseEntity.ok().body(
                 MessageUtils.success(userService.updateUserHospital(loginUser, request)));

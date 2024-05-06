@@ -46,8 +46,6 @@ dependencies {
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
-    implementation(project(":domain"))
-
     // serialization
     implementation(libs.kotlinx.serialization.json)
 
@@ -69,9 +67,25 @@ dependencies {
     // paging3
     implementation(libs.paging.runtime)
 
+    // kakao
+    implementation(libs.kakao.user)
+    implementation(libs.kakao.share)
+    implementation(libs.kakao.auth)
+
+    // google
+    implementation(libs.firebase.auth)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.play.services.auth)
+    implementation("com.google.firebase:firebase-storage-ktx")
+
+    // naver
+    implementation(libs.naver.oauth)
+
     // room
     implementation(libs.room.runtime)
     implementation(libs.room.paging)
     kapt(libs.room.compiler)
 
+    implementation(project(":presentation"))
+    implementation(project(":domain"))
 }

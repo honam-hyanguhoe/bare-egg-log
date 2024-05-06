@@ -11,8 +11,6 @@ import lombok.Data;
 
 @Data
 @Builder
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-
 public class GroupMemberDto {
     private Long userId;
     private Long groupId;

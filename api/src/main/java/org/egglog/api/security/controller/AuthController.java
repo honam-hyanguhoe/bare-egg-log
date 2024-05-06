@@ -1,9 +1,12 @@
 package org.egglog.api.security.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.egglog.api.security.model.dto.request.LoginRequest;
 import org.egglog.api.security.model.service.AuthService;
 import org.egglog.api.user.model.entity.User;
+import org.egglog.api.user.model.entity.enums.AuthProvider;
 import org.egglog.utility.utils.MessageUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,6 +31,16 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+
+    @PostMapping("/login/{provider}")
+    public ResponseEntity<MessageUtils> login(
+            @RequestBody @Valid LoginRequest request,
+            @PathVariable(name = "provider") AuthProvider authProvider
+            ){
+        return ResponseEntity.ok()
+                .body(MessageUtils.success(authService.login(request, authProvider)));
+    }
+
 
     /**
      * 근무 일정 생성

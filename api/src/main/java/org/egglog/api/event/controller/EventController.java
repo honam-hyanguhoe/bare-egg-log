@@ -2,6 +2,7 @@ package org.egglog.api.event.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.egglog.api.event.model.dto.params.EventForm;
+import org.egglog.api.event.model.dto.params.EventPeriodRequest;
 import org.egglog.api.event.model.dto.params.EventUpdateForm;
 import org.egglog.api.event.model.service.EventService;
 import org.egglog.api.user.model.entity.User;
@@ -44,13 +45,25 @@ public class EventController {
     }
 
     /**
-     * 일정 목록 조회
+     * 사용자의 모든 일정 목록 조회
      * @param user
      * @return
      */
     @GetMapping("")
     public ResponseEntity<?> getEventList(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(MessageUtils.success(eventService.getEventList(user.getId())));
+    }
+//    getCalendarListByMonth
+
+    /**
+     * 캘린더그룹의 기간 내 개인 일정 조회
+     * @param eventPeriodRequest
+     * @param user
+     * @return
+     */
+    @GetMapping("/month")
+    public ResponseEntity<?> getEventListByPeriod(@ModelAttribute EventPeriodRequest eventPeriodRequest, @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(MessageUtils.success(eventService.getEventListByPeriod(eventPeriodRequest, user)));
     }
 
     /**

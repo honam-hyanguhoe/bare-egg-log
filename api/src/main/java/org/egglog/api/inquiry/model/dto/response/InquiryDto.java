@@ -6,7 +6,6 @@ import org.egglog.api.inquiry.model.entity.InquiryType;
 
 @Data
 @Builder
-//@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class InquiryDto {
     private Long id;
     private String title;

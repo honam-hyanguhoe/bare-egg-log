@@ -5,7 +5,6 @@
 //import lombok.Data;
 //
 //@Data
-//@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 //public class FcmMessage {
 //    private String title;
 //    private String body;

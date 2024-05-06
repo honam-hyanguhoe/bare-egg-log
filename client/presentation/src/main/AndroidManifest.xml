@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.org.egglog.presentation">
     <application>
         <activity
             android:name="com.org.egglog.presentation.domain.auth.activity.SplashActivity"
@@ -9,7 +10,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.org.egglog.presentation.domain.auth.activity.MainActivity" />
+        <activity
+            android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+            android:launchMode="singleTask"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="oauth"
+                    android:scheme="@string/kakao_redirection_scheme" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.org.egglog.presentation.domain.main.activity.MainActivity" />
         <activity android:name="com.org.egglog.presentation.domain.auth.activity.LoginActivity" />
+        <activity android:name="com.org.egglog.presentation.domain.community.posteditor.activity.PostEditorActivity" />
+        <activity android:name="com.org.egglog.presentation.domain.auth.activity.PlusLoginActivity" />
     </application>
 </manifest>
