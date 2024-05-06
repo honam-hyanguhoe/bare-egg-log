@@ -44,3 +44,4 @@ gradle.properties
 *.jks
 *.cer
 *.pem
+.DS_Store

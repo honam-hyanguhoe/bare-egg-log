@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  parser:
+    container_name: parser
+    image: 54.180.55.106:5000/parser
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "80:80"
+    networks:
+      - config_socon-net
+    command:
+      - uvicorn app.main:app --host 0.0.0.0 --port 80
+
+networks:
+  config_socon-net:
+    external: true
