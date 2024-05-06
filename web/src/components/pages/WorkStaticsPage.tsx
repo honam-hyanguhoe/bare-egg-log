@@ -116,7 +116,7 @@ const WorkStaticsPage = () => {
 
   return (
     <>
-      <div>[에그로그] 근무통계그래프 넣어볼게!</div>
+      <div>내 근무 통계</div>
       <WorkStaticsGraph data={data} />
     </>
   );
