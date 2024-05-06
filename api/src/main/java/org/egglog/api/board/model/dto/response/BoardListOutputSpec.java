@@ -38,4 +38,6 @@ public class BoardListOutputSpec {
     
     private Boolean isHospitalAuth;     // 인증 여부
 
+    private Long userId;            // 유저 id
+
 }
