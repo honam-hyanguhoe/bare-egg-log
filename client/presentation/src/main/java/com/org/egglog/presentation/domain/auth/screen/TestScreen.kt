@@ -12,7 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import com.org.egglog.presentation.component.atoms.dialogs.WebViewDialog
+import com.org.egglog.presentation.component.organisms.dialogs.WebViewDialog
 import com.org.egglog.presentation.theme.NaturalWhite
 
 @Composable

@@ -1,4 +1,4 @@
-package com.org.egglog.presentation.component.atoms.dialogs
+package com.org.egglog.presentation.component.organisms.dialogs
 
 import android.content.Context
 import android.util.Log
