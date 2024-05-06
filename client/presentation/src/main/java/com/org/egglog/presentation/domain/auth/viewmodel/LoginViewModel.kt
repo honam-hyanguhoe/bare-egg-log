@@ -14,8 +14,8 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import com.org.egglog.domain.auth.model.UserParam
+import com.org.egglog.domain.auth.usecase.GetLoginUseCase
 import com.org.egglog.domain.auth.usecase.GetUserUseCase
-import com.org.egglog.domain.auth.usecase.LoginUseCase
 import com.org.egglog.domain.auth.usecase.SetTokenUseCase
 import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
 import com.org.egglog.presentation.domain.auth.extend.authenticateAndGetUserProfile
@@ -32,7 +32,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase,
+    private val getLoginUseCase: GetLoginUseCase,
     private val setTokenUseCase: SetTokenUseCase,
     private val getUserUseCase: GetUserUseCase,
     private val setUserStoreUseCase: SetUserStoreUseCase
@@ -52,12 +52,14 @@ class LoginViewModel @Inject constructor(
         try {
             if(UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {
                 val user = UserApiClient.loginWithKakao(context)
-                val tokens = loginUseCase("kakao", UserParam(
+                val tokens = getLoginUseCase("KAKAO", UserParam(
                     name = user.kakaoAccount?.profile?.nickname.orEmpty(),
                     email = user.kakaoAccount?.email.orEmpty(),
                     profileImgUrl = user.kakaoAccount?.profile?.profileImageUrl.orEmpty()
                 )).getOrThrow()
                 if(tokens?.accessToken?.isNotEmpty() == true && tokens.accessToken.isNotEmpty() && tokens.refreshToken.isNotEmpty()) {
+                    Log.e("Kakao > AccessToken : ", tokens.accessToken)
+                    Log.e("Kakao > RefreshToken : ", tokens.refreshToken)
                     setTokenUseCase(
                         accessToken = tokens.accessToken,
                         refreshToken = tokens.refreshToken
@@ -90,12 +92,14 @@ class LoginViewModel @Inject constructor(
 
     fun onNaverClick(context: Context) = intent {
         val user = authenticateAndGetUserProfile(context)
-        val tokens = loginUseCase("naver", UserParam(
+        val tokens = getLoginUseCase("NAVER", UserParam(
             name = user.profile?.name.orEmpty(),
             email = user.profile?.email.orEmpty(),
             profileImgUrl = user.profile?.profileImage.orEmpty()
         )).getOrThrow()
         if(tokens?.accessToken?.isNotEmpty() == true && tokens.accessToken.isNotEmpty() && tokens.refreshToken.isNotEmpty()) {
+            Log.e("Naver > AccessToken : ", tokens.accessToken)
+            Log.e("Naver > RefreshToken : ", tokens.refreshToken)
             setTokenUseCase(
                 accessToken = tokens.accessToken,
                 refreshToken = tokens.refreshToken
@@ -113,12 +117,14 @@ class LoginViewModel @Inject constructor(
     }
 
     fun onGoogleUserReceived(user: FirebaseUser?) = intent {
-        val tokens = loginUseCase("google", UserParam(
+        val tokens = getLoginUseCase("GOOGLE", UserParam(
             name = user?.displayName.orEmpty(),
             email = user?.email.orEmpty(),
             profileImgUrl = user?.photoUrl.toString()
         )).getOrThrow()
         if(tokens?.accessToken?.isNotEmpty() == true && tokens.accessToken.isNotEmpty() && tokens.refreshToken.isNotEmpty()) {
+            Log.e("Google > AccessToken : ", tokens.accessToken)
+            Log.e("Google > RefreshToken : ", tokens.refreshToken)
             setTokenUseCase(
                 accessToken = tokens.accessToken,
                 refreshToken = tokens.refreshToken
