@@ -25,7 +25,6 @@ private val json = Json {
 @InstallIn(SingletonComponent::class)
 class RetrofitModule {
     @Provides
-
     fun provideOkHttpClient(
         refreshTokenInterceptorProvider: Provider<RefreshTokenInterceptor>
     ): OkHttpClient {
@@ -34,11 +33,11 @@ class RetrofitModule {
             .build()
     }
 
-
     @Provides
     fun provideRetrofit(client: OkHttpClient): Retrofit {
+        val jsonConfig = Json { ignoreUnknownKeys = true }
         val converterFactory =
-            json.asConverterFactory("application/json; charset=UTF8".toMediaType())
+            jsonConfig.asConverterFactory("application/json; charset=UTF8".toMediaType())
         return Retrofit.Builder()
             .baseUrl("$HOST/v1/")
             .addConverterFactory(converterFactory)

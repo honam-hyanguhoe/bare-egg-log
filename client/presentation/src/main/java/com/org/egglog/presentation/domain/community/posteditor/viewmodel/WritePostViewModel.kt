@@ -6,20 +6,35 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.org.egglog.domain.community.posteditor.usecase.WritePostUseCase
+import com.org.egglog.presentation.domain.auth.viewmodel.LoginSideEffect
+import com.org.egglog.presentation.domain.auth.viewmodel.LoginState
 import com.org.egglog.presentation.utils.bitmapToByteArray
 import com.org.egglog.presentation.utils.resizeImage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
+import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
+import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
+import kotlin.math.log
 
 @HiltViewModel
 class WritePostViewModel @Inject constructor(
-    private val writePostUseCase: WritePostUseCase
-) : ViewModel(), ContainerHost<PostState, Nothing> {
-    override val container = container<PostState, Nothing>(PostState())
+    private val writePostUseCase: WritePostUseCase,
+) : ViewModel(), ContainerHost<PostState, PostSideEffect> {
+    override val container: Container<PostState, PostSideEffect> = container(
+        initialState = PostState(),
+        buildSettings = {
+            this.exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+                intent {
+                    postSideEffect(PostSideEffect.Toast(message = throwable.message.orEmpty()))
+                }
+            }
+        }
+    )
 
     fun onTitleChange(title: String) = intent {
         reduce {
@@ -39,14 +54,20 @@ class WritePostViewModel @Inject constructor(
         val postResult = writePostUseCase(
             boardTitle = state.title,
             boardContent = state.content,
-            uploadImages = state.uploadImages.map{
-                    bitmap ->  bitmapToByteArray(bitmap)
+            uploadImages = state.uploadImages.map { bitmap ->
+                bitmapToByteArray(bitmap)
             }
         )
+
+        Log.d("커뮤니티", "결과 $postResult")
+
         postResult.onSuccess {
             reduce { state.copy(isLoading = false) }  // 로딩 종료
+            postSideEffect(PostSideEffect.NavigateToMainScreen)
+            postSideEffect(PostSideEffect.Toast("작성 완료되었습니다."))
         }.onFailure {
             reduce { state.copy(isLoading = false) }  // 오류 발생 시 로딩 종료
+            postSideEffect(PostSideEffect.NavigateToMainScreen)
         }
     }
 
@@ -66,13 +87,14 @@ class WritePostViewModel @Inject constructor(
 }
 
 data class PostState(
-    val title : String = "",
-    val content :  String = "",
+    val title: String = "",
+    val content: String = "",
     val uploadImages: List<Bitmap> = listOf(),
     val isLoading: Boolean = false,
 )
 
 
 sealed class PostSideEffect {
-    object NavigateToNextScreen : PostSideEffect()
+    class Toast(val message: String) : PostSideEffect()
+    object NavigateToMainScreen : PostSideEffect() // 임시로 메인 화면으로 이동
 }
