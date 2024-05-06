@@ -2,7 +2,7 @@ package com.org.egglog.data.community.model
 
 import com.org.egglog.data.auth.model.RefreshResponse
 import com.org.egglog.domain.auth.model.Refresh
-import com.org.egglog.domain.community.model.HotPostData
+import com.org.egglog.domain.community.model.PostData
 import kotlinx.serialization.Serializable
 
 
@@ -24,8 +24,8 @@ data class HotPostResponse (
     val hospitalName: String,
 )
 
-fun HotPostResponse.toDomainModel(): HotPostData {
-    return HotPostData(
+fun HotPostResponse.toDomainModel(): PostData {
+    return PostData(
         boardId = this.boardId,
         boardTitle = this.boardTitle,
         boardContent = this.boardContent,

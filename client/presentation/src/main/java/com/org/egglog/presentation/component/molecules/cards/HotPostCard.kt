@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.org.egglog.client.data.PostInfo
 import com.org.egglog.client.data.PostReactionInfo
 import com.org.egglog.presentation.utils.CommentBorder
 import com.org.egglog.presentation.utils.Favorite
@@ -23,12 +24,11 @@ import com.org.egglog.presentation.utils.widthPercent
 import com.org.egglog.presentation.component.atoms.cards.BackgroundCard
 import com.org.egglog.presentation.component.atoms.icons.Icon
 import com.org.egglog.presentation.component.molecules.postReaction.PostReaction
+import com.org.egglog.presentation.data.HotPostInfo
 import com.org.egglog.presentation.theme.*
 
-class PostInfo(val postId: Long, val title: String,val name: String, val likeCnt: Long, val commentCnt: Long, val isLiked: Boolean)
-
 @Composable
-fun HotPostCard(postInfo: PostInfo, onClickPost: () -> Unit) {
+fun HotPostCard(postInfo: HotPostInfo, onClickPost: () -> Unit) {
     val context = LocalContext.current
 
     BackgroundCard(margin = 4.widthPercent(context).dp, padding = 16.widthPercent(context).dp, color = Gray100, borderRadius = 10.widthPercent(context).dp, onClickCard = onClickPost) {

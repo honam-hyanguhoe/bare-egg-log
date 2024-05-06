@@ -40,9 +40,9 @@ import com.org.egglog.presentation.component.atoms.buttons.FloatingButton
 import com.org.egglog.presentation.component.atoms.cards.BackgroundCard
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.presentation.component.molecules.cards.HotPostCard
-import com.org.egglog.presentation.component.molecules.cards.PostInfo
 import com.org.egglog.presentation.component.molecules.headers.NoticeHeader
 import com.org.egglog.presentation.component.organisms.postCard.PostCard
+import com.org.egglog.presentation.data.HotPostInfo
 import com.org.egglog.presentation.data.PreviewPostInfo
 import com.org.egglog.presentation.domain.community.posteditor.activity.PostEditorActivity
 import com.org.egglog.presentation.domain.community.viewmodel.PostListSideEffect
@@ -78,8 +78,8 @@ fun PostListScreen(
             PreviewPostInfo(32, "test1", "test1", "2024-01-02 17:39:38", "익명의 구운란", 1, 5, 0, "https://picsum.photos/300", false, true, true, 2, "조선대병원")
         ),
         hotPostList = listOf(
-            PostInfo(1, "부서 골라주세요", "익명의 구운란", 100, 12, true),
-            PostInfo(2, "부서 골라주세요", "익명의 구운란", 100, 12, true)
+            HotPostInfo(1, "부서 골라주세요", "익명의 구운란", 100, 12, true),
+            HotPostInfo(2, "부서 골라주세요", "익명의 구운란", 100, 12, true)
         ),
         onClickPost = onNavigateToDetailScreen,
         onClickWriteButton = viewModel::onClickWriteButton
@@ -89,7 +89,7 @@ fun PostListScreen(
 @Composable
 private fun PostListScreen(
     postList: List<PreviewPostInfo>,
-    hotPostList: List<PostInfo>,
+    hotPostList: List<HotPostInfo>,
     onClickPost: () -> Unit,
     onClickWriteButton: () -> Unit
 ) {
