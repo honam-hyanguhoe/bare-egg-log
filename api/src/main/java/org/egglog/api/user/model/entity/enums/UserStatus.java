@@ -1,8 +1,8 @@
 package org.egglog.api.user.model.entity.enums;
 
-import org.egglog.api.global.util.converter.EnumToUpperCase;
+import org.egglog.api.global.util.converter.NormalizeEnumCase;
 
-@EnumToUpperCase
+@NormalizeEnumCase
 public enum UserStatus {
     ACTIVE, INACTIVE, DELETED
 }

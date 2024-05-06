@@ -51,9 +51,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class BoardService {
 
-    //사용자
-    private final UserJpaRepository userJpaRepository;
-
     //게시판
     private final BoardRepository boardRepository;
 
@@ -120,9 +117,15 @@ public class BoardService {
                         .likeCount(likeCnt)
                         .isLiked(isUserLiked)  //좋아요 여부
                         .isCommented(isCommented)   //댓글 유무
+                        .userId(board.getUser().getId())    //작성자
+                        .hospitalName(user.getSelectedHospital().getHospitalName()) //병원명
                         .build();
 
-                //병원 인증배지가 있다면
+                //병원 인증배지가 없다면
+                if (hospitalAuth.isEmpty()) {
+                    boardListOutputSpec.setIsHospitalAuth(false);
+                }
+                //있다면
                 hospitalAuth.ifPresent(auth -> boardListOutputSpec.setIsHospitalAuth(auth.getAuth()));
 
                 boardListOutputSpecList.add(boardListOutputSpec);
@@ -191,9 +194,15 @@ public class BoardService {
                             .likeCount(likeCnt)
                             .isLiked(isUserLiked)
                             .isCommented(isCommented)
+                            .userId(board.getUser().getId())
+                            .hospitalName(user.getSelectedHospital().getHospitalName())
                             .build();
 
-                    //병원 인증배지가 있다면
+                    //병원 인증배지가 없다면
+                    if (hospitalAuth.isEmpty()) {
+                        boardListOutputSpec.setIsHospitalAuth(false);
+                    }
+                    //있다면
                     hospitalAuth.ifPresent(auth -> boardListOutputSpec.setIsHospitalAuth(auth.getAuth()));
 
                     boardListOutputSpecList.add(boardListOutputSpec);
@@ -345,14 +354,13 @@ public class BoardService {
             }
             boardOutputSpec = BoardModifyOutputSpec.builder()
                     .boardId(boardId)
-                    .boardTitle(boardUpdateForm.getBoardContent())
+                    .boardTitle(boardUpdateForm.getBoardTitle())
                     .boardContent(boardUpdateForm.getBoardContent())
                     .pictureOne(boardUpdateForm.getPictureOne())
                     .pictureTwo(boardUpdateForm.getPictureTwo())
                     .pictureThree(boardUpdateForm.getPictureThree())
                     .pictureFour(boardUpdateForm.getPictureFour())
                     .boardCreatedAt(board.getCreatedAt())
-                    .groupId(board.getGroup().getId())
                     .userId(user.getId())
                     .tempNickname(board.getTempNickname())
                     .profileImgUrl(user.getProfileImgUrl())
@@ -363,8 +371,18 @@ public class BoardService {
                     .isCommented(isCommented)
                     .build();
 
+            //병원 인증배지가 없다면
+            if (hospitalAuth.isEmpty()) {
+                boardOutputSpec.setIsHospitalAuth(false);
+            }
             if (hospitalAuth.isPresent()) {
                 boardOutputSpec.setIsHospitalAuth(hospitalAuth.get().getAuth());
+            }
+            if (board.getGroup() != null) {
+                boardOutputSpec.setGroupId(board.getGroup().getId());
+            }
+            if (board.getHospital() != null) {
+                boardOutputSpec.setHospitalId(board.getHospital().getId());
             }
         } catch (DataAccessException e) {
             throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
@@ -441,6 +459,10 @@ public class BoardService {
                     .comments(commentList)
                     .build();
 
+            //병원 인증배지가 없다면
+            if (hospitalAuth.isEmpty()) {
+                boardOutputSpec.setIsHospitalAuth(false);
+            }
             if (hospitalAuth.isPresent()) {
                 boardOutputSpec.setIsHospitalAuth(hospitalAuth.get().getAuth());
             }

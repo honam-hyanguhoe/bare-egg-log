@@ -58,6 +58,8 @@ class LoginViewModel @Inject constructor(
                     profileImgUrl = user.kakaoAccount?.profile?.profileImageUrl.orEmpty()
                 )).getOrThrow()
                 if(tokens?.accessToken?.isNotEmpty() == true && tokens.accessToken.isNotEmpty() && tokens.refreshToken.isNotEmpty()) {
+                    Log.e("Kakao > AccessToken : ", tokens.accessToken)
+                    Log.e("Kakao > RefreshToken : ", tokens.refreshToken)
                     setTokenUseCase(
                         accessToken = tokens.accessToken,
                         refreshToken = tokens.refreshToken
@@ -96,6 +98,8 @@ class LoginViewModel @Inject constructor(
             profileImgUrl = user.profile?.profileImage.orEmpty()
         )).getOrThrow()
         if(tokens?.accessToken?.isNotEmpty() == true && tokens.accessToken.isNotEmpty() && tokens.refreshToken.isNotEmpty()) {
+            Log.e("Naver > AccessToken : ", tokens.accessToken)
+            Log.e("Naver > RefreshToken : ", tokens.refreshToken)
             setTokenUseCase(
                 accessToken = tokens.accessToken,
                 refreshToken = tokens.refreshToken
@@ -119,6 +123,8 @@ class LoginViewModel @Inject constructor(
             profileImgUrl = user?.photoUrl.toString()
         )).getOrThrow()
         if(tokens?.accessToken?.isNotEmpty() == true && tokens.accessToken.isNotEmpty() && tokens.refreshToken.isNotEmpty()) {
+            Log.e("Google > AccessToken : ", tokens.accessToken)
+            Log.e("Google > RefreshToken : ", tokens.refreshToken)
             setTokenUseCase(
                 accessToken = tokens.accessToken,
                 refreshToken = tokens.refreshToken

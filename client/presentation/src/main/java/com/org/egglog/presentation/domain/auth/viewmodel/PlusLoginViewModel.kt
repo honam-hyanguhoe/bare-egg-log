@@ -4,9 +4,8 @@ import androidx.lifecycle.ViewModel
 import com.org.egglog.domain.auth.model.UserHospital
 import com.org.egglog.domain.auth.usecase.DeleteTokenUseCase
 import com.org.egglog.domain.auth.usecase.DeleteUserStoreUseCase
-import com.org.egglog.domain.auth.usecase.GetTokenUseCase
-import com.org.egglog.domain.auth.usecase.GetUserUseCase
 import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
+import com.org.egglog.domain.auth.usecase.UpdateUserJoinUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
@@ -24,8 +23,8 @@ import javax.inject.Inject
 class PlusLoginViewModel @Inject constructor(
     private val deleteUserStoreUseCase: DeleteUserStoreUseCase,
     private val deleteTokenUseCase: DeleteTokenUseCase,
-    private val getUserUseCase: GetUserUseCase,
-    private val setUserStoreUseCase: SetUserStoreUseCase
+    private val setUserStoreUseCase: SetUserStoreUseCase,
+    private val updateUserJoinUseCase: UpdateUserJoinUseCase
 ): ViewModel(), ContainerHost<PlusLoginState, PlusLoginSideEffect>{
     override val container: Container<PlusLoginState, PlusLoginSideEffect> = container(
         initialState = PlusLoginState(),
@@ -65,10 +64,14 @@ class PlusLoginViewModel @Inject constructor(
         postSideEffect(PlusLoginSideEffect.NavigateToLoginActivity)
     }
 
-    fun goMainActivity() = intent {
-        // 1. user 조회
-        // 2. user 세팅
+    fun onClickJoin() = intent {
+        // TODO
+        // 1. 유저 회원가입
+        // 1-1) 성공 시
+        // 유저 store에 저장 후 메인으로
         postSideEffect(PlusLoginSideEffect.NavigateToMainActivity)
+        // 1-2) 실패 시
+        // Toast 띄우고 그대로 두기
     }
 }
 

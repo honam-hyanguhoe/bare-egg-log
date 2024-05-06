@@ -1,8 +1,8 @@
 package org.egglog.api.inquiry.model.entity;
 
-import org.egglog.api.global.util.converter.EnumToUpperCase;
+import org.egglog.api.global.util.converter.NormalizeEnumCase;
 
-@EnumToUpperCase
+@NormalizeEnumCase
 public enum InquiryType {
     DEFAULT
 }
