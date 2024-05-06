@@ -78,6 +78,10 @@ dependencies {
     implementation(libs.hilt)
     kapt(libs.hilt.compiler)
 
+    // paging3
+    implementation(libs.paging.runtime)
+    implementation(libs.paging.compose)
+
     // navigation
     implementation(libs.navigation.compose)
     implementation(libs.hilt.navigation.compose)

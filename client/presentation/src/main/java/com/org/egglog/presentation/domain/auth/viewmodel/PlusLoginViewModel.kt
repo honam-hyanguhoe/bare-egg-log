@@ -1,13 +1,19 @@
 package com.org.egglog.presentation.domain.auth.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.paging.PagingData
+import com.org.egglog.domain.auth.model.HospitalParam
 import com.org.egglog.domain.auth.model.UserHospital
 import com.org.egglog.domain.auth.usecase.DeleteTokenUseCase
 import com.org.egglog.domain.auth.usecase.DeleteUserStoreUseCase
+import com.org.egglog.domain.auth.usecase.GetAllHospitalUseCase
 import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.UpdateUserJoinUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.annotation.OrbitExperimental
@@ -24,7 +30,8 @@ class PlusLoginViewModel @Inject constructor(
     private val deleteUserStoreUseCase: DeleteUserStoreUseCase,
     private val deleteTokenUseCase: DeleteTokenUseCase,
     private val setUserStoreUseCase: SetUserStoreUseCase,
-    private val updateUserJoinUseCase: UpdateUserJoinUseCase
+    private val updateUserJoinUseCase: UpdateUserJoinUseCase,
+    private val getAllHospitalUseCase: GetAllHospitalUseCase
 ): ViewModel(), ContainerHost<PlusLoginState, PlusLoginSideEffect>{
     override val container: Container<PlusLoginState, PlusLoginSideEffect> = container(
         initialState = PlusLoginState(),
@@ -37,6 +44,19 @@ class PlusLoginViewModel @Inject constructor(
         }
     )
 
+    init {
+        load()
+    }
+
+    private fun load() = intent {
+        val hospitalsFlow = getAllHospitalUseCase(HospitalParam(0, 10, "")).getOrThrow()
+        reduce {
+            state.copy(
+                hospitalsFlow = hospitalsFlow ?: emptyFlow()
+            )
+        }
+    }
+
     @OptIn(OrbitExperimental::class)
     fun onNameChange(name: String) = blockingIntent {
         reduce {
@@ -45,7 +65,14 @@ class PlusLoginViewModel @Inject constructor(
     }
 
     @OptIn(OrbitExperimental::class)
-    fun onHospitalChange(hospital: UserHospital) = blockingIntent {
+    fun onSearchChange(search: String) = blockingIntent {
+        reduce {
+            state.copy(search = search)
+        }
+    }
+
+    @OptIn(OrbitExperimental::class)
+    fun onHospitalSelected(hospital: UserHospital) = blockingIntent {
         reduce {
             state.copy(hospital = hospital)
         }
@@ -73,6 +100,10 @@ class PlusLoginViewModel @Inject constructor(
         // 1-2) 실패 시
         // Toast 띄우고 그대로 두기
     }
+
+    fun onClickDone() = intent {
+        Log.e("done: ", state.search)
+    }
 }
 
 
@@ -80,7 +111,9 @@ class PlusLoginViewModel @Inject constructor(
 data class PlusLoginState(
     val name: String = "",
     val hospital: UserHospital? = null,
-    val empNo: String = ""
+    val search: String = "",
+    val empNo: String = "",
+    val hospitalsFlow: Flow<PagingData<UserHospital>> = emptyFlow()
 )
 
 sealed interface PlusLoginSideEffect {

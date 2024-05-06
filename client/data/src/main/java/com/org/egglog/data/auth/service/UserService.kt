@@ -1,8 +1,10 @@
 package com.org.egglog.data.auth.service
 
 import com.org.egglog.data.auth.model.RefreshResponse
+import com.org.egglog.data.auth.model.UserHospitalResponse
 import com.org.egglog.data.auth.model.UserResponse
 import com.org.egglog.data.retrofit.CommonResponse
+import com.org.egglog.domain.auth.model.UserHospital
 import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -31,4 +33,12 @@ interface UserService {
     suspend fun join(
         @Body requestBody: RequestBody
     ): CommonResponse<UserResponse?>
+
+    @GET("hospital/list")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun getHospitals(
+        @Path("offset") page: Int,
+        @Path("limit") size: Int,
+        @Path("search") search: String
+    ): CommonResponse<List<UserHospitalResponse>>
 }

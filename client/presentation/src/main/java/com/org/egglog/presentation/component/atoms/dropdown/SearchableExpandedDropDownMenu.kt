@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSizeIn
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
@@ -36,9 +38,12 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
+import com.org.egglog.domain.auth.model.UserHospital
 import com.org.egglog.presentation.theme.*
 
 /**
@@ -64,9 +69,9 @@ import com.org.egglog.presentation.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun <T> SearchableExpandedDropDownMenu(
+fun SearchableExpandedDropDownMenu(
     modifier: Modifier = Modifier,
-    listOfItems: List<T>,
+    lazyPagingItems: LazyPagingItems<UserHospital>,
     enable: Boolean = true,
     readOnly: Boolean = true,
     placeholder: @Composable (() -> Unit) = { Text(text = "Select Option") },
@@ -74,34 +79,26 @@ fun <T> SearchableExpandedDropDownMenu(
     closedIcon: ImageVector = Icons.Outlined.KeyboardArrowDown,
     parentTextFieldCornerRadius: Dp = 12.dp,
     colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors(),
-    onDropDownItemSelected: (T) -> Unit = {},
-    dropdownItem: @Composable (T) -> Unit,
+    onDropDownItemSelected: (UserHospital) -> Unit = {},
+    dropdownItem: @Composable (UserHospital) -> Unit,
     isError: Boolean = false,
-    showDefaultSelectedItem: Boolean = false,
-    defaultItemIndex: Int = 0,
-    defaultItem: (T) -> Unit,
-    onSearchTextFieldClicked: () -> Unit
+    onSearchTextFieldClicked: () -> Unit,
+    onSearchChange: (String) -> Unit,
+    onClickDone: () -> Unit,
+    search: String
 ) {
+    val focusManager = LocalFocusManager.current
     var selectedOptionText by rememberSaveable { mutableStateOf("") }
     var searchedOption by rememberSaveable { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
-    var filteredItems = mutableListOf<T>()
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
     val itemHeights = remember { mutableStateMapOf<Int, Int>() }
     val baseHeight = 530.dp
     val density = LocalDensity.current
 
-    if (showDefaultSelectedItem) {
-        selectedOptionText = selectedOptionText.ifEmpty { listOfItems[defaultItemIndex].toString() }
-
-        defaultItem(
-            listOfItems[defaultItemIndex],
-        )
-    }
-
-    val maxHeight = remember(itemHeights.toMap()) {
-        if (itemHeights.keys.toSet() != listOfItems.indices.toSet()) {
+    val maxHeight = remember(itemHeights.toMap(), lazyPagingItems.itemCount) {
+        if (itemHeights.keys.toSet() != (0 until lazyPagingItems.itemCount).toSet()) {
             // if we don't have all heights calculated yet, return default value
             return@remember baseHeight
         }
@@ -182,19 +179,12 @@ fun <T> SearchableExpandedDropDownMenu(
                             .fillMaxWidth()
                             .padding(16.dp)
                             .focusRequester(focusRequester),
-                        value = searchedOption,
-                        onValueChange = { selectedSport ->
-                            searchedOption = selectedSport
-                            filteredItems = listOfItems.filter {
-                                it.toString().contains(
-                                    searchedOption,
-                                    ignoreCase = true,
-                                )
-                            }.toMutableList()
-                        },
+                        value = search,
+                        onValueChange = onSearchChange,
                         leadingIcon = {
                             Icon(imageVector = Icons.Outlined.Search, contentDescription = null)
                         },
+                        singleLine = true,
                         placeholder = {
                             Text(text = "Search", color = Gray300)
                         },
@@ -209,25 +199,32 @@ fun <T> SearchableExpandedDropDownMenu(
                                     }
                                 }
                             },
-                    )
-
-                    val items = if (filteredItems.isEmpty()) {
-                        listOfItems
-                    } else {
-                        filteredItems
-                    }
-
-                    items.forEach { selectedItem ->
-                        DropdownMenuItem(
-                            text = { dropdownItem(selectedItem) },
-                            onClick = {
-                                keyboardController?.hide()
-                                selectedOptionText = selectedItem.toString()
-                                onDropDownItemSelected(selectedItem)
-                                searchedOption = ""
-                                expanded = false
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                focusManager.clearFocus()
+                                onClickDone()
                             }
-                        )
+                        ),
+                    )
+                    LazyColumn {
+                        items(
+                            count = lazyPagingItems.itemCount,
+                            key = { index -> lazyPagingItems[index]?.hospitalId ?: index },
+                        ) {index ->
+                            lazyPagingItems[index]?.run {
+                                val model:UserHospital = this
+                                DropdownMenuItem(
+                                    text = { dropdownItem(model) },
+                                    onClick = {
+                                        keyboardController?.hide()
+                                        selectedOptionText = model.toString()
+                                        onDropDownItemSelected(model)
+                                        searchedOption = ""
+                                        expanded = false
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }
