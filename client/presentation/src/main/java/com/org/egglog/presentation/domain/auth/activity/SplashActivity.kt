@@ -13,7 +13,7 @@ import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.util.Utility
 import com.navercorp.nid.NaverIdLoginSDK
 import com.org.egglog.domain.auth.model.UserFcmTokenParam
-import com.org.egglog.domain.auth.usecase.GetRefreshUseCase
+import com.org.egglog.domain.auth.usecase.PostRefreshUseCase
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.auth.usecase.GetUserUseCase
 import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
@@ -21,19 +21,16 @@ import com.org.egglog.domain.auth.usecase.UpdateUserFcmTokenUseCase
 import com.org.egglog.presentation.domain.auth.screen.SplashScreen
 import com.org.egglog.presentation.theme.ClientTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.org.egglog.presentation.R
-import com.org.egglog.presentation.domain.auth.viewmodel.LoginSideEffect
 import com.org.egglog.presentation.domain.main.activity.MainActivity
 import kotlinx.coroutines.tasks.await
-import org.orbitmvi.orbit.syntax.simple.postSideEffect
 
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
     @Inject lateinit var getTokenUseCase: GetTokenUseCase
-    @Inject lateinit var getRefreshUseCase: GetRefreshUseCase
+    @Inject lateinit var postRefreshUseCase: PostRefreshUseCase
     @Inject lateinit var getUserUseCase: GetUserUseCase
     @Inject lateinit var setUserStoreUseCase: SetUserStoreUseCase
     @Inject lateinit var updateUserFcmTokenUseCase: UpdateUserFcmTokenUseCase
@@ -74,7 +71,7 @@ class SplashActivity : AppCompatActivity() {
                         Log.e("FCM Token", "Error fetching FCM token: ${e.message}", e)
                         ""
                     }
-                    if(userDetail.deviceToken != fcmToken) {
+                    if(userDetail.deviceToken == null || userDetail.deviceToken != fcmToken) {
                         val newUser = updateUserFcmTokenUseCase(UserFcmTokenParam(fcmToken)).getOrThrow()
                         setUserStoreUseCase(newUser)
                     } else setUserStoreUseCase(userDetail)

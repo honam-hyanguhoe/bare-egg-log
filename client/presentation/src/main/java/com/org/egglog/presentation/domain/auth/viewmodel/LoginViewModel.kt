@@ -18,7 +18,7 @@ import com.kakao.sdk.user.UserApiClient
 import com.org.egglog.domain.auth.model.Refresh
 import com.org.egglog.domain.auth.model.UserFcmTokenParam
 import com.org.egglog.domain.auth.model.UserParam
-import com.org.egglog.domain.auth.usecase.GetLoginUseCase
+import com.org.egglog.domain.auth.usecase.PostLoginUseCase
 import com.org.egglog.domain.auth.usecase.GetUserUseCase
 import com.org.egglog.domain.auth.usecase.SetTokenUseCase
 import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
@@ -38,7 +38,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val getLoginUseCase: GetLoginUseCase,
+    private val postLoginUseCase: PostLoginUseCase,
     private val setTokenUseCase: SetTokenUseCase,
     private val getUserUseCase: GetUserUseCase,
     private val setUserStoreUseCase: SetUserStoreUseCase,
@@ -59,7 +59,7 @@ class LoginViewModel @Inject constructor(
         try {
             if(UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {
                 val user = UserApiClient.loginWithKakao(context)
-                val tokens = getLoginUseCase("KAKAO", UserParam(
+                val tokens = postLoginUseCase("KAKAO", UserParam(
                     name = user.kakaoAccount?.profile?.nickname.orEmpty(),
                     email = user.kakaoAccount?.email.orEmpty(),
                     profileImgUrl = user.kakaoAccount?.profile?.profileImageUrl.orEmpty()
@@ -83,7 +83,7 @@ class LoginViewModel @Inject constructor(
 
     fun onNaverClick(context: Context) = intent {
         val user = authenticateAndGetUserProfile(context)
-        val tokens = getLoginUseCase("NAVER", UserParam(
+        val tokens = postLoginUseCase("NAVER", UserParam(
             name = user.profile?.name.orEmpty(),
             email = user.profile?.email.orEmpty(),
             profileImgUrl = user.profile?.profileImage.orEmpty()
@@ -92,7 +92,7 @@ class LoginViewModel @Inject constructor(
     }
 
     fun onGoogleUserReceived(user: FirebaseUser?) = intent {
-        val tokens = getLoginUseCase("GOOGLE", UserParam(
+        val tokens = postLoginUseCase("GOOGLE", UserParam(
             name = user?.displayName.orEmpty(),
             email = user?.email.orEmpty(),
             profileImgUrl = user?.photoUrl.toString()
@@ -128,7 +128,7 @@ class LoginViewModel @Inject constructor(
                     Log.e("FCM Token", "Error fetching FCM token: ${e.message}", e)
                     ""
                 }
-                if(userDetail.deviceToken != fcmToken) {
+                if(userDetail.deviceToken == null || userDetail.deviceToken != fcmToken) {
                     val newUser = updateUserFcmTokenUseCase(UserFcmTokenParam(fcmToken)).getOrThrow()
                     setUserStoreUseCase(newUser)
                 } else setUserStoreUseCase(userDetail)
