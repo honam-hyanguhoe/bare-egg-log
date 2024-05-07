@@ -27,6 +27,7 @@ class RefreshTokenInterceptor @Inject constructor(
                 val newRequest = chain.request().newBuilder()
                     .header("Authorization", "Bearer ${newTokens.accessToken}")
                     .build()
+                response.close()
                 return chain.proceed(newRequest)
             } else {
                 // 로그아웃 시키기
@@ -38,6 +39,7 @@ class RefreshTokenInterceptor @Inject constructor(
                         LoginActivity::class.java
                     )
                 )
+                response.close()
             }
         }
         return response

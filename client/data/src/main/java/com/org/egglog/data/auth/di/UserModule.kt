@@ -2,6 +2,7 @@ package com.org.egglog.data.auth.di
 
 import com.org.egglog.data.auth.usecase.DeleteTokenUseCaseImpl
 import com.org.egglog.data.auth.usecase.DeleteUserStoreUseCaseImpl
+import com.org.egglog.data.auth.usecase.GetAllHospitalUseCaseImpl
 import com.org.egglog.domain.auth.usecase.GetRefreshUseCase
 import com.org.egglog.data.auth.usecase.GetLoginUseCaseImpl
 import com.org.egglog.data.auth.usecase.GetRefreshUseCaseImpl
@@ -15,6 +16,7 @@ import com.org.egglog.data.auth.usecase.SetUserStoreUseCaseImpl
 import com.org.egglog.data.auth.usecase.UpdateUserJoinUseCaseImpl
 import com.org.egglog.domain.auth.usecase.DeleteTokenUseCase
 import com.org.egglog.domain.auth.usecase.DeleteUserStoreUseCase
+import com.org.egglog.domain.auth.usecase.GetAllHospitalUseCase
 import com.org.egglog.domain.auth.usecase.GetLoginUseCase
 import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.GetUserUseCase
@@ -57,4 +59,7 @@ abstract class UserModule {
 
     @Binds
     abstract fun bindDeleteTokenUseCaseImpl(uc: DeleteTokenUseCaseImpl): DeleteTokenUseCase
+
+    @Binds
+    abstract fun bindGetAllHospitalUseCaseImpl(uc: GetAllHospitalUseCaseImpl): GetAllHospitalUseCase
 }
