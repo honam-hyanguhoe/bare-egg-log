@@ -9,9 +9,15 @@ import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.model.entity.enums.AuthProvider;
 import org.egglog.api.user.model.service.UserService;
 import org.egglog.api.user.repository.jpa.UserJpaRepository;
+import org.egglog.api.work.model.dto.request.CreateWorkListRequest;
+import org.egglog.api.work.model.dto.request.CreateWorkRequest;
+import org.egglog.api.work.model.service.WorkService;
+import org.egglog.api.worktype.model.dto.response.WorkTypeResponse;
+import org.egglog.api.worktype.model.service.WorkTypeService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -34,6 +40,8 @@ import java.util.UUID;
 public class TestService {
     private final UserService userService;
     private final UserJpaRepository userJpaRepository;
+    private final WorkService workService;
+    private final WorkTypeService workTypeService;
     public List<User> createUserMockData(){
         List<User> users = userJpaRepository.saveAll(makeUsers());
         Long hospitalId = 1L;
@@ -41,8 +49,9 @@ public class TestService {
         for (User user : users) {
             cnt++;
             if (cnt==10||cnt==20||cnt==30) hospitalId++;
-            log.debug("=====start user Join=====");
+            log.debug("=====start user Join hospitalId : {} =====",hospitalId);
             userService.joinUser(user, JoinUserRequest.builder()
+                    .userName(user.getName())
                     .empNo(UUID.randomUUID().toString())
                     .fcmToken(UUID.randomUUID().toString())
                     .hospitalId(hospitalId).build());
@@ -87,4 +96,40 @@ public class TestService {
         mockUsers.add(User.builder().name("최형우").email("test30@ssafy.com").profileImgUrl("https://cdn2.thecatapi.com/images/bpa.jpg").provider(AuthProvider.EGGLOG).build());
         return mockUsers;
     }
+
+    public void deleteUserMockData(){
+        userJpaRepository.saveAll(userJpaRepository.findListByEggLogWithHospital());
+    }
+
+
+    public void makeWorkList(){
+        List<User> listByEggLogWithHospital = userJpaRepository.findListByEggLogWithHospital();
+        for (User user : listByEggLogWithHospital) {
+            List<WorkTypeResponse> workTypeList = workTypeService.getWorkTypeList(user);
+            workService.createWork(user, CreateWorkListRequest.builder()
+                            .calendarGroupId(user.getWorkGroupId())
+                            .workTypes(makeWorkTypes(workTypeList))
+                            .build());
+        }
+    }
+    private List<CreateWorkRequest> makeWorkTypes(List<WorkTypeResponse> workTypeList) {
+        List<CreateWorkRequest> workRequests = new ArrayList<>();
+        LocalDate startDate = LocalDate.of(2023, 5, 1); // 시작 날짜
+        LocalDate endDate = LocalDate.of(2024, 5, 31); // 끝 날짜
+
+        while (!startDate.isAfter(endDate)) {
+            int randomIndex = (int) (Math.random() * workTypeList.size()); // 랜덤한 워크 타입 선택
+            WorkTypeResponse workType = workTypeList.get(randomIndex);
+
+            workRequests.add(CreateWorkRequest.builder()
+                    .workDate(startDate)
+                    .workTypeId(workType.getWorkTypeId())
+                    .build());
+
+            startDate = startDate.plusDays(1); // 다음 날짜로
+        }
+
+        return workRequests;
+    }
+
 }
