@@ -1,17 +1,24 @@
 package org.egglog.api.calendargroup.repository.jpa;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.calendargroup.model.entity.QCalendarGroup;
+import org.egglog.api.event.model.entity.Event;
+import org.egglog.api.event.model.entity.QEvent;
 import org.egglog.api.user.model.entity.QUser;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.egglog.api.calendargroup.model.entity.QCalendarGroup.calendarGroup;
 import static org.egglog.api.user.model.entity.QUser.user;
+import static org.egglog.api.event.model.entity.QEvent.event;
 @Repository
 @RequiredArgsConstructor
 public class CalendarGroupCustomQueryImpl implements CalendarGroupCustomQuery {
@@ -53,13 +60,21 @@ public class CalendarGroupCustomQueryImpl implements CalendarGroupCustomQuery {
      * @return 해당 사용자의 URL이 설정된 CalendarGroup 리스트
      * @Creator 김형민
      */
-    public List<CalendarGroup> findUrlNotNullListByUserId(Long userId) {
-        return jpaQueryFactory
-                .selectFrom(calendarGroup)
-                .where(calendarGroup.user.id.eq(userId),
-                        calendarGroup.url.isNotNull(),
-                        calendarGroup.url.isNotEmpty())
+    public Map<CalendarGroup, Set<String>> findCalendarGroupsWithEventUuids(Long userId) {
+        List<Tuple> results = jpaQueryFactory
+                .select(calendarGroup, event.uuid)
+                .from(event)
+                .join(event.calendarGroup, calendarGroup)
+                .where(calendarGroup.user.id.eq(userId)
+                        .and(calendarGroup.url.isNotNull())
+                        .and(calendarGroup.url.isNotEmpty()))
                 .fetch();
+
+        return results.stream()
+                .collect(Collectors.groupingBy(
+                        tuple -> tuple.get(calendarGroup),
+                        Collectors.mapping(tuple -> tuple.get(event.uuid), Collectors.toSet())
+                ));
     }
 
 }
