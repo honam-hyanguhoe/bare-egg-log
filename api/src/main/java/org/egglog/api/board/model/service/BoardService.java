@@ -14,6 +14,7 @@ import org.egglog.api.board.repository.jpa.boardLike.BoardLikeRepository;
 import org.egglog.api.board.repository.jpa.comment.CommentRepository;
 import org.egglog.api.group.exception.GroupErrorCode;
 import org.egglog.api.group.exception.GroupException;
+import org.egglog.api.group.model.dto.response.GroupPreviewDto;
 import org.egglog.api.group.model.entity.Group;
 import org.egglog.api.group.repository.jpa.GroupRepository;
 import org.egglog.api.hospital.model.entity.HospitalAuth;
@@ -557,5 +558,27 @@ public class BoardService {
     private boolean isNotLiked(Long userId, Long boardId) {
         Optional<BoardLike> userBoardLike = boardRepository.getUserBoardLike(boardId, userId);
         return userBoardLike.isEmpty();
+    }
+
+    /**
+     * 사용자의 병원 아이디, 병원 이름, 그룹 아이디, 그룹 이름
+     *
+     * @param user
+     * @return
+     */
+    public BoardTypeListOutputSpec getBoardTypeListByUser(User user) {
+        //사용자가 선택한 병원
+        Hospital selectedHospital = user.getSelectedHospital();
+        BoardTypeListOutputSpec boardTypeListOutputSpec = BoardTypeListOutputSpec.builder()
+                .hospitalId(selectedHospital.getId())
+                .hospitalName(selectedHospital.getHospitalName())
+                .build();
+
+        //사용자의 그룹리스트
+        Optional<List<GroupPreviewDto>> groupByUserId = groupRepository.findGroupByUserId(user.getId());
+        if (groupByUserId.isPresent()) {
+            boardTypeListOutputSpec.setGroupList(groupByUserId.get());
+        }
+        return boardTypeListOutputSpec;
     }
 }
