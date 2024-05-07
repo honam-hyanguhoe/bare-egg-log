@@ -1,5 +1,6 @@
 package com.org.egglog.data.community.usecase
 
+import android.util.Log
 import androidx.paging.PagingData
 import com.org.egglog.data.community.model.toDomainModel
 import com.org.egglog.data.community.service.CommunityService
@@ -12,7 +13,9 @@ class GetHotPostListUseCaseImpl @Inject constructor(
    private val communityService: CommunityService
 ): GetHotPostListUseCase {
 
-    override suspend fun invoke(accessToken: String): Result<List<PostData>> = kotlin.runCatching {
-        communityService.getHotPostList(accessToken).dataBody.map {it.toDomainModel()}
+    override suspend fun invoke(accessToken: String): Result<List<PostData?>> = kotlin.runCatching {
+        Log.e("GetHotPostListUseCaseImpl", "${communityService.getHotPostList(accessToken).dataBody}")
+        Log.e("GetHotPostListUseCaseImpl", "${communityService.getHotPostList(accessToken).dataBody!!.map {it?.toDomainModel()}}")
+        communityService.getHotPostList(accessToken).dataBody!!.map {it?.toDomainModel()}
     }
 }

@@ -1,6 +1,7 @@
 package com.org.egglog.domain.community.model
 
-data class PostData(
+
+data class PostData constructor(
     val boardId: Long,
     val boardTitle: String,
     val boardContent: String,

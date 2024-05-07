@@ -26,7 +26,11 @@ fun CommunityNavigationHost() {
         }
 
         composable(route = CommunityRoute.PostDetailScreen.name) {
-            PostDetailScreen()
+            PostDetailScreen(onNavigateToPostListScreen = {
+                navController.navigate(
+                    route = CommunityRoute.PostListScreen.name
+                )
+            })
         }
     }
 }

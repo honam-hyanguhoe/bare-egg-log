@@ -64,7 +64,6 @@ fun PostListScreen(
     viewModel: PostListViewModel = hiltViewModel(),
     onNavigateToDetailScreen: () -> Unit
 ) {
-    Log.e("PostListScreen", "${onNavigateToDetailScreen}")
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
     viewModel.collectSideEffect { sideEffect -> when(sideEffect) {
@@ -77,10 +76,7 @@ fun PostListScreen(
             PreviewPostInfo(31, "test1", "test1", "2024-01-02 17:39:38", "익명의 구운란", 1, 5, 0, "https://picsum.photos/300", false, true, true, 1, "전남대병원"),
             PreviewPostInfo(32, "test1", "test1", "2024-01-02 17:39:38", "익명의 구운란", 1, 5, 0, "https://picsum.photos/300", false, true, true, 2, "조선대병원")
         ),
-        hotPostList = listOf(
-            HotPostInfo(1, "부서 골라주세요", "익명의 구운란", 100, 12, true),
-            HotPostInfo(2, "부서 골라주세요", "익명의 구운란", 100, 12, true)
-        ),
+        hotPostList = state.hotPostList,
         onClickPost = onNavigateToDetailScreen,
         onClickWriteButton = viewModel::onClickWriteButton
     )
@@ -151,11 +147,17 @@ private fun PostListScreen(
                 }
             }
 
-            items(
-                count = hotPostList.size,
-                key = {index -> hotPostList[index].postId}
-            ) {index ->
-                HotPostCard(postInfo = hotPostList[index], onClickPost = onClickPost)
+            if(hotPostList.isNotEmpty()) {
+                items(
+                    count = hotPostList.size,
+                    key = { index -> hotPostList[index].postId }
+                ) { index ->
+                    HotPostCard(postInfo = hotPostList[index], onClickPost = onClickPost)
+                }
+            } else {
+                item {
+                    Text(text = "아직 급상승 게시글이 없어요", Modifier.padding())
+                }
             }
 
             item {

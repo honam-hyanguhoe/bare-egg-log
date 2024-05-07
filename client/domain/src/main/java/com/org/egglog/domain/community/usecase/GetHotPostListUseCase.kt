@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface GetHotPostListUseCase {
 
-    suspend operator fun invoke(accessToken: String): Result<List<PostData>>
+    suspend operator fun invoke(accessToken: String): Result<List<PostData?>>
 }
