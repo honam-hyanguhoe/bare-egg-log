@@ -42,12 +42,24 @@ public class AuthController {
     }
 
 
+    /**
+     * 근무 일정 생성
+     * @param loginUser 로그인한 유저(JWT 토큰)
+     * @return 생성된 근무 일정 객체 응답 리스트
+     * @author 김형민
+     */
     @PostMapping("/logout")
-    public ResponseEntity<MessageUtils> logout(@AuthenticationPrincipal User user){
-        authService.logout(user);
+    public ResponseEntity<MessageUtils> logout(@AuthenticationPrincipal User loginUser){
+        authService.logout(loginUser);
         return ResponseEntity.ok().body(MessageUtils.success());
     }
 
+    /**
+     * 근무 일정 생성
+     * @param refreshToken 헤더에 리프레쉬 토큰
+     * @return 새 리프레쉬 토큰
+     * @author 김형민
+     */
     @PostMapping("/refresh")
     public ResponseEntity<MessageUtils> refresh(@RequestHeader String refreshToken){
         return ResponseEntity.ok().body(MessageUtils.success(authService.refresh(refreshToken)));

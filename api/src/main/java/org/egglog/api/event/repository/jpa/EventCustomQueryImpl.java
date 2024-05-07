@@ -68,5 +68,12 @@ public class EventCustomQueryImpl implements EventCustomQuery {
                 .fetch();
     }
 
+    @Override
+    public long deleteAllByCalendarGroupId(Long calendarGroupId) {
+        return jpaQueryFactory
+                .delete(event)
+                .where(event.calendarGroup.id.eq(calendarGroupId))
+                .execute();
+    }
 
 }
