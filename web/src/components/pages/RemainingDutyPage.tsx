@@ -10,16 +10,6 @@ interface TreeNode {
   color?: string;
 }
 
-<<<<<<< Updated upstream
-// const remainingDuty = [
-//   { name: "Day", value: 0, color: "#18C5B5" },
-//   { name: "Eve", value: 0, color: "#F4D567" },
-//   { name: "Night", value: 0, color: "#485E88" },
-//   { name: "Off", value: 0, color: "#9B8AFB" },
-//   { name: "Vacation", value: 0, color: "#FDA29B" },
-//   { name: "Edu", value: 0, color: "#98A2B3" },
-// ];
-=======
 const remainingDuty = [
   { name: "Day", value: 0, color: "#18C5B5" },
   { name: "Eve", value: 0, color: "#F4D567" },
@@ -28,7 +18,6 @@ const remainingDuty = [
   { name: "Vacation", value: 0, color: "#FDA29B" },
   { name: "Edu", value: 0, color: "#98A2B3" },
 ];
->>>>>>> Stashed changes
 
 const RemainingDutyPage = () => {
   const initialData: TreeNode = {

@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.org.egglog.data.community.posteditor.model.WritePostParam
 import com.org.egglog.data.community.posteditor.service.PostEditorService
+import com.org.egglog.data.datastore.UserDataStore
 import com.org.egglog.domain.community.posteditor.usecase.ImageUploadUseCase
 import com.org.egglog.domain.community.posteditor.usecase.WritePostUseCase
 import javax.inject.Inject
@@ -11,7 +12,7 @@ import javax.inject.Inject
 class WritePostUserCaseImpl @Inject constructor(
     private val context: Context,
     private val postingService: PostEditorService,
-    private val imageUploadUseCase: ImageUploadUseCase
+    private val imageUploadUseCase: ImageUploadUseCase,
 ) : WritePostUseCase {
 
     override suspend fun invoke(
@@ -32,16 +33,17 @@ class WritePostUserCaseImpl @Inject constructor(
             pictureThree = urls?.getOrNull(2) ?: "",
             pictureFour = urls?.getOrNull(3) ?: ""
         )
-        Log.d("커뮤니티", "${requestParam.toString()}")
+
+        Log.d("커뮤니티", requestParam.toString())
 
         val requestBody = requestParam.toRequestBody()
-        val response = postingService.writePost(requestBody)
 
-        if (response.dataHeader.resultCode.equals(200)) {
+        val response = postingService.writePost(requestBody)
+        Log.d("커뮤니티", "WritePostUserCaseImpl response ${response.dataHeader.successCode}")
+        if (response.dataHeader.successCode == 0) {
             Log.d("커뮤니티", "WritePostUserCaseImpl response $response")
             true
         } else {
-            throw Exception("커뮤니티 writePost ${response.dataHeader.resultCode} : ${response.dataHeader.resultMessage}")
-        }
+            throw Exception("커뮤니티 writePost ${response.dataHeader.resultCode} : ${response.dataHeader.resultMessage}")        }
     }
 }

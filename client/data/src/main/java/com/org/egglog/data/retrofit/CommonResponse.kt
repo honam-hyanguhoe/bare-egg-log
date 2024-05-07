@@ -12,5 +12,5 @@ data class DataHeader(
 @Serializable
 data class CommonResponse<T> (
     val dataHeader: DataHeader,
-    val dataBody: T
+    val dataBody: T?
 )
