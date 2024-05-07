@@ -9,7 +9,6 @@ from models.hospital_info import HospitalInfo
 
 def map_excel_row_to_hospital_info(row):
     return HospitalInfo(
-        unique_code=row['암호화요양기호'],
         sido_code=row['시도코드'],
         sido=row['시도코드명'],
         gungu_code=row['시군구코드'],
@@ -29,13 +28,14 @@ def parse_and_insert_excel_data(file_path):
     try:
         for index, row in df.iterrows():
             hospital_info = map_excel_row_to_hospital_info(row)
-            existing_hospital = session.query(HospitalInfo).filter_by(unique_code=hospital_info.unique_code).first()
-            if existing_hospital:
+            session.add(hospital_info)
+            # existing_hospital = session.query(HospitalInfo).filter_by(unique_code=hospital_info.unique_code).first()
+            # if existing_hospital:
                 # 기존 데이터가 있으면 업데이트
-                existing_hospital.update(**hospital_info.__dict__)
-            else:
+                # existing_hospital.update(**hospital_info.__dict__)
+            # else:
                 # 없으면 새로 추가
-                session.add(hospital_info)
+                # session.add(hospital_info)
         session.commit()
     except Exception as e:
         session.rollback()

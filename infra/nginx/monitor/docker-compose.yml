@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  nginx:
+    container_name: nginx
+    image: kimdahui/nginx
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - grafana_monitoring
+
+networks:
+  grafana_monitoring:
+    external: true

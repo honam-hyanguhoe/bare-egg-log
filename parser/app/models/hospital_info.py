@@ -16,4 +16,3 @@ class HospitalInfo(Base):
     hospital_name = Column(String(50), nullable=False)
     lat = Column(String(20))
     lng = Column(String(20))
-    unique_code = Column(String(255), nullable=False)
