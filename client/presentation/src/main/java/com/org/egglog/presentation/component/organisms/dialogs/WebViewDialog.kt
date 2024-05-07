@@ -20,7 +20,7 @@ fun WebViewDialog(
     onDismiss: () -> Unit,
     context : Context,
     width : Int = 400,
-    height  : Int = 700
+    height  : Int = 500
 ) {
     val widthP = width.widthPercent(context)
     val heightP = height.heightPercent(context)
