@@ -8,19 +8,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
 import com.org.egglog.domain.auth.model.UserHospital
 import com.org.egglog.presentation.theme.*
 import com.org.egglog.presentation.utils.*
 
 @Composable
 fun SearchDropDownHospital(
-    list: MutableList<UserHospital>,
+    list: LazyPagingItems<UserHospital>,
     placeholder: String,
-    onSelected: (UserHospital) -> Unit
+    onSearchChange: (String) -> Unit,
+    onSelected: (UserHospital) -> Unit,
+    onClickDone: () -> Unit,
+    search: String
 ) {
     val context = LocalContext.current
     SearchableExpandedDropDownMenu(
-        listOfItems = list,
+        lazyPagingItems = list,
         modifier = Modifier.fillMaxWidth(),
         onDropDownItemSelected = { item ->
             onSelected(item)
@@ -42,13 +46,15 @@ fun SearchDropDownHospital(
             unfocusedIndicatorColor = Gray400,
             focusedIndicatorColor = Warning400
         ),
-        defaultItem = { },
         onSearchTextFieldClicked = { },
         dropdownItem = { item ->
             Column {
                 Text(text = item.hospitalName, style = Typography.bodyMedium)
                 Text(text = item.address, style = Typography.displayMedium, color = Gray300)
             }
-        }
+        },
+        onSearchChange = onSearchChange,
+        onClickDone = onClickDone,
+        search = search
     )
 }
