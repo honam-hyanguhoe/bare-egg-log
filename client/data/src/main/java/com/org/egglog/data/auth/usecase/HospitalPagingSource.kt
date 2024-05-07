@@ -31,7 +31,7 @@ class HospitalPagingSource @Inject constructor(
                 search = search
             )
 
-            val size = response.dataBody.size
+            val size = response.dataBody!!.size
             return LoadResult.Page(
                 data = response.dataBody.map { it.toDomainModel() },
                 prevKey = null,

@@ -17,10 +17,6 @@ import javax.inject.Singleton
 
 const val HOST = "https://api.egg-log.org"
 
-private val json = Json {
-    ignoreUnknownKeys = true
-}
-
 @Module
 @InstallIn(SingletonComponent::class)
 class RetrofitModule {
