@@ -52,7 +52,7 @@ public class TestService {
             log.debug("=====start user Join hospitalId : {} =====",hospitalId);
             userService.joinUser(user, JoinUserRequest.builder()
                     .userName(user.getName())
-                    .empNo(UUID.randomUUID().toString())
+                    .empNo("TEST-"+cnt)
                     .fcmToken(UUID.randomUUID().toString())
                     .hospitalId(hospitalId).build());
             log.debug("user = {}", user);
