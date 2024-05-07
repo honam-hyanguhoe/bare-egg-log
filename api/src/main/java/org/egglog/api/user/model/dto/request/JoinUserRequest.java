@@ -38,6 +38,5 @@ public class JoinUserRequest {
     @Size(max = 30, message = "사번이 너무 깁니다.")
     private String empNo;
 
-    @NotBlank(message = "FCM 토큰은 필수 입니다.")
     private String fcmToken;
 }

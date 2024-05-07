@@ -40,8 +40,9 @@ public class TestController {
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
     }
 
-//    @PostMapping("/work")
-//    public ResponseEntity<MessageUtils> creatWorkMockData(){
-//
-//    }
+    @PostMapping("/create/work")
+    public ResponseEntity<MessageUtils> creatWorkMockData(){
+        testService.makeWorkList();
+        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
+    }
 }
