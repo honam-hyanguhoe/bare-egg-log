@@ -1,6 +1,7 @@
 package org.egglog.api.global.util;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
@@ -8,15 +9,15 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Component
-
 @RequiredArgsConstructor
 public class RedisViewCountUtil {
 
     private final RedisTemplate<String, String> redis;
 
     public boolean checkAndIncrementViewCount(String boardId, String userId) {
-        String userKey = "view_count_number " + boardId;
+        String userKey = "view_count_number: " + boardId;
         Long addedCount = redis.opsForSet().add(userKey, userId); // 새로운 요소가 추가되면 1을 반환
 
         if (addedCount == 1L) {
@@ -27,7 +28,7 @@ public class RedisViewCountUtil {
     }
 
     public Set<String> getUsersByBoardId(String boardId) {
-        return redis.opsForSet().members("view_count_number:" + boardId);
+        return redis.opsForSet().members("view_count_number: " + boardId);
     }
 
     // Board 조회수 확인 *
@@ -49,4 +50,12 @@ public class RedisViewCountUtil {
         return redis.opsForZSet().reverseRangeWithScores("view_count_board:", 0, -1);
     }
 
+    public void deleteViewCount(String boardId, String userId) {
+        log.info("deleteViewCount 실행 {}", boardId);
+        redis.opsForSet().remove("view_count_number: " + boardId, userId);
+    }
+
+    public void deleteViewCountBoard(String boardId) {
+        redis.opsForZSet().remove("view_count_board:", boardId); // 조회수 점수 삭제
+    }
 }
