@@ -7,7 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.security.config.JwtProperties;
 import org.egglog.api.security.exception.JwtErrorCode;
 import org.egglog.api.security.exception.JwtException;
+import org.egglog.api.security.repository.redis.RefreshTokenRepository;
 import org.egglog.api.security.repository.redis.UnsafeTokenRepository;
+import org.egglog.api.user.repository.jpa.UserJpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -25,8 +27,9 @@ public class JwtUtils {
     private static final ZoneId zoneId = ZoneId.of("Asia/Seoul");
     private String accessSecretKey;
     private String refreshSecretKey;
-
+    private final RefreshTokenRepository refreshTokenRepository;
     private final UnsafeTokenRepository unsafeTokenRepository;
+    private final UserJpaRepository userJpaRepository;
     @PostConstruct
     protected void init(){
         accessSecretKey = Base64.getEncoder().encodeToString(
@@ -110,6 +113,7 @@ public class JwtUtils {
             throw new JwtException(JwtErrorCode.TOKEN_SIGNATURE_ERROR);
         }catch (ExpiredJwtException e){
             log.info("exception : 리프레쉬 토큰 기간 만료");
+
             throw new JwtException(JwtErrorCode.EXPIRED_TOKEN);
         }catch (UnsupportedJwtException e){
             log.info("exception : 지원되지 않는 리프레쉬 토큰");

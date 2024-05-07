@@ -91,6 +91,10 @@ public class User implements UserDetails {
         this.loginAt = LocalDateTime.now();
         return this;
     }
+    public User doLogout(){
+        this.deviceToken = null;
+        return this;
+    }
 
     public User delete(){
         this.name = "탈퇴회원";
