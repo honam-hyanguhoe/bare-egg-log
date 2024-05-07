@@ -80,7 +80,6 @@ public class BoardScheduler {
                 if (board.getGroup() == null && board.getHospital() == null) { //전체 게시판이라면
                     Long viewCount = Objects.requireNonNull(tuple.getScore()).longValue(); //조회수
                     Long likeCount = boardRepository.getLikeCount(boardId); //좋아요 개수
-
                     boardViewCounts.put(boardId, viewCount + likeCount);
                 }
             }
@@ -95,11 +94,12 @@ public class BoardScheduler {
             redisTemplate.opsForValue().set("hotBoards", hotBoardIds.toString(), 1, TimeUnit.MINUTES);
 //            redisTemplate.opsForValue().set("hotBoards", hotBoardIds.toString(), 1, TimeUnit.HOURS);
 
-        } else {  //최근 게시물 2개
-            List<Long> recentBoardIds = boardRepository.findTop2ByOrderByCreatedAtDesc();
-            redisTemplate.opsForValue().set("hotBoards", recentBoardIds.toString(), 1, TimeUnit.MINUTES);
-
         }
+//        else {  //최근 게시물 2개
+//            List<Long> recentBoardIds = boardRepository.findTop2ByOrderByCreatedAtDesc();
+//            redisTemplate.opsForValue().set("hotBoards", recentBoardIds.toString(), 1, TimeUnit.MINUTES);
+//
+//        }
 
     }
     /**

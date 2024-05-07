@@ -503,7 +503,7 @@ public class BoardService {
                     .boardLikeCount(likeCnt)
                     .isLiked(isUserLiked)
                     .isCommented(isCommented)
-                    .comments(commentList)
+//                    .comments(commentList)
                     .build();
 
             //병원 인증배지가 없다면
