@@ -53,12 +53,7 @@ import kotlinx.coroutines.launch
 fun MainScreen(
 ) {
     val context = LocalContext.current
-    val tempLabels: List<String> = listOf("Night", "Day", "휴가", "보건", "Off", "Eve", "Eve")
-    val dataSource = WeeklyDataSource()
-    var calendarUiModel2 by remember { mutableStateOf(dataSource.getData(lastSelectedDate = dataSource.today)) }
     val scrollState = rememberScrollState()
-
-
     Surface {
         Column(
             modifier = Modifier
@@ -79,40 +74,66 @@ fun MainScreen(
                     )
             )
             Spacer(modifier = Modifier.height(30.dp))
-            Column(
-                modifier = Modifier
-                    .width(320.widthPercent(context).dp)
-                    .background(color = Gray100, shape = RoundedCornerShape(20.dp))
-                    .padding(8.dp, 15.dp, 8.dp, 25.dp)
-            ) {
-                Text(text = "내 근무 일정",
-                    modifier = Modifier.padding(start = 10.dp),
-                    style = Typography.headlineSmall.copy(fontWeight = FontWeight.Bold))
-                Spacer(modifier = Modifier.height(15.dp))
-                WeeklyCalendar(
-                    type = "main",
-                    calendarUiModel = calendarUiModel2,
-                    labels = tempLabels,
-                    width = 320,
-                    backgroundColor = Gray100
-                )
-            }
+            DutyCard()
+            Spacer(modifier = Modifier.height(30.dp))
+            RemainCard()
             Spacer(modifier = Modifier.height(30.dp))
             StaticsCard()
-            Spacer(modifier = Modifier.height(30.dp))
-            ContentWebView(width = 320, height = 350, url = "https://www.egg-log.org/remain")
-
 
         }
     }
 }
 
 @Composable
-fun StaticsCard(){
+fun DutyCard(){
+    val tempLabels: List<String> = listOf("Night", "Day", "휴가", "보건", "Off", "Eve", "Eve")
+    val dataSource = WeeklyDataSource()
+    var calendarUiModel2 by remember { mutableStateOf(dataSource.getData(lastSelectedDate = dataSource.today)) }
+    val context = LocalContext.current
+    Column(
+        modifier = Modifier
+            .width(320.widthPercent(context).dp)
+            .background(color = Gray100, shape = RoundedCornerShape(20.dp))
+            .padding(8.dp, 15.dp, 8.dp, 25.dp)
+    ) {
+        Text(text = "내 근무 일정",
+            modifier = Modifier.padding(start = 10.dp),
+            style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold))
+        Spacer(modifier = Modifier.height(15.dp))
+        WeeklyCalendar(
+            type = "main",
+            calendarUiModel = calendarUiModel2,
+            labels = tempLabels,
+            width = 320,
+            backgroundColor = Gray100
+        )
+    }
+}
+@Composable
+fun RemainCard(){
     val context = LocalContext.current
     // radio
     val radioList = arrayListOf("Week", "Month")
     val selected = remember { mutableStateOf("") }
+    Column (
+        modifier = Modifier
+            .width(320.widthPercent(context).dp)
+            .background(color = Gray100, shape = RoundedCornerShape(20.dp))
+            .padding(8.dp, 15.dp, 8.dp, 25.dp)
+    ){
+        Text(text = "제 근무는 언제 끝나죠?",
+            modifier = Modifier.padding(start = 10.dp),
+            style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold))
+        Box(modifier = Modifier.padding(start = 10.dp, top = 10.dp, end = 0.dp, bottom = 0.dp)){
+            DayRadioButton(radioList = radioList, selected = selected)
+        }
+        ContentWebView(width = 320, height = 350, url = "https://www.egg-log.org/remain")
+    }
+}
+
+@Composable
+fun StaticsCard(){
+    val context = LocalContext.current
 
     Column (
         modifier = Modifier
@@ -120,10 +141,9 @@ fun StaticsCard(){
             .background(color = Gray100, shape = RoundedCornerShape(20.dp))
             .padding(8.dp, 15.dp, 8.dp, 25.dp)
     ){
-        Text(text = "내 근무 일정",
+        Text(text = "내 근무 통계",
             modifier = Modifier.padding(start = 10.dp),
-            style = Typography.headlineSmall.copy(fontWeight = FontWeight.Bold))
-        DayRadioButton(radioList = radioList, selected = selected)
+            style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold))
         ContentWebView(width = 320, height = 350, url = "https://www.egg-log.org/statics")
     }
 }
@@ -133,16 +153,3 @@ fun StaticsCard(){
 fun MainScreenPreview() {
     MainScreen()
 }
-
-
-//            Button(onClick = {
-//                Log.d("main", "move to postEditor")
-//                context.startActivity(
-//                    Intent(
-//                        context,
-//                        PostEditorActivity::class.java
-//                    )
-//                )
-//            }) {
-//                Text("글쓰기 페이지로 이동")
-//            }

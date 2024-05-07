@@ -62,24 +62,14 @@ fun ContentWebView(
         }
     }
 
-//    AndroidView(
-//        factory = { webView },
-//        modifier = Modifier
-//            .width(width.widthPercent(context).dp)
-//            .height(height.heightPercent(context).dp)
-//        ,
-//        update = { view ->
-//            if (view.url != url) view.loadUrl(url)
-//        }
-//    )
-
     Card(
         modifier = Modifier
             .size(
                 width = width.widthPercent(context).dp,
                 height = height.heightPercent(context).dp
-            ),
-        shape = RoundedCornerShape(20.dp) // 모서리 둥글게 20dp
+            ).
+        border(0.5.dp, Gray100),
+        shape = RoundedCornerShape(20.dp)
     ) {
         AndroidView(
             factory = { webView },
