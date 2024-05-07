@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.org.egglog.presentation">
+
     <application>
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id"/>
+
         <activity
             android:name="com.org.egglog.presentation.domain.auth.activity.SplashActivity"
             android:exported="true">
@@ -27,5 +32,15 @@
         <activity android:name="com.org.egglog.presentation.domain.auth.activity.LoginActivity" />
         <activity android:name="com.org.egglog.presentation.domain.community.posteditor.activity.PostEditorActivity" />
         <activity android:name="com.org.egglog.presentation.domain.auth.activity.PlusLoginActivity" />
+
+        <service
+            android:name=".utils.FcmReceiveService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
     </application>
+
 </manifest>

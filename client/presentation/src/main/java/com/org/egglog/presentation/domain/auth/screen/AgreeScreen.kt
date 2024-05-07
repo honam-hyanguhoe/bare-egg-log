@@ -81,6 +81,7 @@ fun AgreeScreen(
                 .fillMaxSize()
                 .background(color = NaturalWhite)
         ) {
+            Spacer(modifier = Modifier.padding(10.widthPercent(LocalContext.current).dp))
             BasicHeader(
                 title = "약관동의",
                 hasTitle = true,
