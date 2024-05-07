@@ -9,19 +9,25 @@ import androidx.activity.result.ActivityResult
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.messaging.messaging
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
+import com.org.egglog.domain.auth.model.Refresh
+import com.org.egglog.domain.auth.model.UserFcmTokenParam
 import com.org.egglog.domain.auth.model.UserParam
 import com.org.egglog.domain.auth.usecase.GetLoginUseCase
 import com.org.egglog.domain.auth.usecase.GetUserUseCase
 import com.org.egglog.domain.auth.usecase.SetTokenUseCase
 import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
+import com.org.egglog.domain.auth.usecase.UpdateUserFcmTokenUseCase
 import com.org.egglog.presentation.domain.auth.extend.authenticateAndGetUserProfile
 import com.org.egglog.presentation.domain.auth.extend.loginWithKakao
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.tasks.await
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
@@ -35,7 +41,8 @@ class LoginViewModel @Inject constructor(
     private val getLoginUseCase: GetLoginUseCase,
     private val setTokenUseCase: SetTokenUseCase,
     private val getUserUseCase: GetUserUseCase,
-    private val setUserStoreUseCase: SetUserStoreUseCase
+    private val setUserStoreUseCase: SetUserStoreUseCase,
+    private val updateUserFcmTokenUseCase: UpdateUserFcmTokenUseCase
 ): ViewModel(), ContainerHost<LoginState, LoginSideEffect> {
     override val container: Container<LoginState, LoginSideEffect> = container(
         initialState = LoginState(),
@@ -57,23 +64,7 @@ class LoginViewModel @Inject constructor(
                     email = user.kakaoAccount?.email.orEmpty(),
                     profileImgUrl = user.kakaoAccount?.profile?.profileImageUrl.orEmpty()
                 )).getOrThrow()
-                if(tokens?.accessToken?.isNotEmpty() == true && tokens.accessToken.isNotEmpty() && tokens.refreshToken.isNotEmpty()) {
-                    Log.e("Kakao > AccessToken : ", tokens.accessToken)
-                    Log.e("Kakao > RefreshToken : ", tokens.refreshToken)
-                    setTokenUseCase(
-                        accessToken = tokens.accessToken,
-                        refreshToken = tokens.refreshToken
-                    )
-                    val userDetail = getUserUseCase("Bearer ${tokens.accessToken}").getOrThrow()
-                    setUserStoreUseCase(userDetail)
-                    if(userDetail?.hospitalAuth == null || userDetail.empNo == null) {
-                        postSideEffect(LoginSideEffect.NavigateToPlusLoginActivity)
-                    } else {
-                        postSideEffect(LoginSideEffect.NavigateToMainActivity)
-                    }
-                } else {
-                    postSideEffect(LoginSideEffect.Toast("인증 에러가 발생했습니다."))
-                }
+                tokenUtilFunc("KAKAO", tokens)
             } else {
                 val kakaoTalkInstallUrl = "market://details?id=com.kakao.talk"
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(kakaoTalkInstallUrl))
@@ -97,23 +88,7 @@ class LoginViewModel @Inject constructor(
             email = user.profile?.email.orEmpty(),
             profileImgUrl = user.profile?.profileImage.orEmpty()
         )).getOrThrow()
-        if(tokens?.accessToken?.isNotEmpty() == true && tokens.accessToken.isNotEmpty() && tokens.refreshToken.isNotEmpty()) {
-            Log.e("Naver > AccessToken : ", tokens.accessToken)
-            Log.e("Naver > RefreshToken : ", tokens.refreshToken)
-            setTokenUseCase(
-                accessToken = tokens.accessToken,
-                refreshToken = tokens.refreshToken
-            )
-            val userDetail = getUserUseCase("Bearer ${tokens.accessToken}").getOrThrow()
-            setUserStoreUseCase(userDetail)
-            if(userDetail?.hospitalAuth == null || userDetail.empNo == null) {
-                postSideEffect(LoginSideEffect.NavigateToPlusLoginActivity)
-            } else {
-                postSideEffect(LoginSideEffect.NavigateToMainActivity)
-            }
-        } else {
-            postSideEffect(LoginSideEffect.Toast("인증 에러가 발생했습니다."))
-        }
+        tokenUtilFunc("NAVER", tokens)
     }
 
     fun onGoogleUserReceived(user: FirebaseUser?) = intent {
@@ -122,23 +97,7 @@ class LoginViewModel @Inject constructor(
             email = user?.email.orEmpty(),
             profileImgUrl = user?.photoUrl.toString()
         )).getOrThrow()
-        if(tokens?.accessToken?.isNotEmpty() == true && tokens.accessToken.isNotEmpty() && tokens.refreshToken.isNotEmpty()) {
-            Log.e("Google > AccessToken : ", tokens.accessToken)
-            Log.e("Google > RefreshToken : ", tokens.refreshToken)
-            setTokenUseCase(
-                accessToken = tokens.accessToken,
-                refreshToken = tokens.refreshToken
-            )
-            val userDetail = getUserUseCase("Bearer ${tokens.accessToken}").getOrThrow()
-            setUserStoreUseCase(userDetail)
-            if(userDetail?.hospitalAuth == null || userDetail.empNo == null) {
-                postSideEffect(LoginSideEffect.NavigateToPlusLoginActivity)
-            } else {
-                postSideEffect(LoginSideEffect.NavigateToMainActivity)
-            }
-        } else {
-            postSideEffect(LoginSideEffect.Toast("인증 에러가 발생했습니다."))
-        }
+        tokenUtilFunc("GOOGLE", tokens)
     }
 
     fun onGoogleClick(context: Context, launcher: ManagedActivityResultLauncher<Intent, ActivityResult>, token: String) = intent {
@@ -148,6 +107,36 @@ class LoginViewModel @Inject constructor(
             .build()
         val googleSignInClient = GoogleSignIn.getClient(context, gso)
         launcher.launch(googleSignInClient.signInIntent)
+    }
+
+    private fun tokenUtilFunc(type: String, tokens: Refresh?) = intent {
+        if(tokens?.accessToken?.isNotEmpty() == true && tokens.accessToken.isNotEmpty() && tokens.refreshToken.isNotEmpty()) {
+            Log.e("$type > AccessToken : ", tokens.accessToken)
+            Log.e("$type > RefreshToken : ", tokens.refreshToken)
+            setTokenUseCase(
+                accessToken = tokens.accessToken,
+                refreshToken = tokens.refreshToken
+            )
+            val userDetail = getUserUseCase("Bearer ${tokens.accessToken}").getOrThrow()
+            if(userDetail?.selectedHospital == null || userDetail.empNo == null) {
+                setUserStoreUseCase(userDetail)
+                postSideEffect(LoginSideEffect.NavigateToPlusLoginActivity)
+            } else {
+                val fcmToken = try {
+                    Firebase.messaging.token.await()
+                } catch (e: Exception) {
+                    Log.e("FCM Token", "Error fetching FCM token: ${e.message}", e)
+                    ""
+                }
+                if(userDetail.deviceToken != fcmToken) {
+                    val newUser = updateUserFcmTokenUseCase(UserFcmTokenParam(fcmToken)).getOrThrow()
+                    setUserStoreUseCase(newUser)
+                } else setUserStoreUseCase(userDetail)
+                postSideEffect(LoginSideEffect.NavigateToMainActivity)
+            }
+        } else {
+            postSideEffect(LoginSideEffect.Toast("인증 에러가 발생했습니다."))
+        }
     }
 }
 

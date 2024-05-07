@@ -13,6 +13,7 @@ import com.org.egglog.data.auth.usecase.GetUserUseCaseImpl
 import com.org.egglog.domain.auth.usecase.SetTokenUseCase
 import com.org.egglog.data.auth.usecase.SetTokenUseCaseImpl
 import com.org.egglog.data.auth.usecase.SetUserStoreUseCaseImpl
+import com.org.egglog.data.auth.usecase.UpdateUserFcmTokenUseCaseImpl
 import com.org.egglog.data.auth.usecase.UpdateUserJoinUseCaseImpl
 import com.org.egglog.domain.auth.usecase.DeleteTokenUseCase
 import com.org.egglog.domain.auth.usecase.DeleteUserStoreUseCase
@@ -21,6 +22,7 @@ import com.org.egglog.domain.auth.usecase.GetLoginUseCase
 import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.GetUserUseCase
 import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
+import com.org.egglog.domain.auth.usecase.UpdateUserFcmTokenUseCase
 import com.org.egglog.domain.auth.usecase.UpdateUserJoinUseCase
 import dagger.Binds
 import dagger.Module
@@ -62,4 +64,7 @@ abstract class UserModule {
 
     @Binds
     abstract fun bindGetAllHospitalUseCaseImpl(uc: GetAllHospitalUseCaseImpl): GetAllHospitalUseCase
+
+    @Binds
+    abstract fun bindUpdateUserFcmTokenUseCaseImpl(uc: UpdateUserFcmTokenUseCaseImpl): UpdateUserFcmTokenUseCase
 }
