@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.FirebaseApp
 import com.kakao.sdk.common.KakaoSdk
+import com.kakao.sdk.common.util.Utility
 import com.navercorp.nid.NaverIdLoginSDK
 import com.org.egglog.domain.auth.usecase.GetRefreshUseCase
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
@@ -36,7 +37,8 @@ class SplashActivity : AppCompatActivity() {
         FirebaseApp.initializeApp(this)
         KakaoSdk.init(this, getString(R.string.kakao_native_app_key))
         NaverIdLoginSDK.initialize(this, getString(R.string.naver_client_id), getString(R.string.naver_client_secret), getString(R.string.naver_client_name))
-//        val keyHash = Utility.getKeyHash(this)
+        val keyHash = Utility.getKeyHash(this)
+        Log.e("keyHash: ", keyHash)
         setContent{
             ClientTheme {
                 SplashScreen()

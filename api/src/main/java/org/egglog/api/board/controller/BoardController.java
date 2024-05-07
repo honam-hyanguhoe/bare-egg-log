@@ -61,6 +61,7 @@ public class BoardController {
         return ResponseEntity.ok().body(MessageUtils.success(boardService.modifyBoard(boardId, boardUpdateForm, user)));
     }
 
+    //좋아요
     @PostMapping("/like")
     public ResponseEntity<?> registerLike(@RequestBody LikeForm likeForm, @AuthenticationPrincipal User user) {
         boardService.registerLike(likeForm, user);
@@ -71,5 +72,11 @@ public class BoardController {
     public ResponseEntity<?> deleteLike(@PathVariable("board_id") Long boardId, @AuthenticationPrincipal User user) {
         boardService.deleteLike(boardId, user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
+    }
+
+    //사용자의 병원, 그룹 리스트
+    @GetMapping("/types")
+    public ResponseEntity<?> getBoardTypeListByUser(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(MessageUtils.success(boardService.getBoardTypeListByUser(user)));
     }
 }

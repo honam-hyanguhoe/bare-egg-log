@@ -14,8 +14,10 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -69,9 +71,11 @@ private fun ImageUploader(
         ImageUploadButton(
             isClicked = { isClicked() }
         )
+        
+        Spacer(modifier = Modifier.width(10.dp))
 
         LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(20.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             items(uploadedImages) { imageBitmap ->
                 ImageUploadBox(imageBitmap = imageBitmap)

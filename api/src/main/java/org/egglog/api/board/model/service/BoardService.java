@@ -14,6 +14,7 @@ import org.egglog.api.board.repository.jpa.boardLike.BoardLikeRepository;
 import org.egglog.api.board.repository.jpa.comment.CommentRepository;
 import org.egglog.api.group.exception.GroupErrorCode;
 import org.egglog.api.group.exception.GroupException;
+import org.egglog.api.group.model.dto.response.GroupPreviewDto;
 import org.egglog.api.group.model.entity.Group;
 import org.egglog.api.group.repository.jpa.GroupRepository;
 import org.egglog.api.hospital.model.entity.HospitalAuth;
@@ -152,7 +153,9 @@ public class BoardService {
 
         try {
             String boardIds = redisTemplate.opsForValue().get("hotBoards");
-            if (boardIds != null && !boardIds.isEmpty()) {
+            log.info("boardIds: {}", boardIds);
+
+            if (boardIds != null && !boardIds.isEmpty() && !boardIds.equals("[]")) {
                 List<Long> ids = Arrays.stream(boardIds.replace("[", "").replace("]", "").split(","))
                         .map(String::trim)
                         .map(Long::parseLong)
@@ -166,15 +169,15 @@ public class BoardService {
                     //사용자의 병원 인증 정보
                     Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(user, user.getSelectedHospital());
 
-                    Long commentCnt = commentRepository.getCommentCount(board.getId());
-                    Long likeCnt = boardRepository.getLikeCount(board.getId());
+                    long commentCnt = commentRepository.getCommentCount(board.getId());
+                    long likeCnt = boardRepository.getLikeCount(board.getId());
                     long viewCount = redisViewCountUtil.getViewCount(String.valueOf(boardId)); //하루 동안의 조회수
-                    Long hitCnt = viewCount + board.getViewCount();
+                    long hitCnt = viewCount + board.getViewCount();
 
                     boolean isUserLiked = false;  //좋아요 누른 여부
                     boolean isCommented = false;    //댓글 유무 여부
 
-                    if (commentCnt != null) {
+                    if (commentCnt == 0) {
                         isCommented = true;
                     }
 
@@ -557,5 +560,27 @@ public class BoardService {
     private boolean isNotLiked(Long userId, Long boardId) {
         Optional<BoardLike> userBoardLike = boardRepository.getUserBoardLike(boardId, userId);
         return userBoardLike.isEmpty();
+    }
+
+    /**
+     * 사용자의 병원 아이디, 병원 이름, 그룹 아이디, 그룹 이름
+     *
+     * @param user
+     * @return
+     */
+    public BoardTypeListOutputSpec getBoardTypeListByUser(User user) {
+        //사용자가 선택한 병원
+        Hospital selectedHospital = user.getSelectedHospital();
+        BoardTypeListOutputSpec boardTypeListOutputSpec = BoardTypeListOutputSpec.builder()
+                .hospitalId(selectedHospital.getId())
+                .hospitalName(selectedHospital.getHospitalName())
+                .build();
+
+        //사용자의 그룹리스트
+        Optional<List<GroupPreviewDto>> groupByUserId = groupRepository.findGroupByUserId(user.getId());
+        if (groupByUserId.isPresent()) {
+            boardTypeListOutputSpec.setGroupList(groupByUserId.get());
+        }
+        return boardTypeListOutputSpec;
     }
 }
