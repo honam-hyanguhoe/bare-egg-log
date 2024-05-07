@@ -25,9 +25,6 @@ import java.time.LocalDate;
 @Setter
 @Builder
 public class FindWorkListRequest {
-    @NotNull(message = "calendarGroupId 는 필수 입니다.")
-    @Positive(message = "정확한 ID 값을 입력 해주세요.")
-    private Long calendarGroupId;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate startDate;
