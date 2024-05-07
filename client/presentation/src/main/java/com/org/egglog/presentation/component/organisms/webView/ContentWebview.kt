@@ -5,9 +5,11 @@ import android.view.View
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
@@ -15,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.org.egglog.presentation.theme.Gray200
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
 import com.org.egglog.presentation.theme.NaturalBlack
@@ -59,7 +62,8 @@ fun ContentWebView(
         modifier = Modifier
             .width(width.widthPercent(context).dp)
             .height(height.heightPercent(context).dp)
-            .border(1.dp, NaturalBlack),
+            .background(color = Gray200)
+            .border(1.dp, NaturalBlack, RoundedCornerShape(15.dp)),
         update = { view ->
             if (view.url != url) view.loadUrl(url)
         }

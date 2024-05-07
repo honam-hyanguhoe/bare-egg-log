@@ -70,6 +70,7 @@ export default RemainingDutyPage;
 
 const GraphContainer = styled.div`
   padding: 20px;
+  background-color: #f2f4f7;
 `;
 const GraphTitle = styled.p`
   font-size: 25px;

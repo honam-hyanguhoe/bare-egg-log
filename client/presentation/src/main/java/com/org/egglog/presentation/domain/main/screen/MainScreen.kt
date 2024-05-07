@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.lifecycleScope
+import com.org.egglog.presentation.component.organisms.webView.ContentWebView
 import com.org.egglog.presentation.domain.community.posteditor.activity.PostEditorActivity
 import com.org.egglog.presentation.domain.main.viewModel.MainViewModel
 import com.org.egglog.presentation.theme.NaturalWhite
@@ -32,18 +33,19 @@ fun MainScreen(
                 .fillMaxSize()
                 .background(color = NaturalWhite)
         ) {
-            Text(text = "main")
-            Button(onClick = {
-                Log.d("main", "move to postEditor")
-                context.startActivity(
-                    Intent(
-                        context,
-                        PostEditorActivity::class.java
-                    )
-                )
-            }) {
-                Text("글쓰기 페이지로 이동")
-            }
+            ContentWebView( width=320, height=350, url = "https://www.egg-log.org/statics")
+            ContentWebView( width=320, height=350, url = "https://www.egg-log.org/remain")
+        //            Button(onClick = {
+//                Log.d("main", "move to postEditor")
+//                context.startActivity(
+//                    Intent(
+//                        context,
+//                        PostEditorActivity::class.java
+//                    )
+//                )
+//            }) {
+//                Text("글쓰기 페이지로 이동")
+//            }
         }
     }
 
