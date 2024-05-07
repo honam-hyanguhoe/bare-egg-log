@@ -7,6 +7,7 @@ import org.egglog.api.calendar.model.service.CalendarService;
 import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.utility.utils.MessageUtils;
+import org.egglog.utility.utils.SuccessType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,6 +31,14 @@ public class CalendarController {
     public ResponseEntity test(){
         log.warn(testVal);
         return ResponseEntity.ok().body(MessageUtils.success(testVal));
+    }
+
+    @PostMapping("/sync")
+    public ResponseEntity<MessageUtils> syncCalendar(
+            @AuthenticationPrincipal User loginUSer
+    ){
+        calendarService.updateIcsEventsForSyncRequest(loginUSer);
+        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }
 
     @GetMapping("/link")

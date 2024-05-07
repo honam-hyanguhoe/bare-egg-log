@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.*;
+import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.Standard;
 import net.fortuna.ical4j.model.component.VEvent;
@@ -46,9 +48,7 @@ import java.time.LocalDateTime;
 //import java.util.TimeZone;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -119,10 +119,59 @@ public class CalendarService {
      * @author 김형민
      */
     public void updateIcsEventsForSyncRequest(User loginUser){
-        List<CalendarGroup> urlNotNullList = calendarGroupRepository.findUrlNotNullListByUserId(loginUser.getId());
-
+        Map<CalendarGroup, Set<String>> uuidMaps = calendarGroupRepository
+                .findCalendarGroupsWithEventUuids(loginUser.getId());
+        for (CalendarGroup calendarGroup : uuidMaps.keySet()) {
+            updateEventForUrl(calendarGroup, uuidMaps.get(calendarGroup), loginUser);
+        }
     }
+    private void updateEventForUrl(CalendarGroup calendarGroup, Set<String> uuidSet, User loginUser){
+        String path = calendarGroup.getUrl();
+        InputStream inputStream = null;
+        List<Event> icsEventList = new ArrayList<>();
+        if (!path.endsWith(".ics")) throw new CalendarException(CalendarErrorCode.IS_NOT_ICS);
+        try {
+            // URL인지 확인
+            if (path.startsWith("http://") || path.startsWith("https://")) {
+                URL url = new URL(path);
+                inputStream = url.openStream(); // URL에서 스트림 열기
+            } else {
+                throw new CalendarException(CalendarErrorCode.ICS_SYNC_FAIL);
+            }
+            List<CalendarComponent> events = new CalendarBuilder().build(inputStream)
+                    .getComponents(Component.VEVENT);
 
+            for (CalendarComponent event : events) {
+                Event eggLogEvent = Event.builder()
+                        .calendarGroup(calendarGroup)
+                        .user(loginUser)
+                        .build();
+                for (Property property : event.getProperties()) {
+                    String name = property.getName();
+                    switch (name){
+                        case "SUMMARY": eggLogEvent.setEventTitle(property.getValue()); break;
+                        case "UID" : eggLogEvent.setUuid(property.getValue()); break;
+                        case "DTSTART" : eggLogEvent.setStartDate(icsTimeToLocalDateTime(property.getValue())); break;
+                        case "DTEND" : eggLogEvent.setEndDate(icsTimeToLocalDateTime(property.getValue())); break;
+                        case "DESCRIPTION" : eggLogEvent.setEventContent(property.getValue()); break;
+                    }
+                }
+                if (!uuidSet.contains(eggLogEvent.getUuid())) icsEventList.add(eggLogEvent);
+            }
+        } catch (Exception e) {
+            throw new CalendarException(CalendarErrorCode.ICS_SYNC_FAIL);
+        } finally {
+            eventRepository.saveAll(icsEventList);
+            if (inputStream != null) {
+                try {
+                    inputStream.close(); // 스트림 닫기
+                } catch (Exception e) {
+                    log.error("스트림 닫기 에러 = {}", e.getMessage());
+                }
+            }
+
+        }
+    }
 
 
     private LocalDateTime icsTimeToLocalDateTime(String stringTime) throws DateTimeParseException {
