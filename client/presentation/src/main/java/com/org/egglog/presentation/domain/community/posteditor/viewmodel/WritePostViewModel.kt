@@ -93,7 +93,6 @@ data class PostState(
     val isLoading: Boolean = false,
 )
 
-
 sealed class PostSideEffect {
     class Toast(val message: String) : PostSideEffect()
     object NavigateToMainScreen : PostSideEffect() // 임시로 메인 화면으로 이동

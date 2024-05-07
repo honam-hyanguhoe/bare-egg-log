@@ -152,7 +152,7 @@ fun DateItem(type: String,
                         // background colors of the selected date
                         // and the non-selected date are different
                         containerColor = if (date.isSelected) {
-                            Warning200
+                            Warning300
                         } else {
                             backgroundColor
                         }
@@ -160,7 +160,7 @@ fun DateItem(type: String,
                 border = if (date.isToday) {
                     BorderStroke(
                             width = 2.dp,
-                            color = Warning200
+                            color = Warning300
                     )
                 } else {
                     null
