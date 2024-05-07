@@ -19,15 +19,15 @@ const RemainingDutyGraph = ({ data }: RemainingDutyGraphProps) => {
   const svgRef = useRef(null);
 
   const [dimensions, setDimensions] = useState({
-    width: Math.min(500, window.innerWidth * 0.9),
-    height: Math.min(500, window.innerWidth * 0.9),
+    width: window.innerWidth > 500 ? 500 : window.innerWidth * 0.95,
+    height: window.innerWidth > 500 ? 500 : window.innerWidth * 0.95,
   });
 
   useEffect(() => {
     const handleResize = () => {
       setDimensions({
-        width: Math.min(500, window.innerWidth * 0.9),
-        height: Math.min(500, window.innerWidth * 0.9),
+        width: window.innerWidth > 500 ? 500 : window.innerWidth * 0.95,
+        height: window.innerWidth > 500 ? 500 : window.innerWidth * 0.95,
       });
     };
 
@@ -86,8 +86,8 @@ const RemainingDutyGraph = ({ data }: RemainingDutyGraphProps) => {
           (d as d3.HierarchyRectangularNode<TreeNode>).y0
       )
       .attr("fill", (d) => d.data.color as string)
-      .attr("rx", 10)
-      .attr("ry", 10);
+      .attr("rx", 20)
+      .attr("ry", 20);
 
     mapNodes
       .append("text")
@@ -121,17 +121,6 @@ const RemainingDutyGraph = ({ data }: RemainingDutyGraphProps) => {
           (d as d3.HierarchyRectangularNode<TreeNode>).y0;
         return `${Math.min(rectWidth, rectHeight) / 5}px`; // 폰트 크기 산정 방식 조정
       });
-    // .each(function (d) {
-    //   const rectWidth =
-    //     (d as d3.HierarchyRectangularNode<TreeNode>).x1 -
-    //     (d as d3.HierarchyRectangularNode<TreeNode>).x0;
-    //   const rectHeight =
-    //     (d as d3.HierarchyRectangularNode<TreeNode>).y1 -
-    //     (d as d3.HierarchyRectangularNode<TreeNode>).y0;
-    //   const textNode = d3.select(this);
-    //   const fontSize = Math.min(rectWidth, rectHeight) / 3 - 30;
-    //   textNode.style("font-size", `${fontSize <= 15 ? 24 : fontSize}px`);
-    // });
   }, [data, dimensions]);
 
   return (

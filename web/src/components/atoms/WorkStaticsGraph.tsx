@@ -17,14 +17,14 @@ const WorkStaticsGraph = ({ data }: WorkStaticsGraphProps) => {
 
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth > 500 ? 500 : window.innerWidth * 0.95,
-    height: window.innerHeight > 400 ? 400 : window.innerHeight * 0.8,
+    height: window.innerHeight > 300 ? 300 : window.innerHeight * 0.5,
   });
 
   useEffect(() => {
     const handleResize = () => {
       setDimensions({
         width: window.innerWidth > 500 ? 500 : window.innerWidth * 0.95,
-        height: window.innerHeight > 400 ? 400 : window.innerHeight * 0.8,
+        height: window.innerHeight > 300 ? 300 : window.innerHeight * 0.5,
       });
     };
 
@@ -84,7 +84,7 @@ const WorkStaticsGraph = ({ data }: WorkStaticsGraphProps) => {
         .tickFormat(() => "");
     };
 
-    const barWidth = xScale.bandwidth() / dataRef.current[0].values.length;
+    const barWidth = xScale.bandwidth() / dataRef.current[0].values.length + 2;
 
     ["DAY", "EVE", "NIGHT", "OFF"].forEach((className, i) => {
       console.log(`className ${className} / ${i}`);
@@ -145,13 +145,16 @@ const WorkStaticsGraph = ({ data }: WorkStaticsGraphProps) => {
       .style("fill", "gray")
       .style("font-size", "12px");
     xAxisG.select(".domain").attr("stroke", "#D4D4D4");
+
     const yAxisG = barSvg
       .append("g")
       .attr("class", "y-axis")
       .attr("transform", `translate(${margin.left}, ${margin.top})`)
       .call(yAxis);
+
     yAxisG.selectAll("text").style("fill", "gray").style("font-size", "12px");
     yAxisG.select(".domain").attr("stroke", "#F2F4F7");
+
     return () => {
       gridLines.remove();
     };

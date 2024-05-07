@@ -69,7 +69,7 @@ const RemainingDutyPage = () => {
 export default RemainingDutyPage;
 
 const GraphContainer = styled.div`
-  padding: 20px;
+  min-height: 100vh;
   background-color: #f2f4f7;
 `;
 const GraphTitle = styled.p`

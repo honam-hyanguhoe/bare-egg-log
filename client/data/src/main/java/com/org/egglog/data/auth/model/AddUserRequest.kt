@@ -9,9 +9,9 @@ import okhttp3.RequestBody.Companion.toRequestBody
 @Serializable
 data class AddUserRequest(
     val userName: String,
-    val hospitalId: Int,
+    val hospitalId: Long,
     val empNo: String,
-    val fcmToken: String
+    val fcmToken: String?
 ) {
     fun toRequestBody(): RequestBody {
         return Json.encodeToString(this).toRequestBody()

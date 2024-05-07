@@ -139,8 +139,8 @@ const WorkStaticsPage = () => {
 export default WorkStaticsPage;
 
 const GraphContainer = styled.div`
-  padding: 20px;
   background-color: #f2f4f7;
+  min-height: 100vh;
 `;
 const GraphTitle = styled.p`
   font-size: 25px;
