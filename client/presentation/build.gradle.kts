@@ -112,5 +112,8 @@ dependencies {
     // naver
     implementation(libs.naver.oauth)
 
+    // paging3
+    implementation(libs.paging.compose)
+
     implementation(project(":domain"))
 }

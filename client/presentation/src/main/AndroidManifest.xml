@@ -27,5 +27,14 @@
         <activity android:name="com.org.egglog.presentation.domain.auth.activity.LoginActivity" />
         <activity android:name="com.org.egglog.presentation.domain.community.posteditor.activity.PostEditorActivity" />
         <activity android:name="com.org.egglog.presentation.domain.auth.activity.PlusLoginActivity" />
+<!--        <activity-->
+<!--            android:name=".domain.community.activity.CommunityActivity"-->
+<!--            android:exported="true">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
+        <activity android:name=".domain.community.activity.CommunityActivity"/>
     </application>
 </manifest>

@@ -45,7 +45,7 @@ fun PostReaction(postReactionInfo: PostReactionInfo) {
         if(postReactionInfo.hitCnt >= 0) {
             Row(Modifier, verticalAlignment = Alignment.CenterVertically) {
                 Spacer(modifier = Modifier.padding(4.widthPercent(context).dp))
-                Icon(imageVector = Watch, modifier = Modifier.size(14.widthPercent(context).dp), color = if (postReactionInfo.isCommented) Blue300 else Gray400)
+                Icon(imageVector = Watch, modifier = Modifier.size(14.widthPercent(context).dp), color = Blue300)
                 Spacer(modifier = Modifier.padding(2.widthPercent(context).dp))
                 Text(text = "${postReactionInfo.hitCnt}", style = Typography.displayMedium.copy(color = Gray400))
             }
