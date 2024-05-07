@@ -155,7 +155,7 @@ public class BoardService {
             String boardIds = redisTemplate.opsForValue().get("hotBoards");
             log.info("boardIds: {}", boardIds);
 
-            if (boardIds != null && !boardIds.isEmpty()) {
+            if (boardIds != null || !boardIds.isEmpty()) {
                 List<Long> ids = Arrays.stream(boardIds.replace("[", "").replace("]", "").split(","))
                         .map(String::trim)
                         .map(Long::parseLong)
