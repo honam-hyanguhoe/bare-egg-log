@@ -3,6 +3,9 @@ package com.org.egglog.presentation.domain.auth.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.paging.PagingData
+import com.google.firebase.Firebase
+import com.google.firebase.messaging.messaging
+import com.org.egglog.domain.auth.model.AddUserParam
 import com.org.egglog.domain.auth.model.HospitalParam
 import com.org.egglog.domain.auth.model.UserHospital
 import com.org.egglog.domain.auth.usecase.DeleteTokenUseCase
@@ -14,6 +17,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.await
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.annotation.OrbitExperimental
@@ -43,19 +48,6 @@ class PlusLoginViewModel @Inject constructor(
             }
         }
     )
-
-    init {
-        load()
-    }
-
-    private fun load() = intent {
-        val hospitalsFlow = getAllHospitalUseCase(HospitalParam(0, 10, "")).getOrThrow()
-        reduce {
-            state.copy(
-                hospitalsFlow = hospitalsFlow ?: emptyFlow()
-            )
-        }
-    }
 
     @OptIn(OrbitExperimental::class)
     fun onNameChange(name: String) = blockingIntent {
@@ -94,15 +86,40 @@ class PlusLoginViewModel @Inject constructor(
     fun onClickJoin() = intent {
         // TODO
         // 1. 유저 회원가입
-        // 1-1) 성공 시
-        // 유저 store에 저장 후 메인으로
-        postSideEffect(PlusLoginSideEffect.NavigateToMainActivity)
-        // 1-2) 실패 시
-        // Toast 띄우고 그대로 두기
+        // Firebase에서 FCM 토큰 가져오기
+        val fcmToken = try {
+            Firebase.messaging.token.await()
+        } catch (e: Exception) {
+            Log.e("FCM Token", "Error fetching FCM token: ${e.message}", e)
+            null
+        }
+
+        // 회원가입 시도
+        val result = updateUserJoinUseCase(AddUserParam(userName = state.name, empNo = state.empNo, hospitalId = state.hospital!!.hospitalId, fcmToken = fcmToken)).getOrThrow()
+        if(result != null) {
+            setUserStoreUseCase(result)
+            postSideEffect(PlusLoginSideEffect.NavigateToMainActivity)
+        } else {
+            postSideEffect(PlusLoginSideEffect.Toast("회원가입에 실패했습니다."))
+        }
     }
 
     fun onClickDone() = intent {
         Log.e("done: ", state.search)
+        if(state.search == "") {
+            reduce {
+                state.copy(
+                    hospitalsFlow = emptyFlow()
+                )
+            }
+        } else {
+            val hospitalsFlow = getAllHospitalUseCase(state.search).getOrThrow()
+            reduce {
+                state.copy(
+                    hospitalsFlow = hospitalsFlow ?: emptyFlow()
+                )
+            }
+        }
     }
 }
 

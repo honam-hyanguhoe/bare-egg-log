@@ -110,6 +110,7 @@ dependencies {
 
     // google
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.messaging.ktx)
     implementation(platform(libs.firebase.bom))
     implementation(libs.play.services.auth)
 

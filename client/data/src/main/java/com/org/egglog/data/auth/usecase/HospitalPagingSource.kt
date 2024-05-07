@@ -21,7 +21,7 @@ class HospitalPagingSource @Inject constructor(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, UserHospital> {
         try {
-            val page: Int = params.key ?: 1
+            val page: Int = params.key ?: 0
             val loadSize = params.loadSize
             val search: String = search // 검색 쿼리
 

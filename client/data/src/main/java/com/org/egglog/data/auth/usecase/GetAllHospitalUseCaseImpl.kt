@@ -12,13 +12,13 @@ import javax.inject.Inject
 class GetAllHospitalUseCaseImpl @Inject constructor(
     private val pagingSourceFactory: HospitalPagingSourceFactory
 ): GetAllHospitalUseCase {
-    override suspend fun invoke(hospitalParam: HospitalParam): Result<Flow<PagingData<UserHospital>>?> = kotlin.runCatching {
+    override suspend fun invoke(search: String): Result<Flow<PagingData<UserHospital>>?> = kotlin.runCatching {
         Pager(
             config = PagingConfig(
-                pageSize = 10,
-                initialLoadSize = 10
+                pageSize = 50,
+                initialLoadSize = 50
             ),
-            pagingSourceFactory = { pagingSourceFactory.create(search = hospitalParam.search) },
+            pagingSourceFactory = { pagingSourceFactory.create(search = search) },
         ).flow
     }
 }

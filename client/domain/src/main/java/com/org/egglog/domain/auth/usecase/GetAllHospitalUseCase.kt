@@ -6,6 +6,6 @@ import com.org.egglog.domain.auth.model.UserHospital
 import kotlinx.coroutines.flow.Flow
 
 interface GetAllHospitalUseCase {
-    suspend operator fun invoke(hospitalParam: HospitalParam): Result<Flow<PagingData<UserHospital>>?>
+    suspend operator fun invoke(search: String): Result<Flow<PagingData<UserHospital>>?>
 }
 

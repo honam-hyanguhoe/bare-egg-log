@@ -13,6 +13,7 @@ import retrofit2.http.Headers
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface UserService {
     @POST("auth/login/{provider}")
@@ -37,8 +38,8 @@ interface UserService {
     @GET("hospital/list")
     @Headers("Content-Type:application/json; charset=UTF8")
     suspend fun getHospitals(
-        @Path("offset") page: Int,
-        @Path("limit") size: Int,
-        @Path("search") search: String
+        @Query("offset") page: Int,
+        @Query("limit") size: Int,
+        @Query("hospitalName") search: String
     ): CommonResponse<List<UserHospitalResponse>>
 }
