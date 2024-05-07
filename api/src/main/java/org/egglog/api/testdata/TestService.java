@@ -98,7 +98,7 @@ public class TestService {
     }
 
     public void deleteUserMockData(){
-        userJpaRepository.saveAll(userJpaRepository.findListByEggLogWithHospital());
+        userJpaRepository.deleteAll(userJpaRepository.findListByEggLogWithHospital());
     }
 
 
