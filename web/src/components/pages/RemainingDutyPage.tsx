@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState, useMemo } from "react";
+import styled from "styled-components";
 import RemainingDutyGraph from "../atoms/RemainingDutyGraph";
 
 interface TreeNode {
@@ -22,14 +23,7 @@ const remainingDuty = [
 const RemainingDutyPage = () => {
   const initialData: TreeNode = {
     name: "duty",
-    children: [
-      { name: "Day", value: 0, color: "#18C5B5" },
-      { name: "Eve", value: 0, color: "#F4D567" },
-      { name: "Night", value: 0, color: "#485E88" },
-      { name: "Off", value: 0, color: "#9B8AFB" },
-      { name: "휴가/연가", value: 0, color: "#FDA29B" },
-      { name: "교육", value: 0, color: "#98A2B3" },
-    ],
+    children: remainingDuty,
     colname: "duty-column",
     color: "white",
     remain: 0,
@@ -56,10 +50,8 @@ const RemainingDutyPage = () => {
       setData(newData);
     };
 
-    // 5초마다 데이터 업데이트 함수 실행
-    const interval = setInterval(updateData, 5000);
+    const interval = setInterval(updateData, 2000);
 
-    // 컴포넌트 언마운트 시 clearInterval을 사용하여 setInterval 정리
     return () => clearInterval(interval);
   }, []);
   const getRandomValues = () => {
@@ -67,11 +59,22 @@ const RemainingDutyPage = () => {
   };
 
   return (
-    <>
-      <div>[에그로그] 잔여근무그래프 넣어볼게</div>
+    <GraphContainer>
+      {/* <GraphTitle>제 근무는 언제 끝나죠?</GraphTitle> */}
       <RemainingDutyGraph data={data} />
-    </>
+    </GraphContainer>
   );
 };
 
 export default RemainingDutyPage;
+
+const GraphContainer = styled.div`
+  padding: 20px;
+`;
+const GraphTitle = styled.p`
+  font-size: 25px;
+  font-family: "Line-Seed-Sans-App";
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 20px;
+`;

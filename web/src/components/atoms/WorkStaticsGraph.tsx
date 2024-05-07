@@ -13,9 +13,28 @@ interface WorkStaticsGraphProps {
 const WorkStaticsGraph = ({ data }: WorkStaticsGraphProps) => {
   const svgRef = useRef(null);
   const dataRef = useRef(data);
-  const width = 500;
-  const height = 400;
   const backgroundColor = "#fff";
+
+  const [dimensions, setDimensions] = useState({
+    width: window.innerWidth > 500 ? 500 : window.innerWidth * 0.9,
+    // height: window.innerHeight > 700 ? 700 : window.innerHeight,
+    height: 400,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setDimensions({
+        width: window.innerWidth > 500 ? 500 : window.innerWidth * 0.9,
+        height: 400,
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   useEffect(() => {
     dataRef.current = data;
   }, [data]);
@@ -23,8 +42,9 @@ const WorkStaticsGraph = ({ data }: WorkStaticsGraphProps) => {
   useEffect(() => {
     if (!svgRef.current || !dataRef.current) return;
 
+    const { width, height } = dimensions;
     const barSvg = d3.select(svgRef.current);
-    const margin = { top: 20, right: 30, bottom: 30, left: 40 };
+    const margin = { top: 0, right: 30, bottom: 30, left: 20 };
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
@@ -39,7 +59,7 @@ const WorkStaticsGraph = ({ data }: WorkStaticsGraphProps) => {
 
     const yScale = d3
       .scaleLinear()
-      .domain([0, maxVal + 5])
+      .domain([0, maxVal + 2])
       .nice()
       .range([innerHeight, 0]);
 
@@ -136,11 +156,11 @@ const WorkStaticsGraph = ({ data }: WorkStaticsGraphProps) => {
     return () => {
       gridLines.remove();
     };
-  }, [width, height, data]);
+  }, [data, dimensions]);
 
   return (
     <>
-      <svg ref={svgRef} width={width} height={height}>
+      <svg ref={svgRef} width={dimensions.width} height={dimensions.height}>
         <g className="x-axis" />
         <g className="y-axis" />
       </svg>

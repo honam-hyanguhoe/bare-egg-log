@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import WorkStaticsGraph from "../atoms/WorkStaticsGraph";
-import { idText } from "typescript";
+import Label from "../atoms/Label";
+import styled from "styled-components";
 
 interface DataItem {
   name: string;
@@ -95,11 +96,9 @@ const WorkStaticsPage = () => {
   const newData1: DataItem[] = normalizeData(monthlyData);
   console.log(`${JSON.stringify(newData1)}`);
 
-  // 데이터 상태 및 업데이트 함수 설정
   const [data, setData] = useState<DataItem[]>(initialData);
 
   useEffect(() => {
-    // 5초마다 데이터를 변경하는 함수
     const updateData = () => {
       const newData: DataItem[] = normalizeData(monthlyData);
       console.log(`${JSON.stringify(newData)}`);
@@ -107,19 +106,63 @@ const WorkStaticsPage = () => {
       setData(newData);
     };
 
-    // 5초마다 데이터 업데이트 함수 실행
     const interval = setInterval(updateData, 5000);
 
-    // 컴포넌트 언마운트 시 clearInterval을 사용하여 setInterval 정리
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <>
-      <div>내 근무 통계</div>
+    <GraphContainer>
+      <GraphTitle>내 근무 통계</GraphTitle>
+      <TypeListContainer>
+        <TypeContainer>
+          <Label borderColor="#18C5B5" bgColor="#18C5B5" />
+          <TypeText>DAY</TypeText>
+        </TypeContainer>
+        <TypeContainer>
+          <Label borderColor="#ffe68a" bgColor="#ffe68a" />
+          <TypeText>EVE</TypeText>
+        </TypeContainer>
+        <TypeContainer>
+          <Label borderColor="#7c90b6" bgColor="#7c90b6" />
+          <TypeText>NIGHT</TypeText>
+        </TypeContainer>
+        <TypeContainer>
+          <Label borderColor="#b4aaeb" bgColor="#b4aaeb" />
+          <TypeText>OFF</TypeText>
+        </TypeContainer>
+      </TypeListContainer>
       <WorkStaticsGraph data={data} />
-    </>
+    </GraphContainer>
   );
 };
 
 export default WorkStaticsPage;
+
+const GraphContainer = styled.div`
+  padding: 20px;
+`;
+const GraphTitle = styled.p`
+  font-size: 25px;
+  font-family: "Line-Seed-Sans-App";
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 20px;
+`;
+const TypeListContainer = styled.div`
+  display: flex;
+  gap: 14px;
+`;
+
+const TypeContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+`;
+const TypeText = styled.div`
+  font-size: 14px;
+  font-family: "Line-Seed-Sans-App";
+  font-weight: 600;
+  color: #767676;
+`;
