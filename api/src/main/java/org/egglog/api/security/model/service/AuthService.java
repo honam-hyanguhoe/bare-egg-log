@@ -55,6 +55,7 @@ public class AuthService {
     }
 
     public void logout(User user){
+        userJpaRepository.save(user.doLogout());
         tokenService.RemoveToken(user.getId());
     }
 
