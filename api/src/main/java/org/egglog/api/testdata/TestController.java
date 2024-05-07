@@ -3,7 +3,9 @@ package org.egglog.api.testdata;
 import lombok.RequiredArgsConstructor;
 import org.egglog.api.user.model.service.UserService;
 import org.egglog.utility.utils.MessageUtils;
+import org.egglog.utility.utils.SuccessType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,9 +29,15 @@ public class TestController {
 
     private final TestService testService;
 
-    @PostMapping ("/user")
+    @PostMapping("/create/user")
     public ResponseEntity<MessageUtils> createUserMockData(){
         return ResponseEntity.ok().body(MessageUtils.success(testService.createUserMockData()));
+    }
+
+    @DeleteMapping("/delete/user")
+    public ResponseEntity<MessageUtils> deleteUserMockData(){
+        testService.deleteUserMockData();
+        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
     }
 
 //    @PostMapping("/work")

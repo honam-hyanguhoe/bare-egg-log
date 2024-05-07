@@ -41,8 +41,9 @@ public class TestService {
         for (User user : users) {
             cnt++;
             if (cnt==10||cnt==20||cnt==30) hospitalId++;
-            log.debug("=====start user Join=====");
+            log.debug("=====start user Join hospitalId : {} =====",hospitalId);
             userService.joinUser(user, JoinUserRequest.builder()
+                    .userName(user.getName())
                     .empNo(UUID.randomUUID().toString())
                     .fcmToken(UUID.randomUUID().toString())
                     .hospitalId(hospitalId).build());
@@ -86,5 +87,9 @@ public class TestService {
         mockUsers.add(User.builder().name("서건창").email("test29@ssafy.com").profileImgUrl("https://cdn2.thecatapi.com/images/9um.jpg").provider(AuthProvider.EGGLOG).build());
         mockUsers.add(User.builder().name("최형우").email("test30@ssafy.com").profileImgUrl("https://cdn2.thecatapi.com/images/bpa.jpg").provider(AuthProvider.EGGLOG).build());
         return mockUsers;
+    }
+
+    public void deleteUserMockData(){
+        userJpaRepository.saveAll(userJpaRepository.findListByEggLogWithHospital());
     }
 }
