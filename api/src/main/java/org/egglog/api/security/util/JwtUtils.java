@@ -9,6 +9,9 @@ import org.egglog.api.security.exception.JwtErrorCode;
 import org.egglog.api.security.exception.JwtException;
 import org.egglog.api.security.repository.redis.RefreshTokenRepository;
 import org.egglog.api.security.repository.redis.UnsafeTokenRepository;
+import org.egglog.api.user.exception.UserErrorCode;
+import org.egglog.api.user.exception.UserException;
+import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.repository.jpa.UserJpaRepository;
 import org.springframework.stereotype.Service;
 
@@ -113,7 +116,9 @@ public class JwtUtils {
             throw new JwtException(JwtErrorCode.TOKEN_SIGNATURE_ERROR);
         }catch (ExpiredJwtException e){
             log.info("exception : 리프레쉬 토큰 기간 만료");
-
+            User expiredUser = userJpaRepository.findById(Long.valueOf(e.getClaims().getSubject()))
+                    .orElseThrow(() -> new UserException(UserErrorCode.DELETED_USER));
+            userJpaRepository.save(expiredUser.doLogout()); //로그아웃 처리
             throw new JwtException(JwtErrorCode.EXPIRED_TOKEN);
         }catch (UnsupportedJwtException e){
             log.info("exception : 지원되지 않는 리프레쉬 토큰");
