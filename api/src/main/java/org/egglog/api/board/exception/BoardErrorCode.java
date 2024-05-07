@@ -12,6 +12,7 @@ public enum BoardErrorCode implements ErrorFormat {
     NO_EXIST_BOARD("존재하지 않는 게시글입니다.", HttpStatus.BAD_REQUEST),
     NO_EXIST_CATEGORY("존재하지 않는 게시판 카테코리입니다.", HttpStatus.BAD_REQUEST),
     TRANSACTION_ERROR("트랜잭션에 실패했습니다.",HttpStatus.INTERNAL_SERVER_ERROR),
+    NOT_SAME_WRITER("작성자가 아닙니다.",  HttpStatus.BAD_REQUEST),
 
 
     DATABASE_CONNECTION_FAILED("데이터베이스 연결에 실패했습니다.",HttpStatus.INTERNAL_SERVER_ERROR),
