@@ -17,15 +17,14 @@ const WorkStaticsGraph = ({ data }: WorkStaticsGraphProps) => {
 
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth > 500 ? 500 : window.innerWidth * 0.95,
-    // height: window.innerHeight > 700 ? 700 : window.innerHeight,
-    height: 350,
+    height: window.innerHeight > 400 ? 400 : window.innerHeight * 0.8,
   });
 
   useEffect(() => {
     const handleResize = () => {
       setDimensions({
         width: window.innerWidth > 500 ? 500 : window.innerWidth * 0.95,
-        height: 350,
+        height: window.innerHeight > 400 ? 400 : window.innerHeight * 0.8,
       });
     };
 
