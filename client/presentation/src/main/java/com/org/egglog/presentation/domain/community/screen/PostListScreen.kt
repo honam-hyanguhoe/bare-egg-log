@@ -62,7 +62,7 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 @Composable
 fun PostListScreen(
     viewModel: PostListViewModel = hiltViewModel(),
-    onNavigateToDetailScreen: () -> Unit
+    onNavigateToDetailScreen: (postId: Int) -> Unit
 ) {
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
@@ -72,12 +72,9 @@ fun PostListScreen(
     }
     }
     PostListScreen(
-        postList = listOf(
-            PreviewPostInfo(31, "test1", "test1", "2024-01-02 17:39:38", "익명의 구운란", 1, 5, 0, "https://picsum.photos/300", false, true, true, 1, "전남대병원"),
-            PreviewPostInfo(32, "test1", "test1", "2024-01-02 17:39:38", "익명의 구운란", 1, 5, 0, "https://picsum.photos/300", false, true, true, 2, "조선대병원")
-        ),
+        postList = state.postList,
         hotPostList = state.hotPostList,
-        onClickPost = onNavigateToDetailScreen,
+        onClickPost = { postId: Int -> onNavigateToDetailScreen(postId) },
         onClickWriteButton = viewModel::onClickWriteButton
     )
 }
@@ -86,7 +83,7 @@ fun PostListScreen(
 private fun PostListScreen(
     postList: List<PreviewPostInfo>,
     hotPostList: List<HotPostInfo>,
-    onClickPost: () -> Unit,
+    onClickPost: (postId: Int) -> Unit,
     onClickWriteButton: () -> Unit
 ) {
     val context = LocalContext.current
@@ -152,11 +149,17 @@ private fun PostListScreen(
                     count = hotPostList.size,
                     key = { index -> hotPostList[index].postId }
                 ) { index ->
-                    HotPostCard(postInfo = hotPostList[index], onClickPost = onClickPost)
+                    HotPostCard(postInfo = hotPostList[index], onClickPost = { postId -> onClickPost(postId) })
                 }
             } else {
                 item {
-                    Text(text = "아직 급상승 게시글이 없어요", Modifier.padding())
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp, bottom = 10.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "아직 급상승 게시글이 없어요")
+                    }
                 }
             }
 
@@ -164,20 +167,51 @@ private fun PostListScreen(
                 Spacer(modifier = Modifier.height(30.dp))
             }
 
-            items(
-                count = postList.size,
-                key = {index -> postList[index].boardId}
-            ) {index ->
-                val postData = postList[index]
-                val profile = Profile(postData.userId, postData.tempNickname, postData.hospitalName, postData.isHospitalAuth)
-                val postInfo = com.org.egglog.client.data.PostInfo(postData.boardId, postData.boardTitle, postData.boardContent, postData.pictureOne)
-                val postReaction = PostReactionInfo(postData.boardId, postData.likeCount, postData.commentCount, postData.viewCount, postData.isLiked, postData.isCommented)
+            if(postList.isNotEmpty()) {
+                items(
+                    count = postList.size,
+                    key = { index -> postList[index].boardId }
+                ) { index ->
+                    val postData = postList[index]
+                    val profile = Profile(
+                        postData.userId,
+                        postData.tempNickname ?: "익명의 구운란",
+                        postData.hospitalName,
+                        postData.isHospitalAuth
+                    )
+                    val postInfo = com.org.egglog.client.data.PostInfo(
+                        postData.boardId,
+                        postData.boardTitle,
+                        postData.boardContent,
+                        postData.pictureOne
+                    )
+                    val postReaction = PostReactionInfo(
+                        postData.boardId,
+                        postData.likeCount,
+                        postData.commentCount,
+                        postData.viewCount,
+                        postData.isLiked,
+                        postData.isCommented
+                    )
 
-                PostCard(profile = profile, postInfo = postInfo, postReaction = postReaction, onClick = onClickPost)
+                    PostCard(
+                        profile = profile,
+                        postInfo = postInfo,
+                        postReaction = postReaction,
+                        onClick = { postId -> onClickPost(postId) })
+                }
+            } else {
+                item {
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp, bottom = 10.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "아직 등록된 게시글이 없어요")
+                    }
+                }
             }
         }
-
-
 
     }
 

@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.community.posteditor.usecase.WritePostUseCase
 import com.org.egglog.presentation.domain.auth.viewmodel.LoginSideEffect
 import com.org.egglog.presentation.domain.auth.viewmodel.LoginState
@@ -23,6 +24,7 @@ import kotlin.math.log
 
 @HiltViewModel
 class WritePostViewModel @Inject constructor(
+    private val getTokenUseCase: GetTokenUseCase,
     private val writePostUseCase: WritePostUseCase,
 ) : ViewModel(), ContainerHost<PostState, PostSideEffect> {
     override val container: Container<PostState, PostSideEffect> = container(
@@ -49,9 +51,12 @@ class WritePostViewModel @Inject constructor(
     }
 
     fun onPostClick() = intent {
+        val tokens = getTokenUseCase()
+
         reduce { state.copy(isLoading = true) }
 
         val postResult = writePostUseCase(
+            accessToken = "Bearer ${tokens.first}",
             boardTitle = state.title,
             boardContent = state.content,
             uploadImages = state.uploadImages.map { bitmap ->

@@ -21,13 +21,13 @@ import com.org.egglog.presentation.component.molecules.postReaction.PostReaction
 import com.org.egglog.presentation.theme.*
 
 @Composable
-fun PostCard(profile: Profile, postInfo: PostInfo, postReaction: PostReactionInfo, onClick: (() -> Unit) ?= null) {
+fun PostCard(profile: Profile, postInfo: PostInfo, postReaction: PostReactionInfo, onClick: ((Int) -> Unit) ?= null) {
 
     Column(Modifier
             .padding(bottom = 20.dp)
             .run{
                 if(onClick != null) {
-                    clickable { onClick() }
+                    clickable { onClick(postInfo.postId.toInt()) }
                 } else {
                     this
                 }

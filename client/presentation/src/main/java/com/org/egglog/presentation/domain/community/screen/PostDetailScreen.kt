@@ -40,7 +40,7 @@ fun PostDetailScreen(
 
         LazyColumn {
             item {
-                val profile = Profile(postData.userId, postData.tempNickname, postData.hospitalName, postData.isHospitalAuth)
+                val profile = Profile(postData.userId, postData.tempNickname?: "익명의 구운란", postData.hospitalName, postData.isHospitalAuth)
                 val postInfo = com.org.egglog.client.data.PostInfo(postData.boardId, postData.boardTitle, postData.boardContent, postData.pictureOne)
                 val postReaction = PostReactionInfo(postData.boardId, postData.likeCount, postData.commentCount, postData.viewCount, postData.isLiked, postData.isCommented)
                 Box(modifier = Modifier.padding(horizontal = 20.dp)) {

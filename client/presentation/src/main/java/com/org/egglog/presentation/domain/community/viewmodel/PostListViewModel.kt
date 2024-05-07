@@ -43,17 +43,24 @@ class PostListViewModel @Inject constructor(
         val tokens = getTokenUseCase()
         Log.e("PostListViewModel", tokens.first!!)
 
-        // hotPostList가 빈배열이면 빈배열로, 아니면 List<HotPostInfo> 로
         var hotPostList = getHotPostListUseCase("Bearer ${tokens.first}").map {
             it.map {
                 it!!.toUiModel()
             }
         }.getOrDefault(listOf())
-//        val postList = getPostListUseCase("Bearer ${tokens.first!!}", state.hospitalId, state.groupId, state.searchWord, state.lastBoardId)
+        Log.e("PostListViewModel", "postList는 ${getPostListUseCase("Bearer ${tokens.first!!}", state.hospitalId, state.groupId, state.searchWord, state.lastBoardId)}")
+        val postList = getPostListUseCase("Bearer ${tokens.first!!}", state.hospitalId, state.groupId, state.searchWord, state.lastBoardId).map {
+            it.map {
+                it!!.toUiModel()
+            }
+        }.getOrThrow()
+
+        Log.e("PostListViewModel", "postList는 ${postList}")
 
         reduce {
             state.copy(
-                hotPostList = if(hotPostList.isEmpty()) listOf() else hotPostList
+                hotPostList = if(hotPostList.isEmpty()) listOf() else hotPostList,
+                postList = if(postList.isEmpty()) listOf() else postList,
             )
         }
     }
