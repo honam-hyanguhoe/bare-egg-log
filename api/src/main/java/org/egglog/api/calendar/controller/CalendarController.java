@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.calendar.model.dto.params.CalendarMonthRequest;
 import org.egglog.api.calendar.model.service.CalendarService;
+import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.utility.utils.MessageUtils;
 import org.springframework.beans.factory.annotation.Value;

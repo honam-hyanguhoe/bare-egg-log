@@ -19,5 +19,5 @@ public interface EventCustomQuery {
     Optional<List<Event>> findByTargetDate(LocalDateTime targetDate, Long userId);
 
     List<Event> findAllEventByUserId(Long userId);
-
+    long deleteAllByCalendarGroupId(Long calendarGroupId);
 }
