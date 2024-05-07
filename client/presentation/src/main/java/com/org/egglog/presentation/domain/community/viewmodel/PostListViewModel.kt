@@ -48,14 +48,11 @@ class PostListViewModel @Inject constructor(
                 it!!.toUiModel()
             }
         }.getOrDefault(listOf())
-        Log.e("PostListViewModel", "postList는 ${getPostListUseCase("Bearer ${tokens.first!!}", state.hospitalId, state.groupId, state.searchWord, state.lastBoardId)}")
         val postList = getPostListUseCase("Bearer ${tokens.first!!}", state.hospitalId, state.groupId, state.searchWord, state.lastBoardId).map {
             it.map {
                 it!!.toUiModel()
             }
         }.getOrThrow()
-
-        Log.e("PostListViewModel", "postList는 ${postList}")
 
         reduce {
             state.copy(

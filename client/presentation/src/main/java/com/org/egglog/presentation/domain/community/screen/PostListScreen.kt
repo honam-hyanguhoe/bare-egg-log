@@ -147,7 +147,7 @@ private fun PostListScreen(
             if(hotPostList.isNotEmpty()) {
                 items(
                     count = hotPostList.size,
-                    key = { index -> hotPostList[index].postId }
+                    key = { index -> "0${hotPostList[index].postId}" }
                 ) { index ->
                     HotPostCard(postInfo = hotPostList[index], onClickPost = { postId -> onClickPost(postId) })
                 }

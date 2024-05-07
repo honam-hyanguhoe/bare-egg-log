@@ -1,11 +1,13 @@
 package com.org.egglog.data.community.service
 
 import com.org.egglog.data.community.model.HotPostResponse
+import com.org.egglog.data.community.model.PostDetailResponse
 import com.org.egglog.data.community.model.PostResponse
 import com.org.egglog.data.retrofit.CommonResponse
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface CommunityService {
@@ -25,5 +27,13 @@ interface CommunityService {
         @Query("search_word") searchWord: String? = null,
         @Query("last_board_id") lastBoardId: Int? = null
     ): CommonResponse<List<PostResponse?>>
+
+    @GET("boards/{postId}")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun getPostDetail(
+        @Header("Authorization") accessToken: String,
+        @Path("postId") postId: Int
+    ): CommonResponse<PostDetailResponse?>
+
 
 }

@@ -36,6 +36,7 @@ fun CommunityNavigationHost() {
             backStackEntry ->
              val postId = backStackEntry.arguments?.getInt("postId")
             PostDetailScreen(
+                postId = postId!!,
                 onNavigateToPostListScreen = {
                     navController.navigate(
                         route = "${CommunityRoute.PostListScreen}"

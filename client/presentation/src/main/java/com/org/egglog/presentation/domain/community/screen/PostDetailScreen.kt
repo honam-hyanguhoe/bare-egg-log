@@ -1,5 +1,7 @@
 package com.org.egglog.presentation.domain.community.screen
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,44 +14,109 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.material.Text
 import com.org.egglog.client.data.PostReactionInfo
 import com.org.egglog.client.data.Profile
 import com.org.egglog.presentation.component.molecules.headers.BasicHeader
 import com.org.egglog.presentation.component.organisms.postCard.PostCard
+import com.org.egglog.presentation.data.PostDetailInfo
 import com.org.egglog.presentation.data.PreviewPostInfo
+import com.org.egglog.presentation.domain.community.viewmodel.PostDetailSideEffect
+import com.org.egglog.presentation.domain.community.viewmodel.PostDetailViewModel
+import com.org.egglog.presentation.domain.community.viewmodel.PostListSideEffect
 import com.org.egglog.presentation.theme.NaturalWhite
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
+import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
 fun PostDetailScreen(
+    viewModel: PostDetailViewModel = hiltViewModel(),
+    postId: Int,
     onNavigateToPostListScreen: () -> Unit
 ) {
     val context = LocalContext.current
-    val postData = PreviewPostInfo(31, "test1", "test1", "2024-01-02 17:39:38", "익명의 구운란", 1, 5, 0, "https://picsum.photos/300", false, true, true, 1, "전남대병원")
+    val state = viewModel.collectAsState().value
+    viewModel.collectSideEffect {
+        sideEffect -> when(sideEffect) {
+        is PostDetailSideEffect.Toast -> Toast.makeText(context , sideEffect.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    PostDetailScreen(state.userId!!, postId, state.postDetailInfo, onNavigateToPostListScreen)
+}
+
+@Composable
+private fun PostDetailScreen(
+    userId: Long,
+    postId: Int,
+    postDetailInfo: PostDetailInfo?,
+    onNavigateToPostListScreen: () -> Unit
+) {
     Column(
         Modifier
             .fillMaxSize()
             .background(NaturalWhite)
     ) {
-        BasicHeader(hasArrow = true, hasMore = true, onClickBack = onNavigateToPostListScreen, options = listOf("수정하기", "삭제하기"))
 
+        // 내 글일 경우만 수정, 삭제 버튼 활성화
+        if(userId.toInt() == postDetailInfo?.userId) {
+            BasicHeader(
+                hasArrow = true,
+                hasMore = true,
+                onClickBack = onNavigateToPostListScreen,
+                options = listOf("수정하기", "삭제하기")
+            )
+        } else {
+            BasicHeader(
+                hasArrow = true,
+                onClickBack = onNavigateToPostListScreen,
+            )
+        }
 
         Spacer(modifier = Modifier.height(20.dp))
 
         LazyColumn {
-            item {
-                val profile = Profile(postData.userId, postData.tempNickname?: "익명의 구운란", postData.hospitalName, postData.isHospitalAuth)
-                val postInfo = com.org.egglog.client.data.PostInfo(postData.boardId, postData.boardTitle, postData.boardContent, postData.pictureOne)
-                val postReaction = PostReactionInfo(postData.boardId, postData.likeCount, postData.commentCount, postData.viewCount, postData.isLiked, postData.isCommented)
-                Box(modifier = Modifier.padding(horizontal = 20.dp)) {
-                    PostCard(profile = profile, postInfo = postInfo, postReaction = postReaction)
+            if(postDetailInfo!=null) {
+                item {
+                    val profile = Profile(
+                        postDetailInfo.userId.toLong(),
+                        postDetailInfo.tempNickname ?: "익명의 구운란",
+                        postDetailInfo.hospitalName?: "",
+                        postDetailInfo.isHospitalAuth
+                    )
+                    val postInfo = com.org.egglog.client.data.PostInfo(
+                        postDetailInfo.boardId,
+                        postDetailInfo.boardTitle,
+                        postDetailInfo.boardContent,
+                        postDetailInfo.pictureOne
+                    )
+                    val postReaction = PostReactionInfo(
+                        postDetailInfo.boardId,
+                        postDetailInfo.boardLikeCount,
+                        postDetailInfo.commentCount,
+                        postDetailInfo.viewCount,
+                        postDetailInfo.isLiked,
+                        postDetailInfo.isCommented
+                    )
+                    Box(modifier = Modifier.padding(horizontal = 20.dp)) {
+                        PostCard(
+                            profile = profile,
+                            postInfo = postInfo,
+                            postReaction = postReaction
+                        )
+                    }
+                }
+            } else {
+                item {
+                    Text(text = "게시글을 불러오는데 실패했습니다.")
                 }
             }
 
             item {
-
+                // 댓글 리스트
             }
         }
 

@@ -12,8 +12,6 @@ class GetHotPostListUseCaseImpl @Inject constructor(
 ): GetHotPostListUseCase {
 
     override suspend fun invoke(accessToken: String): Result<List<HotPostData?>> = kotlin.runCatching {
-        Log.e("GetHotPostListUseCaseImpl", "${communityService.getHotPostList(accessToken).dataBody}")
-        Log.e("GetHotPostListUseCaseImpl", "${communityService.getHotPostList(accessToken).dataBody!!.map {it?.toDomainModel()}}")
         communityService.getHotPostList(accessToken).dataBody!!.map {it?.toDomainModel()}
     }
 }
