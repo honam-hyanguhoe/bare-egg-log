@@ -41,7 +41,6 @@ class PostListViewModel @Inject constructor(
 
     private fun load() = intent {
         val tokens = getTokenUseCase()
-        Log.e("PostListViewModel", tokens.first!!)
 
         var hotPostList = getHotPostListUseCase("Bearer ${tokens.first}").map {
             it.map {
