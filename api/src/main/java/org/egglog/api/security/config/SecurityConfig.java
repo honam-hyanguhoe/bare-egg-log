@@ -25,7 +25,7 @@ import java.util.Collections;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig{
-    private static final String[] ALLOWED_URIS = {"/v1/hospital/list", "/v1/auth/login/**", "/v1/auth/refresh", "/test/**", "/swagger-ui/**", "/login/oauth2/code/**", "/oauth2/**", "/v3/api-docs/**"};
+    private static final String[] ALLOWED_URIS = {"/v1/hospital/list", "/v1/auth/login/**", "/v1/auth/refresh", "/test/**", "/swagger-ui/**", "/login/oauth2/code/**", "/oauth2/**", "/v3/api-docs/**", "/actuator/prometheus", "/actuator/metrics"};
     private final JwtFilter jwtFilter;
     private final CustomOAuth2Service customOAuth2Service;
     private final OAuthSuccessHandler oAuth2SuccessHandler;
