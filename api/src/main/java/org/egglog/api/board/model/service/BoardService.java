@@ -153,6 +153,8 @@ public class BoardService {
 
         try {
             String boardIds = redisTemplate.opsForValue().get("hotBoards");
+            log.info("boardIds: {}", boardIds);
+
             if (boardIds != null && !boardIds.isEmpty()) {
                 List<Long> ids = Arrays.stream(boardIds.replace("[", "").replace("]", "").split(","))
                         .map(String::trim)
@@ -167,15 +169,15 @@ public class BoardService {
                     //사용자의 병원 인증 정보
                     Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(user, user.getSelectedHospital());
 
-                    Long commentCnt = commentRepository.getCommentCount(board.getId());
-                    Long likeCnt = boardRepository.getLikeCount(board.getId());
+                    long commentCnt = commentRepository.getCommentCount(board.getId());
+                    long likeCnt = boardRepository.getLikeCount(board.getId());
                     long viewCount = redisViewCountUtil.getViewCount(String.valueOf(boardId)); //하루 동안의 조회수
-                    Long hitCnt = viewCount + board.getViewCount();
+                    long hitCnt = viewCount + board.getViewCount();
 
                     boolean isUserLiked = false;  //좋아요 누른 여부
                     boolean isCommented = false;    //댓글 유무 여부
 
-                    if (commentCnt != null) {
+                    if (commentCnt == 0) {
                         isCommented = true;
                     }
 
