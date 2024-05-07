@@ -113,7 +113,6 @@ const WorkStaticsPage = () => {
 
   return (
     <GraphContainer>
-      <GraphTitle>내 근무 통계</GraphTitle>
       <TypeListContainer>
         <TypeContainer>
           <Label borderColor="#18C5B5" bgColor="#18C5B5" />

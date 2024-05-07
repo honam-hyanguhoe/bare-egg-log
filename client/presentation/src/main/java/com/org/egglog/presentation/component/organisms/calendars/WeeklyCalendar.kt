@@ -1,6 +1,7 @@
 package com.org.egglog.presentation.component.organisms.calendars
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -52,20 +53,23 @@ fun WeeklyCalendar(
     onDateClick: ((WeeklyUiModel.Date) -> Unit)? = null,
     onPrevClick: ((LocalDate) -> Unit)? = null,
     onNextClick: ((LocalDate) -> Unit)? = null,
-    labels: List<String> ?= null
+    labels: List<String> ?= null,
+    backgroundColor: Color = NaturalWhite,
+    width : Int = 320
 ) {
 
-    Column(Modifier
-            .fillMaxWidth()
+    Column(
+        Modifier
+            .width(width.widthPercent(LocalContext.current).dp)
+            .background(color = backgroundColor)
     ) {
         if (type.equals("group")) {
             Row{
                 CalendarHeader(calendarUiModel,onPrevClick, onNextClick)
-
                 Spacer(modifier = Modifier.height(6.dp))
             }
         }
-        Content(type, calendarUiModel, onDateClick, labels = labels)
+        Content(type, calendarUiModel, onDateClick, labels = labels, backgroundColor = Gray100)
     }
 
 }
@@ -107,14 +111,14 @@ fun CalendarHeader(
 }
 
 @Composable
-fun Content(type: String, data: WeeklyUiModel, onDateClick: ((WeeklyUiModel.Date) -> Unit)? = null, labels: List<String> ?= null) {
+fun Content(type: String, data: WeeklyUiModel, onDateClick: ((WeeklyUiModel.Date) -> Unit)? = null, labels: List<String> ?= null, backgroundColor: Color = NaturalWhite) {
 
     Row(modifier = Modifier
             .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
     ) {
             data.visibleDates.forEachIndexed() { index, date ->
-                DateItem(type, date, onDateClick, labels?.get(index) ?: "")
+                DateItem(type, date, onDateClick, labels?.get(index) ?: "", backgroundColor = backgroundColor)
             }
 
     }
@@ -125,23 +129,24 @@ fun Content(type: String, data: WeeklyUiModel, onDateClick: ((WeeklyUiModel.Date
 fun DateItem(type: String,
              date: WeeklyUiModel.Date,
              onClick: ((WeeklyUiModel.Date) -> Unit)? = null,
-             label: String? = null
+             label: String? = null,
+              backgroundColor: Color = NaturalWhite
 ) {
     Column() {
         Card(
                 modifier = Modifier
-                        .padding(vertical = 4.dp, horizontal = 2.dp)
-                        .run {
-                            if (type.equals("group")) {
-                                clickable { // making the element clickable, by adding 'clickable' modifier
-                                    if (onClick != null) {
-                                        onClick(date)
-                                    }
+                    .padding(vertical = 4.dp, horizontal = 2.dp)
+                    .run {
+                        if (type.equals("group")) {
+                            clickable { // making the element clickable, by adding 'clickable' modifier
+                                if (onClick != null) {
+                                    onClick(date)
                                 }
-                            } else {
-                                this
                             }
-                        },
+                        } else {
+                            this
+                        }
+                    },
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(
                         // background colors of the selected date
@@ -149,7 +154,7 @@ fun DateItem(type: String,
                         containerColor = if (date.isSelected) {
                             Warning200
                         } else {
-                            NaturalWhite
+                            backgroundColor
                         }
                 ),
                 border = if (date.isToday) {
@@ -163,8 +168,8 @@ fun DateItem(type: String,
         ) {
             Column(
                     modifier = Modifier
-                            .width(38.widthPercent(LocalContext.current).dp)
-                            .padding(vertical = 10.dp, horizontal = 4.dp),
+                        .width(38.widthPercent(LocalContext.current).dp)
+                        .padding(vertical = 10.dp, horizontal = 4.dp),
                     verticalArrangement = Arrangement.Center
             ) {
                 Text(
