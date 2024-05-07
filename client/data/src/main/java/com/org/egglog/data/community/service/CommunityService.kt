@@ -1,9 +1,11 @@
 package com.org.egglog.data.community.service
 
+import com.google.android.gms.common.internal.service.Common
 import com.org.egglog.data.community.model.HotPostResponse
 import com.org.egglog.data.community.model.PostDetailResponse
 import com.org.egglog.data.community.model.PostResponse
 import com.org.egglog.data.retrofit.CommonResponse
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
@@ -34,6 +36,13 @@ interface CommunityService {
         @Header("Authorization") accessToken: String,
         @Path("postId") postId: Int
     ): CommonResponse<PostDetailResponse?>
+
+    @DELETE("boards/{postId}")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun deletePost(
+        @Header("Authorization") accessToken: String,
+        @Path("postId") postId: Int
+    ): CommonResponse<String>
 
 
 }
