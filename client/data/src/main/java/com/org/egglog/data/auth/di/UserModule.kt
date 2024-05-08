@@ -14,8 +14,10 @@ import com.org.egglog.data.auth.usecase.PostLogoutUseCaseImpl
 import com.org.egglog.domain.auth.usecase.SetTokenUseCase
 import com.org.egglog.data.auth.usecase.SetTokenUseCaseImpl
 import com.org.egglog.data.auth.usecase.SetUserStoreUseCaseImpl
+import com.org.egglog.data.auth.usecase.UpdateUserDeleteUseCaseImpl
 import com.org.egglog.data.auth.usecase.UpdateUserFcmTokenUseCaseImpl
 import com.org.egglog.data.auth.usecase.UpdateUserJoinUseCaseImpl
+import com.org.egglog.data.auth.usecase.UpdateUserModifyUseCaseImpl
 import com.org.egglog.domain.auth.usecase.DeleteTokenUseCase
 import com.org.egglog.domain.auth.usecase.DeleteUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.GetAllHospitalUseCase
@@ -24,8 +26,10 @@ import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.GetUserUseCase
 import com.org.egglog.domain.auth.usecase.PostLogoutUseCase
 import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
+import com.org.egglog.domain.auth.usecase.UpdateUserDeleteUseCase
 import com.org.egglog.domain.auth.usecase.UpdateUserFcmTokenUseCase
 import com.org.egglog.domain.auth.usecase.UpdateUserJoinUseCase
+import com.org.egglog.domain.auth.usecase.UpdateUserModifyUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -72,4 +76,10 @@ abstract class UserModule {
 
     @Binds
     abstract fun bindPostLogoutUseCaseImpl(uc: PostLogoutUseCaseImpl): PostLogoutUseCase
+
+    @Binds
+    abstract fun bindUpdateUserDeleteUseCaseImpl(uc: UpdateUserDeleteUseCaseImpl): UpdateUserDeleteUseCase
+
+    @Binds
+    abstract fun bindUpdateUserModifyUseCaseImpl(uc: UpdateUserModifyUseCaseImpl): UpdateUserModifyUseCase
 }

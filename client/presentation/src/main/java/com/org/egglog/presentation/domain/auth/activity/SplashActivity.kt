@@ -74,12 +74,12 @@ class SplashActivity : AppCompatActivity() {
                         ""
                     }
                     if(userDetail.deviceToken == null || userDetail.deviceToken != fcmToken) {
-                        val newUser = updateUserFcmTokenUseCase(UserFcmTokenParam(fcmToken)).getOrThrow()
+                        val newUser = updateUserFcmTokenUseCase(tokens.first.orEmpty(), UserFcmTokenParam(fcmToken)).getOrThrow()
                         setUserStoreUseCase(newUser)
                     } else setUserStoreUseCase(userDetail)
                     startActivity(
                         Intent(
-                            this@SplashActivity, MainActivity::class.java
+                            this@SplashActivity, SettingActivity::class.java
                         ).apply {
                             flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                         }

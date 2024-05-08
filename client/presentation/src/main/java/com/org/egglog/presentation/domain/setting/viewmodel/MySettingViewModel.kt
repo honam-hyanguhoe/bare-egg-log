@@ -4,11 +4,16 @@ import androidx.lifecycle.ViewModel
 import androidx.paging.PagingData
 import com.org.egglog.domain.auth.model.UserDetail
 import com.org.egglog.domain.auth.model.UserHospital
+import com.org.egglog.domain.auth.model.UserModifyParam
 import com.org.egglog.domain.auth.usecase.DeleteTokenUseCase
 import com.org.egglog.domain.auth.usecase.DeleteUserStoreUseCase
+import com.org.egglog.domain.auth.usecase.GetAllHospitalUseCase
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.PostLogoutUseCase
+import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
+import com.org.egglog.domain.auth.usecase.UpdateUserDeleteUseCase
+import com.org.egglog.domain.auth.usecase.UpdateUserModifyUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +32,13 @@ import javax.inject.Inject
 @HiltViewModel
 class MySettingViewModel @Inject constructor(
     private val getTokenUseCase: GetTokenUseCase,
-    private val getUserStoreUseCase: GetUserStoreUseCase
+    private val deleteTokenUseCase: DeleteTokenUseCase,
+    private val getUserStoreUseCase: GetUserStoreUseCase,
+    private val setUserStoreUseCase: SetUserStoreUseCase,
+    private val deleteUserStoreUseCase: DeleteUserStoreUseCase,
+    private val updateUserDeleteUseCase: UpdateUserDeleteUseCase,
+    private val updateUserModifyUseCase: UpdateUserModifyUseCase,
+    private val getAllHospitalUseCase: GetAllHospitalUseCase
 ): ViewModel(), ContainerHost<MySettingState, MySettingSideEffect>{
     override val container: Container<MySettingState, MySettingSideEffect> = container(
         initialState = MySettingState(),
@@ -41,7 +52,19 @@ class MySettingViewModel @Inject constructor(
     )
 
     init {
+        load()
+    }
 
+    private fun load() = intent {
+        val user = getUserStoreUseCase()
+        reduce {
+            state.copy(
+                user = user,
+                name = user?.userName ?: "",
+                hospital = user?.selectedHospital,
+                empNo = user?.empNo ?: "",
+            )
+        }
     }
 
     @OptIn(OrbitExperimental::class)
@@ -70,6 +93,42 @@ class MySettingViewModel @Inject constructor(
         reduce {
             state.copy(empNo = empNo)
         }
+    }
+
+    fun onClickDone() = intent {
+        if(state.search == "") {
+            reduce {
+                state.copy(
+                    hospitalsFlow = emptyFlow()
+                )
+            }
+        } else {
+            val hospitalsFlow = getAllHospitalUseCase(state.search).getOrThrow()
+            reduce {
+                state.copy(
+                    hospitalsFlow = hospitalsFlow ?: emptyFlow()
+                )
+            }
+        }
+    }
+
+    fun onClickDelete() = intent {
+        val tokens = getTokenUseCase()
+        updateUserDeleteUseCase(tokens.first ?: "")
+        deleteTokenUseCase()
+        deleteUserStoreUseCase()
+        postSideEffect(MySettingSideEffect.Toast("탈퇴가 완료되었습니다."))
+        postSideEffect(MySettingSideEffect.NavigateToLoginActivity)
+    }
+
+    fun onClickModify() = intent {
+        val tokens = getTokenUseCase()
+        val user = updateUserModifyUseCase(tokens.first ?: "", UserModifyParam(userName = state.name, hospitalId = state.hospital?.hospitalId ?: 0, empNo = state.empNo)).getOrThrow()
+        setUserStoreUseCase(user)
+        reduce {
+            state.copy(user = user)
+        }
+        postSideEffect(MySettingSideEffect.Toast("수정이 완료되었습니다."))
     }
 }
 

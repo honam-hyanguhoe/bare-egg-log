@@ -20,7 +20,8 @@ fun SearchDropDownHospital(
     onSearchChange: (String) -> Unit,
     onSelected: (UserHospital) -> Unit,
     onClickDone: () -> Unit,
-    search: String
+    search: String,
+    defaultText: String = ""
 ) {
     val context = LocalContext.current
     SearchableExpandedDropDownMenu(
@@ -55,6 +56,7 @@ fun SearchDropDownHospital(
         },
         onSearchChange = onSearchChange,
         onClickDone = onClickDone,
-        search = search
+        search = search,
+        defaultText = defaultText
     )
 }
