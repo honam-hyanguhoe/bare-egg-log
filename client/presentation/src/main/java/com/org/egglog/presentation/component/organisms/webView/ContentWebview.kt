@@ -85,14 +85,14 @@ fun ContentWebView(
                 view.loadUrl(url)
             }
         })
-        Button(onClick = {
-
-            webView.evaluateJavascript("mobileToJavascript()") { }
-
-        }) {
-
-            Text(text = "안녕 호남아")
-        }
+//        Button(onClick = {
+//
+//            webView.evaluateJavascript("mobileToJavascript()") { }
+//
+//        }) {
+//
+//            Text(text = "안녕 호남아")
+//        }
     }
 
 
