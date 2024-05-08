@@ -1,14 +1,18 @@
 package com.org.egglog.presentation.component.organisms.webView
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
 import android.view.View
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -17,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -26,6 +31,7 @@ import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
 import java.nio.charset.StandardCharsets
 
+@SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun ContentWebView(
     width: Int = 300, height: Int = 250, url: String = "https://www.egg-log.org/"
@@ -36,7 +42,6 @@ fun ContentWebView(
             // WebView settings
             settings.apply {
                 allowContentAccess = true
-                javaScriptEnabled = true
                 domStorageEnabled = true
                 mediaPlaybackRequiresUserGesture = false
                 useWideViewPort = true
@@ -46,39 +51,56 @@ fun ContentWebView(
 
             }
 
+            settings.javaScriptEnabled = true
             settings.setSupportZoom(false)
             settings.displayZoomControls = false
             settings.builtInZoomControls = false
 
-            // 하드웨어 가속 사용 설정
             setLayerType(
                 View.LAYER_TYPE_HARDWARE, null
             )
-
             webViewClient = WebViewClient()
-
-
         }
     }
 
-    webView.setOnTouchListener { _, _ -> true }
     webView.addJavascriptInterface(AndroidBridge(context, webView), "AndroidBridge")
     webView.loadUrl(url)
     Card(
         modifier = Modifier
             .fillMaxSize()
-            .size(
-                width = width.widthPercent(context).dp,
-                height = height.heightPercent(context).dp
-            )
-            .border(0.5.dp, Gray100), shape = RoundedCornerShape(20.dp)
+//            .size(
+//                width = width.widthPercent(context).dp,
+//                height = height.heightPercent(context).dp
+//            )
+            .background(color = Gray100)
+//            .border(0.5.dp, Color.Black), shape = RoundedCornerShape(20.dp)
+
     ) {
-        AndroidView(factory = { webView }, modifier = Modifier.fillMaxSize(), update = { view ->
-            val url = url
-            if (view.url != url) {
-                view.loadUrl(url)
-            }
-        })
+        AndroidView(
+            factory = { webView },
+            modifier = Modifier
+                .fillMaxSize()
+//                .size(
+//                    width = width.widthPercent(context).dp,
+//                    height = height.heightPercent(context).dp
+//                )
+                .background(color = Gray100),
+//                .border(0.5.dp, Color.Black),
+            update = { view ->
+                val url = url
+                if (view.url != url) {
+                    view.loadUrl(url)
+                }
+            })
+
+        Button(onClick = {
+            webView.loadUrl("javascript:receiveDataFromApp('this is honam')")
+//            webView.("javascript:receiveDataFromApp('this is honam')") { result ->
+//                Log.d("webview", result)
+//            }
+        }) {
+            Text("Click me")
+        }
     }
 
 
