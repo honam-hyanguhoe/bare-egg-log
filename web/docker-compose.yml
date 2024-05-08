@@ -11,6 +11,8 @@ services:
     command: npm start
     ports:
       - "3000:3000"
+    environment:
+      - WDS_SOCKET_PORT=0
     networks:
       - jenkins_egg-log-net
 
