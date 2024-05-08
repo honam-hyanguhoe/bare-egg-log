@@ -93,13 +93,13 @@ fun ContentWebView(
                 }
             })
 
-        Button(onClick = {
-            webView.evaluateJavascript("receiveDataFromApp('this is honam')") { result ->
-                Log.d("webview", result)
-            }
-        }) {
-            Text("Click me")
-        }
+//        Button(onClick = {
+//            webView.evaluateJavascript("receiveDataFromApp('this is honam')") { result ->
+//                Log.d("webview", result)
+//            }
+//        }) {
+//            Text("Click me")
+//        }
 
     }
 
