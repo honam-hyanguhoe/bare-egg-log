@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.security.exception.JwtErrorCode;
 import org.egglog.api.security.exception.JwtException;
+import org.egglog.api.security.model.dto.response.RefreshTokenResponse;
 import org.egglog.api.security.model.dto.response.TokenResponse;
 import org.egglog.api.security.model.entity.Token;
 import org.egglog.api.security.repository.redis.RefreshTokenRepository;
@@ -36,13 +37,16 @@ public class TokenService {
         refreshTokenRepository.delete(token);
     }
 
-    public TokenResponse republishToken(String refreshTokenRequest){
+    public RefreshTokenResponse republishToken(String refreshTokenRequest){
         log.debug(" ==== ==== ==== [토큰 재발행 서비스 실행] ==== ==== ====");
+        RefreshTokenResponse refreshTokenResponse = new RefreshTokenResponse();
         if(jwtUtils.validateRefreshToken(refreshTokenRequest)){
-            log.debug("refresh 토큰 검증 완료");
             //여기 까지 들어온 토큰은 검증이 됨 (몇번이고 발행한 토큰 = 여러명이 같은 ID에 대한 토큰을 가지고 있을 수 있음)
+            log.debug("refresh 토큰 검증 완료");
             Long id = jwtUtils.getUserIdByRefreshToken(refreshTokenRequest);
             String role = jwtUtils.getUserRoleByRefreshToken(refreshTokenRequest);
+            log.debug("id={}",id);
+            log.debug("role={}",role);
             //해당 리프레쉬 토큰으로 발행된 토큰 쌍을 가져온다.(엑세스 토큰이 리프레쉬 될때, 항상 토큰 쌍이 재발행 된다)
             Token token = refreshTokenRepository.findById(id).orElseThrow(() -> new JwtException(JwtErrorCode.NOT_EXISTS_TOKEN));
 
@@ -59,7 +63,11 @@ public class TokenService {
                 //마지막으로 발행된 리프레쉬 토큰과 요청이 들어온 리프레쉬토큰이 같다면 -> 정상적으로 재발행한다.
                 log.debug("리프레쉬 토큰 발행 성공");
                 refreshTokenRepository.delete(token);
-                return generatedToken(id, role);
+                refreshTokenResponse.setTokens(generatedToken(id, role));
+                // 트랜잭션 오류를 제외한 모든 검증 성공
+                User user = userJpaRepository.findById(id).orElseThrow(() -> new UserException(UserErrorCode.TRANSACTION_FAIL));
+                refreshTokenResponse.setUserInfo(user.toResponse());
+                return refreshTokenResponse;
             }else {
                 //마지막으로 발행된 리프레쉬 토큰과 요청 리프레쉬 토큰이 다르다면 -> 같은 ID에 대한 토큰이 두명 이상 가지고 있는 것이다.
                 //마지막으로 발행된 토큰 쌍을 블랙리스트에 넣고, 현재 요청들어온 리프레쉬 토큰은 재 발행을 해주지 않는다.

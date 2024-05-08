@@ -3,6 +3,7 @@ package org.egglog.api.security.model.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.security.model.dto.request.LoginRequest;
+import org.egglog.api.security.model.dto.response.RefreshTokenResponse;
 import org.egglog.api.security.model.dto.response.TokenResponse;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
@@ -60,7 +61,7 @@ public class AuthService {
         tokenService.RemoveToken(user.getId());
     }
 
-    public TokenResponse refresh(String refreshToken){
+    public RefreshTokenResponse refresh(String refreshToken){
         return tokenService.republishToken(refreshToken);
     }
 
