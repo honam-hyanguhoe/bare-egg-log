@@ -68,6 +68,7 @@ public class WorkService {
 
     @Transactional
     public List<WorkResponse> createWork(User loginUser, CreateWorkListRequest request){
+        log.debug(" ==== ==== ==== [ 그룹내 유저의 근무 일정 생성 서비스 실행 ] ==== ==== ====");
         if (loginUser.getWorkGroupId()!= request.getCalendarGroupId()) throw new CalendarGroupException(CalendarGroupErrorCode.WORK_GROUP_ACCESS_DENY);
         CalendarGroup calendarGroup = calendarGroupRepository.findById(request.getCalendarGroupId())
                 .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
@@ -88,6 +89,7 @@ public class WorkService {
 
     @Transactional
     public List<WorkResponse> updateWork(User loginUser, EditAndDeleteWorkListRequest request){
+        log.debug(" ==== ==== ==== [ 그룹내 유저의 근무 일정 수정 및 삭제 서비스 실행 ] ==== ==== ====");
         if (loginUser.getWorkGroupId()!= request.getCalendarGroupId()) throw new CalendarGroupException(CalendarGroupErrorCode.WORK_GROUP_ACCESS_DENY);
         CalendarGroup calendarGroup = calendarGroupRepository.findCalendarGroupWithUserById(request.getCalendarGroupId())
                 .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
@@ -117,6 +119,7 @@ public class WorkService {
 
     @Transactional(readOnly = true)
     public WorkListResponse findWorkList(User loginUser, FindWorkListRequest request){
+        log.debug(" ==== ==== ==== [ 로그인 유저의 근무 일정 정보 조회 서비스 실행 ] ==== ==== ====");
         CalendarGroup calendarGroup = calendarGroupRepository.findCalendarGroupWithUserById(loginUser.getWorkGroupId())
                 .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
         if (calendarGroup.getUser().getId()!=loginUser.getId()) throw new WorkException(WorkErrorCode.ACCESS_DENIED);
@@ -133,6 +136,7 @@ public class WorkService {
 
     @Transactional(readOnly = true)
     public List<WorkResponse> findGroupUserWorkList(User loginUser, FindGroupUserWorkListRequest request){
+        log.debug(" ==== ==== ==== [ 그룹내 유저의 근무 일정 정보 조회 서비스 실행 ] ==== ==== ====");
         User targetUser = userJpaRepository.findById(request.getTargetUserId()).orElseThrow(() -> new UserException(UserErrorCode.NOT_EXISTS_USER));
 
         // 그룹 멤버 목록 조회
@@ -154,6 +158,7 @@ public class WorkService {
 
     @Transactional(readOnly = true)
     public List<UpComingCountWorkResponse> findUpComingWorkCount(User loginUser, LocalDate today, DateType dateType){
+        log.debug(" ==== ==== ==== [ 주, 월 남은 근무 일정 조회 서비스 실행 ] ==== ==== ====");
         if (dateType == DateType.WEEK) {
             LocalDate startOfWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
             LocalDate endOfWeek = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
@@ -167,6 +172,7 @@ public class WorkService {
 
     @Transactional(readOnly = true)
     public CompletedWorkCountResponse findCompletedWorkCount(User loginUser, LocalDate today, LocalDate targetMonth) {
+        log.debug(" ==== ==== ==== [ 완료한 근무 일정 통계 조회 서비스 실행 ] ==== ==== ====");
         Map<String, Integer> initialWorkCounts = Map.of(
                 WorkTag.DAY.name(), 0,
                 WorkTag.EVE.name(), 0,

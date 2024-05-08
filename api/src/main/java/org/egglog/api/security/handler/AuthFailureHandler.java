@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.egglog.utility.utils.MessageUtils;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -15,11 +16,13 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import java.io.IOException;
 
 @Configuration
+@Slf4j
 @RequiredArgsConstructor
 public class AuthFailureHandler implements AuthenticationFailureHandler, AuthenticationEntryPoint {
     private final ObjectMapper objectMapper;
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+        log.debug(" ==== ==== ==== [#AuthFailureHandler onAuthenticationFailure 실행] ==== ==== ====");
         response.setStatus(401);
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType("application/json;charset=UTF-8");
@@ -36,6 +39,7 @@ public class AuthFailureHandler implements AuthenticationFailureHandler, Authent
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+        log.debug(" ==== ==== ==== [#AuthFailureHandler commence 실행] ==== ==== ====");
         response.setStatus(401);
         response.setContentType("application/json;charset=UTF-8");
 

@@ -30,8 +30,7 @@ public class CustomOAuth2Service implements OAuth2UserService<OAuth2UserRequest,
     private final WebClient webClient;
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) {
-        log.debug("OAuth2UserRequest = {}", userRequest);
-
+        log.debug(" ==== ==== ==== [#oauth2.0 라이브러리 소셜 유저 정보 조회 서비스 실행] ==== ==== ====");
         OAuth2UserService<OAuth2UserRequest, OAuth2User> service = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = service.loadUser(userRequest); //OAuth2 정보를 가져온다.
 
@@ -48,6 +47,7 @@ public class CustomOAuth2Service implements OAuth2UserService<OAuth2UserRequest,
 
 
     public OAuth2User loadUserByAccessToken(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        log.debug(" ==== ==== ==== [#oauth2.0 커스텀 소셜 유저 정보 조회 서비스 실행] ==== ==== ====");
         String userInfoEndpointUri = userRequest.getClientRegistration()
                 .getProviderDetails()
                 .getUserInfoEndpoint()
