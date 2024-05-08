@@ -117,10 +117,10 @@ const WorkStaticsPage = () => {
     window.AndroidBridge.showToast("안녕 호남향우회");
   };
 
-  function receiveDataFromApp(data: String) {
-    console.log("Data received: " + data);
-    return "호남이 : " + data;
-  }
+  // function receiveDataFromApp(data : String) {
+  //   console.log("Data received: " + data);
+  //   return "호남이 : " + data;
+  // }
 
   return (
     <GraphContainer>
