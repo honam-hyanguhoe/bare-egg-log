@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.org.egglog.presentation.domain.community.screen.PostDetailScreen
 import com.org.egglog.presentation.domain.community.screen.PostListScreen
+import com.org.egglog.presentation.domain.community.screen.PostSearchScreen
 
 @Composable
 fun CommunityNavigationHost() {
@@ -25,6 +26,28 @@ fun CommunityNavigationHost() {
                     navController.navigate(
                         route = "${CommunityRoute.PostDetailScreen.name}/$postId" // postId를 목적지에 전달
                     )
+                },
+                onNavigateToSearchScreen = {
+                    navController.navigate(
+                        route = CommunityRoute.PostSearchScreen.name
+                    )
+                }
+            )
+        }
+
+        composable(
+            route = CommunityRoute.PostSearchScreen.name
+        ) {
+            PostSearchScreen(
+                onNavigateToPostListScreen = {
+                    navController.navigate(
+                        route = CommunityRoute.PostListScreen.name,
+                        builder = {
+                            popUpTo(CommunityRoute.PostListScreen.name) {
+                                inclusive = true // 목적지도 포함하여 스택을 비웁니다.
+                            }
+                        }
+                    )
                 }
             )
         }
@@ -39,7 +62,12 @@ fun CommunityNavigationHost() {
                 postId = postId!!,
                 onNavigateToPostListScreen = {
                     navController.navigate(
-                        route = "${CommunityRoute.PostListScreen}"
+                        route = CommunityRoute.PostListScreen.name,
+                        builder = {
+                            popUpTo(CommunityRoute.PostListScreen.name) {
+                            inclusive = true // 목적지도 포함하여 스택을 비웁니다.
+                            }
+                        }
                     )
                 }
             )

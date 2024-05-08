@@ -16,6 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
+import org.orbitmvi.orbit.syntax.simple.blockingIntent
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
@@ -124,7 +125,7 @@ class PostListViewModel @Inject constructor(
             )
         }
 
-        postList = getPostListUseCase("Bearer ${accessToken}", hospitalId, groupId, state.searchWord, state.lastBoardId).map {
+        postList = getPostListUseCase("Bearer ${accessToken}", state.hospitalId, state.groupId, state.searchWord, state.lastBoardId).map {
             it.map {
                 it!!.toUiModel()
             }
@@ -133,6 +134,30 @@ class PostListViewModel @Inject constructor(
         reduce {
             state.copy (
                 postList = if(postList.isEmpty()) listOf() else postList,
+            )
+        }
+    }
+
+    fun onSearchChange(value: String) = blockingIntent {
+        reduce {
+            state.copy (
+                searchWord = value
+            )
+        }
+    }
+
+    fun onClickDone() = intent {
+        val searchList = getPostListUseCase("Bearer ${accessToken}", state.hospitalId, state.groupId, state.searchWord, state.lastBoardId).map {
+            it.map {
+                it!!.toUiModel()
+            }
+        }.getOrThrow()
+
+        Log.e("PostListViewModel", "검색 결과는요 ${searchList}")
+
+        reduce {
+            state.copy(
+                searchList = searchList
             )
         }
     }
@@ -146,7 +171,8 @@ data class PostListState(
     val lastBoardId: Int? = null,
     val hotPostList: List<HotPostInfo> = listOf(),
     val postList: List<PreviewPostInfo> = listOf(),
-    val categoryList: List<Pair<Int, String>> = listOf((0 to "전체"))
+    val categoryList: List<Pair<Int, String>> = listOf((0 to "전체")),
+    val searchList: List<PreviewPostInfo> = listOf()
 )
 
 sealed interface PostListSideEffect {
