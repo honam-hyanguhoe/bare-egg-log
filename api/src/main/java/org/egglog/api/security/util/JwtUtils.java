@@ -49,8 +49,8 @@ public class JwtUtils {
     }
     //토큰만료시간
     public Date getExpiredTime(Long period){
-        log.info("기간={}",period);
-        log.info("기간={}",Date.from(ZonedDateTime.now(zoneId).plus(Duration.ofMillis(period)).toInstant()));
+        log.debug("기간={}",period);
+        log.debug("기간={}",Date.from(ZonedDateTime.now(zoneId).plus(Duration.ofMillis(period)).toInstant()));
         return Date.from(ZonedDateTime.now(zoneId).plus(Duration.ofMillis(period)).toInstant());
     }
 
@@ -67,7 +67,7 @@ public class JwtUtils {
 
     //엑세스 토큰 생성
     public String generateAccessToken(Long id, String role){
-        log.info("토큰생성={}", id);
+        log.debug("토큰생성={}", id);
         return Jwts.builder()
                 .setSubject(String.valueOf(id))
                 .claim("role", role)
