@@ -1,11 +1,9 @@
 package com.org.egglog.presentation.domain.main.viewModel
 
-import android.graphics.Color
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
-import com.org.egglog.domain.main.model.WorkType
 import com.org.egglog.domain.main.usecase.GetWeeklyWorkUseCase
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyDataSource
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyUiModel
@@ -13,7 +11,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
-import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
 import java.time.LocalDate
@@ -50,14 +47,29 @@ class WorkViewModel @Inject constructor(
         if (weeklyWork != null) {
             Log.d("weekly", "viewModel-response ${weeklyWork}")
             val tempLabels = weeklyWork.workList.map { it.workType.title }
+
+            val immutableList: List<String> = ensureSevenItems(tempLabels)
             reduce {
                 state.copy(
-                    labels = tempLabels
+                    labels = immutableList
                 )
             }
         }
-
     }
+
+    fun ensureSevenItems(list: List<String>): List<String> {
+        val requiredSize = 7
+        val currentSize = list.size
+        val itemsToAdd = requiredSize - currentSize
+
+        // itemsToAdd가 0보다 클 때만 "none"을 추가
+        return if (itemsToAdd > 0) {
+            list + List(itemsToAdd) { "none" }  // 기존 리스트에 "none"을 추가한 새 리스트를 생성
+        } else {
+            list
+        }
+    }
+
 
     val dataSource = WeeklyDataSource()
 
