@@ -22,8 +22,8 @@ public class GlobalExceptionHandler {
         log.error("[e.getErrorCode().getHttpStatus()] : {}", e.getErrorCode().getHttpStatus());
         log.error("[e.getErrorCode().getMessage()] : {}",e.getErrorCode().getMessage());
         log.debug("==============================[Stack trace]=============================");
-        log.debug(Arrays.toString(e.getStackTrace()));
-        log.debug("======================================================================");
+        log.error("[EXCEPTION] : {}", e.getMessage(), e);
+        log.debug("==============================[Stack trace END]=============================");
         return ResponseEntity.status(e.getErrorCode().getHttpStatus())
                 .body(MessageUtils.fail(String.valueOf(e.getErrorCode()),e.getMessage()));
     }
@@ -34,8 +34,8 @@ public class GlobalExceptionHandler {
         log.error("[e.toString()] : {}", e.toString());
         log.error("[e.getMessage] : {}", e.getMessage());
         log.debug("==============================[Stack trace]=============================");
-        log.debug(Arrays.toString(e.getStackTrace()));
-        log.debug("=========================================================================");
+        log.error("[EXCEPTION] : {}", e.getMessage(), e);
+        log.debug("==============================[Stack trace END]=============================");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(MessageUtils.fail(HttpStatus.BAD_REQUEST.name(), e.getMessage()));
     }
