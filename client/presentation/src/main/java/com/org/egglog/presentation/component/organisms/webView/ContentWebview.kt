@@ -51,11 +51,11 @@ fun ContentWebView(
 
             webViewClient = WebViewClient()
 
-            addJavascriptInterface(AndroidBridge(context), "AndroidBridge")
-
             loadUrl(url)
         }
     }
+
+    webView.addJavascriptInterface(AndroidBridge(context, webView), "AndroidBridge")
 
     Card(
         modifier = Modifier
