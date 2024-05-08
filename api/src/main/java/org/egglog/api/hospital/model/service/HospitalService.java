@@ -30,6 +30,7 @@ public class HospitalService {
     private final HospitalJpaRepository hospitalJpaRepository;
 
     public List<UserHospitalResponse> findList(FindHospitalListRequest request){
+        log.debug(" ==== ==== ==== [ 병원 리스트 조회 서비스 실행 ] ==== ==== ====");
         return hospitalJpaRepository
                 .findHospitals(request.getHospitalName(), request.getOffset(), request.getLimit())
                 .stream()

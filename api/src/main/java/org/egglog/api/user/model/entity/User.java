@@ -98,7 +98,6 @@ public class User implements UserDetails {
 
     public User delete(){
         this.name = "탈퇴회원";
-//        this.profileImgUrl = null;
         this.selectedHospital = null;
         this.userStatus = UserStatus.DELETED;
         this.deletedAt = LocalDateTime.now();
@@ -117,9 +116,6 @@ public class User implements UserDetails {
     }
 
     public boolean isJoin() {
-        System.out.println(this.selectedHospital);
-        System.out.println(this.empNo);
-        System.out.println(this.name);
         return this.selectedHospital != null && this.empNo != null && this.name != null;
     }
 

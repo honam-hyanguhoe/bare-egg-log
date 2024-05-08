@@ -29,11 +29,13 @@ public class WorkTypeService {
 
     @Transactional
     public WorkTypeResponse createWorkType(User loginUser, CreateWorkTypeRequest request){
+        log.debug(" ==== ==== ==== [ 근무 타입 생성 서비스 실행 ] ==== ==== ====");
         return workTypeJpaRepository.save(request.toEntity(loginUser)).toResponse();
     }
 
     @Transactional
     public WorkTypeResponse editWorkType(User loginUser, EditWorkTypeRequest request){
+        log.debug(" ==== ==== ==== [ 근무 타입 수정 서비스 실행 ] ==== ==== ====");
         WorkType workType = workTypeJpaRepository.findWithUserById(request.getWorkTypeId())
                 .orElseThrow(() -> new WorkTypeException(NO_EXIST_WORKTYPE));
         if (workType.getWorkTag().name() != WorkTag.ETC.name()) throw new WorkTypeException(ACCESS_DENIED);
@@ -45,6 +47,7 @@ public class WorkTypeService {
 
     @Transactional
     public void deleteWorkType(User loginUser, Long workTypeId){
+        log.debug(" ==== ==== ==== [ 근무 타입 삭제 서비스 실행 ] ==== ==== ==== ");
         WorkType workType = workTypeJpaRepository.findWithUserById(workTypeId)
                 .orElseThrow(() -> new WorkTypeException(NO_EXIST_WORKTYPE));
         if (workType.getUser().getId()!=loginUser.getId()) throw new WorkTypeException(ACCESS_DENIED);
@@ -53,6 +56,7 @@ public class WorkTypeService {
 
     @Transactional
     public List<WorkTypeResponse> getWorkTypeList(User loginUser){
+        log.debug(" ==== ==== ==== [ 근무 타입 리스트 조회 서비스 실행 ] ==== ==== ====");
         return workTypeJpaRepository.findWorkTypesByUserId(loginUser.getId())
                 .stream()
                 .map(WorkType::toResponse)

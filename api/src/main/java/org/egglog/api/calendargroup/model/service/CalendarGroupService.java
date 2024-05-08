@@ -41,6 +41,7 @@ public class CalendarGroupService {
      * @author 김형민
      */
     public CalendarGroupResponse registerCalendarGroup(CreateCalGroupRequest request, User loginUser) {
+        log.debug(" ==== ==== ==== [ 캘린더 그룹 생성 서비스 실행 ] ==== ==== ====");
         CalendarGroup calendarGroup = calendarGroupRepository.save(request.toEntity(loginUser));
         if (request.isInUrl()) calendarService.readCalendarFile(request.getUrl(), calendarGroup, loginUser);
         return calendarGroup.toResponse();
@@ -55,16 +56,18 @@ public class CalendarGroupService {
      * @author 김형민
      */
     public void deleteCalendarGroup(Long calendarGroupId, User loginUser) {
+        log.debug(" ==== ==== ==== [ 캘린더 그룹 삭제 서비스 실행 ] ==== ==== ====");
         if (loginUser.getWorkGroupId()==calendarGroupId) throw new CalendarGroupException(CalendarGroupErrorCode.NOT_CONTROL_WORKGROUP);
         CalendarGroup calendarGroup = calendarGroupRepository.findCalendarGroupWithUserById(calendarGroupId)
                 .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
         if (calendarGroup.getUser().equals(loginUser)) throw new UserException(UserErrorCode.ACCESS_DENIED);
         long deletedCount = eventRepository.deleteAllByCalendarGroupId(calendarGroupId);
-        log.debug("캘린더 ID = {} 에 대한 값 삭제 관련 일정 = {} 개 삭제 완료",calendarGroupId, deletedCount);
+        log.debug(" ==== ==== ==== [ 캘린더 ID = {} 에 대한 값 삭제 관련 일정 = {} 개 삭제 완료 ] ==== ==== ==== ",calendarGroupId, deletedCount);
         calendarGroupRepository.delete(calendarGroup);
     }
 
     public List<CalendarGroupResponse> findCalendarGroupList(User loginUser){
+        log.debug(" ==== ==== ==== [ 캘린더 그룹 리스트 조회 서비스 실행 ] ==== ==== ====");
         return calendarGroupRepository.findListByUserId(loginUser.getId())
                 .stream()
                 .map(CalendarGroup::toResponse)
@@ -72,6 +75,7 @@ public class CalendarGroupService {
     }
 
     public List<CalendarGroupEventListResponse> getEventListByCalenderIds(CalendarGroupListRequest calendarGroupListRequest, User user) {
+        log.debug(" ==== ==== ==== [ 캘린더 그룹 ID 리스트로 개인 일정 리스트 조회 서비스 실행 ] ==== ==== ====");
         List<Long> calendarGroupIds = calendarGroupListRequest.getCalendarGroupList();      //캘린더그룹 아이디
 
         List<CalendarGroupEventListResponse> calendarGroupEventListResponseList = new ArrayList<>();
