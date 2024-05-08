@@ -116,6 +116,10 @@ public class User implements UserDetails {
         return this;
     }
 
+    public boolean isJoin(){
+        return (this.loginAt==null||this.selectedHospital==null||this.empNo==null||this.name==null);
+    }
+
     public User updateFcmToken(String token){
         this.deviceToken = token;
         this.updatedAt = LocalDateTime.now();

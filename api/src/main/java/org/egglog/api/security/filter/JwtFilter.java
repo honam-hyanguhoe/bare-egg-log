@@ -17,6 +17,7 @@ import org.egglog.api.security.util.JwtUtils;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
+import org.egglog.api.user.repository.jpa.UserJpaRepository;
 import org.egglog.api.user.repository.jpa.UserQueryRepositoryImpl;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,7 +32,7 @@ import java.io.IOException;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-    private final UserQueryRepositoryImpl userQueryRepositoryImpl;
+    private final UserJpaRepository userJpaRepository;
     private final JwtUtils jwtUtils;
     private final UnsafeTokenRepository unsafeTokenRepository;
     private final RefreshTokenRepository refreshTokenRepository;
@@ -59,13 +60,13 @@ public class JwtFilter extends OncePerRequestFilter {
         //엑세스 토큰 검증
         Jws<Claims> claimsJws = jwtUtils.validateAccessToken(accessToken);
         if(claimsJws != null){
-            User user = userQueryRepositoryImpl.findByIdWithHospital(jwtUtils.getUserIdByAccessToken(accessToken))
+            User user = userJpaRepository.findByIdWithHospital(jwtUtils.getUserIdByAccessToken(accessToken))
                     .orElseThrow(() -> new UserException(UserErrorCode.NOT_EXISTS_USER));
             //블랙리스트에 존재한다면
             if (unsafeTokenRepository.findById(accessToken).isPresent()){
                 Token token = refreshTokenRepository.findById(user.getId()).orElseThrow(() -> new JwtException(JwtErrorCode.NOT_EXISTS_TOKEN));
-                log.info("token = {}",token);
                 refreshTokenRepository.delete(token); //토큰 지우고
+                userJpaRepository.save(user.doLogout()); //로그아웃 처리후
                 throw new JwtException(JwtErrorCode.INVALID_TOKEN); //로그인 재요청
             }
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
