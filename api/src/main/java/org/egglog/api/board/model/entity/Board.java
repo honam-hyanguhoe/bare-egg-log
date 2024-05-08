@@ -54,11 +54,11 @@ public class Board extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private BoardType boardType; //ALL, HOSPITAL, GROUP
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
     private Group group;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hospital_id")
     private Hospital hospital;
 
