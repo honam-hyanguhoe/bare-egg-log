@@ -1,6 +1,5 @@
 package com.org.egglog.presentation.domain.main.screen
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -17,10 +16,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -40,7 +37,6 @@ import com.org.egglog.presentation.theme.NaturalWhite
 import com.org.egglog.presentation.theme.Typography
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
-import kotlinx.coroutines.Job
 import org.orbitmvi.orbit.compose.collectAsState
 import java.time.LocalDate
 

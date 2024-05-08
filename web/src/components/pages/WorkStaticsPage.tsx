@@ -69,6 +69,7 @@ const monthlyData = [
   },
 ];
 
+declare var AndroidBridge: any;
 const WorkStaticsPage = () => {
   const initialData: DataItem[] = [
     { name: "5월 1주", values: [1, 3, 4, 5] },
@@ -111,8 +112,14 @@ const WorkStaticsPage = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const showAndroidToast = () => {
+    window.AndroidBridge.showToast("안녕 호남향우회");
+  };
+
   return (
     <GraphContainer>
+      <button onClick={showAndroidToast}>Say hello</button>
+
       <TypeListContainer>
         <TypeContainer>
           <Label borderColor="#18C5B5" bgColor="#18C5B5" />
@@ -141,6 +148,7 @@ export default WorkStaticsPage;
 const GraphContainer = styled.div`
   background-color: #f2f4f7;
   min-height: 100vh;
+  padding: 40px;
 `;
 const GraphTitle = styled.p`
   font-size: 25px;
