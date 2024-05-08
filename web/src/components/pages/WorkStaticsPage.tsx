@@ -99,18 +99,18 @@ const WorkStaticsPage = () => {
 
   const [data, setData] = useState<DataItem[]>(initialData);
 
-  useEffect(() => {
-    const updateData = () => {
-      const newData: DataItem[] = normalizeData(monthlyData);
-      console.log(`${JSON.stringify(newData)}`);
-      // const newData: DataItem[] = initialData;
-      setData(newData);
-    };
+  // useEffect(() => {
+  //   const updateData = () => {
+  //     const newData: DataItem[] = normalizeData(monthlyData);
+  //     console.log(`${JSON.stringify(newData)}`);
+  //     // const newData: DataItem[] = initialData;
+  //     setData(newData);
+  //   };
 
-    const interval = setInterval(updateData, 5000);
+  //   const interval = setInterval(updateData, 5000);
 
-    return () => clearInterval(interval);
-  }, []);
+  //   return () => clearInterval(interval);
+  // }, []);
 
   // webView (web -> App)
   // const showAndroidToast = () => {
@@ -119,6 +119,7 @@ const WorkStaticsPage = () => {
 
   function receiveDataFromApp(data: String) {
     console.log("Data received: " + data);
+    alert(`들어오니... ${data}`);
     return "호남이 : " + data;
   }
 
