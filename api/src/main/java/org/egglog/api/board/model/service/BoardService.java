@@ -14,6 +14,7 @@ import org.egglog.api.board.repository.jpa.boardLike.BoardLikeRepository;
 import org.egglog.api.board.repository.jpa.comment.CommentRepository;
 import org.egglog.api.group.exception.GroupErrorCode;
 import org.egglog.api.group.exception.GroupException;
+import org.egglog.api.group.model.dto.response.GroupPreviewDto;
 import org.egglog.api.group.model.entity.Group;
 import org.egglog.api.group.repository.jpa.GroupRepository;
 import org.egglog.api.hospital.model.entity.HospitalAuth;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -152,7 +154,9 @@ public class BoardService {
 
         try {
             String boardIds = redisTemplate.opsForValue().get("hotBoards");
-            if (boardIds != null && !boardIds.isEmpty()) {
+            log.info("boardIds: {}", boardIds);
+
+            if (boardIds != null && !boardIds.isEmpty() && !boardIds.equals("[]")) {
                 List<Long> ids = Arrays.stream(boardIds.replace("[", "").replace("]", "").split(","))
                         .map(String::trim)
                         .map(Long::parseLong)
@@ -166,15 +170,15 @@ public class BoardService {
                     //사용자의 병원 인증 정보
                     Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(user, user.getSelectedHospital());
 
-                    Long commentCnt = commentRepository.getCommentCount(board.getId());
-                    Long likeCnt = boardRepository.getLikeCount(board.getId());
+                    long commentCnt = commentRepository.getCommentCount(board.getId());
+                    long likeCnt = boardRepository.getLikeCount(board.getId());
                     long viewCount = redisViewCountUtil.getViewCount(String.valueOf(boardId)); //하루 동안의 조회수
-                    Long hitCnt = viewCount + board.getViewCount();
+                    long hitCnt = viewCount + board.getViewCount();
 
                     boolean isUserLiked = false;  //좋아요 누른 여부
                     boolean isCommented = false;    //댓글 유무 여부
 
-                    if (commentCnt != null) {
+                    if (commentCnt == 0) {
                         isCommented = true;
                     }
 
@@ -290,18 +294,61 @@ public class BoardService {
      * @param boardId
      * @param user
      */
+    @Transactional
     public void deleteBoard(Long boardId, User user) {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
         );
+        if (!board.getUser().getId().equals(user.getId())) {
+            throw new BoardException(BoardErrorCode.NOT_SAME_WRITER);
+        }
 
         try {
-            //작성자가 같다면
-            if (board.getUser().getId().equals(user.getId())) {
-                Optional<List<Comment>> commentListByBoardId = commentRepository.getCommentListByBoardId(boardId);
-                commentListByBoardId.ifPresent(commentRepository::deleteAll);
-                boardRepository.delete(board); //삭제
+            Optional<List<Comment>> commentListByBoardId = commentRepository.getCommentListByBoardId(boardId);
+            if (commentListByBoardId.isPresent()) {
+                commentRepository.deleteAll(commentListByBoardId.get());
+            }
+            boardRepository.delete(board); //삭제
 
+            //급상승 게시물 게시물 번호
+            String boardIds = redisTemplate.opsForValue().get("hotBoards");
+
+            if (boardIds != null && !boardIds.isEmpty() && !boardIds.equals("[]")) {
+                List<String> ids = new ArrayList<>(Arrays.stream(boardIds.replace("[", "").replace("]", "").split(","))
+                        .map(String::trim)
+                        .toList());
+                log.info("ids: {}", ids);
+
+                Iterator<String> iterator = ids.iterator();
+                while (iterator.hasNext()) {
+                    String id = iterator.next();
+                    if (String.valueOf(boardId).equals(id)) {
+                        log.info("삭제하려는 게시물임 {}", id);
+
+                        iterator.remove();  // Iterator를 통해 안전하게 삭제
+                        log.info("arraylist 삭제는 됨");
+
+                        redisViewCountUtil.deleteViewCountBoard(id);
+                        redisViewCountUtil.deleteViewCount(id, String.valueOf(user.getId()));
+                        log.info("deleteViewCount() 삭제 됨");
+
+                    }
+                }
+//                for (String id : ids) {
+//                    log.info("id: {}", id);
+//                    if (String.valueOf(boardId).equals(id)) {   //삭제하려는 게시물 번호와 같다면
+//                        log.info("삭제하려는 게시물임 {}", id);
+//                        ids.remove(id);
+//                        log.info("arraylist 삭제는 됨");
+//                        redisViewCountUtil.deleteViewCount(id, String.valueOf(user.getId()));
+//                        log.info("deleteViewCount() 삭제 됨");
+//                    }
+//                }
+                String updatedHotBoards = "[" + String.join(", ", ids) + "]";
+                log.info("updatedHotBoards: {}", updatedHotBoards);
+                log.info(ids.toString());
+
+                redisTemplate.opsForValue().set("hotBoards", updatedHotBoards, 1, TimeUnit.MINUTES);
             }
 
         } catch (DataAccessException e) {
@@ -456,7 +503,7 @@ public class BoardService {
                     .boardLikeCount(likeCnt)
                     .isLiked(isUserLiked)
                     .isCommented(isCommented)
-                    .comments(commentList)
+//                    .comments(commentList)
                     .build();
 
             //병원 인증배지가 없다면
@@ -557,5 +604,27 @@ public class BoardService {
     private boolean isNotLiked(Long userId, Long boardId) {
         Optional<BoardLike> userBoardLike = boardRepository.getUserBoardLike(boardId, userId);
         return userBoardLike.isEmpty();
+    }
+
+    /**
+     * 사용자의 병원 아이디, 병원 이름, 그룹 아이디, 그룹 이름
+     *
+     * @param user
+     * @return
+     */
+    public BoardTypeListOutputSpec getBoardTypeListByUser(User user) {
+        //사용자가 선택한 병원
+        Hospital selectedHospital = user.getSelectedHospital();
+        BoardTypeListOutputSpec boardTypeListOutputSpec = BoardTypeListOutputSpec.builder()
+                .hospitalId(selectedHospital.getId())
+                .hospitalName(selectedHospital.getHospitalName())
+                .build();
+
+        //사용자의 그룹리스트
+        Optional<List<GroupPreviewDto>> groupByUserId = groupRepository.findGroupByUserId(user.getId());
+        if (groupByUserId.isPresent()) {
+            boardTypeListOutputSpec.setGroupList(groupByUserId.get());
+        }
+        return boardTypeListOutputSpec;
     }
 }

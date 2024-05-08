@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.org.egglog.client.data.RadioButtonColorInfo
 import com.org.egglog.presentation.utils.widthPercent
@@ -29,16 +30,16 @@ fun DayRadioButton(radioList: ArrayList<String>, selected: MutableState<String>)
                 radioButtonColorInfo = RadioButtonColorInfo(
                     selectedBorderColor = NaturalBlack,
                     selectedContainerColor = NaturalBlack,
-                    selectedTextColor = Gray200,
-                    unSelectedBorderColor = Gray200,
-                    unSelectedContainerColor = Gray200,
+                    selectedTextColor = Gray100,
+                    unSelectedBorderColor = NaturalBlack,
+                    unSelectedContainerColor = Gray100,
                     unSelectedTextColor = NaturalBlack
                 ),
-                textStyle = Typography.bodyLarge,
-                width = 68,
-                padding = 6
+                textStyle = Typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                width = 64,
+                padding = 8
             )
-            if(index != radioList.size - 1) Spacer(modifier = Modifier.padding(2.widthPercent(context).dp))
+            if(index != radioList.size - 1) Spacer(modifier = Modifier.padding(3.widthPercent(context).dp))
         }
     }
 }

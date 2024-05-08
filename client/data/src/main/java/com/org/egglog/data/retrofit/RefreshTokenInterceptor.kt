@@ -2,6 +2,7 @@ package com.org.egglog.data.retrofit
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import com.org.egglog.data.auth.model.toDomainModel
 import com.org.egglog.data.auth.service.AuthService
 import com.org.egglog.data.datastore.TokenDataStore
@@ -21,30 +22,29 @@ class RefreshTokenInterceptor @Inject constructor(
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val response = chain.proceed(chain.request())
+        val tokens = runBlocking { tokenDataStore.getToken() }
         if (response.code == 401) {
-            val newTokens = refreshAccessToken()
-            if(newTokens != null) {
+            val newTokens = refreshAccessToken(tokens)
+            return if(newTokens != null) {
                 val newRequest = chain.request().newBuilder()
                     .header("Authorization", "Bearer ${newTokens.accessToken}")
                     .build()
-                return chain.proceed(newRequest)
+                response.close()
+                chain.proceed(newRequest)
             } else {
-                // 로그아웃 시키기
+                response.close()
                 runBlocking { tokenDataStore.clear() }
                 runBlocking { userDataStore.clear() }
                 context.startActivity(
-                    Intent(
-                        context,
-                        LoginActivity::class.java
-                    )
+                    Intent(context, LoginActivity::class.java)
                 )
+                response
             }
         }
         return response
     }
 
-    private fun refreshAccessToken(): Refresh? {
-        val tokens = runBlocking { tokenDataStore.getToken() }
+    private fun refreshAccessToken(tokens: Pair<String?, String?>): Refresh? {
         val newTokens = runBlocking { authService.refresh(tokens.second!!).dataBody?.toDomainModel() }
         runBlocking {tokenDataStore.setToken(newTokens?.accessToken!!, newTokens.refreshToken) }
         return newTokens

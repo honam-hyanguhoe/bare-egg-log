@@ -123,21 +123,21 @@ public class BoardCustomQueryImpl implements BoardCustomQuery {
 
         // 마지막 게시물 ID보다 작은 경우
         if (lastBoardId != null) {
-            whereClause = whereClause.and(board.group.id.eq(groupId));
+            whereClause = whereClause.and(board.id.lt(lastBoardId));
         }
 
         // 그룹 ID가 주어진 경우 -> 그룹 게시판
         if (groupId != null) {
-            whereClause = whereClause.and(board.hospital.id.eq(hospitalId));
+            whereClause = whereClause.and(board.group.id.eq(groupId));
         }
 
         // 병원 ID가 주어진 경우 -> 병원 게시판
         if (hospitalId != null) {
-            whereClause = whereClause.and(board.id.lt(lastBoardId));
+            whereClause = whereClause.and(board.hospital.id.eq(hospitalId));
         }
 
         // 키워드가 제목 또는 내용에 있는 경우
-        if (keyword != null) {
+        if (keyword != null && !keyword.isEmpty()) {
             whereClause = whereClause.and(searchKeyword(keyword));
         }
 

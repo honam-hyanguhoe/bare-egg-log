@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" tools:node="remove"/>
     <application
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -14,7 +15,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Client"
         tools:targetApi="31"
-        android:name=".App">
+        android:name=".App"
+        android:usesCleartextTraffic="true">
     </application>
 
 </manifest>
