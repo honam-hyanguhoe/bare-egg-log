@@ -125,9 +125,10 @@ public class User implements UserDetails {
         return this;
     }
 
-    public User updateInfo(String updateUserName, String updateProfileImgUrl){
+    public User updateInfo(String updateUserName, Hospital hospital, String empNo){
         this.name = updateUserName;
-        this.profileImgUrl = updateProfileImgUrl;
+        this.selectedHospital = hospital;
+        this.empNo = empNo;
         this.updatedAt = LocalDateTime.now();
         return this;
     }

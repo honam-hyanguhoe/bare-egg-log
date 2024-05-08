@@ -25,5 +25,6 @@ public class UpdateUserRequest {
     @NotBlank(message = "유저 이름은 필수 입니다.")
     @Size(max = 60, message = "유저 이름이 너무 깁니다.")
     private String userName;
-    private String profileImgUrl;
+    private Long hospitalId;
+    private String empNo;
 }
