@@ -19,16 +19,24 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -62,7 +70,8 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 @Composable
 fun PostListScreen(
     viewModel: PostListViewModel = hiltViewModel(),
-    onNavigateToDetailScreen: (postId: Int) -> Unit
+    onNavigateToDetailScreen: (postId: Int) -> Unit,
+    onNavigateToSearchScreen: () -> Unit,
 ) {
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
@@ -72,21 +81,33 @@ fun PostListScreen(
     }
     }
     PostListScreen(
+        hospitalId = state.hospitalId,
+        groupId = state.groupId,
+        categoryList = state.categoryList,
         postList = state.postList,
         hotPostList = state.hotPostList,
         onClickPost = { postId: Int -> onNavigateToDetailScreen(postId) },
-        onClickWriteButton = viewModel::onClickWriteButton
+        onClickWriteButton = viewModel::onClickWriteButton,
+        onSelectCategory = viewModel::onSelectCategoryIndex,
+        onClickSearch = onNavigateToSearchScreen,
     )
 }
 
 @Composable
 private fun PostListScreen(
+    hospitalId: Int?,
+    groupId: Int?,
+    categoryList: List<Pair<Int, String>>,
     postList: List<PreviewPostInfo>,
     hotPostList: List<HotPostInfo>,
     onClickPost: (postId: Int) -> Unit,
-    onClickWriteButton: () -> Unit
+    onClickWriteButton: () -> Unit,
+    onSelectCategory: (index: Int) -> Unit,
+    onClickSearch: () -> Unit
 ) {
     val context = LocalContext.current
+
+    var selectedMenuItem by remember { mutableStateOf<String>(categoryList[0].second) }
 
     Column(
         Modifier
@@ -100,10 +121,18 @@ private fun PostListScreen(
     ) {
         NoticeHeader(
             hasSearch = true,
-            title = "커뮤니티",
-            selectedOption = "",
-            onClickSearch = {},
+            hasMenu = true,
+            title = selectedMenuItem,
+            selectedOption = selectedMenuItem,
+            options = categoryList.map {it. second},
+            onClickSearch = onClickSearch,
             onClickNotification = {},
+            onSelect = {
+                selectedMenuItem = it
+                var selectedPair = categoryList.find { it.second == selectedMenuItem}
+                var index = categoryList.indexOf(selectedPair)
+                onSelectCategory(index)
+            }
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -122,7 +151,6 @@ private fun PostListScreen(
                             Text(text = "친구와 함께 일정을 공유하세요!", style= Typography.displayLarge)
                         }
 
-
                         Column(
                             Modifier
                                 .fillMaxHeight()
@@ -136,29 +164,34 @@ private fun PostListScreen(
                 }
             }
 
-            item {
-                Column {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(text = "\uD83D\uDD25 급상승 게시글")
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-            }
-
-            if(hotPostList.isNotEmpty()) {
-                items(
-                    count = hotPostList.size,
-                    key = { index -> "0${hotPostList[index].postId}" }
-                ) { index ->
-                    HotPostCard(postInfo = hotPostList[index], onClickPost = { postId -> onClickPost(postId) })
-                }
-            } else {
+            if(groupId==null && hospitalId==null) {
                 item {
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 20.dp, bottom = 10.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = "아직 급상승 게시글이 없어요")
+                    Column {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(text = "\uD83D\uDD25 급상승 게시글")
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
+
+                if (hotPostList.isNotEmpty()) {
+                    items(
+                        count = hotPostList.size,
+                        key = { index -> "0${hotPostList[index].postId}" }
+                    ) { index ->
+                        HotPostCard(
+                            postInfo = hotPostList[index],
+                            onClickPost = { postId -> onClickPost(postId) })
+                    }
+                } else {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 20.dp, bottom = 10.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(text = "아직 급상승 게시글이 없어요")
+                        }
                     }
                 }
             }

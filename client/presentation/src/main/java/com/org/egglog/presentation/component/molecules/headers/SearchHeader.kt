@@ -24,6 +24,10 @@ import com.org.egglog.presentation.theme.*
 @Composable
 fun SearchHeader(
     onClickBack : () -> Unit = {},
+    placeholder: String,
+    onClickDone: () -> Unit = {},
+    searchWord: String,
+    onChangeSearch: (String) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -33,7 +37,11 @@ fun SearchHeader(
     ) {
         Column {
             SearchHeaderContents(
-                onClickBack = onClickBack
+                onClickBack = onClickBack,
+                placeholder = placeholder,
+                onClickDone = onClickDone,
+                searchWord = searchWord,
+                onChangeSearch = onChangeSearch
             )
 
         }
@@ -44,6 +52,10 @@ fun SearchHeader(
 @Composable
 fun SearchHeaderContents(
     onClickBack : () -> Unit = {},
+    placeholder: String,
+    onClickDone: () -> Unit = {},
+    searchWord: String,
+    onChangeSearch: (String) -> Unit
 ) {
     val context = LocalContext.current
     Row(
@@ -59,19 +71,18 @@ fun SearchHeaderContents(
             size = 25.dp,
             imageVector = ArrowLeft,
             color = NaturalBlack,
-            onClick = { onClickBack })
+            onClick = onClickBack)
 
 
         val focusManager = LocalFocusManager.current
-        val pin = remember { mutableStateOf("") }
-        val text3 = remember { mutableStateOf("") }
+
         SearchInput(
             modifier = Modifier.fillMaxWidth(),
-            text = text3.value,
-            onValueChange = { text3.value = it },
+            text = searchWord,
+            onValueChange = onChangeSearch,
             focusManager = focusManager,
-            placeholder = "근무지 지역 선택",
-            onClickDone = { Log.d("click done: ", text3.value) }
+            placeholder = placeholder,
+            onClickDone = onClickDone
         )
 
     }
