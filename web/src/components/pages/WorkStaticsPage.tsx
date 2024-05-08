@@ -113,15 +113,9 @@ const WorkStaticsPage = () => {
   // }, []);
 
   // webView (web -> App)
-  // const showAndroidToast = () => {
-  //   window.AndroidBridge.showToast("안녕 호남향우회");
-  // };
-
-  function receiveDataFromApp(data: String) {
-    console.log("Data received: " + data);
-    alert(`들어오니... ${data}`);
-    return "호남이 : " + data;
-  }
+  const showAndroidToast = () => {
+    window.AndroidBridge.showToast("안녕 호남향우회");
+  };
 
   return (
     <GraphContainer>
