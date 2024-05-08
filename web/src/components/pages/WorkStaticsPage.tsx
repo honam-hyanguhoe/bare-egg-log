@@ -117,14 +117,18 @@ const WorkStaticsPage = () => {
     window.AndroidBridge.showToast("안녕 호남향우회");
   };
 
-  // function receiveDataFromApp(data : String) {
-  //   console.log("Data received: " + data);
-  //   return "호남이 : " + data;
-  // }
+  function mobileToJavascript() {
+    const button = document.querySelector("#test_btn");
+    if (button) {
+      button.textContent = "모바일에서 변경됨";
+    }
+  }
 
   return (
     <GraphContainer>
-      {/* <button onClick={() => showAndroidToast}>앱에 있는 알람으로 띄워줘.</button> */}
+      <button id="test_btn" onClick={() => showAndroidToast}>
+        앱에 있는 알람으로 띄워줘.
+      </button>
 
       <TypeListContainer>
         <TypeContainer>

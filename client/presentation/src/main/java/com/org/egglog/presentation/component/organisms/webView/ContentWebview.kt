@@ -87,12 +87,7 @@ fun ContentWebView(
         })
         Button(onClick = {
 
-            webView.evaluateJavascript("window.dispatchEvent(sayHello)", null)
-            webView.evaluateJavascript("javascript:receiveDataFromApp('this is honam')") { result ->
-                run {
-                    Log.d("webView", result)
-                }
-            }
+            webView.evaluateJavascript("mobileToJavascript()") { }
 
         }) {
 
