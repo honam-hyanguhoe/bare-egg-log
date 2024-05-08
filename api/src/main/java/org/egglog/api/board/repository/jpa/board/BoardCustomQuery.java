@@ -1,5 +1,6 @@
 package org.egglog.api.board.repository.jpa.board;
 
+import org.egglog.api.board.model.dto.response.BoardListOutputSpec;
 import org.egglog.api.board.model.entity.Board;
 import org.egglog.api.board.model.entity.BoardLike;
 
@@ -14,6 +15,6 @@ public interface BoardCustomQuery {
 
     Optional<BoardLike> getUserBoardLike(Long boardId, Long userId);
 
-    List<Board> findBoardList(String keyword, Long groupId, Long hospitalId, Long lastBoardId, int size);
+    List<BoardListOutputSpec> findBoardList(String keyword, Long groupId, Long hospitalId, int offset, int size);
 
 }

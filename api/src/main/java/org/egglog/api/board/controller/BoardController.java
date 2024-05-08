@@ -26,13 +26,13 @@ public class BoardController {
 
     @GetMapping("")
     public ResponseEntity<?> getBoardList(@RequestParam(value = "hospital_id", required = false) Long hospitalId, @RequestParam(value = "group_id", required = false) Long groupId,
-                                          @RequestParam(value = "search_word", required = false) String searchWord, @RequestParam(value = "last_board_id", required = false) Long lastBoardId,
+                                          @RequestParam(value = "search_word", required = false) String searchWord, @RequestParam(value = "offset", required = false) int offset,
                                           @AuthenticationPrincipal User user) {
         BoardListForm boardListForm = BoardListForm.builder()
                 .hospitalId(hospitalId)
                 .groupId(groupId)
                 .searchWord(searchWord)
-                .lastBoardId(lastBoardId)
+                .offset(offset)
                 .build();
 
         return ResponseEntity.ok().body(MessageUtils.success(boardService.getBoardList(boardListForm, user)));
