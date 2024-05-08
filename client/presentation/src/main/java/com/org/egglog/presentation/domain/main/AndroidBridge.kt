@@ -14,10 +14,8 @@ class AndroidBridge(private val context: Context, private val webView: WebView) 
 
     @JavascriptInterface
     fun sendDataToReact(data: String) {
-        webView.post {
-            webView.evaluateJavascript("receiveDataFromApp('$data')") { result ->
-                Log.d("webView", result)
-            }
+        webView.evaluateJavascript("receiveDataFromApp('$data')") { result ->
+            Log.d("webView", result)
         }
     }
 }

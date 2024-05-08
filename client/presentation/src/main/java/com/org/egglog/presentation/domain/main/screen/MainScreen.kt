@@ -77,9 +77,6 @@ private fun MainScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Spacer(modifier = Modifier.height(30.dp))
-        Button(onClick = { onPrevClick(LocalDate.now()) }) {
-            Text(text = "클릭 시도")
-        }
         Box(
             modifier = Modifier
                 .width(340.widthPercent(context).dp)

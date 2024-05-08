@@ -117,14 +117,14 @@ const WorkStaticsPage = () => {
     window.AndroidBridge.showToast("안녕 호남향우회");
   };
 
-  // App -> web
-  const sendDataToReact = (data: String) => {
-    alert(`앱에서 보냈어요 ${data}`);
-  };
-
+  function receiveDataFromApp(data: String) {
+    // 데이터 처리 로직
+    console.log(data);
+    return "Received: " + data;
+  }
   return (
     <GraphContainer>
-      <button onClick={() => sendDataToReact}>Say hello</button>
+      {/* <button onClick={() => showAndroidToast}>앱에 있는 알람으로 띄워줘.</button> */}
 
       <TypeListContainer>
         <TypeContainer>
