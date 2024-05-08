@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import static org.egglog.api.security.exception.JwtErrorCode.*;
 
@@ -30,19 +31,29 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         try{
             filterChain.doFilter(request, response);
         }catch ( MalformedJwtException e){
-            log.error("exception : 잘못된 엑세스 토큰 시그니처");
+            log.error("==============================[--예외 처리--]=============================");
+            log.error("[EXCEPTION] : {}", e.getMessage(), e);
+            log.debug("==============================[Stack trace END]=============================");
             setErrorResponse(response, TOKEN_SIGNATURE_ERROR.getHttpStatus(), TOKEN_SIGNATURE_ERROR.getMessage());
         }catch (ExpiredJwtException e){
-            log.error("exception : 엑세스 토큰 기간 만료");
+            log.error("==============================[--예외 처리--]=============================");
+            log.error("[EXCEPTION] : {}", e.getMessage(), e);
+            log.debug("==============================[Stack trace END]=============================");
             setErrorResponse(response, EXPIRED_TOKEN.getHttpStatus(), EXPIRED_TOKEN.getMessage());
         }catch (UnsupportedJwtException e){
-            log.error("exception : 지원되지 않는 엑세스 토큰");
+            log.error("==============================[--예외 처리--]=============================");
+            log.error("[EXCEPTION] : {}", e.getMessage(), e);
+            log.debug("==============================[Stack trace END]=============================");
             setErrorResponse(response, NOT_SUPPORT_TOKEN.getHttpStatus(), NOT_SUPPORT_TOKEN.getMessage());
         }catch (IllegalArgumentException e){
-            log.error("exception : 잘못된 엑세스 토큰");
+            log.error("==============================[--예외 처리--]=============================");
+            log.error("[EXCEPTION] : {}", e.getMessage(), e);
+            log.debug("==============================[Stack trace END]=============================");
             setErrorResponse(response, INVALID_TOKEN.getHttpStatus(), INVALID_TOKEN.getMessage());
         }catch (Exception e){
-            log.error("exception : {}", e);
+            log.error("==============================[--예외 처리--]=============================");
+            log.error("[EXCEPTION] : {}", e.getMessage(), e);
+            log.debug("==============================[Stack trace END]=============================");
             setErrorResponse(response, HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }

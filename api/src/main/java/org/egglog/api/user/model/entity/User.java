@@ -116,8 +116,11 @@ public class User implements UserDetails {
         return this;
     }
 
-    public boolean isJoin(){
-        return (this.loginAt==null||this.selectedHospital==null||this.empNo==null||this.name==null);
+    public boolean isJoin() {
+        System.out.println(this.selectedHospital);
+        System.out.println(this.empNo);
+        System.out.println(this.name);
+        return this.selectedHospital != null && this.empNo != null && this.name != null;
     }
 
     public User updateFcmToken(String token){
