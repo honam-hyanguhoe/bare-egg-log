@@ -154,7 +154,9 @@ export default WorkStaticsPage;
 const GraphContainer = styled.div`
   background-color: #f2f4f7;
   min-height: 100vh;
-  padding: 40px;
+  padding-top: 5px;
+  padding-left: 5px;
+  // padding: 40px;
 `;
 const GraphTitle = styled.p`
   font-size: 25px;

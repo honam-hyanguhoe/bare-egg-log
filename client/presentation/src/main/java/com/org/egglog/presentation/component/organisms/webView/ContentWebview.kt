@@ -43,40 +43,34 @@ fun ContentWebView(
                 loadWithOverviewMode = true
                 cacheMode = WebSettings.LOAD_DEFAULT
                 mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+
             }
+
+            settings.setSupportZoom(false)
+            settings.displayZoomControls = false
+            settings.builtInZoomControls = false
 
             // 하드웨어 가속 사용 설정
             setLayerType(
                 View.LAYER_TYPE_HARDWARE, null
             )
 
-//            webViewClient = WebViewClient()
+            webViewClient = WebViewClient()
 
-
-            webViewClient = object : WebViewClient() {
-                override fun onPageFinished(view: WebView?, url: String?) {
-                    super.onPageFinished(view, url)
-                    view?.evaluateJavascript("javascript:receiveDataFromApp('this is honam')") { result ->
-                        Log.d("webView", "Result from JS: $result")
-                    }
-                }
-            }
-
-
-            loadUrl(url)
 
         }
     }
 
+    webView.setOnTouchListener { _, _ -> true }
     webView.addJavascriptInterface(AndroidBridge(context, webView), "AndroidBridge")
-
+    webView.loadUrl(url)
     Card(
         modifier = Modifier
             .fillMaxSize()
-//            .size(
-//                width = width.widthPercent(context).dp,
-//                height = height.heightPercent(context).dp
-//            )
+            .size(
+                width = width.widthPercent(context).dp,
+                height = height.heightPercent(context).dp
+            )
             .border(0.5.dp, Gray100), shape = RoundedCornerShape(20.dp)
     ) {
         AndroidView(factory = { webView }, modifier = Modifier.fillMaxSize(), update = { view ->
@@ -85,14 +79,6 @@ fun ContentWebView(
                 view.loadUrl(url)
             }
         })
-//        Button(onClick = {
-//
-//            webView.evaluateJavascript("mobileToJavascript()") { }
-//
-//        }) {
-//
-//            Text(text = "안녕 호남아")
-//        }
     }
 
 
