@@ -1,6 +1,7 @@
 package com.org.egglog.presentation.domain.auth.extend
 
 import android.content.Context
+import android.util.Log
 import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
@@ -28,6 +29,7 @@ suspend fun authenticateAndGetUserProfile(context: Context): NidProfileResponse 
 
         val oAuthLoginCallback = object : OAuthLoginCallback {
             override fun onSuccess() {
+                Log.e("naver: ", NaverIdLoginSDK.getAccessToken() ?: "")
                 NidOAuthLogin().callProfileApi(callback)
             }
 

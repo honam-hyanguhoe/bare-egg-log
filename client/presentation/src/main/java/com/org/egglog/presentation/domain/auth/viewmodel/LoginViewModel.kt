@@ -32,6 +32,7 @@ import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
+import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
 import javax.annotation.concurrent.Immutable
 import javax.inject.Inject
@@ -50,12 +51,18 @@ class LoginViewModel @Inject constructor(
             this.exceptionHandler = CoroutineExceptionHandler { _, throwable ->
                 intent {
                     postSideEffect(LoginSideEffect.Toast(message = throwable.message.orEmpty()))
+                    reduce {
+                        state.copy(enabled = true)
+                    }
                 }
             }
         }
     )
 
     fun onKakaoClick(context: Context) = intent {
+        reduce {
+            state.copy(enabled = false)
+        }
         try {
             if(UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {
                 val user = UserApiClient.loginWithKakao(context)
@@ -70,18 +77,30 @@ class LoginViewModel @Inject constructor(
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(kakaoTalkInstallUrl))
                 context.startActivity(intent)
             }
+            reduce {
+                state.copy(enabled = true)
+            }
         } catch (error: Throwable) {
             if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
                 Log.e("MainActivity", "사용자가 명시적으로 취소")
                 postSideEffect(LoginSideEffect.Toast("취소 되었습니다."))
+                reduce {
+                    state.copy(enabled = true)
+                }
             } else {
                 Log.e("MainActivity", "인증 에러 발생: ${error.message}")
                 postSideEffect(LoginSideEffect.Toast("인증 에러가 발생했습니다."))
+                reduce {
+                    state.copy(enabled = true)
+                }
             }
         }
     }
 
     fun onNaverClick(context: Context) = intent {
+        reduce {
+            state.copy(enabled = false)
+        }
         val user = authenticateAndGetUserProfile(context)
         val tokens = postLoginUseCase("NAVER", UserParam(
             name = user.profile?.name.orEmpty(),
@@ -92,6 +111,9 @@ class LoginViewModel @Inject constructor(
     }
 
     fun onGoogleUserReceived(user: FirebaseUser?) = intent {
+        reduce {
+            state.copy(enabled = false)
+        }
         val tokens = postLoginUseCase("GOOGLE", UserParam(
             name = user?.displayName.orEmpty(),
             email = user?.email.orEmpty(),
@@ -101,6 +123,9 @@ class LoginViewModel @Inject constructor(
     }
 
     fun onGoogleClick(context: Context, launcher: ManagedActivityResultLauncher<Intent, ActivityResult>, token: String) = intent {
+        reduce {
+            state.copy(enabled = false)
+        }
         val gso: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(token)
             .requestEmail()
@@ -134,15 +159,21 @@ class LoginViewModel @Inject constructor(
                 } else setUserStoreUseCase(userDetail)
                 postSideEffect(LoginSideEffect.NavigateToMainActivity)
             }
+            reduce {
+                state.copy(enabled = true)
+            }
         } else {
             postSideEffect(LoginSideEffect.Toast("인증 에러가 발생했습니다."))
+            reduce {
+                state.copy(enabled = true)
+            }
         }
     }
 }
 
 @Immutable
 data class LoginState(
-    val type: String = ""
+    val enabled: Boolean = true
 )
 
 sealed interface LoginSideEffect {
