@@ -112,13 +112,19 @@ const WorkStaticsPage = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // webView (web -> App)
   const showAndroidToast = () => {
     window.AndroidBridge.showToast("안녕 호남향우회");
   };
 
+  // App -> web
+  const sendDataToReact = (data: String) => {
+    alert(`앱에서 보냈어요 ${data}`);
+  };
+
   return (
     <GraphContainer>
-      <button onClick={showAndroidToast}>Say hello</button>
+      <button onClick={() => sendDataToReact}>Say hello</button>
 
       <TypeListContainer>
         <TypeContainer>
