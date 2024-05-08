@@ -32,6 +32,7 @@ import com.org.egglog.presentation.component.atoms.inputs.SingleInput
 import com.org.egglog.presentation.component.molecules.headers.BasicHeader
 import com.org.egglog.presentation.domain.auth.activity.LoginActivity
 import com.org.egglog.presentation.domain.auth.viewmodel.PlusLoginSideEffect
+import com.org.egglog.presentation.domain.community.activity.CommunityActivity
 import com.org.egglog.presentation.domain.community.posteditor.viewmodel.PostSideEffect
 import com.org.egglog.presentation.domain.community.posteditor.viewmodel.WritePostViewModel
 import com.org.egglog.presentation.domain.main.activity.MainActivity
@@ -60,7 +61,7 @@ fun WritePostScreen(
                 {
                     context.startActivity(
                         Intent(
-                            context, MainActivity::class.java
+                            context, CommunityActivity::class.java
                         ).apply {
                             flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                         }

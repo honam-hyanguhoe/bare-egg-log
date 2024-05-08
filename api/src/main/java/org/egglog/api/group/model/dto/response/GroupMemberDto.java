@@ -11,6 +11,7 @@ import lombok.Data;
 
 @Data
 @Builder
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class GroupMemberDto {
     private Long userId;
     private Long groupId;

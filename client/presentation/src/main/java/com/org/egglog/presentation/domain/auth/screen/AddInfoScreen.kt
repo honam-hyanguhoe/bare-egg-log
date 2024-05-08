@@ -37,6 +37,7 @@ import com.org.egglog.presentation.component.molecules.headers.BasicHeader
 import com.org.egglog.presentation.domain.auth.activity.LoginActivity
 import com.org.egglog.presentation.domain.auth.viewmodel.PlusLoginSideEffect
 import com.org.egglog.presentation.domain.auth.viewmodel.PlusLoginViewModel
+import com.org.egglog.presentation.domain.community.activity.CommunityActivity
 import com.org.egglog.presentation.domain.main.activity.MainActivity
 import com.org.egglog.presentation.theme.*
 import com.org.egglog.presentation.utils.heightPercent
@@ -60,7 +61,7 @@ fun AddInfoScreen(
             PlusLoginSideEffect.NavigateToMainActivity -> {
                 context.startActivity(
                     Intent(
-                        context, MainActivity::class.java
+                        context, CommunityActivity::class.java
                     ).apply {
                         flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                     }

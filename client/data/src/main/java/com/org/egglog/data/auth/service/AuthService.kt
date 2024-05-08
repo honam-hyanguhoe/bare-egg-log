@@ -14,4 +14,10 @@ interface AuthService {
     suspend fun refresh(
         @Header("refreshToken") refreshToken: String
     ): CommonResponse<RefreshResponse?>
+
+    @POST("auth/logout")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun logout(
+        @Header("Authorization") accessToken: String
+    ): CommonResponse<Unit?>
 }

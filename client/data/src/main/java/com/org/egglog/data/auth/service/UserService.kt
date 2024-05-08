@@ -35,6 +35,12 @@ interface UserService {
         @Body requestBody: RequestBody
     ): CommonResponse<UserResponse?>
 
+    @PATCH("user/fcm-modify")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun updateFcmToken(
+        @Body requestBody: RequestBody
+    ): CommonResponse<UserResponse?>
+
     @GET("hospital/list")
     @Headers("Content-Type:application/json; charset=UTF8")
     suspend fun getHospitals(

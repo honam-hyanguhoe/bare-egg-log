@@ -16,6 +16,7 @@ class WritePostUserCaseImpl @Inject constructor(
 ) : WritePostUseCase {
 
     override suspend fun invoke(
+        accessToken: String,
         boardTitle: String,
         boardContent: String,
         uploadImages: List<ByteArray>
@@ -38,7 +39,7 @@ class WritePostUserCaseImpl @Inject constructor(
 
         val requestBody = requestParam.toRequestBody()
 
-        val response = postingService.writePost(requestBody)
+        val response = postingService.writePost(accessToken, requestBody)
         Log.d("커뮤니티", "WritePostUserCaseImpl response ${response.dataHeader.successCode}")
         if (response.dataHeader.successCode == 0) {
             Log.d("커뮤니티", "WritePostUserCaseImpl response $response")
