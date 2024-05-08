@@ -3,6 +3,9 @@ package com.org.egglog.presentation.domain.main.viewModel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.org.egglog.domain.auth.usecase.GetTokenUseCase
+import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
+import com.org.egglog.domain.main.usecase.GetWeeklyWorkUseCase
 import com.org.egglog.presentation.domain.community.posteditor.viewmodel.PostSideEffect
 import com.org.egglog.presentation.domain.community.posteditor.viewmodel.PostState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +23,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
+    private val getWeeklyWorkUseCase: GetWeeklyWorkUseCase,
+    private val getTokenUseCase: GetTokenUseCase,
+    private val getUserStoreUseCase: GetUserStoreUseCase
 ) : ViewModel(), ContainerHost<MainState, MainSideEffect> {
     override val container: Container<MainState, MainSideEffect> =
         container(initialState = MainState(), buildSettings = {})
@@ -31,24 +37,13 @@ class MainViewModel @Inject constructor(
         MainSideEffect.NavigateToCommunityScreen,
         MainSideEffect.NavigateToSettingScreen
     )
-    fun selectItem(index: Int) = intent {
-        reduce { state.copy(selectedItem = index) }
-        postSideEffect(sideEffectMappings[index])
-    }
 
-    fun onClickBefore() = intent {
+    // bottom navigation 로직 구현
 
-    }
-
-    fun onClickAfter() = intent {
-
-    }
 }
 
 data class MainState(
-    val title: String = "",
-    val content: String = "",
-    val selectedItem : Int = 2,
+    val selectedItem : Int = 2
 )
 
 sealed class MainSideEffect {
