@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.messaging.messaging
+//import com.google.firebase.messaging.messaging
 import com.kakao.sdk.common.KakaoSdk
 import com.navercorp.nid.NaverIdLoginSDK
 import com.org.egglog.domain.auth.model.UserFcmTokenParam
@@ -23,6 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.org.egglog.presentation.R
+import com.org.egglog.presentation.domain.main.activity.MainActivity
 import com.org.egglog.presentation.domain.setting.activity.SettingActivity
 import kotlinx.coroutines.tasks.await
 
