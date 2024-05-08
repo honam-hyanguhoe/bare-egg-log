@@ -1,5 +1,6 @@
 package com.org.egglog.presentation.component.organisms.calendars
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,11 +36,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.org.egglog.presentation.component.atoms.buttons.CustomIconButton
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyDataSource
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyUiModel
 import com.org.egglog.presentation.utils.widthPercent
 import com.org.egglog.presentation.component.atoms.labels.Labels
 import com.org.egglog.presentation.theme.*
+import com.org.egglog.presentation.utils.ArrowLeft
+import com.org.egglog.presentation.utils.ArrowRight
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -49,13 +53,14 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun WeeklyCalendar(
     type: String,
+    startDate: LocalDate,
     calendarUiModel: WeeklyUiModel,
     onDateClick: ((WeeklyUiModel.Date) -> Unit)? = null,
-    onPrevClick: ((LocalDate) -> Unit)? = null,
-    onNextClick: ((LocalDate) -> Unit)? = null,
-    labels: List<String> ?= null,
+    onPrevClick: (LocalDate) -> Unit,
+    onNextClick: (LocalDate) -> Unit,
+    labels: List<String>,
     backgroundColor: Color = NaturalWhite,
-    width : Int = 320
+    width: Int = 320
 ) {
 
     Column(
@@ -64,46 +69,100 @@ fun WeeklyCalendar(
             .background(color = backgroundColor)
     ) {
         if (type.equals("group")) {
-            Row{
-                CalendarHeader(calendarUiModel,onPrevClick, onNextClick)
+            Row {
+                CalendarHeader(calendarUiModel, { onPrevClick(startDate) }, onNextClick)
                 Spacer(modifier = Modifier.height(6.dp))
+            }
+        }
+
+        if (type.equals("main")) {
+            Column {
+                MainCalendarHeader(
+                    calendarUiModel,
+                    startDate,
+                    { onPrevClick(startDate) },
+                    onNextClick
+                )
+                Spacer(modifier = Modifier.height(15.dp))
             }
         }
         Content(type, calendarUiModel, onDateClick, labels = labels, backgroundColor = Gray100)
     }
+}
 
+@Composable
+fun MainCalendarHeader(
+    data: WeeklyUiModel,
+    startDate: LocalDate,
+    onPrevClick: ((LocalDate) -> Unit)? = null,
+    onNextClick: ((LocalDate) -> Unit)? = null
+) {
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "내 근무 일정",
+            modifier = Modifier,
+            style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
+        )
+        Row(
+            modifier = Modifier
+        ) {
+            CustomIconButton(
+                size = 30.dp,
+                imageVector = ArrowLeft,
+                color = NaturalBlack,
+                onClick = {
+                    if (onPrevClick != null) {
+                        Log.d("weekly", "startDate ${startDate}")
+                        onPrevClick(startDate)
+                    }
+                })
+            CustomIconButton(
+                size = 30.dp,
+                imageVector = ArrowRight,
+                color = NaturalBlack,
+                onClick = { if (onNextClick != null) onNextClick(data.endDate.date) })
+        }
+    }
 }
 
 @Composable
 fun CalendarHeader(
     data: WeeklyUiModel,
-    onPrevClick: ((LocalDate) -> Unit)? = null,
-    onNextClick: ((LocalDate) -> Unit)? = null
+    onPrevClick: (LocalDate) -> Unit,
+    onNextClick: (LocalDate) -> Unit,
 ) {
-    Row(Modifier
+    Row(
+        Modifier
             .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-                text = data.selectedDate.date.format(DateTimeFormatter.ofPattern("yyyy.MM")),
-                style = Typography.bodyLarge.copy(fontSize = 18.sp),
-                modifier = Modifier
-                        .align(Alignment.CenterVertically)
+            text = data.selectedDate.date.format(DateTimeFormatter.ofPattern("yyyy.MM")),
+            style = Typography.bodyLarge.copy(fontSize = 18.sp),
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
         )
         Row() {
-            IconButton(onClick = { if(onPrevClick != null) onPrevClick(data.startDate.date) }) {
+            IconButton(onClick = { onPrevClick }) {
                 Icon(
-                        imageVector = Icons.Filled.KeyboardArrowLeft,
-                        contentDescription = "Previous",
-                        Modifier.size(20.dp)
+                    imageVector = Icons.Filled.KeyboardArrowLeft,
+                    contentDescription = "Previous",
+                    Modifier.size(20.dp)
                 )
             }
-            IconButton(onClick = { if(onNextClick != null) onNextClick(data.endDate.date) }) {
+            IconButton(onClick = { if (onNextClick != null) onNextClick(data.endDate.date) }) {
                 Icon(
-                        imageVector = Icons.Filled.KeyboardArrowRight,
-                        contentDescription = "Next",
-                        Modifier.size(20.dp)
+                    imageVector = Icons.Filled.KeyboardArrowRight,
+                    contentDescription = "Next",
+                    Modifier.size(20.dp)
                 )
             }
         }
@@ -111,83 +170,96 @@ fun CalendarHeader(
 }
 
 @Composable
-fun Content(type: String, data: WeeklyUiModel, onDateClick: ((WeeklyUiModel.Date) -> Unit)? = null, labels: List<String> ?= null, backgroundColor: Color = NaturalWhite) {
-
-    Row(modifier = Modifier
+fun Content(
+    type: String,
+    data: WeeklyUiModel,
+    onDateClick: ((WeeklyUiModel.Date) -> Unit)? = null,
+    labels: List<String>,
+    backgroundColor: Color
+) {
+    Log.d("weekly", "data ${data}")
+    Row(
+        modifier = Modifier
             .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-            data.visibleDates.forEachIndexed() { index, date ->
-                DateItem(type, date, onDateClick, labels?.get(index) ?: "", backgroundColor = backgroundColor)
-            }
-
+        data.visibleDates.forEachIndexed() { index, date ->
+            DateItem(
+                type,
+                date,
+                onDateClick,
+                labels?.get(index) ?: "",
+                backgroundColor = backgroundColor
+            )
+        }
     }
 }
 
 
 @Composable
-fun DateItem(type: String,
-             date: WeeklyUiModel.Date,
-             onClick: ((WeeklyUiModel.Date) -> Unit)? = null,
-             label: String? = null,
-              backgroundColor: Color = NaturalWhite
+fun DateItem(
+    type: String,
+    date: WeeklyUiModel.Date,
+    onClick: ((WeeklyUiModel.Date) -> Unit)? = null,
+    label: String? = null,
+    backgroundColor: Color = NaturalWhite
 ) {
     Column() {
         Card(
-                modifier = Modifier
-                    .padding(vertical = 4.dp, horizontal = 2.dp)
-                    .run {
-                        if (type.equals("group")) {
-                            clickable { // making the element clickable, by adding 'clickable' modifier
-                                if (onClick != null) {
-                                    onClick(date)
-                                }
+            modifier = Modifier
+                .padding(vertical = 4.dp, horizontal = 2.dp)
+                .run {
+                    if (type.equals("group")) {
+                        clickable { // making the element clickable, by adding 'clickable' modifier
+                            if (onClick != null) {
+                                onClick(date)
                             }
-                        } else {
-                            this
                         }
-                    },
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(
-                        // background colors of the selected date
-                        // and the non-selected date are different
-                        containerColor = if (date.isSelected) {
-                            Warning200
-                        } else {
-                            backgroundColor
-                        }
-                ),
-                border = if (date.isToday) {
-                    BorderStroke(
-                            width = 2.dp,
-                            color = Warning200
-                    )
+                    } else {
+                        this
+                    }
+                },
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(
+                // background colors of the selected date
+                // and the non-selected date are different
+                containerColor = if (date.isSelected) {
+                    Warning300
                 } else {
-                    null
+                    backgroundColor
                 }
+            ),
+            border = if (date.isToday) {
+                BorderStroke(
+                    width = 2.dp,
+                    color = Warning300
+                )
+            } else {
+                null
+            }
         ) {
             Column(
-                    modifier = Modifier
-                        .width(38.widthPercent(LocalContext.current).dp)
-                        .padding(vertical = 10.dp, horizontal = 4.dp),
-                    verticalArrangement = Arrangement.Center
+                modifier = Modifier
+                    .width(38.widthPercent(LocalContext.current).dp)
+                    .padding(vertical = 10.dp, horizontal = 4.dp),
+                verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                        text = date.day.uppercase(),
-                        color = if (date.day.equals("일")) Color(0xFFF97066) else if (date.isSelected) NaturalWhite else NaturalBlack,
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        style = Typography.labelMedium.copy(fontWeight = FontWeight.SemiBold)
+                    text = date.day.uppercase(),
+                    color = if (date.day.equals("일")) Color(0xFFF97066) else if (date.isSelected) NaturalWhite else NaturalBlack,
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    style = Typography.labelMedium.copy(fontWeight = FontWeight.SemiBold)
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                        text = date.date.dayOfMonth.toString(),
-                        color = if (date.isSelected) NaturalWhite else NaturalBlack,
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        style = Typography.displayMedium
+                    text = date.date.dayOfMonth.toString(),
+                    color = if (date.isSelected) NaturalWhite else NaturalBlack,
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    style = Typography.displayMedium
                 )
             }
         }
-        if(type != "group") Labels(text = label ?: "None")
+        if (type != "group") Labels(text = label ?: "None")
     }
 }
 
@@ -195,14 +267,14 @@ fun DateItem(type: String,
 @Preview(showBackground = true)
 @Composable
 fun WCTest() {
-    MaterialTheme{
+    MaterialTheme {
         Column {
 
             val dataSource = WeeklyDataSource()
             var calendarUiModel2 by remember { mutableStateOf(dataSource.getData(lastSelectedDate = dataSource.today)) }
             val labels: List<String> = listOf("Night", "Day", "휴가", "보건", "Off", "Eve", "Eve")
 
-            WeeklyCalendar(type = "main", calendarUiModel2, labels = labels)
+//            WeeklyCalendar(type = "main", calendarUiModel2, labels = labels, onPrevClick = {}, onNextClick = {})
         }
 
     }

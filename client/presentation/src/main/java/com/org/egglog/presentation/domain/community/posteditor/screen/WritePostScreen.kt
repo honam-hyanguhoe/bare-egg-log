@@ -1,7 +1,6 @@
 package com.org.egglog.presentation.domain.community.posteditor.screen
 
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -17,7 +15,6 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,17 +22,13 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
 import com.org.egglog.presentation.component.atoms.buttons.BigButton
 import com.org.egglog.presentation.component.atoms.inputs.MultiInput
 import com.org.egglog.presentation.component.atoms.inputs.SingleInput
 import com.org.egglog.presentation.component.molecules.headers.BasicHeader
-import com.org.egglog.presentation.domain.auth.activity.LoginActivity
-import com.org.egglog.presentation.domain.auth.viewmodel.PlusLoginSideEffect
 import com.org.egglog.presentation.domain.community.activity.CommunityActivity
 import com.org.egglog.presentation.domain.community.posteditor.viewmodel.PostSideEffect
 import com.org.egglog.presentation.domain.community.posteditor.viewmodel.WritePostViewModel
-import com.org.egglog.presentation.domain.main.activity.MainActivity
 import com.org.egglog.presentation.theme.ClientTheme
 import com.org.egglog.presentation.theme.Gray25
 import com.org.egglog.presentation.theme.Gray300

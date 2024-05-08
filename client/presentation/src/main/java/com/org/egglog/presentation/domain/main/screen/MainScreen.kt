@@ -1,9 +1,6 @@
 package com.org.egglog.presentation.domain.main.screen
 
-import android.content.Intent
 import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +15,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,99 +28,135 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.lifecycleScope
-import com.org.egglog.presentation.component.molecules.bottomNavigator.BottomNavigator
 import com.org.egglog.presentation.component.molecules.radioButtons.DayRadioButton
 import com.org.egglog.presentation.component.organisms.calendars.WeeklyCalendar
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyDataSource
+import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyUiModel
 import com.org.egglog.presentation.component.organisms.webView.ContentWebView
-import com.org.egglog.presentation.domain.community.posteditor.activity.PostEditorActivity
-import com.org.egglog.presentation.domain.main.viewModel.MainViewModel
+import com.org.egglog.presentation.domain.main.viewModel.WorkViewModel
 import com.org.egglog.presentation.theme.Gray100
 import com.org.egglog.presentation.theme.NaturalBlack
 import com.org.egglog.presentation.theme.NaturalWhite
 import com.org.egglog.presentation.theme.Typography
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import org.orbitmvi.orbit.compose.collectAsState
+import java.time.LocalDate
 
 
 @Composable
 fun MainScreen(
+    workViewModel: WorkViewModel = hiltViewModel()
+) {
+    val workState = workViewModel.collectAsState().value
+
+    MainScreen(
+        startDate = workState.startDate,
+        labels = workState.labels,
+        calendarUiModel = workState.currentWeekDays,
+        onPrevClick = workViewModel::onPrevClick,
+        onNextClick = workViewModel::onNextClick
+    )
+}
+
+
+@Composable
+private fun MainScreen(
+    startDate: LocalDate,
+    calendarUiModel: WeeklyUiModel,
+    onPrevClick: (LocalDate) -> Unit,
+    onNextClick: (LocalDate) -> Unit,
+    labels: List<String>
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
-    Surface {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = NaturalWhite)
-                .verticalScroll(scrollState),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Spacer(modifier = Modifier.height(30.dp))
-            Box(
-                modifier = Modifier
-                    .width(340.widthPercent(context).dp)
-                    .height(185.heightPercent(context).dp)
-                    .border(
-                        1.dp, NaturalBlack,
-                        RoundedCornerShape(15.dp)
-                    )
-            )
-            Spacer(modifier = Modifier.height(30.dp))
-            DutyCard()
-            Spacer(modifier = Modifier.height(30.dp))
-            RemainCard()
-            Spacer(modifier = Modifier.height(30.dp))
-            StaticsCard()
 
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = NaturalWhite)
+            .verticalScroll(scrollState),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Spacer(modifier = Modifier.height(30.dp))
+        Button(onClick = { onPrevClick(LocalDate.now()) }) {
+            Text(text = "클릭 시도")
         }
+        Box(
+            modifier = Modifier
+                .width(340.widthPercent(context).dp)
+                .height(185.heightPercent(context).dp)
+                .border(
+                    1.dp, NaturalBlack,
+                    RoundedCornerShape(15.dp)
+                )
+        ) {
+            Text(text = "으아. 집 갈래요", style = Typography.displayLarge)
+        }
+        Spacer(modifier = Modifier.height(30.dp))
+        DutyCard(
+            startDate = startDate,
+            calendarUiModel = calendarUiModel,
+            onPrevClick = { onPrevClick(startDate) },
+            onNextClick = onNextClick,
+            labels = labels
+        )
+        Spacer(modifier = Modifier.height(30.dp))
+        RemainCard()
+        Spacer(modifier = Modifier.height(30.dp))
+        StaticsCard()
     }
 }
 
 @Composable
-fun DutyCard(){
-    val tempLabels: List<String> = listOf("Night", "Day", "휴가", "보건", "Off", "Eve", "Eve")
-    val dataSource = WeeklyDataSource()
-    var calendarUiModel2 by remember { mutableStateOf(dataSource.getData(lastSelectedDate = dataSource.today)) }
+fun DutyCard(
+    startDate: LocalDate,
+    calendarUiModel: WeeklyUiModel,
+    onPrevClick: (LocalDate) -> Unit,
+    onNextClick: (LocalDate) -> Unit,
+    labels: List<String>
+) {
     val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .width(320.widthPercent(context).dp)
             .background(color = Gray100, shape = RoundedCornerShape(20.dp))
             .padding(8.dp, 15.dp, 8.dp, 25.dp)
     ) {
-        Text(text = "내 근무 일정",
-            modifier = Modifier.padding(start = 10.dp),
-            style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold))
-        Spacer(modifier = Modifier.height(15.dp))
         WeeklyCalendar(
             type = "main",
-            calendarUiModel = calendarUiModel2,
-            labels = tempLabels,
+            startDate = startDate,
+            calendarUiModel = calendarUiModel,
+            labels = labels,
+            onPrevClick = onPrevClick,
+            onNextClick = onNextClick,
             width = 320,
             backgroundColor = Gray100
         )
     }
 }
+
 @Composable
-fun RemainCard(){
+fun RemainCard() {
     val context = LocalContext.current
     // radio
     val radioList = arrayListOf("Week", "Month")
     val selected = remember { mutableStateOf("") }
-    Column (
+    Column(
         modifier = Modifier
             .width(320.widthPercent(context).dp)
             .background(color = Gray100, shape = RoundedCornerShape(20.dp))
             .padding(8.dp, 15.dp, 8.dp, 25.dp)
-    ){
-        Text(text = "제 근무는 언제 끝나죠?",
+    ) {
+        Text(
+            text = "제 근무는 언제 끝나죠?",
             modifier = Modifier.padding(start = 10.dp),
-            style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold))
-        Box(modifier = Modifier.padding(start = 10.dp, top = 10.dp, end = 0.dp, bottom = 0.dp)){
+            style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
+        )
+        Box(modifier = Modifier.padding(start = 10.dp, top = 10.dp, end = 0.dp, bottom = 0.dp)) {
             DayRadioButton(radioList = radioList, selected = selected)
         }
         ContentWebView(width = 320, height = 350, url = "https://www.egg-log.org/remain")
@@ -132,18 +164,20 @@ fun RemainCard(){
 }
 
 @Composable
-fun StaticsCard(){
+fun StaticsCard() {
     val context = LocalContext.current
 
-    Column (
+    Column(
         modifier = Modifier
             .width(320.widthPercent(context).dp)
             .background(color = Gray100, shape = RoundedCornerShape(20.dp))
             .padding(8.dp, 15.dp, 8.dp, 25.dp)
-    ){
-        Text(text = "내 근무 통계",
+    ) {
+        Text(
+            text = "내 근무 통계",
             modifier = Modifier.padding(start = 10.dp),
-            style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold))
+            style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
+        )
         ContentWebView(width = 320, height = 350, url = "https://www.egg-log.org/statics")
     }
 }
@@ -151,5 +185,7 @@ fun StaticsCard(){
 @Preview
 @Composable
 fun MainScreenPreview() {
-    MainScreen()
+//    MainScreen()
 }
+
+
