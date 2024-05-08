@@ -4,6 +4,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import com.org.egglog.data.auth.service.AuthService
 import com.org.egglog.data.community.posteditor.service.PostEditorService
 import com.org.egglog.data.auth.service.UserService
+import com.org.egglog.data.community.service.CommunityService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -54,5 +55,10 @@ class RetrofitModule {
     @Provides
     fun providePostingService(retrofit: Retrofit): PostEditorService {
         return retrofit.create(PostEditorService::class.java)
+    }
+
+    @Provides
+    fun provideCommunityService(retrofit: Retrofit): CommunityService {
+        return retrofit.create(CommunityService::class.java)
     }
 }

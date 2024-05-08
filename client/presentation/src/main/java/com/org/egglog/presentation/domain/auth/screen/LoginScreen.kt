@@ -27,6 +27,7 @@ import com.org.egglog.presentation.domain.auth.activity.PlusLoginActivity
 import com.org.egglog.presentation.domain.auth.extend.rememberFirebaseAuthLauncher
 import com.org.egglog.presentation.domain.auth.viewmodel.LoginSideEffect
 import com.org.egglog.presentation.domain.auth.viewmodel.LoginViewModel
+import com.org.egglog.presentation.domain.community.activity.CommunityActivity
 import com.org.egglog.presentation.domain.main.activity.MainActivity
 import com.org.egglog.presentation.theme.*
 import com.org.egglog.presentation.utils.heightPercent
