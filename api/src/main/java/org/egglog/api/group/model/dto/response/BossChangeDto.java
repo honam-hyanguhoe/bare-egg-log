@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class BossChangeDto {
     private GroupMemberDto currentAdmin;
     private GroupMemberDto oldAdmin;

@@ -7,6 +7,7 @@ import lombok.Data;
 
 @Data
 @Builder
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class InvitationAcceptForm {
     private String invitationCode;
     private String password;
