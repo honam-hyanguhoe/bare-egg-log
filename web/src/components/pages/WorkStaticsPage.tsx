@@ -111,8 +111,14 @@ const WorkStaticsPage = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const showAndroidToast = () => {
+    AndroidBridge.showToast("안녕 호남향우회");
+  };
+
   return (
     <GraphContainer>
+      <button onClick={showAndroidToast}>Say hello</button>
+
       <TypeListContainer>
         <TypeContainer>
           <Label borderColor="#18C5B5" bgColor="#18C5B5" />
