@@ -126,7 +126,7 @@ const WorkStaticsPage = () => {
 
   return (
     <GraphContainer>
-      <button id="test_btn" onClick={() => showAndroidToast}>
+      <button id="test_btn" onClick={() => mobileToJavascript}>
         앱에 있는 알람으로 띄워줘.
       </button>
 
