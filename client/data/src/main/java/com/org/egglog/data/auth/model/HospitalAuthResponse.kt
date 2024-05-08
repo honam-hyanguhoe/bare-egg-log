@@ -14,8 +14,8 @@ data class HospitalAuthResponse(
     val auth: Boolean,
     @Serializable(with = LocalDateTimeSerializer::class) val authRequestTime: LocalDateTime?,
     @Serializable(with = LocalDateTimeSerializer::class) val confirmTime: LocalDateTime?,
-    val nurseCertificationImgUrl: String,
-    val hospitalCertificationImgUrl: String,
+    val nurseCertificationImgUrl: String?,
+    val hospitalCertificationImgUrl: String?,
     @Contextual val hospitalInfo: UserHospitalResponse?
 )
 

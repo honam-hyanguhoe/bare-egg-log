@@ -118,7 +118,8 @@ fun AddInfoScreen(
     Surface(
         Modifier
             .fillMaxSize()
-            .imePadding()) {
+            .imePadding()
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -180,20 +181,20 @@ fun AddInfoScreen(
                     focusManager = focusManager,
                     placeholder = "사번 입력",
                 )
-            }
-            Spacer(modifier = Modifier.height(40.heightPercent(LocalContext.current).dp))
-            Column(Modifier.fillMaxWidth(), Arrangement.Center, Alignment.CenterHorizontally) {
-                BigButton(
-                    colors = ButtonColors(
-                        containerColor = Warning300,
-                        contentColor = NaturalWhite,
-                        disabledContainerColor = Gray300,
-                        disabledContentColor = NaturalWhite
-                    ),
-                    enabled = empNo.isNotEmpty() && hospital != null && name.isNotEmpty(),
-                    onClick = onClickJoin
-                ) {
-                    Text(text = "회원가입 완료하기", style = Typography.bodyMedium, color = NaturalWhite)
+                Spacer(modifier = Modifier.height(40.heightPercent(LocalContext.current).dp))
+                Column(Modifier.fillMaxWidth(), Arrangement.Center, Alignment.CenterHorizontally) {
+                    BigButton(
+                        colors = ButtonColors(
+                            containerColor = Warning300,
+                            contentColor = NaturalWhite,
+                            disabledContainerColor = Gray300,
+                            disabledContentColor = NaturalWhite
+                        ),
+                        enabled = empNo.isNotEmpty() && hospital != null && name.isNotEmpty(),
+                        onClick = onClickJoin
+                    ) {
+                        Text(text = "회원가입 완료하기", style = Typography.bodyMedium, color = NaturalWhite)
+                    }
                 }
             }
         }
