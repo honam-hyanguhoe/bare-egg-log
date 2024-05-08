@@ -89,16 +89,16 @@ public class JwtUtils {
             });
             return claimsJws;
         }catch ( MalformedJwtException e){
-            log.info("exception : 잘못된 엑세스 토큰 시그니처");
+            log.debug("exception : 잘못된 엑세스 토큰 시그니처");
             throw new JwtException(JwtErrorCode.TOKEN_SIGNATURE_ERROR);
         }catch (ExpiredJwtException e){
-            log.info("exception : 엑세스 토큰 기간 만료");
+            log.debug("exception : 엑세스 토큰 기간 만료");
             throw new JwtException(JwtErrorCode.EXPIRED_TOKEN);
         }catch (UnsupportedJwtException e){
-            log.info("exception : 지원되지 않는 엑세스 토큰");
+            log.debug("exception : 지원되지 않는 엑세스 토큰");
             throw new JwtException(JwtErrorCode.NOT_SUPPORT_TOKEN);
         }catch (IllegalArgumentException e){
-            log.info("exception : 잘못된 엑세스 토큰");
+            log.debug("exception : 잘못된 엑세스 토큰");
             throw new JwtException(JwtErrorCode.INVALID_TOKEN);
         }
     }
@@ -112,19 +112,19 @@ public class JwtUtils {
                     .parseClaimsJws(token);
             return true;
         }catch (MalformedJwtException e){
-            log.info("exception : 잘못된 리프레쉬 토큰 시그니처");
+            log.debug("exception : 잘못된 리프레쉬 토큰 시그니처");
             throw new JwtException(JwtErrorCode.TOKEN_SIGNATURE_ERROR);
         }catch (ExpiredJwtException e){
-            log.info("exception : 리프레쉬 토큰 기간 만료");
+            log.debug("exception : 리프레쉬 토큰 기간 만료");
             User expiredUser = userJpaRepository.findById(Long.valueOf(e.getClaims().getSubject()))
                     .orElseThrow(() -> new UserException(UserErrorCode.DELETED_USER));
             userJpaRepository.save(expiredUser.doLogout()); //로그아웃 처리
             throw new JwtException(JwtErrorCode.EXPIRED_TOKEN);
         }catch (UnsupportedJwtException e){
-            log.info("exception : 지원되지 않는 리프레쉬 토큰");
+            log.debug("exception : 지원되지 않는 리프레쉬 토큰");
             throw new JwtException(JwtErrorCode.NOT_SUPPORT_TOKEN);
         }catch (IllegalArgumentException e){
-            log.info("exception : 잘못된 리프레쉬 토큰");
+            log.debug("exception : 잘못된 리프레쉬 토큰");
             throw new JwtException(JwtErrorCode.INVALID_TOKEN);
         }
     }
