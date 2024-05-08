@@ -2,6 +2,11 @@
 FROM amazoncorretto:17.0.7-alpine AS builder
 USER root
 WORKDIR /main-service
+
+# timezone 설정
+RUN apk add --update tzdata
+ENV TZ=Asia/Seoul
+
 COPY gradlew .
 COPY gradle gradle
 COPY build.gradle .
@@ -9,9 +14,6 @@ COPY gradle.properties .
 COPY settings.gradle .
 COPY src src
 
-# timezone 설정
-RUN apk add --update tzdata
-ENV TZ=Asia/Seoul
 
 # gradlew 실행 권한 부여
 RUN chmod +x ./gradlew

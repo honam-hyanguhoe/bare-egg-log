@@ -31,12 +31,9 @@ pipeline {
                 dir("api"){
                     script {
                         try {
-                            sh "docker-compose build --no-cache"
-                            sh "docker-compose up -d"
+                            sh "docker-compose up -d --build"
                         }catch (Exception e) {
                             sh "echo '빌드에 실패했습니다.'"
-                            sh "docker-compose down"
-                            sh "docker-compose up -d"
                         }
                     }
                 }
