@@ -100,7 +100,6 @@ class PlusLoginViewModel @Inject constructor(
     }
 
     fun onClickDone() = intent {
-        Log.e("done: ", state.search)
         if(state.search == "") {
             reduce {
                 state.copy(

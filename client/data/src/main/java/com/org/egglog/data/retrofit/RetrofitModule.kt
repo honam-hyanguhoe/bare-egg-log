@@ -6,6 +6,7 @@ import com.org.egglog.data.community.posteditor.service.PostEditorService
 import com.org.egglog.data.auth.service.UserService
 import com.org.egglog.data.main.service.StaticsService
 import com.org.egglog.data.main.service.WorkService
+import com.org.egglog.data.community.service.CommunityService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,7 +16,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import javax.inject.Provider
-import javax.inject.Singleton
 
 const val HOST = "https://api.egg-log.org"
 
@@ -69,5 +69,10 @@ class RetrofitModule {
     @Provides
     fun provideStaticsService(retrofit: Retrofit): StaticsService {
         return retrofit.create(StaticsService::class.java)
+    }
+
+    @Provides
+    fun provideCommunityService(retrofit: Retrofit): CommunityService {
+        return retrofit.create(CommunityService::class.java)
     }
 }

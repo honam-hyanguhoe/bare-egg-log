@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.org.egglog.presentation.R
 import com.org.egglog.presentation.domain.main.activity.MainActivity
+import com.org.egglog.presentation.domain.setting.activity.SettingActivity
 import kotlinx.coroutines.tasks.await
 
 @AndroidEntryPoint
@@ -40,8 +41,8 @@ class SplashActivity : AppCompatActivity() {
         FirebaseApp.initializeApp(this)
         KakaoSdk.init(this, getString(R.string.kakao_native_app_key))
         NaverIdLoginSDK.initialize(this, getString(R.string.naver_client_id), getString(R.string.naver_client_secret), getString(R.string.naver_client_name))
-        val keyHash = Utility.getKeyHash(this)
-        Log.e("keyHash: ", keyHash)
+//        val keyHash = Utility.getKeyHash(this)
+//        Log.e("keyHash: ", keyHash)
         setContent{
             ClientTheme {
                 SplashScreen()
@@ -54,7 +55,7 @@ class SplashActivity : AppCompatActivity() {
             if (isLoggedIn) {
                 Log.e("SplashActivity > accessToken : ", tokens.first.orEmpty())
                 Log.e("SplashActivity > refreshToken : ", tokens.second.orEmpty())
-                val userDetail = getUserUseCase("Bearer ${tokens.second.orEmpty()}").getOrThrow()
+                val userDetail = getUserUseCase("Bearer ${tokens.first.orEmpty()}").getOrThrow()
                 if(userDetail?.selectedHospital == null || userDetail.empNo == null) {
                     setUserStoreUseCase(userDetail)
                     startActivity(
@@ -77,7 +78,7 @@ class SplashActivity : AppCompatActivity() {
                     } else setUserStoreUseCase(userDetail)
                     startActivity(
                         Intent(
-                            this@SplashActivity, MainActivity::class.java
+                            this@SplashActivity, SettingActivity::class.java
                         ).apply {
                             flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                         }

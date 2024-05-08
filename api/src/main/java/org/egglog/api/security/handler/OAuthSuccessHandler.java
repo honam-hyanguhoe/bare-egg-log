@@ -34,6 +34,7 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+        log.debug(" ==== ==== ==== [ oauth 인증 성공 핸들러 실행 ] ==== ==== ====");
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
         User oauth2user = User.of(oAuth2User);

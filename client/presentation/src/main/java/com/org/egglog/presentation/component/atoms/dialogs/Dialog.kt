@@ -17,7 +17,6 @@ fun Dialog(
     onConfirmation: () -> Unit,
     dialogTitle: String,
     dialogText: String,
-    icon: ImageVector,
 ) {
     AlertDialog(
         onDismissRequest = { onDismissRequest() },
@@ -29,7 +28,6 @@ fun Dialog(
         title = { Text(text = dialogTitle) },
         text = {
             Column {
-                Text(text = dialogText)
                 Text(text = dialogText)
             }
         },
