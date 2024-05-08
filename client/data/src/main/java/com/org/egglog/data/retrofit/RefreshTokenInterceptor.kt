@@ -22,25 +22,29 @@ class RefreshTokenInterceptor @Inject constructor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val response = chain.proceed(chain.request())
         if (response.code == 401) {
+            if(response.request.url.toString().contains("/auth/refresh")) {
+                runBlocking { tokenDataStore.clear() }
+                runBlocking { userDataStore.clear() }
+                startLoginActivity()
+                return response
+            }
             val tokens = runBlocking { tokenDataStore.getToken() }
             if(tokens.first != null) {
-                val newTokens = refreshAccessToken(tokens)
-                return if(newTokens != null) {
-                    runBlocking { tokenDataStore.setToken(newTokens.accessToken, newTokens.refreshToken) }
+                val newInfo = refreshAccessToken(tokens)
+                return if(newInfo != null) {
+                    runBlocking { tokenDataStore.setToken(newInfo.token.accessToken, newInfo.token.refreshToken) }
+                    runBlocking { userDataStore.setUser(newInfo.userDetail) }
                     val newRequest = chain.request().newBuilder()
-                        .header("Authorization", "Bearer ${newTokens.accessToken}")
+                        .header("Authorization", "Bearer ${newInfo.token.accessToken}")
                         .build()
                     response.close()
                     chain.proceed(newRequest)
                 } else {
-                    response.close()
                     runBlocking { tokenDataStore.clear() }
                     runBlocking { userDataStore.clear() }
                     startLoginActivity()
                     response
                 }
-            } else {
-                response.close()
             }
         }
         return response
@@ -51,6 +55,8 @@ class RefreshTokenInterceptor @Inject constructor(
     }
 
     private fun startLoginActivity() {
-        context.startActivity(Intent(context, LoginActivity::class.java))
+        val intent = Intent(context, LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        context.startActivity(intent)
     }
 }

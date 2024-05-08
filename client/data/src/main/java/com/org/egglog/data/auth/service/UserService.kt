@@ -1,10 +1,9 @@
 package com.org.egglog.data.auth.service
 
-import com.org.egglog.data.auth.model.RefreshResponse
+import com.org.egglog.data.auth.model.TokenResponse
 import com.org.egglog.data.auth.model.UserHospitalResponse
 import com.org.egglog.data.auth.model.UserResponse
 import com.org.egglog.data.retrofit.CommonResponse
-import com.org.egglog.domain.auth.model.UserHospital
 import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -21,7 +20,7 @@ interface UserService {
     suspend fun login(
         @Path("provider") type: String,
         @Body requestBody: RequestBody
-    ): CommonResponse<RefreshResponse?>
+    ): CommonResponse<TokenResponse?>
 
     @GET("user/find")
     @Headers("Content-Type:application/json; charset=UTF8")
@@ -38,6 +37,20 @@ interface UserService {
     @PATCH("user/fcm-modify")
     @Headers("Content-Type:application/json; charset=UTF8")
     suspend fun updateFcmToken(
+        @Header("Authorization") accessToken: String,
+        @Body requestBody: RequestBody
+    ): CommonResponse<UserResponse?>
+
+    @PATCH("user/delete")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun updateUserDelete(
+        @Header("Authorization") accessToken: String
+    ): CommonResponse<UserResponse?>
+
+    @PATCH("user/info-modify")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun updateUserModify(
+        @Header("Authorization") accessToken: String,
         @Body requestBody: RequestBody
     ): CommonResponse<UserResponse?>
 

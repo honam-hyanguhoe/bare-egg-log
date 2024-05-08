@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonColors
@@ -118,6 +119,7 @@ fun AddInfoScreen(
     Surface(
         Modifier
             .fillMaxSize()
+            .systemBarsPadding()
             .imePadding()
     ) {
         Column(
@@ -125,7 +127,6 @@ fun AddInfoScreen(
                 .fillMaxSize()
                 .background(color = NaturalWhite)
         ) {
-            Spacer(modifier = Modifier.padding(10.widthPercent(LocalContext.current).dp))
             BasicHeader(
                 title = "추가정보 입력",
                 hasTitle = true,

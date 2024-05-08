@@ -120,5 +120,8 @@ dependencies {
     // paging3
     implementation(libs.paging.compose)
 
+    // ui controller
+    implementation(libs.accompanist.insets)
+
     implementation(project(":domain"))
 }
