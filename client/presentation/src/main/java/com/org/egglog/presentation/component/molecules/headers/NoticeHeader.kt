@@ -121,13 +121,15 @@ fun NoticeHeaderContents(
                     size = 25.dp,
                     imageVector = Search,
                     color = NaturalBlack,
-                    onClick = { onClickSearch })
+                    onClick = onClickSearch
+                )
             }
             CustomIconButton(
                 size = 25.dp,
                 imageVector = Notification,
                 color = NaturalBlack,
-                onClick = { onClickNotification })
+                onClick = onClickNotification
+            )
         }
     }
 }

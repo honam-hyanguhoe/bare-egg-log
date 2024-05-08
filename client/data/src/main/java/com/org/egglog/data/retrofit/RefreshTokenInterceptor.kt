@@ -26,6 +26,7 @@ class RefreshTokenInterceptor @Inject constructor(
             if(tokens.first != null) {
                 val newTokens = refreshAccessToken(tokens)
                 return if(newTokens != null) {
+                    runBlocking { tokenDataStore.setToken(newTokens.accessToken, newTokens.refreshToken) }
                     val newRequest = chain.request().newBuilder()
                         .header("Authorization", "Bearer ${newTokens.accessToken}")
                         .build()
@@ -46,9 +47,7 @@ class RefreshTokenInterceptor @Inject constructor(
     }
 
     private fun refreshAccessToken(tokens: Pair<String?, String?>): Refresh? {
-        val newTokens = runBlocking { authService.refresh(tokens.second!!).dataBody?.toDomainModel() }
-        runBlocking {tokenDataStore.setToken(newTokens?.accessToken!!, newTokens.refreshToken) }
-        return newTokens
+        return runBlocking { authService.refresh(tokens.second.orEmpty()).dataBody?.toDomainModel() }
     }
 
     private fun startLoginActivity() {

@@ -10,7 +10,6 @@ import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.messaging.messaging
 import com.kakao.sdk.common.KakaoSdk
-import com.kakao.sdk.common.util.Utility
 import com.navercorp.nid.NaverIdLoginSDK
 import com.org.egglog.domain.auth.model.UserFcmTokenParam
 import com.org.egglog.domain.auth.usecase.PostRefreshUseCase
@@ -24,7 +23,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.org.egglog.presentation.R
-import com.org.egglog.presentation.domain.main.activity.MainActivity
 import com.org.egglog.presentation.domain.setting.activity.SettingActivity
 import kotlinx.coroutines.tasks.await
 
@@ -53,9 +51,10 @@ class SplashActivity : AppCompatActivity() {
             val tokens = getTokenUseCase()
             val isLoggedIn = !tokens.first.isNullOrEmpty() && !tokens.second.isNullOrEmpty()
             if (isLoggedIn) {
-                Log.e("SplashActivity > accessToken : ", tokens.first.orEmpty())
-                Log.e("SplashActivity > refreshToken : ", tokens.second.orEmpty())
-                val userDetail = getUserUseCase("Bearer ${tokens.first.orEmpty()}").getOrThrow()
+                Log.e("SplashActivity", "access: " + tokens.first.orEmpty())
+                Log.e("SplashActivity", "refresh: " + tokens.second.orEmpty())
+                val userDetail = getUserUseCase("Bearer ${tokens.first}").getOrNull()
+                Log.e("SplashActivity", "user: " + userDetail.toString())
                 if(userDetail?.selectedHospital == null || userDetail.empNo == null) {
                     setUserStoreUseCase(userDetail)
                     startActivity(
