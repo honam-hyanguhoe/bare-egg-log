@@ -12,10 +12,10 @@ class AndroidBridge(private val context: Context, private val webView: WebView) 
         Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
     }
 
-    @JavascriptInterface
-    fun sendDataToReact(data: String) {
-        webView.evaluateJavascript("receiveDataFromApp('$data')") { result ->
-            Log.d("webView", result)
-        }
-    }
+//    @JavascriptInterface
+//    fun sendDataToReact(data: String) {
+//        webView.evaluateJavascript("receiveDataFromApp('$data')") { result ->
+//            Log.d("webView", result)
+//        }
+//    }
 }

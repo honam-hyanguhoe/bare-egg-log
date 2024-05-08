@@ -28,9 +28,7 @@ import java.nio.charset.StandardCharsets
 
 @Composable
 fun ContentWebView(
-    width: Int = 300,
-    height: Int = 250,
-    url: String = "https://www.egg-log.org/"
+    width: Int = 300, height: Int = 250, url: String = "https://www.egg-log.org/"
 ) {
     val context = LocalContext.current
     val webView = remember {
@@ -49,8 +47,7 @@ fun ContentWebView(
 
             // 하드웨어 가속 사용 설정
             setLayerType(
-                View.LAYER_TYPE_HARDWARE,
-                null
+                View.LAYER_TYPE_HARDWARE, null
             )
 
             webViewClient = WebViewClient()
@@ -64,32 +61,34 @@ fun ContentWebView(
 
     Card(
         modifier = Modifier
-            .size(
-                width = width.widthPercent(context).dp,
-                height = height.heightPercent(context).dp
-            )
-            .border(0.5.dp, Gray100),
-        shape = RoundedCornerShape(20.dp)
+            .fillMaxSize()
+//            .size(
+//                width = width.widthPercent(context).dp,
+//                height = height.heightPercent(context).dp
+//            )
+            .border(0.5.dp, Gray100), shape = RoundedCornerShape(20.dp)
     ) {
-        AndroidView(
-            factory = { webView },
-            modifier = Modifier.fillMaxSize(),
-            update = { view ->
-                val url = url
-                if (view.url != url) {
-                    view.loadUrl(url)
+        AndroidView(factory = { webView }, modifier = Modifier.fillMaxSize(), update = { view ->
+            val url = url
+            if (view.url != url) {
+                view.loadUrl(url)
+            }
+        })
+        Button(onClick = {
+
+            webView.evaluateJavascript("javascript:receiveDataFromApp('this is honam')") { result ->
+                run {
+                    Log.d("webView", result)
                 }
             }
-        )
 
-        Button(onClick = {
-            webView.evaluateJavascript("receiveDataFromApp('hi')") { result ->
-                Log.d("webView", result)
-            }
         }) {
-            Text(text = "클릭 시도")
+
+            Text(text = "안녕 호남아")
         }
     }
+
+
 
     DisposableEffect(Unit) {
         onDispose {
