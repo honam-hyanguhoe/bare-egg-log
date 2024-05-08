@@ -2,6 +2,7 @@ package org.egglog.api.security.config;
 
 
 import lombok.RequiredArgsConstructor;
+import org.egglog.api.security.filter.JoinExceptionFilter;
 import org.egglog.api.security.filter.JwtFilter;
 import org.egglog.api.security.handler.AuthFailureHandler;
 import org.egglog.api.security.handler.ExceptionHandlerFilter;
@@ -31,6 +32,7 @@ public class SecurityConfig{
     private final OAuthSuccessHandler oAuth2SuccessHandler;
     private final AuthFailureHandler authFailureHandler;
     private final ExceptionHandlerFilter exceptionHandlerFilter;
+    private final JoinExceptionFilter joinExceptionFilter;
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
@@ -48,6 +50,7 @@ public class SecurityConfig{
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)// JwtFilter 추가
                 .addFilterBefore(exceptionHandlerFilter, JwtFilter.class) // ExceptionHandlerFilter 추가
+                .addFilterAfter(joinExceptionFilter, JwtFilter.class)
                 .oauth2Login(customizer ->
                         customizer
 //                                .authorizationEndpoint(authorization -> authorization
@@ -61,7 +64,8 @@ public class SecurityConfig{
                                         userInfoEndpoint.userService(customOAuth2Service))
                                 .successHandler(oAuth2SuccessHandler)
                                 .failureHandler(authFailureHandler)
-                ).exceptionHandling(exceptionHandling ->
+                )
+                .exceptionHandling(exceptionHandling ->
                         exceptionHandling
                                 .authenticationEntryPoint(authFailureHandler)
                 );
