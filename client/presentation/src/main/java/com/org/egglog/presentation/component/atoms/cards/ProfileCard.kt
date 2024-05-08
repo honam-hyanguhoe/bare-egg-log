@@ -15,7 +15,6 @@ import com.org.egglog.presentation.utils.widthPercent
 import com.org.egglog.presentation.component.atoms.imageLoader.UrlImageLoader
 import com.org.egglog.presentation.theme.Typography
 
-
 @Composable
 fun ProfileCard(userInfo: UserInfo) {
     val context = LocalContext.current

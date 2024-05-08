@@ -24,7 +24,8 @@ fun InfoList(
     onClickPrepared: () -> Unit = {},
     onNavigateToPrivacyDetailScreen: () -> Unit,
     onNavigateToAgreeDetailScreen: () -> Unit,
-    onNavigateToMySettingScreen: () -> Unit
+    onNavigateToMySettingScreen: () -> Unit,
+    onClickLogout: () -> Unit
 ) {
     val context = LocalContext.current
     Column(modifier = Modifier
@@ -36,6 +37,6 @@ fun InfoList(
         SettingButton(onClick = { onNavigateToPrivacyDetailScreen() }, text =  "개인정보 처리방침", color = Gray600, icon = PersonalSetting)
         SettingButton(onClick = { onNavigateToAgreeDetailScreen() }, text =  "이용약관", color = Gray600, icon = Agree)
         SettingButton(onClick = { onClickPrepared()  }, text =  "문의하기", color = Gray600, icon = Ask)
-        SettingButton(onClick = { Log.d("test: ", "clicked!!!") }, text =  "로그아웃", color = Error500, icon = Logout)
+        SettingButton(onClick = { onClickLogout() }, text =  "로그아웃", color = Error500, icon = Logout)
     }
 }

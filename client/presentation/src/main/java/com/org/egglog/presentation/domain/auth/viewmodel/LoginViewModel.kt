@@ -143,6 +143,7 @@ class LoginViewModel @Inject constructor(
                 refreshToken = tokens.refreshToken
             )
             val userDetail = getUserUseCase("Bearer ${tokens.accessToken}").getOrThrow()
+            Log.e("LoginVM", "user: " + userDetail.toString())
             if(userDetail?.selectedHospital == null || userDetail.empNo == null) {
                 setUserStoreUseCase(userDetail)
                 postSideEffect(LoginSideEffect.NavigateToPlusLoginActivity)
