@@ -20,15 +20,22 @@ import com.org.egglog.presentation.component.atoms.buttons.SettingButton
 import com.org.egglog.presentation.theme.*
 
 @Composable
-fun InfoList() {
+fun InfoList(
+    onClickPrepared: () -> Unit = {},
+    onNavigateToPrivacyDetailScreen: () -> Unit,
+    onNavigateToAgreeDetailScreen: () -> Unit,
+    onNavigateToMySettingScreen: () -> Unit
+) {
     val context = LocalContext.current
-    Column(modifier = Modifier.fillMaxWidth().padding(10.widthPercent(context).dp)) {
-        SettingButton(onClick = { Log.d("test: ", "clicked!!!")}, text =  "내 정보 설정", color = Gray600, icon = MySetting)
-        SettingButton(onClick = { Log.d("test: ", "clicked!!!")}, text =  "알림 설정", color = Gray600, icon = Notification)
-        SettingButton(onClick = { Log.d("test: ", "clicked!!!")}, text =  "근무 설정", color = Gray600, icon = WorkSetting)
-        SettingButton(onClick = { Log.d("test: ", "clicked!!!")}, text =  "개인정보 처리방침", color = Gray600, icon = PersonalSetting)
-        SettingButton(onClick = { Log.d("test: ", "clicked!!!")}, text =  "이용약관", color = Gray600, icon = Agree)
-        SettingButton(onClick = { Log.d("test: ", "clicked!!!")}, text =  "문의하기", color = Gray600, icon = Ask)
-        SettingButton(onClick = { Log.d("test: ", "clicked!!!")}, text =  "로그아웃", color = Error500, icon = Logout)
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(10.widthPercent(context).dp)) {
+        SettingButton(onClick = { onNavigateToMySettingScreen() }, text =  "내 정보 설정", color = Gray600, icon = MySetting)
+        SettingButton(onClick = { onClickPrepared() }, text =  "알림 설정", color = Gray600, icon = Notification)
+        SettingButton(onClick = { onClickPrepared() }, text =  "근무 설정", color = Gray600, icon = WorkSetting)
+        SettingButton(onClick = { onNavigateToPrivacyDetailScreen() }, text =  "개인정보 처리방침", color = Gray600, icon = PersonalSetting)
+        SettingButton(onClick = { onNavigateToAgreeDetailScreen() }, text =  "이용약관", color = Gray600, icon = Agree)
+        SettingButton(onClick = { onClickPrepared()  }, text =  "문의하기", color = Gray600, icon = Ask)
+        SettingButton(onClick = { Log.d("test: ", "clicked!!!") }, text =  "로그아웃", color = Error500, icon = Logout)
     }
 }

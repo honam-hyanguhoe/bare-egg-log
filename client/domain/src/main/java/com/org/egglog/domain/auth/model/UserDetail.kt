@@ -19,5 +19,6 @@ data class UserDetail(
     val empNo: String?,
     @Serializable(with = LocalDateTimeSerializer::class) val createdAt: LocalDateTime?,
     @Serializable(with = LocalDateTimeSerializer::class) val updatedAt: LocalDateTime?,
-    @Serializable(with = LocalDateTimeSerializer::class) val loginAt: LocalDateTime?
+    @Serializable(with = LocalDateTimeSerializer::class) val loginAt: LocalDateTime?,
+    val workGroupId: Long?
 )

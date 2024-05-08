@@ -42,5 +42,5 @@ fun SettingButton(onClick: () -> Unit, icon: ImageVector, text: String, color: C
             Text(style = Typography.bodyMedium, text = text, color = color)
         }
     }
-    HorizontalDivider(color = Gray300)
+    HorizontalDivider(color = Gray200)
 }

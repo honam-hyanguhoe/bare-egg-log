@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -70,7 +72,8 @@ fun LoginScreen(
     LoginScreen(
         onKakaoClick = { viewModel.onKakaoClick(context) },
         onNaverClick = { viewModel.onNaverClick(context) },
-        onGoogleClick = { viewModel.onGoogleClick(context, launcher, token) }
+        onGoogleClick = { viewModel.onGoogleClick(context, launcher, token) },
+        enabled = state.enabled
     )
 }
 
@@ -78,7 +81,8 @@ fun LoginScreen(
 fun LoginScreen(
     onKakaoClick: () -> Unit,
     onNaverClick: () -> Unit,
-    onGoogleClick: () -> Unit
+    onGoogleClick: () -> Unit,
+    enabled: Boolean
 ) {
     Surface {
         Column (
@@ -99,11 +103,11 @@ fun LoginScreen(
                 Text(text = "SIGN WITH ___________________", color = Gray700, style = Typography.displayMedium)
                 Spacer(modifier = Modifier.height(36.heightPercent(LocalContext.current).dp))
                 Row{
-                    AuthButton(type = "kakao", onClick = onKakaoClick)
+                    AuthButton(type = "kakao", onClick = onKakaoClick, enabled = enabled)
                     Spacer(modifier = Modifier.width(16.widthPercent(LocalContext.current).dp))
-                    AuthButton(type = "naver", onClick = onNaverClick)
+                    AuthButton(type = "naver", onClick = onNaverClick, enabled = enabled)
                     Spacer(modifier = Modifier.width(16.widthPercent(LocalContext.current).dp))
-                    AuthButton(type = "google", onClick = onGoogleClick)
+                    AuthButton(type = "google", onClick = onGoogleClick, enabled = enabled)
                 }
             }
         }
