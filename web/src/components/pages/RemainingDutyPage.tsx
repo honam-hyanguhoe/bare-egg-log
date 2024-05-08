@@ -31,29 +31,29 @@ const RemainingDutyPage = () => {
 
   const [data, setData] = useState<TreeNode>(initialData);
 
-  useEffect(() => {
-    const updateData = () => {
-      const newData: TreeNode = {
-        name: "duty",
-        children: [
-          { name: "Day", value: getRandomValues(), color: "#18C5B5" },
-          { name: "Eve", value: getRandomValues(), color: "#F4D567" },
-          { name: "Night", value: getRandomValues(), color: "#485E88" },
-          { name: "Off", value: getRandomValues(), color: "#9B8AFB" },
-          { name: "휴가", value: getRandomValues(), color: "#FDA29B" },
-          { name: "Edu", value: getRandomValues(), color: "#98A2B3" },
-        ],
-        colname: "duty-column",
-        color: "white",
-        remain: 0,
-      };
-      setData(newData);
-    };
+  // useEffect(() => {
+  //   const updateData = () => {
+  //     const newData: TreeNode = {
+  //       name: "duty",
+  //       children: [
+  //         { name: "Day", value: getRandomValues(), color: "#18C5B5" },
+  //         { name: "Eve", value: getRandomValues(), color: "#F4D567" },
+  //         { name: "Night", value: getRandomValues(), color: "#485E88" },
+  //         { name: "Off", value: getRandomValues(), color: "#9B8AFB" },
+  //         { name: "휴가", value: getRandomValues(), color: "#FDA29B" },
+  //         { name: "Edu", value: getRandomValues(), color: "#98A2B3" },
+  //       ],
+  //       colname: "duty-column",
+  //       color: "white",
+  //       remain: 0,
+  //     };
+  //     setData(newData);
+  //   };
 
-    const interval = setInterval(updateData, 2000);
+  //   // const interval = setInterval(updateData, 2000);
 
-    return () => clearInterval(interval);
-  }, []);
+  //   // return () => clearInterval(interval);
+  // }, []);
   const getRandomValues = () => {
     return Math.floor(Math.random() * 8);
   };
