@@ -50,7 +50,18 @@ fun ContentWebView(
                 View.LAYER_TYPE_HARDWARE, null
             )
 
-            webViewClient = WebViewClient()
+//            webViewClient = WebViewClient()
+
+
+            webViewClient = object : WebViewClient() {
+                override fun onPageFinished(view: WebView?, url: String?) {
+                    super.onPageFinished(view, url)
+                    view?.evaluateJavascript("javascript:receiveDataFromApp('this is honam')") { result ->
+                        Log.d("webView", "Result from JS: $result")
+                    }
+                }
+            }
+
 
             loadUrl(url)
 
@@ -76,6 +87,7 @@ fun ContentWebView(
         })
         Button(onClick = {
 
+            webView.evaluateJavascript("window.dispatchEvent(sayHello)", null)
             webView.evaluateJavascript("javascript:receiveDataFromApp('this is honam')") { result ->
                 run {
                     Log.d("webView", result)
