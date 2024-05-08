@@ -16,9 +16,4 @@ abstract class AppModule {
 
     @Binds
     abstract fun bindContext(application: Application): Context
-
-//    @Provides
-//    fun provideUserDataStore(@ApplicationContext context: Context) : UserDataStore {
-//        return UserDataStore(context)
-//    }
 }

@@ -7,14 +7,14 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 
 interface StaticsService {
-    @POST("/v1/work/find/upcoming/{dateType}")
+    @POST("work/find/upcoming/{dateType}")
     @Headers("Content-Type:application/json; charset=UTF8")
     suspend fun countRemainingDuty(
         @Body requestBody: RequestBody
     ) : CommonResponse<String>
 
 
-    @POST("/v1/work/find/completed")
+    @POST("work/find/completed")
     @Headers("Content-Type:application/json; charset=UTF8")
     suspend fun getWorkStatics(
         @Body requestBody: RequestBody

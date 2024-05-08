@@ -20,7 +20,7 @@ data class HospitalAuthResponse(
 )
 
 fun HospitalAuthResponse.toDomainModel(): HospitalAuth {
-    return HospitalAuth(
-        empNo, auth, authRequestTime, confirmTime, nurseCertificationImgUrl, hospitalCertificationImgUrl, hospitalInfo?.toDomainModel()
-    )
+        return HospitalAuth(
+            empNo, auth, authRequestTime, confirmTime, nurseCertificationImgUrl, hospitalCertificationImgUrl, hospitalInfo?.toDomainModel()
+        )
 }

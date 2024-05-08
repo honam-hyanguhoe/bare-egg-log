@@ -1,10 +1,15 @@
 package org.egglog.api.testdata;
 
 import lombok.RequiredArgsConstructor;
+import org.egglog.api.security.exception.AuthException;
+import org.egglog.api.security.exception.JwtErrorCode;
+import org.egglog.api.security.exception.JwtException;
+import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.model.service.UserService;
 import org.egglog.utility.utils.MessageUtils;
 import org.egglog.utility.utils.SuccessType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +48,15 @@ public class TestController {
     @PostMapping("/create/work")
     public ResponseEntity<MessageUtils> creatWorkMockData(){
         testService.makeWorkList();
+        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
+    }
+
+    @PostMapping("/create/work-user")
+    public ResponseEntity<MessageUtils> creatWorkMockData(
+            @AuthenticationPrincipal User loginUser
+            ){
+        if (loginUser==null) throw new JwtException(JwtErrorCode.NO_TOKEN);
+        testService.makeWorkListForUser(loginUser);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }
 }

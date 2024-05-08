@@ -22,33 +22,36 @@ class RefreshTokenInterceptor @Inject constructor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val response = chain.proceed(chain.request())
         if (response.code == 401) {
-            val newTokens = refreshAccessToken()
-            if(newTokens != null) {
-                val newRequest = chain.request().newBuilder()
-                    .header("Authorization", "Bearer ${newTokens.accessToken}")
-                    .build()
-                response.close()
-                return chain.proceed(newRequest)
+            val tokens = runBlocking { tokenDataStore.getToken() }
+            if(tokens.first != null) {
+                val newTokens = refreshAccessToken(tokens)
+                return if(newTokens != null) {
+                    val newRequest = chain.request().newBuilder()
+                        .header("Authorization", "Bearer ${newTokens.accessToken}")
+                        .build()
+                    response.close()
+                    chain.proceed(newRequest)
+                } else {
+                    response.close()
+                    runBlocking { tokenDataStore.clear() }
+                    runBlocking { userDataStore.clear() }
+                    startLoginActivity()
+                    response
+                }
             } else {
-                // 로그아웃 시키기
-                runBlocking { tokenDataStore.clear() }
-                runBlocking { userDataStore.clear() }
-                context.startActivity(
-                    Intent(
-                        context,
-                        LoginActivity::class.java
-                    )
-                )
                 response.close()
             }
         }
         return response
     }
 
-    private fun refreshAccessToken(): Refresh? {
-        val tokens = runBlocking { tokenDataStore.getToken() }
+    private fun refreshAccessToken(tokens: Pair<String?, String?>): Refresh? {
         val newTokens = runBlocking { authService.refresh(tokens.second!!).dataBody?.toDomainModel() }
         runBlocking {tokenDataStore.setToken(newTokens?.accessToken!!, newTokens.refreshToken) }
         return newTokens
+    }
+
+    private fun startLoginActivity() {
+        context.startActivity(Intent(context, LoginActivity::class.java))
     }
 }

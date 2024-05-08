@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class GroupUpdateForm {
     private String newName = null;
     private String newPassword =null;

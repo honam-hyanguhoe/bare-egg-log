@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,10 +19,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.org.egglog.presentation.utils.heightPercent
@@ -31,12 +34,13 @@ import com.org.egglog.presentation.utils.widthPercent
 
 @Composable
 fun FullPageWebView(
-    height: Float = 250f,
-    width: Float = 300f,
+    height: Float = 1f,
+    width: Float = 1f,
     url: String = "https://www.egg-log.org/",
     onClose: () -> Unit
 ) {
     val context = LocalContext.current
+    val enabled = remember { mutableStateOf(true) }
     val webView = remember {
         WebView(context).apply {
             settings.apply {
@@ -56,8 +60,8 @@ fun FullPageWebView(
 
     Box(
         modifier = Modifier
-            .width(width.dp)
-            .height(height.dp)
+            .fillMaxWidth(width)
+            .fillMaxHeight(height)
             .background(color = NaturalWhite)
     ) {
         AndroidView(
@@ -70,12 +74,14 @@ fun FullPageWebView(
         Button(
             onClick = {
                 onClose()
+                enabled.value = false
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomEnd)
                 .padding(10.dp),
-            shape = RoundedCornerShape(10.dp)
+            shape = RoundedCornerShape(10.dp),
+            enabled = enabled.value
         ) {
             Text("닫기")
         }

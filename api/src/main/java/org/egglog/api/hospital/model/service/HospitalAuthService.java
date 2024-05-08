@@ -49,6 +49,7 @@ public class HospitalAuthService {
      */
     @Transactional
     public HospitalAuthResponse createHospitalAuth(User loginUser, CreateHospitalAuthRequest request){
+        log.debug(" ==== ==== ==== [ 병원 인증 요청 생성 조회 서비스 실행 ] ==== ==== ====");
         return hospitalAuthJpaRepository.save(hospitalAuthJpaRepository
                 .findByUserAndHospital(loginUser, loginUser.getSelectedHospital())
                 .map(auth -> auth.create(loginUser, request.getNurseCertificationImgUrl(), request.getHospitalCertificationImgUrl()))
@@ -59,6 +60,7 @@ public class HospitalAuthService {
     @Transactional(readOnly = true)
     public List<HospitalAuthListResponse> findHospitalAuthList(User masterUser, Boolean authType){
         if (masterUser.getUserRole()!= UserRole.ADMIN) throw new UserException(UserErrorCode.ACCESS_DENIED);
+        log.debug(" ==== ==== ==== [ [관리자] 요청된 병원 인증 리스트 조회 서비스 실행 ] ==== ==== ====");
         return hospitalAuthJpaRepository.findAuthListWithUser(authType).stream()
                 .map(auth -> HospitalAuthListResponse.builder()
                         .userId(auth.getUser().getId())
@@ -75,6 +77,8 @@ public class HospitalAuthService {
 
     @Transactional
     public HospitalAuthResponse certHospitalAuth(User adminUser, Long authHospitalId){
+        if (adminUser.getUserRole()!= UserRole.ADMIN) throw new UserException(UserErrorCode.ACCESS_DENIED);
+        log.debug(" ==== ==== ==== [ [관리자] 인증하기 서비스 실행 ] ==== ==== ====");
         HospitalAuth hospitalAuth = hospitalAuthJpaRepository.findByIdWithHospitalAndUser(authHospitalId)
                 .orElseThrow(() -> new HospitalException(HospitalErrorCode.AUTH_NOT_FOUND));
         return hospitalAuthJpaRepository.save(hospitalAuth.confirm(adminUser)).toResponse();

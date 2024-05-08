@@ -84,17 +84,12 @@ class PlusLoginViewModel @Inject constructor(
     }
 
     fun onClickJoin() = intent {
-        // TODO
-        // 1. 유저 회원가입
-        // Firebase에서 FCM 토큰 가져오기
         val fcmToken = try {
             Firebase.messaging.token.await()
         } catch (e: Exception) {
             Log.e("FCM Token", "Error fetching FCM token: ${e.message}", e)
             null
         }
-
-        // 회원가입 시도
         val result = updateUserJoinUseCase(AddUserParam(userName = state.name, empNo = state.empNo, hospitalId = state.hospital!!.hospitalId, fcmToken = fcmToken)).getOrThrow()
         if(result != null) {
             setUserStoreUseCase(result)
@@ -105,7 +100,6 @@ class PlusLoginViewModel @Inject constructor(
     }
 
     fun onClickDone() = intent {
-        Log.e("done: ", state.search)
         if(state.search == "") {
             reduce {
                 state.copy(

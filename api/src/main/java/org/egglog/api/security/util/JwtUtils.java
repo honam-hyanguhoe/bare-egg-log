@@ -7,7 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.security.config.JwtProperties;
 import org.egglog.api.security.exception.JwtErrorCode;
 import org.egglog.api.security.exception.JwtException;
+import org.egglog.api.security.repository.redis.RefreshTokenRepository;
 import org.egglog.api.security.repository.redis.UnsafeTokenRepository;
+import org.egglog.api.user.exception.UserErrorCode;
+import org.egglog.api.user.exception.UserException;
+import org.egglog.api.user.model.entity.User;
+import org.egglog.api.user.repository.jpa.UserJpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -25,8 +30,9 @@ public class JwtUtils {
     private static final ZoneId zoneId = ZoneId.of("Asia/Seoul");
     private String accessSecretKey;
     private String refreshSecretKey;
-
+    private final RefreshTokenRepository refreshTokenRepository;
     private final UnsafeTokenRepository unsafeTokenRepository;
+    private final UserJpaRepository userJpaRepository;
     @PostConstruct
     protected void init(){
         accessSecretKey = Base64.getEncoder().encodeToString(
@@ -43,8 +49,8 @@ public class JwtUtils {
     }
     //토큰만료시간
     public Date getExpiredTime(Long period){
-        log.info("기간={}",period);
-        log.info("기간={}",Date.from(ZonedDateTime.now(zoneId).plus(Duration.ofMillis(period)).toInstant()));
+        log.debug("기간={}",period);
+        log.debug("기간={}",Date.from(ZonedDateTime.now(zoneId).plus(Duration.ofMillis(period)).toInstant()));
         return Date.from(ZonedDateTime.now(zoneId).plus(Duration.ofMillis(period)).toInstant());
     }
 
@@ -61,7 +67,7 @@ public class JwtUtils {
 
     //엑세스 토큰 생성
     public String generateAccessToken(Long id, String role){
-        log.info("토큰생성={}", id);
+        log.debug("토큰생성={}", id);
         return Jwts.builder()
                 .setSubject(String.valueOf(id))
                 .claim("role", role)
@@ -83,16 +89,16 @@ public class JwtUtils {
             });
             return claimsJws;
         }catch ( MalformedJwtException e){
-            log.info("exception : 잘못된 엑세스 토큰 시그니처");
+            log.debug("exception : 잘못된 엑세스 토큰 시그니처");
             throw new JwtException(JwtErrorCode.TOKEN_SIGNATURE_ERROR);
         }catch (ExpiredJwtException e){
-            log.info("exception : 엑세스 토큰 기간 만료");
+            log.debug("exception : 엑세스 토큰 기간 만료");
             throw new JwtException(JwtErrorCode.EXPIRED_TOKEN);
         }catch (UnsupportedJwtException e){
-            log.info("exception : 지원되지 않는 엑세스 토큰");
+            log.debug("exception : 지원되지 않는 엑세스 토큰");
             throw new JwtException(JwtErrorCode.NOT_SUPPORT_TOKEN);
         }catch (IllegalArgumentException e){
-            log.info("exception : 잘못된 엑세스 토큰");
+            log.debug("exception : 잘못된 엑세스 토큰");
             throw new JwtException(JwtErrorCode.INVALID_TOKEN);
         }
     }
@@ -106,16 +112,19 @@ public class JwtUtils {
                     .parseClaimsJws(token);
             return true;
         }catch (MalformedJwtException e){
-            log.info("exception : 잘못된 리프레쉬 토큰 시그니처");
+            log.debug("exception : 잘못된 리프레쉬 토큰 시그니처");
             throw new JwtException(JwtErrorCode.TOKEN_SIGNATURE_ERROR);
         }catch (ExpiredJwtException e){
-            log.info("exception : 리프레쉬 토큰 기간 만료");
+            log.debug("exception : 리프레쉬 토큰 기간 만료");
+            User expiredUser = userJpaRepository.findById(Long.valueOf(e.getClaims().getSubject()))
+                    .orElseThrow(() -> new UserException(UserErrorCode.DELETED_USER));
+            userJpaRepository.save(expiredUser.doLogout()); //로그아웃 처리
             throw new JwtException(JwtErrorCode.EXPIRED_TOKEN);
         }catch (UnsupportedJwtException e){
-            log.info("exception : 지원되지 않는 리프레쉬 토큰");
+            log.debug("exception : 지원되지 않는 리프레쉬 토큰");
             throw new JwtException(JwtErrorCode.NOT_SUPPORT_TOKEN);
         }catch (IllegalArgumentException e){
-            log.info("exception : 잘못된 리프레쉬 토큰");
+            log.debug("exception : 잘못된 리프레쉬 토큰");
             throw new JwtException(JwtErrorCode.INVALID_TOKEN);
         }
     }

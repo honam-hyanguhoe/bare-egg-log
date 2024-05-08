@@ -17,6 +17,7 @@ import lombok.Data;
  * |2024-04-30|김다희|최초 생성|
  */
 @Data
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class GroupMemberSimpleDto {
     private Long userId;
     private String userName;

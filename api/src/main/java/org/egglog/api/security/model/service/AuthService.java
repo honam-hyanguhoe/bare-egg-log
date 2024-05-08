@@ -38,6 +38,7 @@ public class AuthService {
     private final TokenService tokenService;
     private final UserJpaRepository userJpaRepository;
     public TokenResponse login(LoginRequest request, AuthProvider provider){
+        log.debug(" ==== ==== ==== [login 서비스 실행] ==== ==== ====");
         //회원 가입 일 경우
         Optional<User> optionalUser = userJpaRepository.findByEmailWithHospital(request.getEmail());
         if (optionalUser.isPresent()){
@@ -55,6 +56,7 @@ public class AuthService {
     }
 
     public void logout(User user){
+        userJpaRepository.save(user.doLogout());
         tokenService.RemoveToken(user.getId());
     }
 
