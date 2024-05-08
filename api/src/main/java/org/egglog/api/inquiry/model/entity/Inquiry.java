@@ -2,12 +2,11 @@ package org.egglog.api.inquiry.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.egglog.api.inquiry.model.dto.response.InquiryDto;
 import org.egglog.api.inquiry.model.dto.response.InquiryUserDto;
 import org.egglog.api.user.model.entity.User;
-import org.springframework.data.elasticsearch.annotations.DateFormat;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
@@ -16,7 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder(toBuilder = true)
+@SuperBuilder(toBuilder = true)
 @Table(name = "`Inquiries`")
 public class Inquiry {
     @Id
@@ -41,7 +40,7 @@ public class Inquiry {
     @Column(name = "is_noted", nullable = false)
     private Boolean isNoted;
 
-    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second)
+    @CreatedDate
     @Column(name = "inquiry_created_at")
     private LocalDateTime createdAt;  //작성일
 

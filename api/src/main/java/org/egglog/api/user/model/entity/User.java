@@ -84,20 +84,26 @@ public class User implements UserDetails {
     @Column(name = "device_token")
     private String deviceToken;
 
+    @Column(name = "work_group_id")
+    private Long workGroupId;
+
     public User doLogin(){
         this.loginAt = LocalDateTime.now();
+        return this;
+    }
+    public User doLogout(){
+        this.deviceToken = null;
         return this;
     }
 
     public User delete(){
         this.name = "탈퇴회원";
-//        this.profileImgUrl = null;
         this.selectedHospital = null;
         this.userStatus = UserStatus.DELETED;
         this.deletedAt = LocalDateTime.now();
         return this;
     }
-    public User join(String joinUserName, Hospital joinHospital, String empNo, String token){
+    public User join(String joinUserName, Hospital joinHospital, String empNo, String token, Long workGroupId){
         this.name = joinUserName;
         this.selectedHospital = joinHospital;
         this.loginAt = LocalDateTime.now();
@@ -105,7 +111,12 @@ public class User implements UserDetails {
         this.empNo = empNo;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        this.workGroupId = workGroupId;
         return this;
+    }
+
+    public boolean isJoin() {
+        return this.selectedHospital != null && this.empNo != null && this.name != null;
     }
 
     public User updateFcmToken(String token){
@@ -143,6 +154,7 @@ public class User implements UserDetails {
                 .createdAt(this.createdAt)
                 .deviceToken(this.deviceToken)
                 .loginAt(this.loginAt)
+                .workGroupId(this.workGroupId)
                 .build();
     }
     public UserResponse toResponse(HospitalAuth hospitalAuth){
@@ -160,6 +172,7 @@ public class User implements UserDetails {
                 .createdAt(this.createdAt)
                 .deviceToken(this.deviceToken)
                 .loginAt(this.loginAt)
+                .workGroupId(this.workGroupId)
                 .build();
     }
 

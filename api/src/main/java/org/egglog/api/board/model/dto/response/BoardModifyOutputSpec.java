@@ -33,6 +33,8 @@ public class BoardModifyOutputSpec {
 
     private Long groupId;           // 그룹 id
 
+    private Long hospitalId;        //병원 id
+
     private Long userId;            // 유저 id
 
     private String tempNickname;       // 익명 닉네임

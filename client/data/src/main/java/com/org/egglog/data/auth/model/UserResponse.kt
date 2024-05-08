@@ -22,7 +22,8 @@ data class UserResponse(
     val empNo: String?,
     @Serializable(with = LocalDateTimeSerializer::class) val createdAt: LocalDateTime?,
     @Serializable(with = LocalDateTimeSerializer::class) val updatedAt: LocalDateTime?,
-    @Serializable(with = LocalDateTimeSerializer::class) val loginAt: LocalDateTime?
+    @Serializable(with = LocalDateTimeSerializer::class) val loginAt: LocalDateTime?,
+    val workGroupId: Long?
 )
 
 fun UserResponse.toDomainModel(): UserDetail {
@@ -39,6 +40,7 @@ fun UserResponse.toDomainModel(): UserDetail {
         empNo = empNo,
         createdAt = createdAt,
         updatedAt = updatedAt,
-        loginAt = loginAt
+        loginAt = loginAt,
+        workGroupId = workGroupId
     )
 }

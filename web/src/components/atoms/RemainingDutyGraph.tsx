@@ -18,30 +18,45 @@ interface RemainingDutyGraphProps {
 const RemainingDutyGraph = ({ data }: RemainingDutyGraphProps) => {
   const svgRef = useRef(null);
 
-  const width = 500;
-  const height = 500;
-  var margin = { top: 10, right: 10, bottom: 10, left: 10 };
+  const [dimensions, setDimensions] = useState({
+    width: window.innerWidth > 500 ? 500 : window.innerWidth * 0.95,
+    height: window.innerWidth > 500 ? 500 : window.innerWidth * 0.95,
+  });
 
-  const defaultColor = "white";
+  useEffect(() => {
+    const handleResize = () => {
+      setDimensions({
+        width: window.innerWidth > 500 ? 500 : window.innerWidth * 0.95,
+        height: window.innerWidth > 500 ? 500 : window.innerWidth * 0.95,
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     console.log(`잔여 duty ${JSON.stringify(data)}`);
     if (!svgRef.current) return;
 
+    const { width, height } = dimensions;
     const mapSvg = d3.select(svgRef.current);
     mapSvg.selectAll(".dutyMap").remove();
 
+    var margin = { top: 10, right: 10, bottom: 10, left: 10 };
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
     const nodesGroup = mapSvg
       .append("g")
       .attr("class", "dutyMap")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
     const root = d3.hierarchy<TreeNode>(data).sum((d) => d.value ?? 0);
 
-    d3.treemap<TreeNode>().size([innerWidth, innerHeight]).padding(7)(root);
+    d3.treemap<TreeNode>().size([innerWidth, innerHeight]).padding(5)(root);
 
     const mapNodes = nodesGroup
       .selectAll("g")
@@ -57,7 +72,6 @@ const RemainingDutyGraph = ({ data }: RemainingDutyGraphProps) => {
 
     mapNodes
       .append("rect")
-
       .attr("width", (d) => {
         return (
           (d as d3.HierarchyRectangularNode<TreeNode>).x1 -
@@ -72,10 +86,9 @@ const RemainingDutyGraph = ({ data }: RemainingDutyGraphProps) => {
           (d as d3.HierarchyRectangularNode<TreeNode>).y0
       )
       .attr("fill", (d) => d.data.color as string)
-      .attr("rx", 25)
-      .attr("ry", 25);
+      .attr("rx", 20)
+      .attr("ry", 20);
 
-    // let firstFontSize: number = 0;
     mapNodes
       .append("text")
       .attr("class", "nodeDuty")
@@ -99,82 +112,19 @@ const RemainingDutyGraph = ({ data }: RemainingDutyGraphProps) => {
       .style("fill", "#f9f9f9")
       .style("font-family", "Line-Seed-Sans-App")
       .style("font-weight", "700")
-      .each(function (d) {
+      .style("font-size", (d) => {
         const rectWidth =
           (d as d3.HierarchyRectangularNode<TreeNode>).x1 -
           (d as d3.HierarchyRectangularNode<TreeNode>).x0;
         const rectHeight =
           (d as d3.HierarchyRectangularNode<TreeNode>).y1 -
           (d as d3.HierarchyRectangularNode<TreeNode>).y0;
-        const textNode = d3.select(this);
-        const fontSize = Math.min(rectWidth, rectHeight) / 3 - 30;
-        textNode.style("font-size", `${fontSize <= 15 ? 24 : fontSize}px`);
+        return `${Math.min(rectWidth, rectHeight) / 5}px`; // 폰트 크기 산정 방식 조정
       });
-
-    // mapNodes
-    //   .append("text")
-    //   .attr(
-    //     "x",
-    //     (d) =>
-    //       ((d as d3.HierarchyRectangularNode<TreeNode>).x1 -
-    //         (d as d3.HierarchyRectangularNode<TreeNode>).x0) /
-    //       2
-    //   )
-    //   .attr("y", (d) => {
-    //     const currentNode = document.querySelector(".nodeDuty");
-
-    //     if (currentNode && currentNode.nextElementSibling) {
-    //       const siblingNode =
-    //         currentNode.nextElementSibling.querySelector(".nodeDuty");
-
-    //       if (siblingNode) {
-    //         // 선택된 형제 요소의 계산된 스타일에서 font-size 값을 가져옵니다.
-    //         const computedStyle = window.getComputedStyle(siblingNode);
-    //         firstFontSize = Number(computedStyle.getPropertyValue("font-size"));
-
-    //         // 가져온 font-size 값을 출력합니다.
-    //         console.log(
-    //           "Font size of sibling node with class 'nodeDuty':",
-    //           firstFontSize
-    //         );
-    //       } else {
-    //         console.error("Sibling node with class 'nodeDuty' not found.");
-    //       }
-    //     }
-
-    //     return (
-    //       ((d as d3.HierarchyRectangularNode<TreeNode>).y1 -
-    //         (d as d3.HierarchyRectangularNode<TreeNode>).y0) /
-    //         2 +
-    //       firstFontSize
-    //     );
-    //   })
-    //   .text((d) => `+${d.data.value}일`)
-    //   .attr("text-anchor", "middle")
-    //   .attr("dominant-baseline", "middle")
-    //   .style("fill", "#f9f9f9")
-    //   .style("font-family", "Line-Seed-Sans-App")
-    //   .style("font-weight", "700")
-    //   .each(function (d) {
-    //     const rectWidth =
-    //       (d as d3.HierarchyRectangularNode<TreeNode>).x1 -
-    //       (d as d3.HierarchyRectangularNode<TreeNode>).x0;
-    //     const rectHeight =
-    //       (d as d3.HierarchyRectangularNode<TreeNode>).y1 -
-    //       (d as d3.HierarchyRectangularNode<TreeNode>).y0;
-    //     const textNode = d3.select(this);
-    //     const fontSize = Math.min(rectWidth, rectHeight) / 3 - 35;
-    //     textNode.style("font-size", `${fontSize}px`);
-    //     // textNode.style("font-size", `${fontSize <= 15 ? 24 : fontSize}px`);
-    //   });
-  }, [data]);
+  }, [data, dimensions]);
 
   return (
-    <svg
-      ref={svgRef}
-      width={width + margin.left + margin.right}
-      height={height + margin.top + margin.bottom}
-    ></svg>
+    <svg ref={svgRef} width={dimensions.width} height={dimensions.height}></svg>
   );
 };
 

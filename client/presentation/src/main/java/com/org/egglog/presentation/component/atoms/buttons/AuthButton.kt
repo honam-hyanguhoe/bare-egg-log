@@ -14,7 +14,7 @@ import com.org.egglog.presentation.R
 import com.org.egglog.presentation.utils.widthPercent
 
 @Composable
-fun AuthButton(type: String, onClick: () -> Unit) {
+fun AuthButton(type: String, onClick: () -> Unit, enabled: Boolean) {
     val imageResId = when (type) {
         "kakao" -> R.drawable.kakao
         "naver" -> R.drawable.naver
@@ -25,7 +25,8 @@ fun AuthButton(type: String, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
         modifier = Modifier.size(56.widthPercent(LocalContext.current).dp),
-        shape = RoundedCornerShape(12.widthPercent(LocalContext.current).dp)
+        shape = RoundedCornerShape(12.widthPercent(LocalContext.current).dp),
+        enabled = enabled
     ) {
         Image(
             painter = painterResource(id = imageResId),

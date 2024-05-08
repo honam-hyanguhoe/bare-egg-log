@@ -1,13 +1,17 @@
 package com.org.egglog.domain.auth.model
 
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
+import util.LocalDateTimeSerializer
 import java.time.LocalDateTime
 
+@Serializable
 data class HospitalAuth(
     val empNo: String,
     val auth: Boolean,
-    val authRequestTime: LocalDateTime?,
-    val confirmTime: LocalDateTime?,
+    @Serializable(with = LocalDateTimeSerializer::class) val authRequestTime: LocalDateTime?,
+    @Serializable(with = LocalDateTimeSerializer::class) val confirmTime: LocalDateTime?,
     val nurseCertificationImgUrl: String,
     val hospitalCertificationImgUrl: String,
-    val hospitalInfo: UserHospital?
+    @Contextual val hospitalInfo: UserHospital?
 )

@@ -24,11 +24,11 @@ public class BoardListOutputSpec {
 
     private String tempNickname;
 
-    private Long viewCount;         // 게시판 조회수
+    private long viewCount;         // 게시판 조회수
 
-    private Long commentCount;      // 댓글 갯수
+    private long commentCount;      // 댓글 갯수
 
-    private Long likeCount;    // 좋아요 수
+    private long likeCount;    // 좋아요 수
 
     private String pictureOne;  // 첫번째 사진
 
@@ -37,5 +37,9 @@ public class BoardListOutputSpec {
     private Boolean isCommented;    //댓글 유무 여부
     
     private Boolean isHospitalAuth;     // 인증 여부
+
+    private String hospitalName;    // 사용자 병원명
+
+    private Long userId;            // 유저 id
 
 }

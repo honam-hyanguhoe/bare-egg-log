@@ -12,7 +12,7 @@ import kotlin.coroutines.suspendCoroutine
 suspend fun UserApiClient.Companion.loginWithKakao(context: Context): User {
     return try {
         UserApiClient.loginWithKakaoTalk(context)
-        UserApiClient.profile(context)
+        return UserApiClient.profile(context)
     } catch (error: Throwable) {
         throw error
     }
@@ -88,6 +88,8 @@ suspend fun UserApiClient.Companion.profile(context: Context): User {
                             }
                         }
                     }
+                } else {
+                    continuation.resume(user)
                 }
             } else {
                 continuation.resumeWithException(RuntimeException("알수 없는 에러 발생"))

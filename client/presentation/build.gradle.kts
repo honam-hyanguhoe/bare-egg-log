@@ -78,6 +78,10 @@ dependencies {
     implementation(libs.hilt)
     kapt(libs.hilt.compiler)
 
+    // paging3
+    implementation(libs.paging.runtime)
+    implementation(libs.paging.compose)
+
     // navigation
     implementation(libs.navigation.compose)
     implementation(libs.hilt.navigation.compose)
@@ -106,11 +110,15 @@ dependencies {
 
     // google
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.messaging.ktx)
     implementation(platform(libs.firebase.bom))
     implementation(libs.play.services.auth)
 
     // naver
     implementation(libs.naver.oauth)
+
+    // paging3
+    implementation(libs.paging.compose)
 
     implementation(project(":domain"))
 }

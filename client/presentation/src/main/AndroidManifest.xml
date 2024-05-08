@@ -1,15 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.org.egglog.presentation">
+
     <application>
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id"/>
+
+        <!-- AUTH -->
         <activity
-            android:name="com.org.egglog.presentation.domain.auth.activity.SplashActivity"
+            android:name=".domain.auth.activity.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".domain.auth.activity.LoginActivity" />
+        <activity android:name=".domain.auth.activity.PlusLoginActivity" />
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:launchMode="singleTask"
@@ -23,9 +31,24 @@
                     android:scheme="@string/kakao_redirection_scheme" />
             </intent-filter>
         </activity>
-        <activity android:name="com.org.egglog.presentation.domain.main.activity.MainActivity" />
-        <activity android:name="com.org.egglog.presentation.domain.auth.activity.LoginActivity" />
-        <activity android:name="com.org.egglog.presentation.domain.community.posteditor.activity.PostEditorActivity" />
-        <activity android:name="com.org.egglog.presentation.domain.auth.activity.PlusLoginActivity" />
+
+        <!-- MAIN -->
+        <activity android:name=".domain.main.activity.MainActivity" />
+
+        <!-- SETTING -->
+        <activity android:name=".domain.setting.activity.SettingActivity" />
+
+        <activity android:name=".domain.community.posteditor.activity.PostEditorActivity" />
+        <activity android:name=".domain.community.activity.CommunityActivity"/>
+
+        <service
+            android:name=".utils.FcmReceiveService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
     </application>
+
 </manifest>

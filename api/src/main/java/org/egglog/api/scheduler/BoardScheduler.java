@@ -61,7 +61,9 @@ public class BoardScheduler {
      * 전체게시판에만 급상승 게시물이 있음<br>
      * * 그룹아이디 && 병원아이디 == null -> 전체 게시판<br>
      */
-    @Scheduled(cron = "0 0 0/1 * * *")
+
+//    @Scheduled(cron = "0 0/1 * * * ?")
+    @Scheduled(cron = "0 0 0/1 * * ?")
     @Transactional
     public void updateHotBoardScheduledMethod() {
         //<boardId, (조회수 + 좋아요)>
@@ -71,6 +73,7 @@ public class BoardScheduler {
         if (!redisUtil.getAllViewedBoards().isEmpty()) {
             for (ZSetOperations.TypedTuple<String> tuple : redisUtil.getAllViewedBoards()) {
                 Long boardId = Long.parseLong(Objects.requireNonNull(tuple.getValue())); //boardId
+                log.info("boardId: {}", boardId);
 
                 Board board = boardRepository.findById(boardId).orElseThrow(
                         () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
@@ -79,7 +82,6 @@ public class BoardScheduler {
                 if (board.getGroup() == null && board.getHospital() == null) { //전체 게시판이라면
                     Long viewCount = Objects.requireNonNull(tuple.getScore()).longValue(); //조회수
                     Long likeCount = boardRepository.getLikeCount(boardId); //좋아요 개수
-
                     boardViewCounts.put(boardId, viewCount + likeCount);
                 }
             }
@@ -91,13 +93,15 @@ public class BoardScheduler {
                     .toList();
 
             // Redis에 저장 (ID 리스트)
-            redisTemplate.opsForValue().set("hotBoards", hotBoardIds.toString(), 1, TimeUnit.HOURS);
-
-        } else {  //최근 게시물 2개
-            List<Long> recentBoardIds = boardRepository.findTop2ByOrderByCreatedAtDesc();
-            redisTemplate.opsForValue().set("hotBoards", recentBoardIds.toString(), 1, TimeUnit.HOURS);
+            redisTemplate.opsForValue().set("hotBoards", hotBoardIds.toString(), 1, TimeUnit.MINUTES);
+//            redisTemplate.opsForValue().set("hotBoards", hotBoardIds.toString(), 1, TimeUnit.HOURS);
 
         }
+//        else {  //최근 게시물 2개
+//            List<Long> recentBoardIds = boardRepository.findTop2ByOrderByCreatedAtDesc();
+//            redisTemplate.opsForValue().set("hotBoards", recentBoardIds.toString(), 1, TimeUnit.MINUTES);
+//
+//        }
 
     }
     /**

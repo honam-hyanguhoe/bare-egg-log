@@ -49,6 +49,7 @@ public class UserService {
     }
     @Transactional(readOnly = true)
     public UserResponse find(User loginUser){
+        log.debug(" ==== ==== ==== [ 유저 조회 서비스 실행] ==== ==== ====");
         Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(loginUser, loginUser.getSelectedHospital());
         if (hospitalAuth.isPresent()){
             return loginUser.toResponse(hospitalAuth.get());
@@ -65,13 +66,14 @@ public class UserService {
      */
     @Transactional
     public UserResponse joinUser(User loginUser, JoinUserRequest request){
+        log.debug(" ==== ==== ==== [ 회원가입 서비스 실행] ==== ==== ====");
         Hospital hospital = hospitalJpaRepository.findById(request.getHospitalId())
                 .orElseThrow(() -> new HospitalException(HospitalErrorCode.NOT_FOUND));
         //todo 1. 기본 태그 자동 생성
         workTypeJpaRepository.saveAll(getDefaultWorkTypes(loginUser));
         //todo 2. 근무 일정 캘린더 그룹 자동 생성
-        calendarGroupRepository.save(CalendarGroup.builder().alias("근무 일정").user(loginUser).build());
-        return userJpaRepository.save(loginUser.join(request.getUserName(), hospital, request.getEmpNo(), request.getFcmToken()))
+        CalendarGroup workGroup = calendarGroupRepository.save(CalendarGroup.builder().alias("근무 일정").user(loginUser).build());
+        return userJpaRepository.save(loginUser.join(request.getUserName(), hospital, request.getEmpNo(), request.getFcmToken(), workGroup.getId()))
                 .toResponse();
     }
 
@@ -81,6 +83,7 @@ public class UserService {
                 .title("DAY")
                 .color("#18C5B5")
                 .workTag(WorkTag.DAY)
+                .workTypeImgUrl("https://firebasestorage.googleapis.com/v0/b/egglog-422207.appspot.com/o/honam%2Feggs%2FDAY.png?alt=media&token=34852f61-9513-41ab-a733-f01c3014206a")
                 .startTime(LocalTime.of(6,0))//오전 6시 ~ 오후 2시 | 오후 2시 ~ 10시 | 오후 10시 + 익일 오전 6시
                 .workTime(LocalTime.of(8,0))//8시간
                 .user(loginUser)
@@ -89,6 +92,7 @@ public class UserService {
                 .title("EVE")
                 .color("#F4D567")
                 .workTag(WorkTag.EVE)
+                .workTypeImgUrl("https://firebasestorage.googleapis.com/v0/b/egglog-422207.appspot.com/o/honam%2Feggs%2FEVE.png?alt=media&token=c62376bb-1ed2-45f0-83cd-d0aeeb19f4aa")
                 .startTime(LocalTime.of(2,0))//오전 6시 ~ 오후 2시 | 오후 2시 ~ 10시 | 오후 10시 + 익일 오전 6시
                 .workTime(LocalTime.of(8,0))//8시간
                 .user(loginUser)
@@ -97,6 +101,7 @@ public class UserService {
                 .title("NIGHT")
                 .color("#E55555")
                 .workTag(WorkTag.NIGHT)
+                .workTypeImgUrl("https://firebasestorage.googleapis.com/v0/b/egglog-422207.appspot.com/o/honam%2Feggs%2FNIGHT.png?alt=media&token=1181cfa8-1e19-402b-a977-eb8d096a8576")
                 .startTime(LocalTime.of(2,0))//오전 6시 ~ 오후 2시 | 오후 2시 ~ 10시 | 오후 10시 + 익일 오전 6시
                 .workTime(LocalTime.of(8,0))//8시간
                 .user(loginUser)
@@ -105,6 +110,7 @@ public class UserService {
                 .title("OFF")
                 .color("#9B8AFB")
                 .workTag(WorkTag.OFF)
+                .workTypeImgUrl("https://firebasestorage.googleapis.com/v0/b/egglog-422207.appspot.com/o/honam%2Feggs%2FOFF.png?alt=media&token=066f293c-9af2-4bdb-82d6-ba9a30a9b03d")
                 .startTime(LocalTime.of(0,0))//오전 6시 ~ 오후 2시 | 오후 2시 ~ 10시 | 오후 10시 + 익일 오전 6시
                 .workTime(LocalTime.of(1,0))//8시간
                 .user(loginUser)
@@ -121,6 +127,7 @@ public class UserService {
      */
     @Transactional
     public UserResponse updateUserInfo(User loginUser, UpdateUserRequest request){
+        log.debug(" ==== ==== ==== [ 유저 회원 정보 수정 서비스 실행] ==== ==== ====");
         User updateUser = userJpaRepository.save(loginUser.updateInfo(request.getUserName(), request.getProfileImgUrl()));
         Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(updateUser, updateUser.getSelectedHospital());
         if (hospitalAuth.isPresent()){
@@ -137,6 +144,7 @@ public class UserService {
      */
     @Transactional
     public UserResponse updateFcmUser(User loginUser, UpdateFcmRequest request){
+        log.debug(" ==== ==== ==== [ 유저 FCM 수정 서비스 실행] ==== ==== ====");
         User updateUser = userJpaRepository.save(loginUser.updateFcmToken(request.getFcmToken()));
         Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(updateUser, updateUser.getSelectedHospital());
         if (hospitalAuth.isPresent()){
@@ -154,6 +162,7 @@ public class UserService {
      */
     @Transactional
     public UserResponse updateUserHospital(User loginUser, UpdateUserHospitalRequest request){
+        log.debug(" ==== ==== ==== [ 유저 선택 병원 수정 서비스 실행] ==== ==== ====");
         Hospital selectHospital = hospitalJpaRepository.findById(request.getHospitalId())
                 .orElseThrow(() -> new HospitalException(HospitalErrorCode.NOT_FOUND));
         //유저 병원 업데이트
@@ -173,6 +182,7 @@ public class UserService {
      */
     @Transactional
     public UserResponse deleteUser(User loginUser){
+        log.debug(" ==== ==== ==== [ 유저 탈퇴 서비스 실행] ==== ==== ====");
         return userJpaRepository.save(loginUser.delete())
                 .toResponse();
     }

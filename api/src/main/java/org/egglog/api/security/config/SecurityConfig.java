@@ -2,6 +2,7 @@ package org.egglog.api.security.config;
 
 
 import lombok.RequiredArgsConstructor;
+import org.egglog.api.security.filter.JoinExceptionFilter;
 import org.egglog.api.security.filter.JwtFilter;
 import org.egglog.api.security.handler.AuthFailureHandler;
 import org.egglog.api.security.handler.ExceptionHandlerFilter;
@@ -19,18 +20,23 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @EnableWebSecurity
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig{
-    private static final String[] ALLOWED_URIS = {"/**"};
+    private static final String[] ALLOWED_URIS = {"/v1/hospital/list", "/v1/auth/login/**", "/v1/auth/refresh", "/test/**", "/swagger-ui/**", "/login/oauth2/code/**", "/oauth2/**", "/v3/api-docs/**", "/actuator/prometheus", "/actuator/metrics"};
     private final JwtFilter jwtFilter;
     private final CustomOAuth2Service customOAuth2Service;
     private final OAuthSuccessHandler oAuth2SuccessHandler;
     private final AuthFailureHandler authFailureHandler;
     private final ExceptionHandlerFilter exceptionHandlerFilter;
+    private final JoinExceptionFilter joinExceptionFilter;
+
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
@@ -43,12 +49,12 @@ public class SecurityConfig{
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers(ALLOWED_URIS).permitAll() // 특정 경로 인증 미요구
-//                        .anyRequest().authenticated() // 나머지 경로는 인증 요구
-                                .anyRequest().permitAll()
+                        .requestMatchers(ALLOWED_URIS).permitAll() // 특정 경로 인증 미요구
+                        .anyRequest().authenticated() // 나머지 경로는 인증 요구
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)// JwtFilter 추가
                 .addFilterBefore(exceptionHandlerFilter, JwtFilter.class) // ExceptionHandlerFilter 추가
+                .addFilterAfter(joinExceptionFilter, JwtFilter.class)
                 .oauth2Login(customizer ->
                         customizer
 //                                .authorizationEndpoint(authorization -> authorization
@@ -61,12 +67,12 @@ public class SecurityConfig{
                                 .userInfoEndpoint(userInfoEndpoint ->
                                         userInfoEndpoint.userService(customOAuth2Service))
                                 .successHandler(oAuth2SuccessHandler)
-//                                .failureHandler(authFailureHandler)
+                                .failureHandler(authFailureHandler)
+                )
+                .exceptionHandling(exceptionHandling ->
+                        exceptionHandling
+                                .authenticationEntryPoint(authFailureHandler)
                 );
-//                .exceptionHandling(exceptionHandling ->
-//                        exceptionHandling
-//                                .authenticationEntryPoint(authFailureHandler)
-//                );
 
 
         return http.build();

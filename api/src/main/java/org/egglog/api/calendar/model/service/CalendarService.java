@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.*;
+import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.Standard;
 import net.fortuna.ical4j.model.component.VEvent;
@@ -40,11 +42,13 @@ import org.egglog.api.work.repository.jpa.WorkQueryRepositoryImpl;
 import org.egglog.api.worktype.model.dto.response.WorkTypeResponse;
 import org.egglog.api.worktype.model.entity.WorkType;
 
+import java.io.InputStream;
+import java.net.URL;
 import java.time.LocalDateTime;
 //import java.util.TimeZone;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,22 +66,126 @@ public class CalendarService {
 
 
     /**
-     * 파일이 내부에 존재하는 경우를 가정한 예제 코드
-     * @param filePath
+     * url or file path ics를 받아서 일정에 저장하는 서비스
+     * @author 김형민
      */
-    public void readCalendarFile(String filePath){
+    public void readCalendarFile(String path, CalendarGroup calendarGroup, User loginUser) {
+        InputStream inputStream = null;
+        List<Event> icsEventList = new ArrayList<>();
+        if (!path.endsWith(".ics")) throw new CalendarException(CalendarErrorCode.IS_NOT_ICS);
         try {
-            FileInputStream fileInputStream =new FileInputStream(filePath);
+            // URL인지 확인
+            if (path.startsWith("http://") || path.startsWith("https://")) {
+                URL url = new URL(path);
+                inputStream = url.openStream(); // URL에서 스트림 열기
+            } else {
+                inputStream = new FileInputStream(path); // 파일 경로에서 스트림 열기
+            }
+
             CalendarBuilder builder = new CalendarBuilder();
-            Calendar calendar = builder.build(fileInputStream);
+            Calendar calendar = builder.build(inputStream);
             List<CalendarComponent> events = calendar.getComponents(Component.VEVENT);
+
             for (CalendarComponent event : events) {
-                log.info(event.toString());
+                Event eggLogEvent = Event.builder().calendarGroup(calendarGroup).user(loginUser).build();
+                for (Property property : event.getProperties()) {
+                    String name = property.getName();
+                    switch (name){
+                        case "SUMMARY": eggLogEvent.setEventTitle(property.getValue()); break;
+                        case "UID" : eggLogEvent.setUuid(property.getValue()); break;
+                        case "DTSTART" : eggLogEvent.setStartDate(icsTimeToLocalDateTime(property.getValue())); break;
+                        case "DTEND" : eggLogEvent.setEndDate(icsTimeToLocalDateTime(property.getValue())); break;
+                        case "DESCRIPTION" : eggLogEvent.setEventContent(property.getValue()); break;
+                    }
+                }
+                icsEventList.add(eggLogEvent);
             }
         } catch (Exception e) {
-            log.error(e.getMessage());
+            throw new CalendarException(CalendarErrorCode.ICS_SYNC_FAIL);
+        } finally {
+            eventRepository.saveAll(icsEventList);
+            if (inputStream != null) {
+                try {
+                    inputStream.close(); // 스트림 닫기
+                } catch (Exception e) {
+                    log.error("스트림 닫기 에러 = {}", e.getMessage());
+                }
+            }
+
         }
     }
+    /**
+     * 유저가 버튼을 누르면 유저의 캘린더 그룹 중에서 url이 있는 것들은 동기화를 한다.
+     * @author 김형민
+     */
+    public void updateIcsEventsForSyncRequest(User loginUser){
+        Map<CalendarGroup, Set<String>> uuidMaps = calendarGroupRepository
+                .findCalendarGroupsWithEventUuids(loginUser.getId());
+        for (CalendarGroup calendarGroup : uuidMaps.keySet()) {
+            updateEventForUrl(calendarGroup, uuidMaps.get(calendarGroup), loginUser);
+        }
+    }
+    private void updateEventForUrl(CalendarGroup calendarGroup, Set<String> uuidSet, User loginUser){
+        String path = calendarGroup.getUrl();
+        InputStream inputStream = null;
+        List<Event> icsEventList = new ArrayList<>();
+        if (!path.endsWith(".ics")) throw new CalendarException(CalendarErrorCode.IS_NOT_ICS);
+        try {
+            // URL인지 확인
+            if (path.startsWith("http://") || path.startsWith("https://")) {
+                URL url = new URL(path);
+                inputStream = url.openStream(); // URL에서 스트림 열기
+            } else {
+                throw new CalendarException(CalendarErrorCode.ICS_SYNC_FAIL);
+            }
+            List<CalendarComponent> events = new CalendarBuilder().build(inputStream)
+                    .getComponents(Component.VEVENT);
+
+            for (CalendarComponent event : events) {
+                Event eggLogEvent = Event.builder()
+                        .calendarGroup(calendarGroup)
+                        .user(loginUser)
+                        .build();
+                for (Property property : event.getProperties()) {
+                    String name = property.getName();
+                    switch (name){
+                        case "SUMMARY": eggLogEvent.setEventTitle(property.getValue()); break;
+                        case "UID" : eggLogEvent.setUuid(property.getValue()); break;
+                        case "DTSTART" : eggLogEvent.setStartDate(icsTimeToLocalDateTime(property.getValue())); break;
+                        case "DTEND" : eggLogEvent.setEndDate(icsTimeToLocalDateTime(property.getValue())); break;
+                        case "DESCRIPTION" : eggLogEvent.setEventContent(property.getValue()); break;
+                    }
+                }
+                if (!uuidSet.contains(eggLogEvent.getUuid())) icsEventList.add(eggLogEvent);
+            }
+        } catch (Exception e) {
+            throw new CalendarException(CalendarErrorCode.ICS_SYNC_FAIL);
+        } finally {
+            eventRepository.saveAll(icsEventList);
+            if (inputStream != null) {
+                try {
+                    inputStream.close(); // 스트림 닫기
+                } catch (Exception e) {
+                    log.error("스트림 닫기 에러 = {}", e.getMessage());
+                }
+            }
+
+        }
+    }
+
+
+    private LocalDateTime icsTimeToLocalDateTime(String stringTime) throws DateTimeParseException {
+        if (stringTime.length() == 16) {
+            // ISO 8601 확장 포멧 ("yyyyMMdd'T'HHmmss'Z'")
+            return LocalDateTime.parse(stringTime, DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'"));
+        } else if (stringTime.length() == 8) {
+            // 연월일 포멧 ("yyyyMMdd"), 자정 시간 추가
+            return LocalDateTime.parse(stringTime + "T000000", DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss"));
+        } else {
+            throw new DateTimeParseException("Unsupported date format", stringTime, 0);
+        }
+    }
+
     public String getIcsLink(User user) {
         //TODO data query
         String blobPath = "ics/" + user.getId() + "/calendar.ics";

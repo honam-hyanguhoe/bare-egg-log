@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -79,6 +81,7 @@ fun AgreeScreen(
                 .fillMaxSize()
                 .background(color = NaturalWhite)
         ) {
+            Spacer(modifier = Modifier.padding(10.widthPercent(LocalContext.current).dp))
             BasicHeader(
                 title = "약관동의",
                 hasTitle = true,

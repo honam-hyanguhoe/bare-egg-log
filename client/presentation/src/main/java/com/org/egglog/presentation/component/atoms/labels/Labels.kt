@@ -27,14 +27,14 @@ import com.org.egglog.presentation.theme.*
 fun Labels(text: String, size: String? = null, onClick: (()->Unit)? = null) {
 
     var color = when(text) {
-        "Day" -> Day
-        "Eve" -> Eve
-        "Night" -> Night
-        "Off" -> Off
+        "DAY" -> Day
+        "EVE" -> Eve
+        "NIGHT" -> Night
+        "OFF" -> Off
         "교육" -> Education
         "보건" -> Health
         "휴가" -> Vacation
-        "None" -> None
+        "NONE" -> None
         else -> None
     }
 

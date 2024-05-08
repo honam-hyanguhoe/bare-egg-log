@@ -20,6 +20,7 @@ import java.util.List;
  * |2024-04-30|김다희|최초 생성|
  */
 @Data
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class GroupDutySummary {
     public List<GroupMemberSimpleDto> day=new ArrayList<>();
     public List<GroupMemberSimpleDto> eve=new ArrayList<>();

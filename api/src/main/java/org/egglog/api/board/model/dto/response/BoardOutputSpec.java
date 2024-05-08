@@ -53,6 +53,6 @@ public class BoardOutputSpec {
 
     private Boolean isHospitalAuth;     // 인증 여부
 
-    private List<CommentListOutputSpec> comments;    //댓글
+//    private List<CommentListOutputSpec> comments;    //댓글
 
 }

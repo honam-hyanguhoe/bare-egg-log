@@ -13,9 +13,27 @@ interface WorkStaticsGraphProps {
 const WorkStaticsGraph = ({ data }: WorkStaticsGraphProps) => {
   const svgRef = useRef(null);
   const dataRef = useRef(data);
-  const width = 500;
-  const height = 400;
-  const backgroundColor = "#fff";
+  const backgroundColor = "#F2F4F7";
+
+  const [dimensions, setDimensions] = useState({
+    width: window.innerWidth > 500 ? 500 : window.innerWidth * 0.95,
+    height: window.innerHeight > 300 ? 300 : window.innerHeight * 0.5,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setDimensions({
+        width: window.innerWidth > 500 ? 500 : window.innerWidth * 0.95,
+        height: window.innerHeight > 300 ? 300 : window.innerHeight * 0.5,
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   useEffect(() => {
     dataRef.current = data;
   }, [data]);
@@ -23,8 +41,9 @@ const WorkStaticsGraph = ({ data }: WorkStaticsGraphProps) => {
   useEffect(() => {
     if (!svgRef.current || !dataRef.current) return;
 
+    const { width, height } = dimensions;
     const barSvg = d3.select(svgRef.current);
-    const margin = { top: 20, right: 30, bottom: 30, left: 40 };
+    const margin = { top: 0, right: 30, bottom: 30, left: 20 };
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
@@ -39,7 +58,7 @@ const WorkStaticsGraph = ({ data }: WorkStaticsGraphProps) => {
 
     const yScale = d3
       .scaleLinear()
-      .domain([0, maxVal + 5])
+      .domain([0, maxVal + 2])
       .nice()
       .range([innerHeight, 0]);
 
@@ -65,9 +84,10 @@ const WorkStaticsGraph = ({ data }: WorkStaticsGraphProps) => {
         .tickFormat(() => "");
     };
 
-    const barWidth = xScale.bandwidth() / dataRef.current[0].values.length;
+    const barWidth = xScale.bandwidth() / dataRef.current[0].values.length + 2;
 
-    ["day", "eve", "night", "off"].forEach((className, i) => {
+    ["DAY", "EVE", "NIGHT", "OFF"].forEach((className, i) => {
+      console.log(`className ${className} / ${i}`);
       barSvg
         .selectAll(`rect.${className}`)
         .data(dataRef.current)
@@ -94,7 +114,7 @@ const WorkStaticsGraph = ({ data }: WorkStaticsGraphProps) => {
 
     gridLines
       .selectAll(".tick line")
-      .attr("stroke", "#ECECEC")
+      .attr("stroke", "#D4D4D4")
       .attr("opacity", 0.5);
 
     gridLines.select(".domain").attr("stroke", backgroundColor);
@@ -124,22 +144,25 @@ const WorkStaticsGraph = ({ data }: WorkStaticsGraphProps) => {
       .style("text-anchor", "center")
       .style("fill", "gray")
       .style("font-size", "12px");
-    xAxisG.select(".domain").attr("stroke", "#ECECEC");
+    xAxisG.select(".domain").attr("stroke", "#D4D4D4");
+
     const yAxisG = barSvg
       .append("g")
       .attr("class", "y-axis")
       .attr("transform", `translate(${margin.left}, ${margin.top})`)
       .call(yAxis);
+
     yAxisG.selectAll("text").style("fill", "gray").style("font-size", "12px");
-    yAxisG.select(".domain").attr("stroke", "#fff");
+    yAxisG.select(".domain").attr("stroke", "#F2F4F7");
+
     return () => {
       gridLines.remove();
     };
-  }, [width, height, data]);
+  }, [data, dimensions]);
 
   return (
     <>
-      <svg ref={svgRef} width={width} height={height}>
+      <svg ref={svgRef} width={dimensions.width} height={dimensions.height}>
         <g className="x-axis" />
         <g className="y-axis" />
       </svg>
