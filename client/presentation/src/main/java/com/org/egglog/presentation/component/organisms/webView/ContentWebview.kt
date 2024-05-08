@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.org.egglog.presentation.domain.main.WebAppInterface
 import com.org.egglog.presentation.theme.Gray100
 import com.org.egglog.presentation.theme.Gray200
 import com.org.egglog.presentation.utils.heightPercent
@@ -58,6 +59,9 @@ fun ContentWebView(
             )
 
             webViewClient = WebViewClient()
+
+            addJavascriptInterface(WebAppInterface(context), "AndroidBridge")
+
             loadUrl(url)
         }
     }
