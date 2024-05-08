@@ -63,7 +63,15 @@ public class TokenService {
                 //마지막으로 발행된 리프레쉬 토큰과 요청이 들어온 리프레쉬토큰이 같다면 -> 정상적으로 재발행한다.
                 log.debug("리프레쉬 토큰 발행 성공");
                 refreshTokenRepository.delete(token);
-                refreshTokenResponse.setTokens(generatedToken(id, role));
+
+                TokenResponse newTokenSet = generatedToken(id, role);
+                refreshTokenRepository.save(Token.builder()
+                                .id(id)
+                                .accessToken(newTokenSet.getAccessToken())
+                                .refreshToken(newTokenSet.getRefreshToken())
+                        .build());
+                refreshTokenResponse.setTokens(newTokenSet);
+
                 // 트랜잭션 오류를 제외한 모든 검증 성공
                 User user = userJpaRepository.findById(id).orElseThrow(() -> new UserException(UserErrorCode.TRANSACTION_FAIL));
                 refreshTokenResponse.setUserInfo(user.toResponse());
