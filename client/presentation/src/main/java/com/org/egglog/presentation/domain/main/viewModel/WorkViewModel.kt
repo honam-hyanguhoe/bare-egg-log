@@ -28,10 +28,9 @@ class WorkViewModel @Inject constructor(
 
     init {
         getInitalData(LocalDate.now())
-        loadWork()
     }
 
-    private fun loadWork() = intent {
+    private fun loadWork(start : String, end: String) = intent {
         Log.d("weekly", "근무 일정 초기화")
         val tokens = getTokenUseCase()
         val user = getUserStoreUseCase()
@@ -39,8 +38,8 @@ class WorkViewModel @Inject constructor(
         val response = getWeeklyWorkUseCase(
             accessToken = tokens?.first ?: "",
             calendarGroupId = user?.workGroupId ?: 0,
-            startDate = state.startDate.toString(),
-            endDate = state.endDate.toString()
+            startDate = start,
+            endDate = end
         )
 
         val weeklyWork = response.getOrNull()
@@ -77,6 +76,7 @@ class WorkViewModel @Inject constructor(
         val finalStartDate = dataSource.getStartOfWeek(localDate).minusDays(1)
         val calendarUiModel: WeeklyUiModel =
             dataSource.getData(startDate = finalStartDate, lastSelectedDate = finalStartDate)
+        loadWork(calendarUiModel.startDate.date.toString(),finalStartDate.toString())
         reduce {
             state.copy(
                 currentWeekDays = calendarUiModel,
@@ -93,7 +93,7 @@ class WorkViewModel @Inject constructor(
         val calendarUiModel: WeeklyUiModel =
             dataSource.getData(startDate = finalStartDate, lastSelectedDate = finalStartDate)
         Log.d("weekly", "${calendarUiModel}")
-
+        loadWork(calendarUiModel.startDate.date.toString(), finalStartDate.toString())
 
         reduce {
             state.copy(
@@ -105,7 +105,7 @@ class WorkViewModel @Inject constructor(
 
         Log.d("weekly", "${state.currentWeekDays}")
         Log.d("weekly", " ${state.startDate} ---- ${state.endDate}")
-        loadWork()
+
     }
 
     fun onNextClick(localDate: LocalDate) = intent {
@@ -118,6 +118,7 @@ class WorkViewModel @Inject constructor(
                 startDate = finalStartDate.plusDays(7),
                 lastSelectedDate = finalStartDate.plusDays(1)
             )
+        loadWork(calendarUiModel.startDate.date.toString(), finalStartDate.plusDays(7).toString())
         Log.d("weekly", "${calendarUiModel}")
 
         reduce {
@@ -130,7 +131,7 @@ class WorkViewModel @Inject constructor(
 
         Log.d("weekly", "${calendarUiModel}")
         Log.d("weekly", "${state.startDate} ---- ${state.endDate}")
-        loadWork()
+
     }
 }
 
