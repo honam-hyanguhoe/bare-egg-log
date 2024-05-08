@@ -118,10 +118,10 @@ const WorkStaticsPage = () => {
   };
 
   function receiveDataFromApp(data: String) {
-    // 데이터 처리 로직
-    console.log(data);
-    return "Received: " + data;
+    console.log("Data received: " + data);
+    return "호남이 : " + data;
   }
+
   return (
     <GraphContainer>
       {/* <button onClick={() => showAndroidToast}>앱에 있는 알람으로 띄워줘.</button> */}
