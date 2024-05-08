@@ -44,8 +44,8 @@ public class TokenService {
             //여기 까지 들어온 토큰은 검증이 됨 (몇번이고 발행한 토큰 = 여러명이 같은 ID에 대한 토큰을 가지고 있을 수 있음)
             log.debug("refresh 토큰 검증 완료");
             Long id = jwtUtils.getUserIdByRefreshToken(refreshTokenRequest);
-            String role = jwtUtils.getUserRoleByRefreshToken(refreshTokenRequest);
             log.debug("id={}",id);
+            String role = jwtUtils.getUserRoleByRefreshToken(refreshTokenRequest);
             log.debug("role={}",role);
             //해당 리프레쉬 토큰으로 발행된 토큰 쌍을 가져온다.(엑세스 토큰이 리프레쉬 될때, 항상 토큰 쌍이 재발행 된다)
             Token token = refreshTokenRepository.findById(id).orElseThrow(() -> new JwtException(JwtErrorCode.NOT_EXISTS_TOKEN));
