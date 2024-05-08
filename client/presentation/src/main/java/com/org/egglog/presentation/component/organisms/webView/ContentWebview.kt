@@ -1,6 +1,7 @@
 package com.org.egglog.presentation.component.organisms.webView
 
 import android.os.Build
+import android.util.Log
 import android.view.View
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -9,7 +10,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
@@ -21,12 +24,13 @@ import com.org.egglog.presentation.domain.main.AndroidBridge
 import com.org.egglog.presentation.theme.Gray100
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
+import java.nio.charset.StandardCharsets
 
 @Composable
 fun ContentWebView(
-     width : Int = 300,
-     height : Int = 250,
-     url : String = "https://www.egg-log.org/"
+    width: Int = 300,
+    height: Int = 250,
+    url: String = "https://www.egg-log.org/"
 ) {
     val context = LocalContext.current
     val webView = remember {
@@ -52,6 +56,7 @@ fun ContentWebView(
             webViewClient = WebViewClient()
 
             loadUrl(url)
+
         }
     }
 
@@ -62,8 +67,8 @@ fun ContentWebView(
             .size(
                 width = width.widthPercent(context).dp,
                 height = height.heightPercent(context).dp
-            ).
-        border(0.5.dp, Gray100),
+            )
+            .border(0.5.dp, Gray100),
         shape = RoundedCornerShape(20.dp)
     ) {
         AndroidView(
@@ -76,6 +81,14 @@ fun ContentWebView(
                 }
             }
         )
+
+        Button(onClick = {
+            webView.evaluateJavascript("receiveDataFromApp('hi')") { result ->
+                Log.d("webView", result)
+            }
+        }) {
+            Text(text = "클릭 시도")
+        }
     }
 
     DisposableEffect(Unit) {
