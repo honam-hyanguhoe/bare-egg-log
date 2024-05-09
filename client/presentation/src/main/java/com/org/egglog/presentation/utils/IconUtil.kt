@@ -1,6 +1,7 @@
 package com.org.egglog.presentation.utils
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddBox
 import androidx.compose.material.icons.filled.AlarmOn
@@ -27,6 +28,7 @@ import androidx.compose.material.icons.filled.NotificationAdd
 import androidx.compose.material.icons.filled.NotificationsNone
 import androidx.compose.material.icons.filled.PersonOutline
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SubdirectoryArrowRight
 import androidx.compose.material.icons.filled.SupervisedUserCircle
@@ -68,3 +70,4 @@ val Add = Icons.Default.Add
 val CommentBorder = Icons.Default.ChatBubbleOutline
 val Agree = Icons.Default.Verified
 val Link = Icons.Default.Link
+val Send = Icons.AutoMirrored.Outlined.Send

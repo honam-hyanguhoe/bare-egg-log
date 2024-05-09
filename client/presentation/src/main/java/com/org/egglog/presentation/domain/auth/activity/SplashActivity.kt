@@ -55,7 +55,7 @@ class SplashActivity : AppCompatActivity() {
             if (isLoggedIn) {
                 Log.e("SplashActivity", "access: " + tokens.first.orEmpty())
                 Log.e("SplashActivity", "refresh: " + tokens.second.orEmpty())
-                val userDetail = getUserUseCase("Bearer ${tokens.first}").getOrNull()
+                val userDetail = getUserUseCase("Bearer ${tokens.first.orEmpty()}").getOrThrow()
                 Log.e("SplashActivity", "user: " + userDetail.toString())
                 if(userDetail?.selectedHospital == null || userDetail.empNo == null) {
                     setUserStoreUseCase(userDetail)
@@ -74,7 +74,7 @@ class SplashActivity : AppCompatActivity() {
                         ""
                     }
                     if(userDetail.deviceToken == null || userDetail.deviceToken != fcmToken) {
-                        val newUser = updateUserFcmTokenUseCase(UserFcmTokenParam(fcmToken)).getOrThrow()
+                        val newUser = updateUserFcmTokenUseCase("Bearer ${tokens.first.orEmpty()}", UserFcmTokenParam(fcmToken)).getOrThrow()
                         setUserStoreUseCase(newUser)
                     } else setUserStoreUseCase(userDetail)
                     startActivity(

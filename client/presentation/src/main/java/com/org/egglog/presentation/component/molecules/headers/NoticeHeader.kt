@@ -1,11 +1,14 @@
 package com.org.egglog.presentation.component.molecules.headers
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,6 +25,7 @@ import com.org.egglog.presentation.utils.Search
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.presentation.component.atoms.menus.ScrollableMenus
 import com.org.egglog.presentation.theme.*
+import com.org.egglog.presentation.utils.heightPercent
 
 @Composable
 fun NoticeHeader(
@@ -33,16 +37,19 @@ fun NoticeHeader(
     onClickNotification : () -> Unit = {},
     onClickMenus : () -> Unit = {},
     options: List<String> = listOf(""),
-    selectedOption: String?,
+    selectedOption: String? = null,
     onSelect: (String) -> Unit = {}
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(NaturalWhite),
-//            .border(1.dp, Success500)
+//            .padding(vertical = 20.dp)
+            .background(NaturalWhite)
+//            .border(1.dp, NaturalBlack)
     ) {
-        Column {
+        Column (
+            modifier = Modifier.fillMaxWidth()
+        ){
             NoticeHeaderContents(
                 title = title,
                 hasSearch = hasSearch,

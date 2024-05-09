@@ -97,6 +97,9 @@ dependencies {
     // splash
     implementation(libs.splash)
 
+    // ui controller
+    implementation(libs.accompanist.insets)
+
     implementation(project(":domain"))
     implementation(project(":data"))
     implementation(project(":presentation"))

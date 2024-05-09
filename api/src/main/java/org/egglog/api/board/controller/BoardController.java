@@ -26,7 +26,7 @@ public class BoardController {
 
     @GetMapping("")
     public ResponseEntity<?> getBoardList(@RequestParam(value = "hospital_id", required = false) Long hospitalId, @RequestParam(value = "group_id", required = false) Long groupId,
-                                          @RequestParam(value = "search_word", required = false) String searchWord, @RequestParam(value = "offset", required = false) int offset,
+                                          @RequestParam(value = "search_word", required = false) String searchWord, @RequestParam(value = "offset", required = false) Long offset,
                                           @AuthenticationPrincipal User user) {
         BoardListForm boardListForm = BoardListForm.builder()
                 .hospitalId(hospitalId)

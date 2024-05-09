@@ -2,8 +2,11 @@ package org.egglog.api.testdata;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.egglog.api.security.model.dto.request.LoginRequest;
-import org.egglog.api.security.model.service.AuthService;
+import org.egglog.api.security.model.dto.response.TokenResponse;
+import org.egglog.api.security.model.service.TokenService;
+import org.egglog.api.testdata.dto.request.TestLoginRequest;
+import org.egglog.api.user.exception.UserErrorCode;
+import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.dto.request.JoinUserRequest;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.model.entity.enums.AuthProvider;
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -44,6 +48,31 @@ public class TestService {
     private final UserJpaRepository userJpaRepository;
     private final WorkService workService;
     private final WorkTypeService workTypeService;
+    private final TokenService tokenService;
+
+    public void testDeleteUser(User user){
+
+    }
+
+
+
+    public TokenResponse testLogin(TestLoginRequest request, AuthProvider provider){
+        log.debug(" ==== ==== ==== [test login 서비스 실행] ==== ==== ====");
+        //회원 가입 일 경우
+        Optional<User> optionalUser = userJpaRepository.findByEmailWithHospital(request.getEmail());
+        if (optionalUser.isPresent()){
+            //로그인인 경우
+            User user = optionalUser.get();
+            if (user.getUserStatus()!= UserStatus.ACTIVE) throw new UserException(UserErrorCode.DELETED_USER);
+            userJpaRepository.save(user.doLogin());
+            return tokenService.generatedToken(user.getId(), user.getUserRole().name());
+        }
+        else {
+            //회원가입일 경우
+            User saveUser = userJpaRepository.save(request.toEntity(provider));
+            return tokenService.generatedToken(saveUser.getId(), saveUser.getUserRole().name());
+        }
+    }
     public List<User> createUserMockData(){
         List<User> users = userJpaRepository.saveAll(makeUsers());
         Long hospitalId = 1L;

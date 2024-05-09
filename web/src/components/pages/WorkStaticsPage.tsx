@@ -99,29 +99,24 @@ const WorkStaticsPage = () => {
 
   const [data, setData] = useState<DataItem[]>(initialData);
 
-  useEffect(() => {
-    const updateData = () => {
-      const newData: DataItem[] = normalizeData(monthlyData);
-      console.log(`${JSON.stringify(newData)}`);
-      // const newData: DataItem[] = initialData;
-      setData(newData);
-    };
+  // useEffect(() => {
+  //   const updateData = () => {
+  //     const newData: DataItem[] = normalizeData(monthlyData);
+  //     console.log(`${JSON.stringify(newData)}`);
+  //     // const newData: DataItem[] = initialData;
+  //     setData(newData);
+  //   };
 
-    const interval = setInterval(updateData, 5000);
+  //   const interval = setInterval(updateData, 5000);
 
-    return () => clearInterval(interval);
-  }, []);
+  //   return () => clearInterval(interval);
+  // }, []);
 
   // webView (web -> App)
-  const showAndroidToast = () => {
-    window.AndroidBridge.showToast("안녕 호남향우회");
-  };
+  // const showAndroidToast = () => {
+  //   window.AndroidBridge.showToast("안녕 호남향우회");
+  // };
 
-  function receiveDataFromApp(data: String) {
-    // 데이터 처리 로직
-    console.log(data);
-    return "Received: " + data;
-  }
   return (
     <GraphContainer>
       {/* <button onClick={() => showAndroidToast}>앱에 있는 알람으로 띄워줘.</button> */}
@@ -154,7 +149,9 @@ export default WorkStaticsPage;
 const GraphContainer = styled.div`
   background-color: #f2f4f7;
   min-height: 100vh;
-  padding: 40px;
+  padding-top: 20x;
+  padding-left: 20px;
+  // padding: 40px;
 `;
 const GraphTitle = styled.p`
   font-size: 25px;

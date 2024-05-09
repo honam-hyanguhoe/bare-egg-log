@@ -1,9 +1,7 @@
 package org.egglog.api.security.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.egglog.api.security.model.dto.request.LoginRequest;
 import org.egglog.api.security.model.service.AuthService;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.model.entity.enums.AuthProvider;
@@ -34,11 +32,11 @@ public class AuthController {
 
     @PostMapping("/login/{provider}")
     public ResponseEntity<MessageUtils> login(
-            @RequestBody @Valid LoginRequest request,
+            @RequestHeader String accessToken,
             @PathVariable(name = "provider") AuthProvider authProvider
             ){
         return ResponseEntity.ok()
-                .body(MessageUtils.success(authService.login(request, authProvider)));
+                .body(MessageUtils.success(authService.login(accessToken, authProvider)));
     }
 
 

@@ -15,7 +15,7 @@ import com.google.firebase.messaging.messaging
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
-import com.org.egglog.domain.auth.model.Refresh
+import com.org.egglog.domain.auth.model.Token
 import com.org.egglog.domain.auth.model.UserFcmTokenParam
 import com.org.egglog.domain.auth.model.UserParam
 import com.org.egglog.domain.auth.usecase.PostLoginUseCase
@@ -23,7 +23,7 @@ import com.org.egglog.domain.auth.usecase.GetUserUseCase
 import com.org.egglog.domain.auth.usecase.SetTokenUseCase
 import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.UpdateUserFcmTokenUseCase
-import com.org.egglog.presentation.domain.auth.extend.authenticateAndGetUserProfile
+import com.org.egglog.presentation.domain.auth.extend.authenticateToken
 import com.org.egglog.presentation.domain.auth.extend.loginWithKakao
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -65,13 +65,9 @@ class LoginViewModel @Inject constructor(
         }
         try {
             if(UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {
-                val user = UserApiClient.loginWithKakao(context)
-                val tokens = postLoginUseCase("KAKAO", UserParam(
-                    name = user.kakaoAccount?.profile?.nickname.orEmpty(),
-                    email = user.kakaoAccount?.email.orEmpty(),
-                    profileImgUrl = user.kakaoAccount?.profile?.profileImageUrl.orEmpty()
-                )).getOrThrow()
-                tokenUtilFunc("KAKAO", tokens)
+                val token = UserApiClient.loginWithKakao(context)
+                val tokens = postLoginUseCase(provider = "kakao", authToken = token.accessToken).getOrThrow()
+                tokenUtilFunc("kakao", tokens)
             } else {
                 val kakaoTalkInstallUrl = "market://details?id=com.kakao.talk"
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(kakaoTalkInstallUrl))
@@ -101,25 +97,17 @@ class LoginViewModel @Inject constructor(
         reduce {
             state.copy(enabled = false)
         }
-        val user = authenticateAndGetUserProfile(context)
-        val tokens = postLoginUseCase("NAVER", UserParam(
-            name = user.profile?.name.orEmpty(),
-            email = user.profile?.email.orEmpty(),
-            profileImgUrl = user.profile?.profileImage.orEmpty()
-        )).getOrThrow()
-        tokenUtilFunc("NAVER", tokens)
+        val token = authenticateToken(context)
+        val tokens = postLoginUseCase(provider = "naver", authToken = token).getOrThrow()
+        tokenUtilFunc("naver", tokens)
     }
 
-    fun onGoogleUserReceived(user: FirebaseUser?) = intent {
+    fun onGoogleUserReceived(token: String?) = intent {
         reduce {
             state.copy(enabled = false)
         }
-        val tokens = postLoginUseCase("GOOGLE", UserParam(
-            name = user?.displayName.orEmpty(),
-            email = user?.email.orEmpty(),
-            profileImgUrl = user?.photoUrl.toString()
-        )).getOrThrow()
-        tokenUtilFunc("GOOGLE", tokens)
+        val tokens = postLoginUseCase(provider = "google", authToken = token?: "").getOrThrow()
+        tokenUtilFunc("google", tokens)
     }
 
     fun onGoogleClick(context: Context, launcher: ManagedActivityResultLauncher<Intent, ActivityResult>, token: String) = intent {
@@ -128,13 +116,14 @@ class LoginViewModel @Inject constructor(
         }
         val gso: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(token)
+            .requestServerAuthCode(token)
             .requestEmail()
             .build()
         val googleSignInClient = GoogleSignIn.getClient(context, gso)
         launcher.launch(googleSignInClient.signInIntent)
     }
 
-    private fun tokenUtilFunc(type: String, tokens: Refresh?) = intent {
+    private fun tokenUtilFunc(type: String, tokens: Token?) = intent {
         if(tokens?.accessToken?.isNotEmpty() == true && tokens.accessToken.isNotEmpty() && tokens.refreshToken.isNotEmpty()) {
             Log.e("$type > AccessToken : ", tokens.accessToken)
             Log.e("$type > RefreshToken : ", tokens.refreshToken)
@@ -155,7 +144,7 @@ class LoginViewModel @Inject constructor(
                     ""
                 }
                 if(userDetail.deviceToken == null || userDetail.deviceToken != fcmToken) {
-                    val newUser = updateUserFcmTokenUseCase(UserFcmTokenParam(fcmToken)).getOrThrow()
+                    val newUser = updateUserFcmTokenUseCase("Bearer ${tokens.accessToken}", UserFcmTokenParam(fcmToken)).getOrThrow()
                     setUserStoreUseCase(newUser)
                 } else setUserStoreUseCase(userDetail)
                 postSideEffect(LoginSideEffect.NavigateToMainActivity)

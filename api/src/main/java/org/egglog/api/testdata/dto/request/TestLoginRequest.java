@@ -1,4 +1,4 @@
-package org.egglog.api.security.model.dto.request;
+package org.egglog.api.testdata.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -10,12 +10,24 @@ import org.egglog.api.user.model.entity.enums.AuthProvider;
 import org.egglog.api.user.model.entity.enums.UserRole;
 import org.egglog.api.user.model.entity.enums.UserStatus;
 
+/**
+ * ```
+ * ===================[Info]=========================
+ * packageName    : org.egglog.api.testdata.dto.request
+ * fileName      : TestLoginRequest
+ * description    :
+ * =================================================
+ * ```
+ * |DATE|AUTHOR|NOTE|
+ * |:---:|:---:|:---:|
+ * |2024-05-09|김형민|최초 생성|
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder
-public class LoginRequest {
+public class TestLoginRequest {
     @NotBlank(message = "유저 이름은 필수 입니다.")
     @Size(max = 60, message = "유저 이름이 너무 깁니다.")
     private String name;

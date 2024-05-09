@@ -26,7 +26,6 @@ import org.egglog.api.hospital.exception.HospitalException;
 import org.egglog.api.hospital.model.entity.Hospital;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
-import org.egglog.api.user.model.dto.response.UserResponse;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.repository.jpa.UserJpaRepository;
 import org.springframework.dao.DataAccessException;
@@ -58,6 +57,7 @@ public class BoardService {
 
     //사용자
     private final UserJpaRepository userJpaRepository;
+
     //게시판
     private final BoardRepository boardRepository;
 
@@ -66,7 +66,6 @@ public class BoardService {
 
     //댓글
     private final CommentRepository commentRepository;
-    private final CommentService commentService;
 
     //병원
     private final HospitalAuthJpaRepository hospitalAuthJpaRepository;
@@ -91,17 +90,16 @@ public class BoardService {
 //        List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
 //        int size = 10;
 //        try {
-//            List<Board> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getLastBoardId(), size);
+//            List<Board> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getOffset(), size);
 //
 //            for (Board board : boardList) {
-//                User writer = board.getUser();
 //                Long commentCnt = commentRepository.getCommentCount(board.getId());
 //                Long likeCnt = boardRepository.getLikeCount(board.getId());
 //                long viewCount = redisViewCountUtil.getViewCount(String.valueOf(board.getId())); //하루 동안의 조회수
 //                Long hitCnt = viewCount + board.getViewCount();
 //
 //                //사용자의 병원 인증 정보
-//                Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(writer, writer.getSelectedHospital());
+//                Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(user, user.getSelectedHospital());
 //
 //                boolean isUserLiked = false;  //좋아요 누른 여부
 //                boolean isCommented = false;    //댓글 유무 여부
@@ -148,12 +146,13 @@ public class BoardService {
 //
 //        return boardListOutputSpecList;
 //    }
+
     public List<BoardListOutputSpec> getBoardList(BoardListForm boardListForm, User user) {
         List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
         int size = 10;
         try {
             List<BoardListOutputSpec> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getOffset(), size);
-
+            log.info("boardList 쿼리 실행");
             for (BoardListOutputSpec board : boardList) {
                 User writer = userJpaRepository.findById(board.getUserId()).orElseThrow(
                         () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
@@ -163,14 +162,14 @@ public class BoardService {
 
                 //사용자의 병원 인증 정보
                 Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(writer, writer.getSelectedHospital());
-
                 boolean isUserLiked = false;  //좋아요 누른 여부
                 boolean isCommented = false;    //댓글 유무 여부
 
                 if (board.getCommentCount() != 0) {
                     isCommented = true;
                 }
-                //사용자가 이미 좋아요를 눌렀는지
+
+                //로그인한 사용자가 이미 좋아요를 눌렀는지
                 if (!isNotLiked(user.getId(), board.getBoardId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
                     isUserLiked = true;
                 }
@@ -513,7 +512,10 @@ public class BoardService {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
         );
-
+        //작성자
+        User writer = userJpaRepository.findById(board.getUser().getId()).orElseThrow(
+                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
+        );
         BoardOutputSpec boardOutputSpec = null;
 
         try {
@@ -523,25 +525,22 @@ public class BoardService {
             }
             long viewCount = redisViewCountUtil.getViewCount(String.valueOf(boardId)); //하루 동안의 조회수
 
-            Long commentCnt = commentRepository.getCommentCount(board.getId());
-            Long likeCnt = boardRepository.getLikeCount(board.getId());
-            Long hitCnt = viewCount + board.getViewCount();     // DB + redis
+            long commentCnt = commentRepository.getCommentCount(board.getId());
+            long likeCnt = boardRepository.getLikeCount(board.getId());
+            long hitCnt = viewCount + board.getViewCount();     // DB + redis
 
             boolean isUserLiked = false;  //좋아요 누른 여부
-            boolean isCommented = false;    //댓글 유무 여부
+            boolean isCommented = false;  //댓글 유무 여부
 
-            if (commentCnt != null) {
+            if (commentCnt != 0) {
                 isCommented = true;
             }
-            //사용자가 이미 좋아요를 눌렀는지
+            //로그인 사용자가 이미 좋아요를 눌렀는지
             if (!isNotLiked(user.getId(), board.getId())) {
                 isUserLiked = true;
             }
             //사용자의 병원 인증 정보
-            Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(user, user.getSelectedHospital());
-
-            //게시물에 대한 댓글(댓글이 없다면 빈 리스트로 리턴)
-            List<CommentListOutputSpec> commentList = commentService.getCommentList(boardId);
+            Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(writer, writer.getSelectedHospital());
 
             boardOutputSpec = BoardOutputSpec.builder()
                     .boardId(boardId)
@@ -555,27 +554,30 @@ public class BoardService {
                     .viewCount(hitCnt)
                     .userId(user.getId())
                     .tempNickname(board.getTempNickname())
-                    .profileImgUrl(user.getProfileImgUrl())
+                    .profileImgUrl(writer.getProfileImgUrl())
                     .commentCount(commentCnt)
                     .boardLikeCount(likeCnt)
                     .isLiked(isUserLiked)
                     .isCommented(isCommented)
-//                    .comments(commentList)
+                    .hospitalName(writer.getSelectedHospital().getHospitalName())
                     .build();
 
             //병원 인증배지가 없다면
             if (hospitalAuth.isEmpty()) {
                 boardOutputSpec.setIsHospitalAuth(false);
             }
-            if (hospitalAuth.isPresent()) {
+            else {
                 boardOutputSpec.setIsHospitalAuth(hospitalAuth.get().getAuth());
             }
+
             if (board.getGroup() != null) {
                 boardOutputSpec.setGroupId(board.getGroup().getId());
             }
             if (board.getHospital() != null) {
-                boardOutputSpec.setHospitalName(board.getHospital().getHospitalName());
+                boardOutputSpec.setHospitalId(board.getHospital().getId());
+
             }
+
 
         } catch (DataAccessException e) {
             throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);

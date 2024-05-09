@@ -98,6 +98,7 @@ public class User implements UserDetails {
 
     public User delete(){
         this.name = "탈퇴회원";
+        this.email = null;
         this.selectedHospital = null;
         this.userStatus = UserStatus.DELETED;
         this.deletedAt = LocalDateTime.now();
@@ -125,19 +126,15 @@ public class User implements UserDetails {
         return this;
     }
 
-    public User updateInfo(String updateUserName, String updateProfileImgUrl){
+    public User updateInfo(String updateUserName, String updateProfileImgUrl, Hospital selectHospital, String updateEmpNo){
         this.name = updateUserName;
         this.profileImgUrl = updateProfileImgUrl;
-        this.updatedAt = LocalDateTime.now();
-        return this;
-    }
-
-    public User updateHospital(Hospital selectHospital, String updateEmpNo){
         this.selectedHospital = selectHospital;
         this.empNo = updateEmpNo;
         this.updatedAt = LocalDateTime.now();
         return this;
     }
+
 
     public UserResponse toResponse(){
         return UserResponse.builder()

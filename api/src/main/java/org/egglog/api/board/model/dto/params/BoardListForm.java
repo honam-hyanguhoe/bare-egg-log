@@ -18,6 +18,6 @@ public class BoardListForm {
 
     private String searchWord;  //검색어
 
-    private int offset;
+    private Long offset;
 
 }

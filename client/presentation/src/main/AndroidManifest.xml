@@ -17,7 +17,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".domain.auth.activity.LoginActivity" />
-        <activity android:name=".domain.auth.activity.PlusLoginActivity" />
+        <activity android:name=".domain.auth.activity.PlusLoginActivity"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:launchMode="singleTask"
@@ -36,7 +37,8 @@
         <activity android:name=".domain.main.activity.MainActivity" />
 
         <!-- SETTING -->
-        <activity android:name=".domain.setting.activity.SettingActivity" />
+        <activity android:name=".domain.setting.activity.SettingActivity"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity android:name=".domain.community.posteditor.activity.PostEditorActivity" />
         <activity android:name=".domain.community.activity.CommunityActivity"/>

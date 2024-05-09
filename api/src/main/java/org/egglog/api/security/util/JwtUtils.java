@@ -1,6 +1,7 @@
 package org.egglog.api.security.util;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -93,13 +94,16 @@ public class JwtUtils {
             throw new JwtException(JwtErrorCode.TOKEN_SIGNATURE_ERROR);
         }catch (ExpiredJwtException e){
             log.debug("exception : 엑세스 토큰 기간 만료");
-            throw new JwtException(JwtErrorCode.EXPIRED_TOKEN);
+            throw new JwtException(JwtErrorCode.EXPIRED_ACCESS_TOKEN);
         }catch (UnsupportedJwtException e){
             log.debug("exception : 지원되지 않는 엑세스 토큰");
             throw new JwtException(JwtErrorCode.NOT_SUPPORT_TOKEN);
         }catch (IllegalArgumentException e){
             log.debug("exception : 잘못된 엑세스 토큰");
             throw new JwtException(JwtErrorCode.INVALID_TOKEN);
+        }catch (SignatureException e){
+            log.debug("exception : 변조된 엑세스 토큰");
+            throw new JwtException(JwtErrorCode.TOKEN_SIGNATURE_ERROR);
         }
     }
 
@@ -113,18 +117,23 @@ public class JwtUtils {
             return true;
         }catch (MalformedJwtException e){
             log.debug("exception : 잘못된 리프레쉬 토큰 시그니처");
-            throw new JwtException(JwtErrorCode.TOKEN_SIGNATURE_ERROR);
+            throw new JwtException(JwtErrorCode.INVALID_TOKEN);
         }catch (ExpiredJwtException e){
             log.debug("exception : 리프레쉬 토큰 기간 만료");
             User expiredUser = userJpaRepository.findById(Long.valueOf(e.getClaims().getSubject()))
                     .orElseThrow(() -> new UserException(UserErrorCode.DELETED_USER));
             userJpaRepository.save(expiredUser.doLogout()); //로그아웃 처리
-            throw new JwtException(JwtErrorCode.EXPIRED_TOKEN);
+            throw new JwtException(JwtErrorCode.INVALID_TOKEN);
         }catch (UnsupportedJwtException e){
             log.debug("exception : 지원되지 않는 리프레쉬 토큰");
-            throw new JwtException(JwtErrorCode.NOT_SUPPORT_TOKEN);
+            throw new JwtException(JwtErrorCode.INVALID_TOKEN);
         }catch (IllegalArgumentException e){
             log.debug("exception : 잘못된 리프레쉬 토큰");
+            throw new JwtException(JwtErrorCode.INVALID_TOKEN);
+        }catch (SignatureException e){
+            log.debug("exception : 변조된 엑세스 토큰");
+            throw new JwtException(JwtErrorCode.INVALID_TOKEN);
+        } catch (Exception e){
             throw new JwtException(JwtErrorCode.INVALID_TOKEN);
         }
     }
