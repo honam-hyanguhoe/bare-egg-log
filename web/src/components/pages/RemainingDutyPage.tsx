@@ -34,24 +34,42 @@ const initialData: TreeNode = {
 const RemainingDutyPage = () => {
   const [duty, setDuty] = useState<TreeNode>(initialData);
 
-  useEffect(() => {
-    const receiveDataFromApp = (data: string) => {
-      console.log("Data received: " + data);
-      try {
-        const tempData: TreeNode[] = JSON.parse(data);
-        updateData(tempData);
-      } catch (error) {
-        console.error("Error parsing JSON data:", error);
-      }
-      return `Window updated with: ${data}`;
-    };
+  window.receiveDataFromApp = (data: string) => {
+    console.log("Data received: " + data);
+    // setDuty(JSON.parse(data));
 
-    window.receiveDataFromApp = receiveDataFromApp;
+    const tempData: TreeNode[] = JSON.parse(data);
+    console.log("tempData" + tempData);
 
-    return () => {
-      delete (window as any).receiveDataFromApp;
-    };
-  }, []);
+    setDuty((prevData) => ({
+      ...prevData,
+      children: JSON.parse(data),
+    }));
+
+    updateData(tempData);
+
+    return `${data}`;
+  };
+
+  // useEffect(() => {
+  //   const receiveDataFromApp = (data: string) => {
+  //     console.log("Data received: " + data);
+  //     setDuty(JSON.parse(data));
+  //     // try {
+  //     // const tempData: TreeNode[] = JSON.parse(data);
+  //     // updateData(tempData);
+  //     // } catch (error) {
+  //     //   console.error("Error parsing JSON data:", error);
+  //     // }
+  //     return `Window updated with: ${data}`;
+  //   };
+
+  //   window.receiveDataFromApp = receiveDataFromApp;
+
+  //   return () => {
+  //     delete (window as any).receiveDataFromApp;
+  //   };
+  // }, []);
 
   const updateData = (newChildren: TreeNode[]) => {
     setDuty((prevData) => ({
@@ -62,8 +80,8 @@ const RemainingDutyPage = () => {
 
   return (
     <GraphContainer>
-      <GraphTitle>{JSON.stringify(duty)}</GraphTitle>
-      <RemainingDutyGraph data={duty} />
+      <GraphTitle id="title">{JSON.stringify(duty)}</GraphTitle>
+      {/* <RemainingDutyGraph data={duty} /> */}
     </GraphContainer>
   );
 };
