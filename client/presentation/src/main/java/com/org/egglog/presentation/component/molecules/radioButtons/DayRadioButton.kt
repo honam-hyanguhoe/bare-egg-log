@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -17,7 +18,9 @@ import com.org.egglog.presentation.component.atoms.buttons.RadioLabelButton
 import com.org.egglog.presentation.theme.*
 
 @Composable
-fun DayRadioButton(radioList: ArrayList<String>, selected: MutableState<String>) {
+fun DayRadioButton(
+    radioList: ArrayList<String>, selected: MutableState<String>
+) {
     val context = LocalContext.current
     Row(Modifier.fillMaxWidth()) {
         radioList.mapIndexed { index, text ->
@@ -26,7 +29,8 @@ fun DayRadioButton(radioList: ArrayList<String>, selected: MutableState<String>)
                 isSelected = selected.value == text,
                 onClick = { clickedIdx ->
                     Log.d("", clickedIdx)
-                    selected.value = clickedIdx },
+                    selected.value = clickedIdx
+                },
                 radioButtonColorInfo = RadioButtonColorInfo(
                     selectedBorderColor = NaturalBlack,
                     selectedContainerColor = NaturalBlack,
@@ -39,7 +43,13 @@ fun DayRadioButton(radioList: ArrayList<String>, selected: MutableState<String>)
                 width = 64,
                 padding = 8
             )
-            if(index != radioList.size - 1) Spacer(modifier = Modifier.padding(3.widthPercent(context).dp))
+            if (index != radioList.size - 1) Spacer(
+                modifier = Modifier.padding(
+                    3.widthPercent(
+                        context
+                    ).dp
+                )
+            )
         }
     }
 }
