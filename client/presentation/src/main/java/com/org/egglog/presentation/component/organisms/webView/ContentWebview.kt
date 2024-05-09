@@ -88,14 +88,14 @@ fun ContentWebView(
         Text("Click me")
     }
 
-    LaunchedEffect(data) {
-        Log.d("webview", "데이터 변경 감지")
-        val script =
-            "javascript:receiveDataFromApp('${data.replace("\"", "\\\"")}')" // Improved string template
-        webView.evaluateJavascript(script) { value ->
-            Log.d("WebView", "JavaScript response: $value")
-        }
-    }
+//    LaunchedEffect(data) {
+//        Log.d("webview", "데이터 변경 감지")
+//        val script =
+//            "javascript:receiveDataFromApp('${data.replace("\"", "\\\"")}')" // Improved string template
+//        webView.evaluateJavascript(script) { value ->
+//            Log.d("WebView", "JavaScript response: $value")
+//        }
+//    }
 
     DisposableEffect(Unit) {
         onDispose {
