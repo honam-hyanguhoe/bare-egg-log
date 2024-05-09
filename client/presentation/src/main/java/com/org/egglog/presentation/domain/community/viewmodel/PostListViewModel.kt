@@ -16,6 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
+import org.orbitmvi.orbit.annotation.OrbitExperimental
 import org.orbitmvi.orbit.syntax.simple.blockingIntent
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
@@ -34,7 +35,7 @@ class PostListViewModel @Inject constructor(
     private var hotPostList: List<HotPostInfo> = emptyList()
     private var postList: List<PreviewPostInfo> = emptyList()
     private var groupList: CommunityGroupInfo ?= null
-    private var accessToken: String ?= null
+    private var accessToken: String ?= ""
     private var categoryList =  mutableListOf<Pair<Int, String>>()
 
     override val container: Container<PostListState, PostListSideEffect> = container(
@@ -138,6 +139,7 @@ class PostListViewModel @Inject constructor(
         }
     }
 
+    @OptIn(OrbitExperimental::class)
     fun onSearchChange(value: String) = blockingIntent {
         reduce {
             state.copy (
@@ -168,7 +170,7 @@ data class PostListState(
     val hospitalId: Int? = null,
     val groupId: Int? = null,
     val searchWord: String? = null,
-    val lastBoardId: Int? = null,
+    val lastBoardId: Int? = 0,
     val hotPostList: List<HotPostInfo> = listOf(),
     val postList: List<PreviewPostInfo> = listOf(),
     val categoryList: List<Pair<Int, String>> = listOf((0 to "전체")),

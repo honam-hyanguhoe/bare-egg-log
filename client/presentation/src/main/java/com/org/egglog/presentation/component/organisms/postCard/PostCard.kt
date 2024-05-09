@@ -24,7 +24,7 @@ import com.org.egglog.presentation.theme.*
 fun PostCard(profile: Profile, postInfo: PostInfo, postReaction: PostReactionInfo, onClick: ((Int) -> Unit) ?= null) {
 
     Column(Modifier
-            .padding(bottom = 20.dp)
+            .padding(bottom = 10.dp)
             .run{
                 if(onClick != null) {
                     clickable { onClick(postInfo.postId.toInt()) }

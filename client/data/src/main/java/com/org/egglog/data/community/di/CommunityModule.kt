@@ -1,11 +1,17 @@
 package com.org.egglog.data.community.di
 
+import com.org.egglog.data.community.usecase.CreateCommentUseCaseImpl
+import com.org.egglog.data.community.usecase.DeleteCommentUseCaseImpl
 import com.org.egglog.data.community.usecase.DeletePostUseCaseImpl
+import com.org.egglog.data.community.usecase.GetCommentListUseCaseImpl
 import com.org.egglog.data.community.usecase.GetCommunityGroupUseCaseImpl
 import com.org.egglog.data.community.usecase.GetHotPostListUseCaseImpl
 import com.org.egglog.data.community.usecase.GetPostDetailUseCaseImpl
 import com.org.egglog.data.community.usecase.GetPostListUseCaseImpl
+import com.org.egglog.domain.community.usecase.CreateCommentUseCase
+import com.org.egglog.domain.community.usecase.DeleteCommentUseCase
 import com.org.egglog.domain.community.usecase.DeletePostUseCase
+import com.org.egglog.domain.community.usecase.GetCommentListUseCase
 import com.org.egglog.domain.community.usecase.GetCommunityGroupUseCase
 import com.org.egglog.domain.community.usecase.GetHotPostListUseCase
 import com.org.egglog.domain.community.usecase.GetPostDetailUseCase
@@ -33,4 +39,13 @@ abstract class CommunityModule {
 
     @Binds
     abstract fun bindGetCommunityGroupUseCaseImpl(uc: GetCommunityGroupUseCaseImpl): GetCommunityGroupUseCase
+
+    @Binds
+    abstract fun bindGetCommentListUseCaseImpl(uc: GetCommentListUseCaseImpl): GetCommentListUseCase
+
+    @Binds
+    abstract fun bindDeleteCommentUseCaseImpl(uc: DeleteCommentUseCaseImpl): DeleteCommentUseCase
+
+    @Binds
+    abstract fun bindCreateCommentUseCaseImpl(uc: CreateCommentUseCaseImpl): CreateCommentUseCase
 }

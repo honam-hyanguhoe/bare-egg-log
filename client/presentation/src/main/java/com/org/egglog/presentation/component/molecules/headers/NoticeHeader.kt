@@ -43,9 +43,9 @@ fun NoticeHeader(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 20.dp)
+//            .padding(vertical = 20.dp)
             .background(NaturalWhite)
-            .border(1.dp, NaturalBlack)
+//            .border(1.dp, NaturalBlack)
     ) {
         Column (
             modifier = Modifier.fillMaxWidth()
@@ -84,7 +84,7 @@ fun NoticeHeaderContents(
         modifier = Modifier
             .fillMaxWidth()
             .background(NaturalWhite)
-            .padding(horizontal = 15.dp),
+            .padding(horizontal = 10.dp),
 //            .border(3.dp, Gray500),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
