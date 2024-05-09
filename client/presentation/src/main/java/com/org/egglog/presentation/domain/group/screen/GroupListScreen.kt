@@ -21,12 +21,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.org.egglog.domain.group.Group
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.org.egglog.domain.group.model.Group
 import com.org.egglog.presentation.component.atoms.buttons.GroupButton
 import com.org.egglog.presentation.component.atoms.buttons.MiddleButton
 import com.org.egglog.presentation.component.atoms.dialogs.BottomSheet
 import com.org.egglog.presentation.component.atoms.icons.Icon
 import com.org.egglog.presentation.component.molecules.headers.NoticeHeader
+import com.org.egglog.presentation.domain.group.viewmodel.GroupListViewModel
 import com.org.egglog.presentation.theme.Gray25
 import com.org.egglog.presentation.theme.Gray300
 import com.org.egglog.presentation.theme.NaturalWhite
@@ -36,11 +38,14 @@ import com.org.egglog.presentation.theme.Warning300
 import com.org.egglog.presentation.utils.AddBox
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
+import org.orbitmvi.orbit.compose.collectAsState
 
 @Composable
 fun GroupListScreen(
-
+    groupListViewModel: GroupListViewModel = hiltViewModel()
 ) {
+    val groupListState = groupListViewModel.collectAsState().value
+
     val groupList = listOf(
         Group(id = 1, master = "김다희", name = "호남 향우회", memberCount = 2, image = 1),
         Group(id = 2, master = "박철수", name = "서울 친구들", memberCount = 5, image = 2),
@@ -48,7 +53,7 @@ fun GroupListScreen(
     )
 
     GroupListScreen(
-        groupList = groupList
+        groupList = groupListState.groupList
     )
 
 

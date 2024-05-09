@@ -1,4 +1,4 @@
-package com.org.egglog.domain.group
+package com.org.egglog.domain.group.model
 
 data class Group(
     val id: Long,
