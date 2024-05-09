@@ -27,9 +27,16 @@ import com.org.egglog.presentation.utils.ArrowRight
 import com.org.egglog.presentation.component.atoms.icons.Icon
 
 @Composable
-fun GroupButton(onClick: () -> Unit, groupName: String, memberCnt: Int, groupMaster: String, groupImage: Int, groupId: Long) {
+fun GroupButton(
+    onClick: () -> Unit,
+    groupName: String,
+    memberCnt: Int,
+    groupMaster: String,
+    groupImage: Int,
+    groupId: Long
+) {
     val context = LocalContext.current
-    val image = when(groupImage) {
+    val image = when (groupImage) {
         1 -> R.drawable.dark
         2 -> R.drawable.dark
         3 -> R.drawable.dark
@@ -44,17 +51,30 @@ fun GroupButton(onClick: () -> Unit, groupName: String, memberCnt: Int, groupMas
         shadowElevation = 4.heightPercent(context).dp,
         shape = RoundedCornerShape(10.widthPercent(context).dp)
     ) {
-        Row(Modifier.fillMaxSize().padding(10.widthPercent(context).dp), Arrangement.SpaceBetween, Alignment.CenterVertically) {
+        Row(
+            Modifier
+                .fillMaxSize()
+                .padding(10.widthPercent(context).dp),
+            Arrangement.SpaceBetween,
+            Alignment.CenterVertically
+        ) {
             Image(
                 painter = painterResource(id = image),
                 contentDescription = null,
                 modifier = Modifier.size(32.widthPercent(context).dp)
             )
             Column(Modifier.width(212.widthPercent(context).dp), Arrangement.Center) {
-                Text(style = Typography.headlineSmall.copy(fontWeight = FontWeight.Bold), text = "$groupName 모여라")
-                Text(style = Typography.displayMedium,  text = "멤버 $memberCnt · 그룹장 $groupMaster")
+                Text(
+                    style = Typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                    text = "$groupName 모여라"
+                )
+                Text(style = Typography.displayMedium, text = "멤버 $memberCnt · 그룹장 $groupMaster")
             }
-            Icon(imageVector = ArrowRight, modifier = Modifier.size(24.widthPercent(context).dp), color = Gray300)
+            Icon(
+                imageVector = ArrowRight,
+                modifier = Modifier.size(24.widthPercent(context).dp),
+                color = Gray300
+            )
         }
     }
 }
