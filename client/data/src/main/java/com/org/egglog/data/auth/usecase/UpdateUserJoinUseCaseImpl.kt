@@ -11,13 +11,13 @@ import javax.inject.Inject
 class UpdateUserJoinUseCaseImpl @Inject constructor(
     private val userService: UserService
 ): UpdateUserJoinUseCase {
-    override suspend fun invoke(addUserParam: AddUserParam): Result<UserDetail?> = kotlin.runCatching {
+    override suspend fun invoke(accessToken: String, addUserParam: AddUserParam): Result<UserDetail?> = kotlin.runCatching {
         val requestBody = AddUserRequest(
             userName =  addUserParam.userName,
             hospitalId = addUserParam.hospitalId,
             empNo = addUserParam.empNo,
             fcmToken = addUserParam.fcmToken
         ).toRequestBody()
-        userService.join(requestBody).dataBody?.toDomainModel()
+        userService.join(accessToken, requestBody).dataBody?.toDomainModel()
     }
 }
