@@ -117,31 +117,17 @@ public class BoardCustomQueryImpl implements BoardCustomQuery {
 
     @Override
     public List<BoardListOutputSpec> findBoardList(String keyword, Long groupId, Long hospitalId, Long offset, int size) {
-        BooleanExpression whereClause = board.isNotNull(); // 기본 조건
-
-        // 그룹 ID가 주어진 경우 -> 그룹 게시판
-        if (groupId != null) {
-            whereClause = whereClause.and(board.group.id.eq(groupId));
-        }
-
-        // 병원 ID가 주어진 경우 -> 병원 게시판
-        if (hospitalId != null) {
-            whereClause = whereClause.and(board.hospital.id.eq(hospitalId));
-        }
-
-        // 키워드가 제목 또는 내용에 있는 경우
-        if (keyword != null && !keyword.isEmpty()) {
-            whereClause = whereClause.and(searchKeyword(keyword));
-        }
+        BooleanExpression whereClause = board.isNotNull()
+                .and(groupId != null ? board.group.id.eq(groupId) : null)
+                .and(hospitalId != null ? board.hospital.id.eq(hospitalId) : null)
+                .and(keyword != null && !keyword.isEmpty() ? searchKeyword(keyword) : null);
 
         List<Tuple> results = jpaQueryFactory
                 .select(board, comment.countDistinct(), boardLike.countDistinct())
                 .from(board)
                 .leftJoin(comment).on(comment.board.eq(board))
                 .leftJoin(boardLike).on(boardLike.board.eq(board))
-                .where(
-                        whereClause
-                )
+                .where(whereClause)
                 .groupBy(board.id)
                 .orderBy(board.id.desc())
                 .offset(offset)
