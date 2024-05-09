@@ -12,7 +12,8 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 public enum WorkTypeErrorCode implements ErrorFormat {
 
     NO_EXIST_WORKTYPE("근무 타입이 존재하지 않습니다.", BAD_REQUEST),
-    ACCESS_DENIED("권한이 없습니다.", BAD_REQUEST),
+    ACCESS_DENIED("수정, 삭제 권한이 없습니다.", BAD_REQUEST),
+    MODIFY_DEFAULT_TAG_DENIED("기본 생성 태그는 수정할 수 없습니다.", BAD_REQUEST),
     NOT_SAME_WORKTYPE_ID("근무 아이디와 수정 근무 아이디와 다릅니다.", BAD_REQUEST);
 
     ;

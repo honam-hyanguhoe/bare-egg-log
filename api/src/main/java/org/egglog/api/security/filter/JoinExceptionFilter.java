@@ -22,7 +22,7 @@ import java.util.List;
 @Slf4j
 @Component
 public class JoinExceptionFilter extends OncePerRequestFilter {
-    private static final List<String> EXCLUDED_PATHS = Arrays.asList("/v1/hospital/list", "/v1/auth/login/**", "/v1/auth/refresh", "/test/**", "/swagger-ui/**", "/login/oauth2/code/**", "/oauth2/**", "/v3/api-docs/**", "/actuator/prometheus", "/actuator/metrics", "/v1/user/join/**","/v1/user/find/**");
+    private static final List<String> EXCLUDED_PATHS = Arrays.asList("/v1/hospital/list", "/v1/auth/login/**", "/v1/auth/refresh", "/test/**", "/swagger-ui/**", "/login/oauth2/code/**", "/oauth2/**", "/v3/api-docs/**", "/actuator/prometheus", "/actuator/metrics", "/v1/user/join/**");
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Override

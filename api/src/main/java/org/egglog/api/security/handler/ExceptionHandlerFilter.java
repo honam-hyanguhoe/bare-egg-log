@@ -8,6 +8,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.egglog.api.security.exception.AuthException;
+import org.egglog.api.security.exception.JwtException;
 import org.egglog.utility.utils.MessageUtils;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -30,27 +32,18 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
     ) {
         try{
             filterChain.doFilter(request, response);
-        }catch ( MalformedJwtException e){
+        }catch (JwtException e){
             log.debug("============================== [ ** 예외 처리 ** ] =============================");
             log.debug("[EXCEPTION] : {}", e.getMessage(), e);
             log.debug("============================== [ Stack trace END ] =============================");
-            setErrorResponse(response, TOKEN_SIGNATURE_ERROR.getHttpStatus(), TOKEN_SIGNATURE_ERROR.getMessage());
-        }catch (ExpiredJwtException e){
+            setErrorResponse(response, e.getErrorCode().getHttpStatus(), e.getMessage());
+        } catch (AuthException e){
             log.debug("============================== [ ** 예외 처리 ** ] =============================");
             log.debug("[EXCEPTION] : {}", e.getMessage(), e);
             log.debug("============================== [ Stack trace END ] =============================");
-            setErrorResponse(response, EXPIRED_TOKEN.getHttpStatus(), EXPIRED_TOKEN.getMessage());
-        }catch (UnsupportedJwtException e){
-            log.debug("============================== [ ** 예외 처리 ** ] =============================");
-            log.debug("[EXCEPTION] : {}", e.getMessage(), e);
-            log.debug("============================== [ Stack trace END ] =============================");
-            setErrorResponse(response, NOT_SUPPORT_TOKEN.getHttpStatus(), NOT_SUPPORT_TOKEN.getMessage());
-        }catch (IllegalArgumentException e){
-            log.debug("============================== [ ** 예외 처리 ** ] =============================");
-            log.debug("[EXCEPTION] : {}", e.getMessage(), e);
-            log.debug("============================== [ Stack trace END ] =============================");
-            setErrorResponse(response, INVALID_TOKEN.getHttpStatus(), INVALID_TOKEN.getMessage());
-        }catch (Exception e){
+            setErrorResponse(response, e.getErrorCode().getHttpStatus(), e.getMessage());
+        }
+        catch (Exception e){
             log.debug("============================== [ ** 예상하지 못한 예외 처리 ** ] =============================");
             log.debug("[EXCEPTION] : {}", e.getMessage(), e);
             log.debug("============================== [ Stack trace END ] =============================");
@@ -63,7 +56,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             String errorMassage
     ){
         ObjectMapper objectMapper = new ObjectMapper();
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setStatus(status.value());
         response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
         try{
             String jsonResponse = objectMapper.writeValueAsString(MessageUtils.fail(status.name(), errorMassage));
@@ -74,5 +67,4 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
     }
 
 }
-
 
