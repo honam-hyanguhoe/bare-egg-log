@@ -1,6 +1,6 @@
 package com.org.egglog.data.community.service
 
-import com.google.android.gms.common.internal.service.Common
+import com.org.egglog.data.community.model.CommentResponse
 import com.org.egglog.data.community.model.CommunityGroupResponse
 import com.org.egglog.data.community.model.HotPostResponse
 import com.org.egglog.data.community.model.PostDetailResponse
@@ -28,7 +28,7 @@ interface CommunityService {
         @Query("hospital_id") hospitalId: Int? = null,
         @Query("group_id") groupId: Int? = null,
         @Query("search_word") searchWord: String? = null,
-        @Query("last_board_id") lastBoardId: Int? = null
+        @Query("offset") lastBoardId: Int? = 0
     ): CommonResponse<List<PostResponse?>>
 
     @GET("boards/{postId}")
@@ -51,5 +51,18 @@ interface CommunityService {
         @Header("Authorization") accessToken: String
     ): CommonResponse<CommunityGroupResponse>
 
+    @GET("board/{postId}/comments")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun getCommentList(
+        @Header("Authorization") accessToken: String,
+        @Path("postId") postId: Int
+    ): CommonResponse<List<CommentResponse?>>
+
+    @DELETE("board/comment/{commentId}")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun deleteComment(
+        @Header("Authorization") accessToken: String,
+        @Path("commentId") commentId: Long
+    ): CommonResponse<String>
 
 }

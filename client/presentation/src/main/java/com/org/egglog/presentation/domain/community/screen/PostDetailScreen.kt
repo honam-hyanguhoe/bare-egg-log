@@ -85,9 +85,11 @@ fun PostDetailScreen(
         state.userId!!,
         postId,
         state.postDetailInfo,
+        state.commentList,
         onNavigateToPostListScreen,
         viewModel::onDeletePost,
-        {})
+        {},
+        viewModel::onDeleteComment)
 }
 
 @Composable
@@ -95,9 +97,11 @@ private fun PostDetailScreen(
     userId: Long,
     postId: Int,
     postDetailInfo: PostDetailInfo?,
+    commentList: List<CommentInfo>?,
     onNavigateToPostListScreen: () -> Unit,
-    onClickDelete: () -> Unit,
+    onDeletePost: () -> Unit,
     onClickModify: () -> Unit,
+    onDeleteComment: (Long) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -106,27 +110,6 @@ private fun PostDetailScreen(
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val comment1 = CommentInfo(
-            3, 1, "안녕", "전남대병원", "익명의 완숙란", "2024-02-04", "", true, arrayListOf(
-                CommentInfo(
-                    1,
-                    5,
-                    "test",
-                    "전남대병원",
-                    "익명의 구운란",
-                    "2023-12-24 13:28:12",
-                    "https://picsum.photos/300",
-                    true
-                )
-            )
-        )
-        val comment2 =
-            CommentInfo(2, 2, "네 안녕하세요", "전남대병원", "익명의 완숙란2", "2024-04-02", "", true, emptyList())
-        val comment3 =
-            CommentInfo(2, 3, "네 안녕하세요", "전남대병원", "익명의 완숙란2", "2024-04-02", "", true, emptyList())
-        val comment4 =
-            CommentInfo(2, 4, "네 안녕하세요", "전남대병원", "익명의 완숙란2", "2024-04-02", "", true, emptyList())
-        val commentList: List<CommentInfo> = listOf(comment2, comment3, comment4)
         var selectedMenuItem by remember { mutableStateOf<String?>(null) }
 
         Column(modifier = Modifier.weight(1f)) {
@@ -141,7 +124,7 @@ private fun PostDetailScreen(
                     onSelect = {
                         selectedMenuItem = it
                         if (it == "삭제하기") {
-                            onClickDelete()
+                            onDeletePost()
                         } else if (it == "수정하기") {
                             // TODO : 게시글 수정 로직 추가
                             onClickModify()
@@ -195,26 +178,33 @@ private fun PostDetailScreen(
                     }
                 }
 
-                items(
-                    count = commentList.size,
-                    key = { index -> commentList[index].commentId }
-                ) { index ->
-                    Column(modifier = Modifier.padding(horizontal = 20.dp)) {
-                        CommentCard(
-                            false,
-                            commentInfo = commentList[index],
-                            myUserId = userId,
-                            onDeleteClick = {},
-                            onRecommentClick = {}
-                        )
-                        if (commentList[index].recomment.isNotEmpty()) {
-                            commentList[index].recomment.forEach { recomment ->
-                                CommentCard(
-                                    true,
-                                    commentInfo = recomment,
-                                    myUserId = 1,
-                                    onDeleteClick = {},
-                                    {})
+                if(commentList!!.isNotEmpty()) {
+                    items(
+                        count = commentList.size,
+                        key = { index -> commentList[index].commentId }
+                    ) { index ->
+                        Column(modifier = Modifier.padding(horizontal = 20.dp)) {
+                            CommentCard(
+                                false,
+                                commentInfo = commentList[index],
+                                myUserId = userId,
+                                onDeleteClick = { commentId ->
+                                    onDeleteComment(commentId)
+                                },
+                                onRecommentClick = {}
+                            )
+                            if(commentList[index].recomment.isNotEmpty()) {
+                                commentList[index].recomment.forEach { recomment ->
+                                    CommentCard(
+                                        true,
+                                        commentInfo = recomment,
+                                        myUserId = userId,
+                                        onDeleteClick = { commentId ->
+                                            onDeleteComment(commentId)
+                                        },
+                                        {}
+                                    )
+                                }
                             }
                         }
                     }
@@ -269,20 +259,22 @@ private fun PostDetailPreview() {
                 "",
                 0,
                 1,
-                "",
+                "익명의 구운란",
                 "",
                 4,
                 3,
                 2,
-                "",
+                "전남대병원",
                 true,
                 true,
                 true
             ),
+            emptyList(),
             onNavigateToPostListScreen = { /*TODO*/ },
-            onClickDelete = { /*TODO*/ }) {
-
-        }
+            onClickModify = {},
+            onDeletePost = { /*TODO*/ },
+            onDeleteComment = {}
+        )
     }
 
 }
