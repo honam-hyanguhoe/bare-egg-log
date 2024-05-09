@@ -1,7 +1,9 @@
 package com.org.egglog.data.group.model
 
 import com.org.egglog.domain.group.model.Group
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class GroupResponse(
     val id: Long,
     val master: String,
