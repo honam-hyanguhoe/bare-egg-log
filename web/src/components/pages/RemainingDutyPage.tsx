@@ -22,8 +22,6 @@ const remainingDuty = [
   { name: "Eve", value: 2, color: "#F4D567" },
   { name: "Night", value: 1, color: "#485E88" },
   { name: "Off", value: 4, color: "#9B8AFB" },
-  // { name: "Vacation", value: 0, color: "#FDA29B" },
-  // { name: "Edu", value: 0, color: "#98A2B3" },
 ];
 
 const RemainingDutyPage = () => {
@@ -35,6 +33,7 @@ const RemainingDutyPage = () => {
     remain: 0,
   };
 
+  const [dutyData, setDutyData] = useState<>;
   const [data, setData] = useState<TreeNode>(initialData);
 
   const getRandomValues = () => {
@@ -45,10 +44,10 @@ const RemainingDutyPage = () => {
     window.receiveDataFromApp = (data: string) => {
       console.log("Data received: " + data);
 
-      let updatedData = parseData(data);
+      // let updatedData = parseData(data);
 
-      setData(updatedData);
-      return `윈도우로 변경 test : ${updatedData}`;
+      // setData(updatedData);
+      return `윈도우로 변경 test : ${data}`;
     };
 
     return () => {
