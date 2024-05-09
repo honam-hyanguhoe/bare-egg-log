@@ -35,6 +35,19 @@ const RemainingDutyPage = () => {
     return Math.floor(Math.random() * 8);
   };
 
+  useEffect(() => {
+    // 컴포넌트가 마운트될 때 함수를 window 객체에 할당합니다.
+    window.receiveDataFromApp = (data) => {
+      console.log("Data received: " + data);
+      return `윈도우로 변경 test : ${data}`;
+    };
+
+    // 컴포넌트가 언마운트될 때 window 객체에서 함수를 제거합니다.
+    return () => {
+      delete window.receiveDataFromApp;
+    };
+  }, []);
+
   return (
     <GraphContainer>
       {/* <GraphTitle>제 근무는 언제 끝나죠?</GraphTitle> */}
