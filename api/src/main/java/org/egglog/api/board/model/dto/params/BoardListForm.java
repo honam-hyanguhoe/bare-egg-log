@@ -18,6 +18,6 @@ public class BoardListForm {
 
     private String searchWord;  //검색어
 
-    private Long lastBoardId;   //마지막 게시물 번호
+    private Long offset;
 
 }
