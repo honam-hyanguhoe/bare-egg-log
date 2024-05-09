@@ -130,9 +130,11 @@ public class UserService {
         log.debug(" ==== ==== ==== [ 유저 회원 정보 수정 서비스 실행] ==== ==== ====");
         User updateUser = userJpaRepository.save(loginUser.updateInfo(request.getUserName(), request.getProfileImgUrl()));
         Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(updateUser, updateUser.getSelectedHospital());
+
         if (hospitalAuth.isPresent()){
             return updateUser.toResponse(hospitalAuth.get());
         }
+
         return updateUser.toResponse();
     }
     /**

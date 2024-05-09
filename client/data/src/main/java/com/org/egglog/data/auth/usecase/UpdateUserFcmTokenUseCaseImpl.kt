@@ -11,8 +11,8 @@ import javax.inject.Inject
 class UpdateUserFcmTokenUseCaseImpl @Inject constructor(
     private val userService: UserService
 ): UpdateUserFcmTokenUseCase {
-    override suspend fun invoke(userFcmTokenParam: UserFcmTokenParam): Result<UserDetail?> = kotlin.runCatching {
+    override suspend fun invoke(accessToken: String, userFcmTokenParam: UserFcmTokenParam): Result<UserDetail?> = kotlin.runCatching {
         val requestBody = UserFcmTokenRequest(fcmToken = userFcmTokenParam.fcmToken).toRequestBody()
-        userService.updateFcmToken(requestBody).dataBody?.toDomainModel()
+        userService.updateFcmToken(accessToken, requestBody).dataBody?.toDomainModel()
     }
 }

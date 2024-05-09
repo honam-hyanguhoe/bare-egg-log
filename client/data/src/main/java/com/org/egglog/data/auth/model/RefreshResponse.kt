@@ -2,18 +2,20 @@ package com.org.egglog.data.auth.model
 
 import androidx.room.Entity
 import com.org.egglog.domain.auth.model.Refresh
+import com.org.egglog.domain.auth.model.Token
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 
 @Entity
 @Serializable
 data class RefreshResponse(
-    val accessToken: String,
-    val refreshToken: String
+    @Contextual val tokens: TokenResponse,
+    @Contextual val userInfo: UserResponse?
 )
 
 fun RefreshResponse.toDomainModel(): Refresh {
     return Refresh(
-        refreshToken = this.refreshToken,
-        accessToken = this.accessToken
+        tokens.toDomainModel(),
+        userInfo?.toDomainModel()
     )
 }
