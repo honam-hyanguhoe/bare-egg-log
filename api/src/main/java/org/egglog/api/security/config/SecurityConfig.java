@@ -54,25 +54,25 @@ public class SecurityConfig{
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)// JwtFilter 추가
                 .addFilterBefore(exceptionHandlerFilter, JwtFilter.class) // ExceptionHandlerFilter 추가
-                .addFilterAfter(joinExceptionFilter, JwtFilter.class)
-                .oauth2Login(customizer ->
-                        customizer
+                .addFilterAfter(joinExceptionFilter, JwtFilter.class);
+//                .oauth2Login(customizer ->
+//                        customizer
 //                                .authorizationEndpoint(authorization -> authorization
 //                                        .baseUri("/oauth2/authorization")
 //                                        .authorizationRequestRepository(this.authorizationRequestRepository())
 //                                )
-                                .redirectionEndpoint(redirection -> redirection
-                                        .baseUri("/*/oauth2/code/*")
-                                )
-                                .userInfoEndpoint(userInfoEndpoint ->
-                                        userInfoEndpoint.userService(customOAuth2Service))
-                                .successHandler(oAuth2SuccessHandler)
-                                .failureHandler(authFailureHandler)
-                )
-                .exceptionHandling(exceptionHandling ->
-                        exceptionHandling
-                                .authenticationEntryPoint(authFailureHandler)
-                );
+//                                .redirectionEndpoint(redirection -> redirection
+//                                        .baseUri("/*/oauth2/code/*")
+//                                )
+//                                .userInfoEndpoint(userInfoEndpoint ->
+//                                        userInfoEndpoint.userService(customOAuth2Service))
+//                                .successHandler(oAuth2SuccessHandler)
+//                                .failureHandler(authFailureHandler)
+//                );
+//                .exceptionHandling(exceptionHandling ->
+//                        exceptionHandling
+//                                .authenticationEntryPoint(authFailureHandler)
+//                );
 
 
         return http.build();

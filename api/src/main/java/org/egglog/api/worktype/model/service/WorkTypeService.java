@@ -38,7 +38,7 @@ public class WorkTypeService {
         log.debug(" ==== ==== ==== [ 근무 타입 수정 서비스 실행 ] ==== ==== ====");
         WorkType workType = workTypeJpaRepository.findWithUserById(request.getWorkTypeId())
                 .orElseThrow(() -> new WorkTypeException(NO_EXIST_WORKTYPE));
-        if (workType.getWorkTag().name() != WorkTag.ETC.name()) throw new WorkTypeException(ACCESS_DENIED);
+        if (workType.getWorkTag().name() != WorkTag.ETC.name()) throw new WorkTypeException(MODIFY_DEFAULT_TAG_DENIED);
         if (workType.getUser().getId() != loginUser.getId()) throw new WorkTypeException(ACCESS_DENIED);
         return workTypeJpaRepository.save(workType
                     .edit(request.getTitle(), request.getColor(), request.getWorkTypeImgUrl(), request.getStartTime(), request.getWorkTime()))
