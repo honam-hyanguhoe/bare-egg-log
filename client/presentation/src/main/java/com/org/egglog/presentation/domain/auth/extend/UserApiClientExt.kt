@@ -9,10 +9,9 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-suspend fun UserApiClient.Companion.loginWithKakao(context: Context): User {
+suspend fun UserApiClient.Companion.loginWithKakao(context: Context): OAuthToken {
     return try {
-        UserApiClient.loginWithKakaoTalk(context)
-        return UserApiClient.profile(context)
+        return UserApiClient.loginWithKakaoTalk(context)
     } catch (error: Throwable) {
         throw error
     }
