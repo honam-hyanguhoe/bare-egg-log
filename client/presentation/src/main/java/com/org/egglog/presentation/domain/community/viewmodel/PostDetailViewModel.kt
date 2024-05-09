@@ -109,10 +109,12 @@ class PostDetailViewModel @Inject constructor(
                     it.toUiModel()
                 }
             }.getOrThrow()
+            val commentInfo = state.commentList!!.find { it.commentId == commentId }
+            val commentSize = commentInfo?.recomment?.size?.plus(1)?: 1
             reduce {
                 state.copy (
                     commentList = newCommentList,
-                    postDetailInfo = state.postDetailInfo!!.copy(commentCount = state.postDetailInfo!!.commentCount - 1)
+                    postDetailInfo = state.postDetailInfo!!.copy(commentCount = state.postDetailInfo!!.commentCount - commentSize)
                 )
             }
             postSideEffect(PostDetailSideEffect.Toast("댓글이 삭제되었습니다"))
