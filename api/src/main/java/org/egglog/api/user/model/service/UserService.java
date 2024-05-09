@@ -128,11 +128,7 @@ public class UserService {
     @Transactional
     public UserResponse updateUserInfo(User loginUser, UpdateUserRequest request){
         log.debug(" ==== ==== ==== [ 유저 회원 정보 수정 서비스 실행] ==== ==== ====");
-        Hospital hospital = hospitalJpaRepository
-                .findById(request.getHospitalId())
-                .orElseThrow(()->new HospitalException(HospitalErrorCode.NOT_FOUND));
-
-        User updateUser = userJpaRepository.save(loginUser.updateInfo(request.getUserName(), hospital, request.getEmpNo()));
+        User updateUser = userJpaRepository.save(loginUser.updateInfo(request.getUserName(), request.getProfileImgUrl()));
         Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(updateUser, updateUser.getSelectedHospital());
 
         if (hospitalAuth.isPresent()){
