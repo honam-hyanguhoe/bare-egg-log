@@ -35,7 +35,6 @@ import com.org.egglog.presentation.theme.Gray100
 import com.org.egglog.presentation.theme.NaturalBlack
 import com.org.egglog.presentation.theme.Typography
 import com.org.egglog.presentation.utils.widthPercent
-
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun ContentWebView(
@@ -48,8 +47,8 @@ fun ContentWebView(
     val context = LocalContext.current
     val webView = remember {
         WebView(context).apply {
-            // WebView settings
             settings.apply {
+                javaScriptEnabled = true
                 allowContentAccess = true
                 domStorageEnabled = true
                 mediaPlaybackRequiresUserGesture = false
@@ -57,45 +56,42 @@ fun ContentWebView(
                 loadWithOverviewMode = true
                 cacheMode = WebSettings.LOAD_DEFAULT
                 mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-
+                setSupportZoom(false)
+                displayZoomControls = false
+                builtInZoomControls = false
             }
-
-            settings.javaScriptEnabled = true
-            settings.setSupportZoom(false)
-            settings.displayZoomControls = false
-            settings.builtInZoomControls = false
-
-            setLayerType(
-                View.LAYER_TYPE_HARDWARE, null
-            )
+            setLayerType(View.LAYER_TYPE_HARDWARE, null)
             webViewClient = WebViewClient()
         }
     }
 
-    webView.addJavascriptInterface(AndroidBridge(context, webView), "AndroidBridge")
-    webView.loadUrl(url)
+    // JavaScript 인터페이스 추가
+    DisposableEffect(Unit) {
+        webView.addJavascriptInterface(AndroidBridge(context, webView), "AndroidBridge")
+        onDispose {
+            webView.removeJavascriptInterface("AndroidBridge")
+            webView.destroy()
+        }
+    }
 
-    // radio
+    // URL 로드 처리
+    LaunchedEffect(key1 = url) {
+        webView.loadUrl(url)
+    }
+
+    // JavaScript 실행용 라디오 버튼
     val radioList = arrayListOf("Week", "Month")
-
     Row(Modifier.fillMaxWidth()) {
         radioList.mapIndexed { index, text ->
             RadioLabelButton(
                 text = text,
                 isSelected = selected.value == text,
                 onClick = { clickedIdx ->
-                    Log.d("", clickedIdx)
                     selected.value = clickedIdx
-
-                    Log.d("webview", "data change $data")
-//                    val tempData = "[{\"color\":\"#9B8AFB\",\"name\":\"OFF\",\"value\":3},{\"color\":\"#18C5B5\",\"name\":\"DAY\",\"value\":1}]"
-//                    val script1 =
-//                        ("javascript:receiveDataFromApp('" + tempData.replace("\"", "\\\"")).toString() + "')"
-//                    Log.d("webview", "script --- $script1")
-//                    webView.evaluateJavascript(
-//                        script1
-//                    ) { value -> Log.d("WebView", "JavaScript response: $value") }
-                    updateWebView(webView, data)
+                    val script = "javascript:receiveDataFromApp('${data.replace("\"", "\\\"")}')"
+                    webView.evaluateJavascript(script) { value ->
+                        Log.d("WebView", "JavaScript response: $value")
+                    }
                 },
                 radioButtonColorInfo = RadioButtonColorInfo(
                     selectedBorderColor = NaturalBlack,
@@ -111,62 +107,33 @@ fun ContentWebView(
             )
             if (index != radioList.size - 1) Spacer(
                 modifier = Modifier.padding(
-                    3.widthPercent(
-                        context
-                    ).dp
+                    3.widthPercent(context).dp
                 )
             )
         }
     }
 
-
-
+    // WebView 표시
     Card(
         modifier = Modifier
             .fillMaxSize()
             .background(color = Gray100)
-
     ) {
-        Box(modifier = Modifier.padding(start = 10.dp, top = 10.dp, end = 0.dp, bottom = 0.dp)) {
-
-        }
-        AndroidView(factory = { webView },
+        AndroidView(
+            factory = { webView },
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = Gray100),
-            update = { view ->
-                val url = url
-                if (view.url != url) {
-                    view.loadUrl(url)
-                }
-            }
+                .background(color = Gray100)
         )
     }
 
-
-    Button(onClick = {
-        val script =
-            ("javascript:receiveDataFromApp('" + data.replace("\"", "\\\"")).toString() + "')"
-        Log.d("webview", "script --- $script")
-        webView.evaluateJavascript(
-            script
-        ) { value -> Log.d("WebView", "JavaScript response: $value") }
-
-    }) {
-        Text("Click me")
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            webView.destroy()
-        }
-    }
-}
-
-private fun updateWebView(webView: WebView, data: String) {
-    val script =
-        "javascript:receiveDataFromApp('${data.replace("\"", "\\\"")}')" // Improved string template
-    webView.evaluateJavascript(script) { value ->
-        Log.d("WebView", "JavaScript response: $value")
-    }
+    // JavaScript 실행 버튼
+//    Button(onClick = {
+//        val script = "javascript:receiveDataFromApp('${data.replace("\"", "\\\"")}')"
+//        webView.evaluateJavascript(script) { value ->
+//            Log.d("WebView", "JavaScript response: $value")
+//        }
+//    }) {
+//        Text("Click me")
+//    }
 }
