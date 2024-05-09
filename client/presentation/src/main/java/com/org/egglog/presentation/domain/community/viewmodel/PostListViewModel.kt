@@ -16,6 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
+import org.orbitmvi.orbit.annotation.OrbitExperimental
 import org.orbitmvi.orbit.syntax.simple.blockingIntent
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
@@ -138,6 +139,7 @@ class PostListViewModel @Inject constructor(
         }
     }
 
+    @OptIn(OrbitExperimental::class)
     fun onSearchChange(value: String) = blockingIntent {
         reduce {
             state.copy (
