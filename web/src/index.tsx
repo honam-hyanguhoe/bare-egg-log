@@ -9,12 +9,6 @@ const root = ReactDOM.createRoot(
 );
 
 const App = () => {
-  function receiveDataFromApp(data: String) {
-    console.log("Data received: " + data);
-    alert(`들어오니... ${data}`);
-    return "호남이 : " + data;
-  }
-
   return (
     <>
       <GlobalStyle />
