@@ -143,7 +143,8 @@ class PostDetailViewModel @Inject constructor(
             }.getOrThrow()
             reduce {
                 state.copy (
-                    commentList = newCommentList
+                    commentList = newCommentList,
+                    postDetailInfo = state.postDetailInfo!!.copy (commentCount = state.postDetailInfo!!.commentCount + 1)
                 )
             }
             postSideEffect(PostDetailSideEffect.Toast("댓글이 등록되었습니다"))
