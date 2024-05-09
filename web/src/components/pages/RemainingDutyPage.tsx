@@ -49,9 +49,9 @@ const RemainingDutyPage = () => {
 
     window.receiveDataFromApp = receiveDataFromApp;
 
-    // return () => {
-    //   delete (window as any).receiveDataFromApp;
-    // };
+    return () => {
+      delete (window as any).receiveDataFromApp;
+    };
   }, []);
 
   // const updateData = (newChildren: TreeNode[]) => {
@@ -64,7 +64,7 @@ const RemainingDutyPage = () => {
   return (
     <GraphContainer>
       <GraphTitle>{JSON.stringify(duty)}</GraphTitle>
-      <RemainingDutyGraph data={duty} />
+      {/* <RemainingDutyGraph data={duty} /> */}
     </GraphContainer>
   );
 };
