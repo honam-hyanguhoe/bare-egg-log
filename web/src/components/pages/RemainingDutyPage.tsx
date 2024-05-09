@@ -36,13 +36,11 @@ const RemainingDutyPage = () => {
 
   window.receiveDataFromApp = (data: string) => {
     console.log("Data received: " + data);
-    setDuty(JSON.parse(data));
-    try {
-      const tempData: TreeNode[] = JSON.parse(data);
-      updateData(tempData);
-    } catch (error) {
-      console.error("Error parsing JSON data:", error);
-    }
+    // setDuty(JSON.parse(data));
+
+    const tempData: TreeNode[] = JSON.parse(data);
+    updateData(tempData);
+
     return `호남이 : ${data}`;
   };
 
