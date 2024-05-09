@@ -3,6 +3,7 @@ package org.egglog.api.board.model.dto.response;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
+import org.egglog.api.board.model.entity.Board;
 
 import java.time.LocalDateTime;
 
@@ -41,5 +42,17 @@ public class BoardListOutputSpec {
     private String hospitalName;    // 사용자 병원명
 
     private Long userId;            // 유저 id
+
+    public BoardListOutputSpec(Board board, long commentCount, long likeCount) {
+        this.boardId = board.getId();
+        this.boardTitle = board.getTitle();
+        this.boardContent = board.getContent();
+        this.boardCreatedAt = board.getCreatedAt();
+        this.tempNickname = board.getTempNickname();
+        this.commentCount = commentCount;
+        this.likeCount = likeCount;
+        this.pictureOne = board.getPictureOne();
+        this.userId = board.getUser().getId();
+    }
 
 }
