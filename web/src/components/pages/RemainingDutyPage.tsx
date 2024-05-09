@@ -36,17 +36,27 @@ const RemainingDutyPage = () => {
   };
 
   useEffect(() => {
-    // 컴포넌트가 마운트될 때 함수를 window 객체에 할당합니다.
-    window.receiveDataFromApp = (data) => {
+    window.receiveDataFromApp = (data: string) => {
       console.log("Data received: " + data);
+
+      let updatedData = parseData(data);
+
+      setData(updatedData);
       return `윈도우로 변경 test : ${data}`;
     };
 
-    // 컴포넌트가 언마운트될 때 window 객체에서 함수를 제거합니다.
     return () => {
       delete window.receiveDataFromApp;
     };
   }, []);
+
+  const parseData = (data: string) => {
+    let parsedData = JSON.parse(data);
+
+    console.log(`parsedData ${parsedData}`);
+
+    return parsedData;
+  };
 
   return (
     <GraphContainer>
