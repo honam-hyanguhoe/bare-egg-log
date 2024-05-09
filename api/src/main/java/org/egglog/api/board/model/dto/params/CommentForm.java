@@ -18,8 +18,6 @@ public class CommentForm {
 
     private Long parentId;
 
-    private int commentDepth;
-
     private String tempNickname;
 
 }

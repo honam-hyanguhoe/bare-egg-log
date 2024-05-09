@@ -25,10 +25,7 @@ public class Comment extends BaseEntity {
     private String content;  //내용
 
     @Column(name = "parent_id")
-    private Long parentId;  //부모 댓글
-
-    @Column(name = "comment_depth")
-    private int depth;  //댓글 깊이
+    private Long parentId;  //부모 댓글 (대댓글까지만 허용 -> depth = 1)
 
     private String tempNickname;    //익명 닉네임
 
