@@ -36,8 +36,19 @@ const RemainingDutyPage = () => {
 
   window.receiveDataFromApp = (data: string) => {
     console.log("Data received: " + data);
-    setDuty(JSON.parse(data));
-    return `호남이 : ${data}`;
+    // setDuty(JSON.parse(data));
+
+    const tempData: TreeNode[] = JSON.parse(data);
+    console.log("tempData" + tempData);
+
+    setDuty((prevData) => ({
+      ...prevData,
+      children: JSON.parse(data),
+    }));
+
+    updateData(tempData);
+
+    return `${data}`;
   };
 
   // useEffect(() => {
@@ -60,12 +71,12 @@ const RemainingDutyPage = () => {
   //   };
   // }, []);
 
-  // const updateData = (newChildren: TreeNode[]) => {
-  //   setDuty((prevData) => ({
-  //     ...prevData,
-  //     children: newChildren,
-  //   }));
-  // };
+  const updateData = (newChildren: TreeNode[]) => {
+    setDuty((prevData) => ({
+      ...prevData,
+      children: newChildren,
+    }));
+  };
 
   return (
     <GraphContainer>
