@@ -80,7 +80,7 @@ const RemainingDutyPage = () => {
 
   return (
     <GraphContainer>
-      <GraphTitle id="title">{JSON.stringify(duty)}</GraphTitle>
+      {/* <GraphTitle id="title">{JSON.stringify(duty)}</GraphTitle> */}
       <RemainingDutyGraph data={duty} />
     </GraphContainer>
   );
