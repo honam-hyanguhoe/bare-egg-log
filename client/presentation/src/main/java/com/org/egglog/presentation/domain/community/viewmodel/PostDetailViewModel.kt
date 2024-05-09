@@ -70,7 +70,6 @@ class PostDetailViewModel @Inject constructor(
             it!!.toUiModel()
         }.getOrThrow()
 
-        Log.e("PostDetailViewModel", "commentList는 ${getCommentListUseCase("Bearer ${accessToken}", postId)}")
         val commentList = getCommentListUseCase("Bearer ${accessToken}", postId).map {
             it?.map {
                it.toUiModel()
@@ -173,9 +172,7 @@ class PostDetailViewModel @Inject constructor(
 
     // 좋아요 클릭시
     fun onClickLike() = intent {
-        Log.e("PostDetailViewModel", "${postId}번 게시글 좋아요 처리 합니다")
         if (state.postDetailInfo?.isLiked == true) {
-            Log.e("PostDetailViewModel", "${postId}번 게시글 좋아요 삭제 처리 합니다")
             // 좋아요가 눌러져 있다면, 좋아요 삭제
             val response: Result<Boolean> = deleteLikeUseCase("Bearer ${accessToken}", postId)
             // 요청이 성공 했다면 state의 isLiked 값 false로 변경
@@ -190,7 +187,6 @@ class PostDetailViewModel @Inject constructor(
             }
 
         } else {
-            Log.e("PostDetailViewModel", "${postId}번 게시글 좋아요 삽입 처리 합니다")
             // 좋아요가 눌러져 있지 않다면, 좋아요 삽입
             val response: Result<Boolean> = createLikeUseCase("Bearer ${accessToken}", postId)
             // 요청이 성공 했다면 state의 isLiked 값 true로 변경

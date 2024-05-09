@@ -2,18 +2,19 @@ package com.org.egglog.presentation.domain.community.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.paging.PagingData
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.community.model.PostData
-import com.org.egglog.domain.community.posteditor.model.Post
 import com.org.egglog.domain.community.usecase.GetCommunityGroupUseCase
 import com.org.egglog.domain.community.usecase.GetHotPostListUseCase
 import com.org.egglog.domain.community.usecase.GetPostListUseCase
 import com.org.egglog.presentation.data.CommunityGroupInfo
 import com.org.egglog.presentation.data.HotPostInfo
-import com.org.egglog.presentation.data.PreviewPostInfo
 import com.org.egglog.presentation.data.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.annotation.OrbitExperimental
@@ -33,7 +34,6 @@ class PostListViewModel @Inject constructor(
 ): ViewModel(), ContainerHost<PostListState, PostListSideEffect>{
 
     private var hotPostList: List<HotPostInfo> = emptyList()
-    private var postList: List<PreviewPostInfo> = emptyList()
     private var groupList: CommunityGroupInfo ?= null
     private var accessToken: String ?= ""
     private var categoryList =  mutableListOf<Pair<Int, String>>()
@@ -61,17 +61,11 @@ class PostListViewModel @Inject constructor(
                 it!!.toUiModel()
             }
         }.getOrDefault(listOf())
-        Log.e("PostLitViewModel", "급상승 리스트는 ${hotPostList}")
 
-        postList = getPostListUseCase("Bearer ${accessToken}", state.hospitalId, state.groupId, state.searchWord, state.lastBoardId).map {
-            it.map {
-                it!!.toUiModel()
-            }
-        }.getOrThrow()
-        Log.e("PostLitViewModel", "글 리스트는 ${postList}")
+        val postListFlow = getPostListUseCase("Bearer ${accessToken}", state.hospitalId, state.groupId, state.searchWord
+        ).getOrThrow()
 
         groupList = getCommunityGroupUseCase("Bearer ${accessToken}").map{ it.toUiModel()}.getOrThrow()
-        Log.e("PostListViewModel", "그룹리스트는 ${groupList}")
 
         categoryList.add(0 to "전체")
         if(groupList != null) {
@@ -81,22 +75,14 @@ class PostListViewModel @Inject constructor(
             }
         }
 
-        Log.e("PostListViewModel", "카테고리 리스트는 ${categoryList}")
 
         reduce {
             state.copy(
                 hotPostList = if(hotPostList.isEmpty()) listOf() else hotPostList,
-                postList = if(postList.isEmpty()) listOf() else postList,
+                postListFlow = postListFlow!!,
                 categoryList = if(categoryList.isEmpty()) listOf((0 to "전체")) else categoryList
             )
         }
-    }
-
-    fun onClickSearch() = intent {  }
-
-    fun onClickNotification() = intent { }
-
-    fun onClickPost() = intent {
     }
 
     fun onClickWriteButton() = intent {
@@ -104,10 +90,9 @@ class PostListViewModel @Inject constructor(
     }
 
     fun onSelectCategoryIndex(index: Int) = intent {
-        // 선택된 index 처리를 여기서 수행
-        Log.e("PostListViewModel", "선택된 index는 ${index}이며 Category는 ${categoryList[index]}입니다")
         var groupId: Int ?= null
         var hospitalId: Int ?= null
+
         if(index == 0) {
             groupId = null
             hospitalId = null
@@ -126,15 +111,11 @@ class PostListViewModel @Inject constructor(
             )
         }
 
-        postList = getPostListUseCase("Bearer ${accessToken}", state.hospitalId, state.groupId, state.searchWord, state.lastBoardId).map {
-            it.map {
-                it!!.toUiModel()
-            }
-        }.getOrThrow()
+        val postListFlow = getPostListUseCase("Bearer ${accessToken}", state.hospitalId, state.groupId, state.searchWord).getOrThrow()
 
         reduce {
             state.copy (
-                postList = if(postList.isEmpty()) listOf() else postList,
+                postListFlow = postListFlow!!
             )
         }
     }
@@ -149,17 +130,11 @@ class PostListViewModel @Inject constructor(
     }
 
     fun onClickDone() = intent {
-        val searchList = getPostListUseCase("Bearer ${accessToken}", state.hospitalId, state.groupId, state.searchWord, state.lastBoardId).map {
-            it.map {
-                it!!.toUiModel()
-            }
-        }.getOrThrow()
-
-        Log.e("PostListViewModel", "검색 결과는요 ${searchList}")
+        val searchListFlow = getPostListUseCase("Bearer ${accessToken}", state.hospitalId, state.groupId, state.searchWord).getOrThrow()
 
         reduce {
-            state.copy(
-                searchList = searchList
+            state.copy (
+                searchListFlow = searchListFlow!!
             )
         }
     }
@@ -170,11 +145,10 @@ data class PostListState(
     val hospitalId: Int? = null,
     val groupId: Int? = null,
     val searchWord: String? = null,
-    val lastBoardId: Int? = 0,
     val hotPostList: List<HotPostInfo> = listOf(),
-    val postList: List<PreviewPostInfo> = listOf(),
+    val postListFlow: Flow<PagingData<PostData>> = emptyFlow(),
     val categoryList: List<Pair<Int, String>> = listOf((0 to "전체")),
-    val searchList: List<PreviewPostInfo> = listOf()
+    val searchListFlow: Flow<PagingData<PostData>> = emptyFlow()
 )
 
 sealed interface PostListSideEffect {

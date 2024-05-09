@@ -22,9 +22,8 @@ fun CommunityNavigationHost() {
         composable(route = CommunityRoute.PostListScreen.name) {
             PostListScreen(
                 onNavigateToDetailScreen = { postId ->
-                    Log.e("NavController", "${postId}")
                     navController.navigate(
-                        route = "${CommunityRoute.PostDetailScreen.name}/$postId" // postId를 목적지에 전달
+                        route = "${CommunityRoute.PostDetailScreen.name}/$postId"
                     )
                 },
                 onNavigateToSearchScreen = {
@@ -44,9 +43,14 @@ fun CommunityNavigationHost() {
                         route = CommunityRoute.PostListScreen.name,
                         builder = {
                             popUpTo(CommunityRoute.PostListScreen.name) {
-                                inclusive = true // 목적지도 포함하여 스택을 비웁니다.
+                                inclusive = true
                             }
                         }
+                    )
+                },
+                onNavigateToDetailScreen = { postId ->
+                    navController.navigate(
+                        route = "${CommunityRoute.PostDetailScreen.name}/$postId" // postId를 목적지에 전달
                     )
                 }
             )
