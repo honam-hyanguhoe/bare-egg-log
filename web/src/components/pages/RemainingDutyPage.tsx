@@ -37,6 +37,12 @@ const RemainingDutyPage = () => {
   window.receiveDataFromApp = (data: string) => {
     console.log("Data received: " + data);
     setDuty(JSON.parse(data));
+    try {
+      const tempData: TreeNode[] = JSON.parse(data);
+      updateData(tempData);
+    } catch (error) {
+      console.error("Error parsing JSON data:", error);
+    }
     return `호남이 : ${data}`;
   };
 
@@ -60,17 +66,17 @@ const RemainingDutyPage = () => {
   //   };
   // }, []);
 
-  // const updateData = (newChildren: TreeNode[]) => {
-  //   setDuty((prevData) => ({
-  //     ...prevData,
-  //     children: newChildren,
-  //   }));
-  // };
+  const updateData = (newChildren: TreeNode[]) => {
+    setDuty((prevData) => ({
+      ...prevData,
+      children: newChildren,
+    }));
+  };
 
   return (
     <GraphContainer>
       <GraphTitle id="title">{JSON.stringify(duty)}</GraphTitle>
-      {/* <RemainingDutyGraph data={duty} /> */}
+      <RemainingDutyGraph data={duty} />
     </GraphContainer>
   );
 };
