@@ -166,6 +166,11 @@ public class CommentService {
             //접속자와 작성자가 같다면 삭제 가능
             if (comment.getUser().getId().equals(userId)) {
                 commentRepository.delete(comment);
+                //해당 댓글에 달린 대댓글이 있다면 함께 삭제
+                Optional<List<Comment>> recommentListByCommentId = commentRepository.getRecommentListByCommentId(commentId);
+                if (recommentListByCommentId.isPresent()) {
+                    commentRepository.deleteAll(recommentListByCommentId.get());
+                }
             }
 
         } catch (DataAccessException e) {
