@@ -38,10 +38,17 @@ const RemainingDutyPage = () => {
     console.log("Data received: " + data);
     // setDuty(JSON.parse(data));
 
-    const tempData: TreeNode[] = JSON.parse(data);
-    updateData(tempData);
+    // const tempData: TreeNode[] = JSON.parse(data);
+    // console.log("tempData" + tempData);
 
-    return `호남이 : ${data}`;
+    setDuty((prevData) => ({
+      ...prevData,
+      children: JSON.parse(data),
+    }));
+
+    // updateData(tempData);
+
+    return `${data}`;
   };
 
   // useEffect(() => {
@@ -74,7 +81,7 @@ const RemainingDutyPage = () => {
   return (
     <GraphContainer>
       <GraphTitle id="title">{JSON.stringify(duty)}</GraphTitle>
-      <RemainingDutyGraph data={duty} />
+      {/* <RemainingDutyGraph data={duty} /> */}
     </GraphContainer>
   );
 };
