@@ -65,7 +65,6 @@ fun ContentWebView(
         }
     }
 
-    // JavaScript 인터페이스 추가
     DisposableEffect(Unit) {
         webView.addJavascriptInterface(AndroidBridge(context, webView), "AndroidBridge")
         onDispose {
@@ -74,12 +73,11 @@ fun ContentWebView(
         }
     }
 
-    // URL 로드 처리
+
     LaunchedEffect(key1 = url) {
         webView.loadUrl(url)
     }
 
-    // JavaScript 실행용 라디오 버튼
     val radioList = arrayListOf("Week", "Month")
     Row(Modifier.fillMaxWidth()) {
         radioList.mapIndexed { index, text ->
@@ -113,7 +111,6 @@ fun ContentWebView(
         }
     }
 
-    // WebView 표시
     Card(
         modifier = Modifier
             .fillMaxSize()
@@ -126,14 +123,4 @@ fun ContentWebView(
                 .background(color = Gray100)
         )
     }
-
-    // JavaScript 실행 버튼
-//    Button(onClick = {
-//        val script = "javascript:receiveDataFromApp('${data.replace("\"", "\\\"")}')"
-//        webView.evaluateJavascript(script) { value ->
-//            Log.d("WebView", "JavaScript response: $value")
-//        }
-//    }) {
-//        Text("Click me")
-//    }
 }
