@@ -2,16 +2,13 @@ package com.org.egglog.presentation.domain.main.viewModel
 
 import android.util.Log
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.google.gson.Gson
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.main.usecase.CountRemainingDutyUseCase
 import com.org.egglog.domain.main.usecase.GetWorkStatsUseCase
-import com.org.egglog.presentation.domain.main.AndroidBridge
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
@@ -19,6 +16,7 @@ import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
 import java.time.LocalDate
 import javax.inject.Inject
+
 
 @HiltViewModel
 class StaticsViewModel @Inject constructor(
@@ -61,18 +59,21 @@ class StaticsViewModel @Inject constructor(
 //        Log.d("remain", "viewModel result!!!!!!! ${result.getOrNull()}")
 
         if(result != null){
-            val json = Json { prettyPrint = true }
-            val jsonString = json.encodeToString(result)
-            Log.d("remain", jsonString)
+            Log.d("remain", result.toString())
 
+            val gson = Gson()
+            val jsonData = gson.toJson(result)
+
+            Log.d("remain", "gson result --- $jsonData")
+//    [RemainDuty(name=OFF, value=3, color=#9B8AFB), RemainDuty(name=DAY, value=1, color=#18C5B5)]
             reduce {
-                state.copy( remainData = jsonString)
+                state.copy( remainData = jsonData)
             }
 
         }
     }
 
-    fun getWorkStatsData() = intent {
+    private fun getWorkStatsData() = intent {
         val tokens = getTokenUseCase()
 
         Log.d("stats", "${state.date} --- ${state.month} ")
@@ -80,9 +81,18 @@ class StaticsViewModel @Inject constructor(
             accessToken =  "Bearer ${tokens.first}",
             date = state.date,
             month = state.month
-        )
-        Log.d("stats", "viewModel result!!!!!!! $result")
+        ).getOrNull()
 
+        Log.d("stats", result.toString())
+
+        val gson = Gson()
+        val jsonData = gson.toJson(result)
+
+        Log.d("stats", "gson result --- $jsonData")
+//        WorkStats(month=2024-05, weeks=[WeekStats(week=1, data=WeekData(DAY=3, EVE=3, NIGHT=0, OFF=3))])
+        reduce {
+            state.copy( remainData = jsonData)
+        }
 
     }
 }

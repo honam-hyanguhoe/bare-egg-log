@@ -47,6 +47,7 @@ const RemainingDutyPage = () => {
   }, []);
 
   const updateData = (newChildren: TreeNode[]) => {
+    console.log("Updating duty with new children:", newChildren);
     setDuty((prevData) => ({
       ...prevData,
       children: newChildren,
