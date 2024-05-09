@@ -2,27 +2,28 @@ package org.egglog.api.security.model.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.egglog.api.security.model.dto.request.LoginRequest;
+import org.egglog.api.security.config.OAuthProperties;
 import org.egglog.api.security.model.dto.response.TokenResponse;
 import org.egglog.api.security.model.entity.OAuthAttribute;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.model.entity.enums.AuthProvider;
-import org.egglog.api.user.model.entity.enums.UserRole;
 import org.egglog.api.user.model.entity.enums.UserStatus;
 import org.egglog.api.user.repository.jpa.UserJpaRepository;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
 
-import java.util.Collections;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * packageName    : org.egglog.api.security.model.service
@@ -42,17 +43,33 @@ public class AuthService {
     private final TokenService tokenService;
     private final UserJpaRepository userJpaRepository;
     private final WebClient webClient;
+    private final OAuthProperties oAuthProperties;
     public TokenResponse login(String accessToken, AuthProvider provider){
         log.debug(" ==== ==== ==== [login 서비스 실행] ==== ==== ====");
+        Map<AuthProvider, String> clientKeyMap = Map.of(
+                AuthProvider.GOOGLE, "google",
+                AuthProvider.KAKAO, "kakao",
+                AuthProvider.NAVER, "naver",
+                AuthProvider.APPLE, "apple"
+        );
+        OAuthProperties.Client clientConfig = oAuthProperties.getRegistration().get(clientKeyMap.get(provider));
+        OAuthProperties.Details detailsConfig = oAuthProperties.getProvider().get(clientKeyMap.get(provider));
 
-        Map<AuthProvider, String> uriMap = new HashMap<>();
-        uriMap.put(AuthProvider.GOOGLE, "https://openidconnect.googleapis.com/v1/userinfo");
-        uriMap.put(AuthProvider.NAVER, "https://openapi.naver.com/v1/nid/me");
-        uriMap.put(AuthProvider.KAKAO, "https://kapi.kakao.com/v2/user/me");
+
+        if (provider.equals(AuthProvider.GOOGLE)){
+            Map tokenResponse = webClient.post()
+                    .uri(detailsConfig.getTokenUri())
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .body(Mono.just(buildFormData(clientConfig, accessToken)), String.class)
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
+            accessToken = (String) tokenResponse.get("access_token");
+        }
 
 
         Map<String, Object> userAttributes = webClient.get()
-                .uri(uriMap.get(provider))
+                .uri(detailsConfig.getUserInfoUri())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .retrieve()
                 .bodyToMono(Map.class)
@@ -76,7 +93,6 @@ public class AuthService {
         //회원가입일 경우
         User saveUser = userJpaRepository.save(oauthUser);
         return tokenService.generatedToken(saveUser.getId(), saveUser.getUserRole().name());
-
     }
 
     public void logout(User user){
@@ -88,5 +104,12 @@ public class AuthService {
         return tokenService.republishToken(refreshToken);
     }
 
+    private String buildFormData(OAuthProperties.Client clientConfig, String code) {
+        return "client_id=" + clientConfig.getClientId() +
+                "&client_secret=" + clientConfig.getClientSecret() +
+                "&redirect_uri=" +clientConfig.getRedirectUri() +
+                "&code=" + code +
+                "&grant_type=authorization_code";
+    }
 }
 

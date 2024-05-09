@@ -98,6 +98,7 @@ public class User implements UserDetails {
 
     public User delete(){
         this.name = "탈퇴회원";
+        this.email = null;
         this.selectedHospital = null;
         this.userStatus = UserStatus.DELETED;
         this.deletedAt = LocalDateTime.now();
