@@ -11,6 +11,7 @@ import com.org.egglog.domain.auth.model.UserHospital
 import com.org.egglog.domain.auth.usecase.DeleteTokenUseCase
 import com.org.egglog.domain.auth.usecase.DeleteUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.GetAllHospitalUseCase
+import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.UpdateUserJoinUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,6 +36,7 @@ class PlusLoginViewModel @Inject constructor(
     private val deleteUserStoreUseCase: DeleteUserStoreUseCase,
     private val deleteTokenUseCase: DeleteTokenUseCase,
     private val setUserStoreUseCase: SetUserStoreUseCase,
+    private val getTokenUseCase: GetTokenUseCase,
     private val updateUserJoinUseCase: UpdateUserJoinUseCase,
     private val getAllHospitalUseCase: GetAllHospitalUseCase
 ): ViewModel(), ContainerHost<PlusLoginState, PlusLoginSideEffect>{
@@ -90,7 +92,8 @@ class PlusLoginViewModel @Inject constructor(
             Log.e("FCM Token", "Error fetching FCM token: ${e.message}", e)
             null
         }
-        val result = updateUserJoinUseCase(AddUserParam(userName = state.name, empNo = state.empNo, hospitalId = state.hospital!!.hospitalId, fcmToken = fcmToken)).getOrThrow()
+        val tokens = getTokenUseCase()
+        val result = updateUserJoinUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}", addUserParam = AddUserParam(userName = state.name, empNo = state.empNo, hospitalId = state.hospital!!.hospitalId, fcmToken = fcmToken)).getOrThrow()
         if(result != null) {
             setUserStoreUseCase(result)
             postSideEffect(PlusLoginSideEffect.NavigateToMainActivity)

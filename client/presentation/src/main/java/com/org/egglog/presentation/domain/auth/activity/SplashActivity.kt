@@ -55,7 +55,7 @@ class SplashActivity : AppCompatActivity() {
             if (isLoggedIn) {
                 Log.e("SplashActivity", "access: " + tokens.first.orEmpty())
                 Log.e("SplashActivity", "refresh: " + tokens.second.orEmpty())
-                val userDetail = getUserUseCase("Bearer ${tokens.first}").getOrThrow()
+                val userDetail = getUserUseCase("Bearer ${tokens.first.orEmpty()}").getOrThrow()
                 Log.e("SplashActivity", "user: " + userDetail.toString())
                 if(userDetail?.selectedHospital == null || userDetail.empNo == null) {
                     setUserStoreUseCase(userDetail)

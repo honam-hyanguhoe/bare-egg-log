@@ -55,7 +55,7 @@ class SettingViewModel @Inject constructor(
 
     fun onClickLogout() = intent {
         val tokens = getTokenUseCase()
-        postLogoutUseCase(tokens.first ?: "")
+        postLogoutUseCase("Bearer ${tokens.first.orEmpty()}")
         deleteTokenUseCase()
         deleteUserStoreUseCase()
         postSideEffect(SettingSideEffect.NavigateToLoginActivity)
