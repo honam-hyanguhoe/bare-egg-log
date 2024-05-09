@@ -26,4 +26,6 @@ public class UpdateUserRequest {
     @Size(max = 60, message = "유저 이름이 너무 깁니다.")
     private String userName;
     private String profileImgUrl;
+    private Long selectHospitalId;
+    private String empNo;
 }
