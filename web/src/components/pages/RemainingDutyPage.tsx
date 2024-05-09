@@ -37,28 +37,29 @@ const RemainingDutyPage = () => {
   useEffect(() => {
     const receiveDataFromApp = (data: string) => {
       console.log("Data received: " + data);
-      try {
-        const tempData: TreeNode[] = JSON.parse(data);
-        updateData(tempData);
-      } catch (error) {
-        console.error("Error parsing JSON data:", error);
-      }
+      setDuty(JSON.parse(data));
+      // try {
+      // const tempData: TreeNode[] = JSON.parse(data);
+      // updateData(tempData);
+      // } catch (error) {
+      //   console.error("Error parsing JSON data:", error);
+      // }
       return `Window updated with: ${data}`;
     };
 
-    window.receiveDataFromApp = receiveDataFromApp;
+    // window.receiveDataFromApp = receiveDataFromApp;
 
     // return () => {
     //   delete (window as any).receiveDataFromApp;
     // };
-  }, [duty]);
+  }, []);
 
-  const updateData = (newChildren: TreeNode[]) => {
-    setDuty((prevData) => ({
-      ...prevData,
-      children: newChildren,
-    }));
-  };
+  // const updateData = (newChildren: TreeNode[]) => {
+  //   setDuty((prevData) => ({
+  //     ...prevData,
+  //     children: newChildren,
+  //   }));
+  // };
 
   return (
     <GraphContainer>
