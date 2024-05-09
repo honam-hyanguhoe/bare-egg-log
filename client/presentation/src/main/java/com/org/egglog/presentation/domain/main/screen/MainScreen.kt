@@ -1,7 +1,7 @@
 package com.org.egglog.presentation.domain.main.screen
 
+import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,11 +13,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,16 +27,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.org.egglog.presentation.component.molecules.radioButtons.DayRadioButton
 import com.org.egglog.presentation.component.organisms.calendars.WeeklyCalendar
-import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyDataSource
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyUiModel
 import com.org.egglog.presentation.component.organisms.webView.ContentWebView
 import com.org.egglog.presentation.domain.main.viewModel.StaticsViewModel
 import com.org.egglog.presentation.domain.main.viewModel.WorkViewModel
 import com.org.egglog.presentation.theme.Gray100
-import com.org.egglog.presentation.theme.NaturalBlack
 import com.org.egglog.presentation.theme.NaturalWhite
 import com.org.egglog.presentation.theme.Typography
-import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
 import org.orbitmvi.orbit.compose.collectAsState
 import java.time.LocalDate
@@ -49,15 +46,23 @@ fun MainScreen(
 ) {
     val workState = workViewModel.collectAsState().value
     val statsState = staticsViewModel.collectAsState().value
+    val selected = staticsViewModel.selected
+    LaunchedEffect(selected.value) {
+        staticsViewModel.setSelected(selected.value)
+        Log.d("remain", "--- ${selected.value}")
+    }
     MainScreen(
         startDate = workState.startDate,
         labels = workState.labels,
         calendarUiModel = workState.currentWeekDays,
         onPrevClick = workViewModel::onPrevClick,
-        onNextClick = workViewModel::onNextClick
+        onNextClick = workViewModel::onNextClick,
+        selected = selected,
+        remainData = statsState.remainData ?: "",
+        statsData = statsState.statsData ?: ""
+
     )
 }
-
 
 @Composable
 private fun MainScreen(
@@ -65,7 +70,10 @@ private fun MainScreen(
     calendarUiModel: WeeklyUiModel,
     onPrevClick: (LocalDate) -> Unit,
     onNextClick: (LocalDate) -> Unit,
-    labels: List<String>
+    labels: List<String>,
+    selected: MutableState<String>,
+    remainData : String,
+    statsData : String
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -99,9 +107,9 @@ private fun MainScreen(
             labels = labels
         )
         Spacer(modifier = Modifier.height(30.dp))
-        RemainCard()
+        RemainCard(selected = selected, remainData = remainData)
         Spacer(modifier = Modifier.height(30.dp))
-        StaticsCard()
+        StaticsCard(statsData = statsData)
     }
 }
 
@@ -135,11 +143,13 @@ fun DutyCard(
 }
 
 @Composable
-fun RemainCard() {
+fun RemainCard(
+    selected : MutableState<String>,
+    remainData : String
+) {
     val context = LocalContext.current
     // radio
     val radioList = arrayListOf("Week", "Month")
-    val selected = remember { mutableStateOf("") }
     Column(
         modifier = Modifier
             .width(320.widthPercent(context).dp)
@@ -154,12 +164,14 @@ fun RemainCard() {
         Box(modifier = Modifier.padding(start = 10.dp, top = 10.dp, end = 0.dp, bottom = 0.dp)) {
             DayRadioButton(radioList = radioList, selected = selected)
         }
-        ContentWebView(width = 320, height = 350, url = "https://www.egg-log.org/remain")
+        ContentWebView(width = 320, height = 350, url = "https://www.egg-log.org/remain", data = remainData)
     }
 }
 
 @Composable
-fun StaticsCard() {
+fun StaticsCard(
+    statsData: String
+) {
     val context = LocalContext.current
 
     Column(
@@ -173,7 +185,7 @@ fun StaticsCard() {
             modifier = Modifier.padding(start = 10.dp),
             style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
         )
-        ContentWebView(width = 320, height = 350, url = "https://www.egg-log.org/statics")
+        ContentWebView(width = 320, height = 350, url = "https://www.egg-log.org/statics" , data = statsData)
     }
 }
 

@@ -19,6 +19,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,7 +35,7 @@ import java.nio.charset.StandardCharsets
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun ContentWebView(
-    width: Int = 300, height: Int = 250, url: String = "https://www.egg-log.org/"
+    width: Int = 300, height: Int = 250, url: String = "https://www.egg-log.org/", data: String = ""
 ) {
     val context = LocalContext.current
     val webView = remember {
@@ -60,10 +61,7 @@ fun ContentWebView(
                 View.LAYER_TYPE_HARDWARE, null
             )
             webViewClient = WebViewClient()
-
         }
-
-
     }
 
     webView.addJavascriptInterface(AndroidBridge(context, webView), "AndroidBridge")
@@ -74,8 +72,7 @@ fun ContentWebView(
             .background(color = Gray100)
 
     ) {
-        AndroidView(
-            factory = { webView },
+        AndroidView(factory = { webView },
             modifier = Modifier
                 .fillMaxSize()
                 .background(color = Gray100),
@@ -85,11 +82,22 @@ fun ContentWebView(
                     view.loadUrl(url)
                 }
             })
-
-
     }
 
-
+    val androidBridge = AndroidBridge(context, webView)
+//    LaunchedEffect(data) {
+//        webView.evaluateJavascript("receiveDataFromApp('$data')") { result ->
+//            Log.d("webView honam", result)
+//        }
+//    }
+    Button(onClick = {
+//        webView.loadUrl("javascript:receiveDataFromApp('this is honam')")
+        webView.evaluateJavascript("receiveDataFromApp(${data})") { result ->
+            Log.d("webview", result)
+        }
+    }) {
+        Text("Click me")
+    }
 
     DisposableEffect(Unit) {
         onDispose {
