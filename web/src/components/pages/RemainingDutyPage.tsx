@@ -47,7 +47,7 @@ const RemainingDutyPage = () => {
       return `Window updated with: ${data}`;
     };
 
-    // window.receiveDataFromApp = receiveDataFromApp;
+    window.receiveDataFromApp = receiveDataFromApp;
 
     // return () => {
     //   delete (window as any).receiveDataFromApp;
