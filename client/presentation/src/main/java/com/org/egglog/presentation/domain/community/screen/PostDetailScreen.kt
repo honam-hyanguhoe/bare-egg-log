@@ -4,6 +4,7 @@ import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,8 +25,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -45,6 +48,9 @@ import com.org.egglog.presentation.domain.community.viewmodel.PostDetailSideEffe
 import com.org.egglog.presentation.domain.community.viewmodel.PostDetailViewModel
 import com.org.egglog.presentation.domain.community.viewmodel.PostListSideEffect
 import com.org.egglog.presentation.theme.ClientTheme
+import com.org.egglog.presentation.theme.Gray100
+import com.org.egglog.presentation.theme.Gray200
+import com.org.egglog.presentation.theme.Gray400
 import com.org.egglog.presentation.theme.NaturalWhite
 import com.org.egglog.presentation.theme.Warning200
 import com.org.egglog.presentation.utils.Send
@@ -82,27 +88,42 @@ fun PostDetailScreen(
     }
 
     PostDetailScreen(
-        state.userId!!,
-        postId,
-        state.postDetailInfo,
-        state.commentList,
-        onNavigateToPostListScreen,
-        viewModel::onDeletePost,
-        {},
-        viewModel::onDeleteComment)
+        userId = state.userId!!,
+        postId = postId,
+        parentId = state.parentId,
+        postDetailInfo = state.postDetailInfo,
+        commentList = state.commentList,
+        commentValue = state.comment,
+        onNavigateToPostListScreen = onNavigateToPostListScreen,
+        onDeletePost = viewModel::onDeletePost,
+        onClickModify = {}, // 수정 버튼 클릭시
+        onDeleteComment = viewModel::onDeleteComment,
+        onChangeComment = viewModel::onChangeComment,
+        onClickRecomment = viewModel::onClickRecomment,
+        onClickSend = viewModel::onClickSend,
+    )
 }
+
 
 @Composable
 private fun PostDetailScreen(
     userId: Long,
     postId: Int,
+    parentId: Long,
     postDetailInfo: PostDetailInfo?,
     commentList: List<CommentInfo>?,
+    commentValue: String,
     onNavigateToPostListScreen: () -> Unit,
     onDeletePost: () -> Unit,
     onClickModify: () -> Unit,
-    onDeleteComment: (Long) -> Unit
+    onDeleteComment: (Long) -> Unit,
+    onChangeComment: (String) -> Unit,
+    onClickRecomment: (Long) -> Unit,
+    onClickSend: () -> Unit
 ) {
+
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -111,6 +132,9 @@ private fun PostDetailScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         var selectedMenuItem by remember { mutableStateOf<String?>(null) }
+        val focusManager = LocalFocusManager.current
+        val keyboardController = LocalSoftwareKeyboardController.current
+
 
         Column(modifier = Modifier.weight(1f)) {
             // 내 글일 경우만 수정, 삭제 버튼 활성화
@@ -184,25 +208,36 @@ private fun PostDetailScreen(
                         key = { index -> commentList[index].commentId }
                     ) { index ->
                         Column(modifier = Modifier.padding(horizontal = 20.dp)) {
+                            val commentInfo = commentList[index]
+                            // 게시글 작성자와 댓글 작성자의 userId 비교
+                            val isPostAuthor = commentInfo.userId == userId
+                            // 댓글 작성자가 게시글 작성자와 같을 경우 tempNickname을 변경
+                            val tempNickname = if (isPostAuthor) "익명의 구운란" else commentInfo.tempNickname
+
                             CommentCard(
-                                false,
-                                commentInfo = commentList[index],
+                                commentInfo = commentInfo.copy(tempNickname = tempNickname),
                                 myUserId = userId,
                                 onDeleteClick = { commentId ->
                                     onDeleteComment(commentId)
                                 },
-                                onRecommentClick = {}
+                                onRecommentClick = { commentId ->
+                                    focusManager.moveFocus(FocusDirection.Previous)
+                                    onClickRecomment(commentId)
+                                }
                             )
-                            if(commentList[index].recomment.isNotEmpty()) {
-                                commentList[index].recomment.forEach { recomment ->
+
+                            if(commentInfo.recomment.isNotEmpty()) {
+                                commentInfo.recomment.forEach { recomment ->
+                                    val recommentTempNickname = if (isPostAuthor) "익명의 구운란" else recomment.tempNickname
+
                                     CommentCard(
                                         true,
-                                        commentInfo = recomment,
+                                        commentInfo = recomment.copy(tempNickname = recommentTempNickname),
                                         myUserId = userId,
                                         onDeleteClick = { commentId ->
                                             onDeleteComment(commentId)
                                         },
-                                        {}
+                                        onRecommentClick = {}
                                     )
                                 }
                             }
@@ -218,63 +253,30 @@ private fun PostDetailScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            val focusManager = LocalFocusManager.current
+            Log.e("PostDetailScreen", "parentId는 ${parentId}")
             SingleInput(
                 modifier = Modifier.fillMaxWidth(0.8f),
-                text = "",
-                placeholder = "댓글을 입력해주세요",
-                onValueChange = {},
+                text = commentValue,
+                placeholder = if(parentId.toInt() == 0) "댓글을 입력해주세요" else "대댓글을 입력해주세요",
+                onValueChange = { commentValue -> onChangeComment(commentValue) },
                 focusManager = focusManager,
             )
             Box(
                 modifier = Modifier
-                    .background(Warning200, RoundedCornerShape(10.dp))
+                    .background(if(commentValue == "") Gray200 else Warning200, RoundedCornerShape(10.dp))
                     .padding(10.dp)
             ) {
                 CustomIconButton(
                     size = 36.dp,
                     imageVector = Send,
                     color = NaturalWhite,
-                    onClick = { /*TODO*/ })
+                    onClick = {
+                        onClickSend()
+                        focusManager.clearFocus()
+                              },
+                    enabled = commentValue != ""
+                )
             }
         }
     }
-}
-
-@Preview
-@Composable
-private fun PostDetailPreview() {
-    ClientTheme {
-        PostDetailScreen(
-            userId = 1,
-            postId = 2,
-            postDetailInfo = PostDetailInfo(
-                1,
-                "d",
-                "d",
-                "",
-                "",
-                "",
-                "",
-                "",
-                0,
-                1,
-                "익명의 구운란",
-                "",
-                4,
-                3,
-                2,
-                "전남대병원",
-                true,
-                true,
-                true
-            ),
-            emptyList(),
-            onNavigateToPostListScreen = { /*TODO*/ },
-            onClickModify = {},
-            onDeletePost = { /*TODO*/ },
-            onDeleteComment = {}
-        )
-    }
-
 }

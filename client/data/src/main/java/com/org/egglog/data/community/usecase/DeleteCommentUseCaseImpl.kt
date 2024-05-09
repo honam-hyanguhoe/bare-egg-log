@@ -12,7 +12,7 @@ class DeleteCommentUseCaseImpl @Inject constructor(
         if(response.dataHeader.successCode == 0) {
             true
         } else {
-            throw Exception("게시글 삭제 error 발생! ${response.dataHeader.resultCode} : ${response.dataHeader.resultMessage}")
+            throw Exception("댓글 삭제 에러 발생! ${response.dataHeader.resultCode} : ${response.dataHeader.resultMessage}")
         }
     }
 

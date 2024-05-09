@@ -6,10 +6,13 @@ import com.org.egglog.data.community.model.HotPostResponse
 import com.org.egglog.data.community.model.PostDetailResponse
 import com.org.egglog.data.community.model.PostResponse
 import com.org.egglog.data.retrofit.CommonResponse
+import okhttp3.RequestBody
+import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -63,6 +66,13 @@ interface CommunityService {
     suspend fun deleteComment(
         @Header("Authorization") accessToken: String,
         @Path("commentId") commentId: Long
+    ): CommonResponse<String>
+
+    @POST("board/comment")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun createComment(
+        @Header("Authorization") accessToken: String,
+        @Body requestBody: RequestBody
     ): CommonResponse<String>
 
 }

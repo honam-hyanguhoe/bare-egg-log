@@ -35,7 +35,7 @@ class PostListViewModel @Inject constructor(
     private var hotPostList: List<HotPostInfo> = emptyList()
     private var postList: List<PreviewPostInfo> = emptyList()
     private var groupList: CommunityGroupInfo ?= null
-    private var accessToken: String ?= "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwicm9sZSI6IkdFTkVSQUxfVVNFUiIsImlhdCI6MTcxNTIyOTYxOCwiZXhwIjoxNzE2MDkzNjE4fQ.fWGMfbiuC5OPETj3Fiprhw4jQNX-Rt1KD66rKXXkwbs"
+    private var accessToken: String ?= ""
     private var categoryList =  mutableListOf<Pair<Int, String>>()
 
     override val container: Container<PostListState, PostListSideEffect> = container(
@@ -52,8 +52,8 @@ class PostListViewModel @Inject constructor(
     }
 
     private fun load() = intent {
-//        val tokens = getTokenUseCase()
-//        accessToken = tokens.first!!
+        val tokens = getTokenUseCase()
+        accessToken = tokens.first!!
 
         Log.e("PostListViewModel", "token은 ${accessToken}")
         hotPostList = getHotPostListUseCase("Bearer ${accessToken}").map {

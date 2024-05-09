@@ -7,6 +7,7 @@ import com.org.egglog.client.data.CommentInfo
 import com.org.egglog.client.data.toUiModel
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.auth.usecase.GetUserUseCase
+import com.org.egglog.domain.community.usecase.CreateCommentUseCase
 import com.org.egglog.domain.community.usecase.DeleteCommentUseCase
 import com.org.egglog.domain.community.usecase.DeletePostUseCase
 import com.org.egglog.domain.community.usecase.GetCommentListUseCase
@@ -17,6 +18,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
+import org.orbitmvi.orbit.annotation.OrbitExperimental
+import org.orbitmvi.orbit.syntax.simple.blockingIntent
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
@@ -32,11 +35,12 @@ class PostDetailViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
     private val deletePostUseCase: DeletePostUseCase,
     private val getCommentListUseCase: GetCommentListUseCase,
-    private val deleteCommentUseCase: DeleteCommentUseCase
+    private val deleteCommentUseCase: DeleteCommentUseCase,
+    private val createCommentUseCase: CreateCommentUseCase
 ): ViewModel(), ContainerHost<PostDetailState, PostDetailSideEffect> {
 
     private val postId: Int = savedStateHandle.get<Int>("postId") ?: throw IllegalArgumentException("postId is required")
-    private var accessToken: String ?= "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwicm9sZSI6IkdFTkVSQUxfVVNFUiIsImlhdCI6MTcxNTIyOTYxOCwiZXhwIjoxNzE2MDkzNjE4fQ.fWGMfbiuC5OPETj3Fiprhw4jQNX-Rt1KD66rKXXkwbs"
+    private var accessToken: String ?= ""
 
     override val container: Container<PostDetailState, PostDetailSideEffect> = container(
         initialState = PostDetailState(),
@@ -52,7 +56,7 @@ class PostDetailViewModel @Inject constructor(
     }
 
     private fun load() = intent {
-//         accessToken = getTokenUseCase().first!!
+         accessToken = getTokenUseCase().first!!
 
         val userDetail = getUserUseCase("Bearer ${accessToken}").getOrThrow()
         val userId = userDetail!!.id
@@ -106,7 +110,51 @@ class PostDetailViewModel @Inject constructor(
         } else {
             postSideEffect(PostDetailSideEffect.Toast("댓글 삭제에 실패했습니다"))
         }
+    }
 
+    @OptIn(OrbitExperimental::class)
+    fun onChangeComment(value: String) = blockingIntent {
+        reduce {
+            state.copy(
+                comment = value
+            )
+        }
+    }
+
+    fun onClickSend() = intent {
+
+        val result = createCommentUseCase("Bearer ${accessToken}", postId, state.comment, state.parentId, "익명의 완숙란")
+        if(result.isSuccess) {
+            val newCommentList = getCommentListUseCase("Bearer ${accessToken}", postId).map {
+                it?.map {
+                    it.toUiModel()
+                }
+            }.getOrThrow()
+            reduce {
+                state.copy (
+                    commentList = newCommentList
+                )
+            }
+            postSideEffect(PostDetailSideEffect.Toast("댓글이 등록되었습니다"))
+        } else {
+            postSideEffect(PostDetailSideEffect.Toast("댓글 등록에 실패했습니다"))
+        }
+        reduce {
+            state.copy (
+                parentId = 0,
+                comment = ""
+            )
+        }
+
+    }
+
+    fun onClickRecomment(parentId: Long) = intent {
+        Log.e("PostDetailViewModel", "${parentId}번 댓글에 답댓 달고 싶어요")
+        reduce {
+            state.copy (
+                parentId = parentId
+            )
+        }
     }
 
 }
@@ -115,7 +163,9 @@ class PostDetailViewModel @Inject constructor(
 data class PostDetailState(
     val postDetailInfo: PostDetailInfo ?= null,
     val userId: Long ?= -1,
-    val commentList: List<CommentInfo> ?= emptyList()
+    val commentList: List<CommentInfo> ?= emptyList(),
+    val comment: String = "",
+    val parentId: Long = 0
 )
 
 sealed interface PostDetailSideEffect {
