@@ -97,6 +97,7 @@ private fun PostSearchScreen (
                         postData.boardId,
                         postData.boardTitle,
                         postData.boardContent,
+                        postData.boardCreatedAt,
                         postData.pictureOne
                     )
                     val postReaction = PostReactionInfo(

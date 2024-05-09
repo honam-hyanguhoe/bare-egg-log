@@ -216,6 +216,7 @@ private fun PostListScreen(
                         postData.boardId,
                         postData.boardTitle,
                         postData.boardContent,
+                        postData.boardCreatedAt,
                         postData.pictureOne
                     )
                     val postReaction = PostReactionInfo(

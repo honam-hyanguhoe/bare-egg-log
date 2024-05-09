@@ -49,14 +49,32 @@ fun HotPostCard(postInfo: HotPostInfo, onClickPost: (Int) -> Unit) {
         }
         .padding(16.widthPercent(context).dp)) {
         Column(Modifier.fillMaxWidth()) {
-            Text(text = "${postInfo.title}", color = NaturalBlack, style = Typography.displayLarge.copy(fontSize = 16.sp))
+            Text(
+                text = "${postInfo.title}",
+                color = NaturalBlack,
+                style = Typography.displayLarge.copy(fontSize = 16.sp)
+            )
             Spacer(modifier = Modifier.height(10.dp))
             Row(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically) {
-                Text("${postInfo.name}", color= Gray500, style = Typography.labelSmall.copy(fontSize = 14.sp))
-                PostReaction(postReactionInfo = PostReactionInfo(1, likeCnt = postInfo.likeCnt, commentCnt = postInfo.commentCnt, isLiked = postInfo.isLiked, isCommented = false, ))
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "${postInfo.name}",
+                    color = Gray500,
+                    style = Typography.labelSmall.copy(fontSize = 14.sp)
+                )
+                PostReaction(
+                    postReactionInfo = PostReactionInfo(
+                        1,
+                        likeCnt = postInfo.likeCnt,
+                        commentCnt = postInfo.commentCnt,
+                        isLiked = postInfo.isLiked,
+                        isCommented = false
+                    ),
+                    onClickLike = {}
+                )
             }
         }
     }

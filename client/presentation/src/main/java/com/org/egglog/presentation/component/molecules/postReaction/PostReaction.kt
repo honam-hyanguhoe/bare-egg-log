@@ -19,19 +19,18 @@ import com.org.egglog.presentation.utils.Watch
 import com.org.egglog.presentation.utils.widthPercent
 import com.org.egglog.presentation.component.atoms.buttons.IconButton
 import com.org.egglog.presentation.component.atoms.icons.Icon
+import com.org.egglog.presentation.utils.Favorite
 
 @Composable
-fun PostReaction(postReactionInfo: PostReactionInfo) {
+fun PostReaction(postReactionInfo: PostReactionInfo, onClickLike: (() -> Unit)) {
     val context = LocalContext.current
     Row {
         Row(Modifier, verticalAlignment = Alignment.CenterVertically) {
             IconButton(
-                imageVector = FavoriteBorder,
+                imageVector = if(postReactionInfo.isLiked) Favorite else FavoriteBorder,
                 size = 14.widthPercent(context).dp,
                 color = if(postReactionInfo.isLiked) Error500 else Gray400,
-                onClick = {
-                    Log.d("좋아요 삽입하기: ", "${postReactionInfo.postId} clicked!!!")
-                },
+                onClick = onClickLike,
                 enabled = postReactionInfo.hitCnt >= 0)
             Spacer(modifier = Modifier.padding(2.widthPercent(context).dp))
             Text(text = "${postReactionInfo.likeCnt}", style = Typography.displayMedium.copy(color = Gray400))
