@@ -114,7 +114,7 @@ class MySettingViewModel @Inject constructor(
 
     fun onClickDelete() = intent {
         val tokens = getTokenUseCase()
-        updateUserDeleteUseCase(tokens.first ?: "")
+        updateUserDeleteUseCase("Bearer ${tokens.first.orEmpty()}")
         deleteTokenUseCase()
         deleteUserStoreUseCase()
         postSideEffect(MySettingSideEffect.Toast("탈퇴가 완료되었습니다."))
@@ -123,7 +123,7 @@ class MySettingViewModel @Inject constructor(
 
     fun onClickModify() = intent {
         val tokens = getTokenUseCase()
-        val user = updateUserModifyUseCase(tokens.first ?: "", UserModifyParam(userName = state.name, hospitalId = state.hospital?.hospitalId ?: 0, empNo = state.empNo)).getOrThrow()
+        val user = updateUserModifyUseCase("Bearer ${tokens.first.orEmpty()}", UserModifyParam(userName = state.name, hospitalId = state.hospital?.hospitalId ?: 0, empNo = state.empNo)).getOrThrow()
         setUserStoreUseCase(user)
         reduce {
             state.copy(user = user)

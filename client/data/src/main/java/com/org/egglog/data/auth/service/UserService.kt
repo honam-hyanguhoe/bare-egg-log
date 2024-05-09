@@ -31,6 +31,7 @@ interface UserService {
     @PATCH("user/join")
     @Headers("Content-Type:application/json; charset=UTF8")
     suspend fun join(
+        @Header("Authorization") accessToken: String,
         @Body requestBody: RequestBody
     ): CommonResponse<UserResponse?>
 

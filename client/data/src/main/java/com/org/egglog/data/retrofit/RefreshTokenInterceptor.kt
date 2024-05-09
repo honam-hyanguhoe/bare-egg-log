@@ -39,22 +39,22 @@ class RefreshTokenInterceptor @Inject constructor(
                 response.close()
                 return chain.proceed(newRequest)
             }
-            } else if(response.code == 410) {
-                runBlocking { tokenDataStore.clear() }
-                runBlocking { userDataStore.clear() }
-                startLoginActivity()
-                return response.newBuilder()
-                    .code(200)
-                    .message("")
-                    .build()
+        } else if(response.code == 410) {
+            runBlocking { tokenDataStore.clear() }
+            runBlocking { userDataStore.clear() }
+            startLoginActivity()
+            return response.newBuilder()
+                .code(200)
+                .message("")
+                .build()
         } else if(response.code == 418) {
-                runBlocking { userDataStore.clear() }
-                startPlusLoginActivity()
-                return response.newBuilder()
-                    .code(200)
-                    .message("")
-                    .build()
-            }
+            runBlocking { userDataStore.clear() }
+            startPlusLoginActivity()
+            return response.newBuilder()
+                .code(200)
+                .message("")
+                .build()
+        }
         return response
     }
 
