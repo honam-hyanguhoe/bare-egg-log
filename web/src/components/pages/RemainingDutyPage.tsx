@@ -48,10 +48,10 @@ const RemainingDutyPage = () => {
 
     window.receiveDataFromApp = receiveDataFromApp;
 
-    return () => {
-      delete (window as any).receiveDataFromApp;
-    };
-  }, []);
+    // return () => {
+    //   delete (window as any).receiveDataFromApp;
+    // };
+  }, [duty]);
 
   const updateData = (newChildren: TreeNode[]) => {
     setDuty((prevData) => ({
