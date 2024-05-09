@@ -7,27 +7,22 @@ import com.org.egglog.data.main.service.StaticsService
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.main.model.WorkStats
 import com.org.egglog.domain.main.usecase.GetWorkStatsUseCase
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 class GetWorkStatsUseCaseImpl @Inject constructor(
     private val staticsService: StaticsService
-) : GetWorkStatsUseCase{
-    override suspend fun invoke(accessToken: String, date: String, month: String): Result<WorkStats?> {
-        Log.d("stats", "Date: $date, Month: $month")
-        return try {
-            val response = staticsService.getWorkStatics(accessToken = accessToken, today = date, month = month)
-            if (response.dataHeader.successCode == 0) {
-                Log.d("stats response!!!", "DataBody: ${response.dataBody}")
+) : GetWorkStatsUseCase {
+    override suspend fun invoke(accessToken: String, date: String, month: String): Result<WorkStats?> = kotlin.runCatching {
+        val response = staticsService.getWorkStatics(accessToken = accessToken, today = date, month = month)
 
-                val workStats = null
-                Result.success(workStats)
-            } else {
-                Log.e("stats error", "Failed to fetch work stats with error code: ${response.dataHeader.resultCode}")
-                Result.failure(RuntimeException("Failed to fetch work stats: ${response.dataHeader.resultCode}"))
-            }
-        } catch (e: Exception) {
-            Log.e("stats exception", "Error fetching work stats", e)
-            Result.failure(e)
+        if (response.dataHeader.successCode == 0) {
+            Log.d("stats", "impl 결과 ${response.dataBody}")
+            Result.success(response.dataBody?.toDomainModel())
+        } else {
+            Result.failure(RuntimeException("Failed to fetch weekly work: ${response.dataHeader.resultCode}"))
         }
+    }.getOrElse { e ->
+        Result.failure(e)
     }
 }

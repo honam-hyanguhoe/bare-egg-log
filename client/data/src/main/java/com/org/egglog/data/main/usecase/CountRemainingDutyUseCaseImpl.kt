@@ -1,7 +1,6 @@
 package com.org.egglog.data.main.usecase
 
 import android.util.Log
-import com.org.egglog.data.main.model.stats.RemainDutyResponse
 import com.org.egglog.data.main.model.stats.toDomainModel
 import com.org.egglog.data.main.service.StaticsService
 import com.org.egglog.domain.main.model.RemainDuty
@@ -13,14 +12,14 @@ class CountRemainingDutyUseCaseImpl @Inject constructor(
 ) : CountRemainingDutyUseCase {
     override suspend fun invoke(
         accessToken: String,
-        date: String,
+        today: String,
         dateType: String
     ): Result<List<RemainDuty>> {
 
         return try {
-            val response = staticsService.countRemainingDuty(accessToken, dateType, date)
+            val response = staticsService.countRemainingDuty(accessToken, dateType, today)
             if (response.dataHeader.successCode == 0) {
-                Log.d("stats response!!!", "DataBody: ${response.dataBody}")
+                Log.d("remain", "DataBody: ${response.dataBody}")
                 val remainDutyList = response.dataBody
                 Result.success(remainDutyList!!.mapNotNull { it.toDomainModel() })
             } else {

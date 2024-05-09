@@ -4,5 +4,5 @@ import com.org.egglog.domain.main.model.RemainDuty
 
 interface CountRemainingDutyUseCase {
 
-    suspend operator fun invoke(accessToken: String, date: String, dateType: String) : Result<List<RemainDuty>>
+    suspend operator fun invoke(accessToken: String, today: String, dateType: String) : Result<List<RemainDuty>>
 }

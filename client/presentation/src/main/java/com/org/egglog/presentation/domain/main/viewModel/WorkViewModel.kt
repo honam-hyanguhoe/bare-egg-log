@@ -40,8 +40,8 @@ class WorkViewModel @Inject constructor(
 
         val tokens = getTokenUseCase()
         val user = getUserStoreUseCase()
-//        Log.d("weekly", "근무 일정 초기화 ${tokens.first}")
 
+        Log.d("token", "${tokens.first}")
         val response = getWeeklyWorkUseCase(
             accessToken =  "Bearer ${tokens.first}",
             calendarGroupId = user?.workGroupId ?: 0,
@@ -148,7 +148,8 @@ data class WorkState(
     ),
     val startDate: LocalDate = LocalDate.now(),
     val endDate: LocalDate = LocalDate.now(),
-    val labels: List<String> = listOf("NIGHT", "NIGHT", "NIGHT", "NIGHT", "NIGHT", "NIGHT", "NIGHT")
+    val labels: List<String> = listOf("NIGHT", "NIGHT", "NIGHT", "NIGHT", "NIGHT", "NIGHT", "NIGHT"),
+
 )
 
 sealed class WorkSideEffect {
