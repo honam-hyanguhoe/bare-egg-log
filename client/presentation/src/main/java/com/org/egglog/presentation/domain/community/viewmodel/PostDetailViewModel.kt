@@ -76,7 +76,6 @@ class PostDetailViewModel @Inject constructor(
                it.toUiModel()
             }
         }.getOrThrow()
-        Log.e("PostDetailViewModel", "commentList는 ${commentList}")
 
         reduce {
             state.copy(
@@ -135,8 +134,9 @@ class PostDetailViewModel @Inject constructor(
 
     // 댓글 작성 버튼 클릭시
     fun onClickSend() = intent {
+        val tempNickname: String = if(postId==state.postDetailInfo?.userId) "익명의 구운란" else "익명의 완숙란"
 
-        val result = createCommentUseCase("Bearer ${accessToken}", postId, state.comment, state.parentId, "익명의 완숙란")
+        val result = createCommentUseCase("Bearer ${accessToken}", postId, state.comment, state.parentId, tempNickname)
         if(result.isSuccess) {
             val newCommentList = getCommentListUseCase("Bearer ${accessToken}", postId).map {
                 it?.map {
@@ -205,7 +205,6 @@ class PostDetailViewModel @Inject constructor(
             }
         }
     }
-
 }
 
 
@@ -221,5 +220,4 @@ sealed interface PostDetailSideEffect {
     class Toast(val message: String) : PostDetailSideEffect
     object NavigateToCommunityActivity: PostDetailSideEffect
 }
-
 
