@@ -38,17 +38,17 @@ const RemainingDutyPage = () => {
     console.log("Data received: " + data);
     // setDuty(JSON.parse(data));
 
-    const tempData: TreeNode[] = JSON.parse(data);
-    console.log("tempData" + tempData);
+    // const tempData: TreeNode[] = JSON.parse(data);
+    // console.log("tempData" + tempData);
 
     setDuty((prevData) => ({
       ...prevData,
       children: JSON.parse(data),
     }));
 
-    updateData(tempData);
+    // updateData(tempData);
 
-    return `${data}`;
+    return `${duty}`;
   };
 
   // useEffect(() => {
@@ -81,7 +81,7 @@ const RemainingDutyPage = () => {
   return (
     <GraphContainer>
       <GraphTitle id="title">{JSON.stringify(duty)}</GraphTitle>
-      <RemainingDutyGraph data={duty} />
+      {/* <RemainingDutyGraph data={duty} /> */}
     </GraphContainer>
   );
 };

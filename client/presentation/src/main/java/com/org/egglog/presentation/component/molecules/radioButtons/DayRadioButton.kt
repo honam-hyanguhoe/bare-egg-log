@@ -19,7 +19,7 @@ import com.org.egglog.presentation.theme.*
 
 @Composable
 fun DayRadioButton(
-    radioList: ArrayList<String>, selected: MutableState<String>
+    radioList: ArrayList<String>, selected: MutableState<String> , onClick: () -> Unit
 ) {
     val context = LocalContext.current
     Row(Modifier.fillMaxWidth()) {
@@ -30,6 +30,7 @@ fun DayRadioButton(
                 onClick = { clickedIdx ->
                     Log.d("", clickedIdx)
                     selected.value = clickedIdx
+                    onClick()
                 },
                 radioButtonColorInfo = RadioButtonColorInfo(
                     selectedBorderColor = NaturalBlack,

@@ -49,7 +49,7 @@ class StaticsViewModel @Inject constructor(
     }
 
 
-    fun getRemainData() = intent {
+    private fun getRemainData() = intent {
         val tokens = getTokenUseCase()
         val result = countRemainingDutyUseCase(
             accessToken =  "Bearer ${tokens.first}",
