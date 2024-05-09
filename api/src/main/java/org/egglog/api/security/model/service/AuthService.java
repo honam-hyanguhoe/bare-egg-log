@@ -3,7 +3,6 @@ package org.egglog.api.security.model.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.security.model.dto.request.LoginRequest;
-import org.egglog.api.security.model.dto.response.RefreshTokenResponse;
 import org.egglog.api.security.model.dto.response.TokenResponse;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
@@ -11,12 +10,6 @@ import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.model.entity.enums.AuthProvider;
 import org.egglog.api.user.model.entity.enums.UserStatus;
 import org.egglog.api.user.repository.jpa.UserJpaRepository;
-import org.egglog.utility.utils.MessageUtils;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -61,7 +54,7 @@ public class AuthService {
         tokenService.RemoveToken(user.getId());
     }
 
-    public RefreshTokenResponse refresh(String refreshToken){
+    public TokenResponse refresh(String refreshToken){
         return tokenService.republishToken(refreshToken);
     }
 
