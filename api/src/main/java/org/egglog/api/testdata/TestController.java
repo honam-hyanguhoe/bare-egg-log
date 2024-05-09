@@ -1,19 +1,19 @@
 package org.egglog.api.testdata;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.egglog.api.security.exception.AuthException;
 import org.egglog.api.security.exception.JwtErrorCode;
 import org.egglog.api.security.exception.JwtException;
+import org.egglog.api.testdata.dto.request.TestLoginRequest;
 import org.egglog.api.user.model.entity.User;
+import org.egglog.api.user.model.entity.enums.AuthProvider;
 import org.egglog.api.user.model.service.UserService;
 import org.egglog.utility.utils.MessageUtils;
 import org.egglog.utility.utils.SuccessType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * ```
@@ -33,6 +33,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
 
     private final TestService testService;
+
+    @PostMapping("/login/{provider}")
+    public ResponseEntity<MessageUtils> testLogin(
+            @RequestBody @Valid TestLoginRequest request,
+            @PathVariable AuthProvider provider
+            ){
+        return ResponseEntity.ok().body(MessageUtils.success(testService.testLogin(request, provider)));
+    }
 
     @PostMapping("/create/user")
     public ResponseEntity<MessageUtils> createUserMockData(){
