@@ -49,7 +49,7 @@ fun MainScreen(
     val selected = staticsViewModel.selected
     LaunchedEffect(selected.value) {
         staticsViewModel.setSelected(selected.value)
-        Log.d("remain", "--- ${selected.value}")
+        Log.d("webview", "--- ${selected.value}")
     }
     MainScreen(
         startDate = workState.startDate,
@@ -148,8 +148,7 @@ fun RemainCard(
     remainData : String
 ) {
     val context = LocalContext.current
-    // radio
-    val radioList = arrayListOf("Week", "Month")
+
     Column(
         modifier = Modifier
             .width(320.widthPercent(context).dp)
@@ -161,11 +160,10 @@ fun RemainCard(
             modifier = Modifier.padding(start = 10.dp),
             style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
         )
-        Box(modifier = Modifier.padding(start = 10.dp, top = 10.dp, end = 0.dp, bottom = 0.dp)) {
-            DayRadioButton(radioList = radioList, selected = selected)
-        }
-        ContentWebView(width = 320, height = 350, url = "https://www.egg-log.org/remain", data = remainData)
+
+        ContentWebView(width = 320, height = 350, url = "https://www.egg-log.org/remain", data = remainData, selected=selected)
     }
+
 }
 
 @Composable
@@ -185,7 +183,7 @@ fun StaticsCard(
             modifier = Modifier.padding(start = 10.dp),
             style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
         )
-        ContentWebView(width = 320, height = 350, url = "https://www.egg-log.org/statics" , data = statsData)
+//        ContentWebView(width = 320, height = 350, url = "https://www.egg-log.org/statics" , data = statsData)
     }
 }
 
