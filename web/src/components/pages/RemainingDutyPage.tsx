@@ -2,52 +2,43 @@ import React, { useRef, useEffect, useState, useMemo } from "react";
 import styled from "styled-components";
 import RemainingDutyGraph from "../atoms/RemainingDutyGraph";
 
-interface TreeNode {
-  name: string;
-  remain?: number;
-  value?: number;
-  children?: TreeNode[];
-  colname?: string;
-  color?: string;
-}
-
 declare global {
   interface Window {
     receiveDataFromApp: (data: string) => string;
   }
 }
 
-const remainingDuty = [
-  { name: "Day", value: 3, color: "#18C5B5" },
-  { name: "Eve", value: 2, color: "#F4D567" },
-  { name: "Night", value: 1, color: "#485E88" },
-  { name: "Off", value: 4, color: "#9B8AFB" },
-];
+interface TreeNode {
+  name: string;
+  remain?: number;
+  value?: number;
+  colname?: string;
+  color?: string;
+  children?: TreeNode[];
+}
 
 const RemainingDutyPage = () => {
   const initialData: TreeNode = {
     name: "duty",
-    children: remainingDuty,
     colname: "duty-column",
     color: "white",
     remain: 0,
+    children: [
+      { name: "Day", value: 3, color: "#18C5B5" },
+      { name: "Eve", value: 2, color: "#F4D567" },
+      { name: "Night", value: 1, color: "#485E88" },
+      { name: "Off", value: 4, color: "#9B8AFB" },
+    ],
   };
 
-  const [dutyData, setDutyData] = useState<>;
-  const [data, setData] = useState<TreeNode>(initialData);
-
-  const getRandomValues = () => {
-    return Math.floor(Math.random() * 8);
-  };
+  const [duty, setDuty] = useState<TreeNode>(initialData);
 
   useEffect(() => {
     window.receiveDataFromApp = (data: string) => {
       console.log("Data received: " + data);
-
-      // let updatedData = parseData(data);
-
-      // setData(updatedData);
-      return `윈도우로 변경 test : ${data}`;
+      const tempData: TreeNode[] = JSON.parse(data);
+      updateData(tempData);
+      return `Window updated with: ${data}`;
     };
 
     return () => {
@@ -55,18 +46,17 @@ const RemainingDutyPage = () => {
     };
   }, []);
 
-  const parseData = (data: string) => {
-    let parsedData = JSON.parse(data);
-
-    console.log(`parsedData ${parsedData}`);
-
-    return parsedData;
+  const updateData = (newChildren: TreeNode[]) => {
+    setDuty((prevData) => ({
+      ...prevData,
+      children: newChildren,
+    }));
   };
 
   return (
     <GraphContainer>
-      <GraphTitle>호남 들어왔니 {JSON.stringify(data)}</GraphTitle>
-      <RemainingDutyGraph data={data} />
+      <GraphTitle>호남 들어왔니 {JSON.stringify(duty)}</GraphTitle>
+      <RemainingDutyGraph data={duty} />
     </GraphContainer>
   );
 };
@@ -84,3 +74,17 @@ const GraphTitle = styled.p`
   color: #333;
   margin-bottom: 20px;
 `;
+
+// useEffect(() => {
+//   const data = `[{
+//       "name": "DAY",
+//       "value": 1,
+//       "color": "#18C5B5"
+//     }, {
+//       "name": "OFF",
+//       "value": 3,
+//       "color": "#9B8AFB"
+//     }]`;
+//   const tempData: TreeNode[] = JSON.parse(data);
+//   updateData(tempData);
+// }, []);
