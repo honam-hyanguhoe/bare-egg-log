@@ -4,11 +4,14 @@ import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -21,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.org.egglog.domain.group.Group
 import com.org.egglog.presentation.component.atoms.buttons.GroupButton
 import com.org.egglog.presentation.component.atoms.buttons.MiddleButton
+import com.org.egglog.presentation.component.atoms.dialogs.BottomSheet
 import com.org.egglog.presentation.component.atoms.icons.Icon
 import com.org.egglog.presentation.component.molecules.headers.NoticeHeader
 import com.org.egglog.presentation.theme.Gray25
@@ -46,6 +50,8 @@ fun GroupListScreen(
     GroupListScreen(
         groupList = groupList
     )
+
+
 }
 
 @Composable
@@ -62,12 +68,13 @@ private fun GroupListScreen(
             verticalArrangement = Arrangement.Top
         ) {
             NoticeHeader(title = "그룹")
-            Column(
+
+            // LazyColumn으로 그룹 리스트 그리기
+            LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(15.dp)
+                contentPadding = PaddingValues(15.dp)
             ) {
-                groupList.forEach { group ->
+                items(groupList) { group ->
                     GroupButton(
                         onClick = { Log.d("test: ", "clicked!!!") },
                         groupMaster = group.master,
@@ -77,37 +84,45 @@ private fun GroupListScreen(
                         groupImage = group.image
                     )
                 }
-                MiddleButton(
-                    onClick = { Log.d("clicked: ", "clicked!!!!") },
-                    colors = ButtonColors(
-                        contentColor = Warning25,
-                        containerColor = Warning300,
-                        disabledContentColor = Gray25,
-                        disabledContainerColor = Gray300
-                    )
+            }
+
+            MiddleButton(
+                onClick = { Log.d("clicked: ", "clicked!!!!") },
+                colors = ButtonColors(
+                    contentColor = Warning25,
+                    containerColor = Warning300,
+                    disabledContentColor = Gray25,
+                    disabledContainerColor = Gray300
+                )
+            ) {
+                Row(
+                    Modifier.fillMaxSize(),
+                    Arrangement.SpaceBetween,
+                    Alignment.CenterVertically
                 ) {
-                    Row(
-                        Modifier.fillMaxSize(),
-                        Arrangement.SpaceBetween,
-                        Alignment.CenterVertically
-                    ) {
-                        Text(
-                            style = Typography.displayLarge,
-                            text = "그룹을 만들고 동료를 초대해보세요"
-                        )
-                        Icon(
-                            AddBox,
-                            Modifier.size(24.widthPercent(LocalContext.current).dp),
-                            NaturalWhite
-                        )
-                    }
+                    Text(
+                        style = Typography.displayLarge,
+                        text = "그룹을 만들고 동료를 초대해보세요"
+                    )
+                    Icon(
+                        AddBox,
+                        Modifier.size(24.widthPercent(LocalContext.current).dp),
+                        NaturalWhite
+                    )
                 }
             }
 
-
+            // BottomSheet 추가
+            BottomSheet(
+                height = 300.dp, // BottomSheet의 높이
+                showBottomSheet = false, // BottomSheet를 보여줄지 여부
+                onDismiss = { /* TODO: BottomSheet가 닫힐 때 수행할 동작 */ }) {
+                Text(text = "hi")
+            }
         }
     }
 }
+
 
 @Preview
 @Composable
