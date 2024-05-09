@@ -69,6 +69,7 @@ const monthlyData = [
   },
 ];
 
+declare var AndroidBridge: any;
 const WorkStaticsPage = () => {
   const initialData: DataItem[] = [
     { name: "5월 1주", values: [1, 3, 4, 5] },
@@ -98,21 +99,28 @@ const WorkStaticsPage = () => {
 
   const [data, setData] = useState<DataItem[]>(initialData);
 
-  useEffect(() => {
-    const updateData = () => {
-      const newData: DataItem[] = normalizeData(monthlyData);
-      console.log(`${JSON.stringify(newData)}`);
-      // const newData: DataItem[] = initialData;
-      setData(newData);
-    };
+  // useEffect(() => {
+  //   const updateData = () => {
+  //     const newData: DataItem[] = normalizeData(monthlyData);
+  //     console.log(`${JSON.stringify(newData)}`);
+  //     // const newData: DataItem[] = initialData;
+  //     setData(newData);
+  //   };
 
-    const interval = setInterval(updateData, 5000);
+  //   const interval = setInterval(updateData, 5000);
 
-    return () => clearInterval(interval);
-  }, []);
+  //   return () => clearInterval(interval);
+  // }, []);
+
+  // webView (web -> App)
+  const showAndroidToast = () => {
+    window.AndroidBridge.showToast("안녕 호남향우회");
+  };
 
   return (
     <GraphContainer>
+      {/* <button onClick={() => showAndroidToast}>앱에 있는 알람으로 띄워줘.</button> */}
+
       <TypeListContainer>
         <TypeContainer>
           <Label borderColor="#18C5B5" bgColor="#18C5B5" />
@@ -141,6 +149,9 @@ export default WorkStaticsPage;
 const GraphContainer = styled.div`
   background-color: #f2f4f7;
   min-height: 100vh;
+  padding-top: 5px;
+  padding-left: 5px;
+  // padding: 40px;
 `;
 const GraphTitle = styled.p`
   font-size: 25px;

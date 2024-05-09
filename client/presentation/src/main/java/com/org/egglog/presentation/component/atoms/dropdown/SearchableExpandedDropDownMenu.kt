@@ -91,10 +91,11 @@ fun SearchableExpandedDropDownMenu(
     onSearchTextFieldClicked: () -> Unit,
     onSearchChange: (String) -> Unit,
     onClickDone: () -> Unit,
-    search: String
+    search: String,
+    defaultText: String = ""
 ) {
     val focusManager = LocalFocusManager.current
-    var selectedOptionText by rememberSaveable { mutableStateOf("") }
+    var selectedOptionText by rememberSaveable { mutableStateOf(defaultText) }
     var searchedOption by rememberSaveable { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current

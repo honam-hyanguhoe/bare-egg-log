@@ -1,5 +1,7 @@
 package com.org.egglog.presentation.domain.setting.screen
 
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -33,26 +36,77 @@ import com.org.egglog.presentation.utils.ArrowRight
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.org.egglog.presentation.domain.auth.activity.LoginActivity
+import com.org.egglog.presentation.domain.auth.viewmodel.PlusLoginSideEffect
+import com.org.egglog.presentation.domain.main.activity.MainActivity
+import com.org.egglog.presentation.domain.setting.viewmodel.SettingSideEffect
+import com.org.egglog.presentation.domain.setting.viewmodel.SettingViewModel
 import com.org.egglog.presentation.utils.getVersionInfo
+import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
 fun SettingScreen(
+    viewModel: SettingViewModel = hiltViewModel(),
     onNavigateToPrivacyDetailScreen: () -> Unit,
     onNavigateToAgreeDetailScreen: () -> Unit,
     onNavigateToMySettingScreen: () -> Unit
 ) {
     val context = LocalContext.current
+    viewModel.collectSideEffect { sideEffect ->
+        when (sideEffect) {
+            is SettingSideEffect.Toast -> Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
+            SettingSideEffect.NavigateToMainActivity -> {
+                context.startActivity(
+                    Intent(
+                        context, MainActivity::class.java
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                )
+            }
+            SettingSideEffect.NavigateToLoginActivity -> {
+                context.startActivity(
+                    Intent(
+                        context, LoginActivity::class.java
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                )
+            }
+        }
+    }
+
+    SettingScreen(
+        onNavigateToPrivacyDetailScreen = onNavigateToPrivacyDetailScreen,
+        onNavigateToAgreeDetailScreen = onNavigateToAgreeDetailScreen,
+        onNavigateToMySettingScreen = onNavigateToMySettingScreen,
+        onClickLogout = viewModel::onClickLogout
+    )
+}
+
+@Composable
+fun SettingScreen(
+    onNavigateToPrivacyDetailScreen: () -> Unit,
+    onNavigateToAgreeDetailScreen: () -> Unit,
+    onNavigateToMySettingScreen: () -> Unit,
+    onClickLogout: () -> Unit
+) {
+    val context = LocalContext.current
     val openDialog = remember { mutableStateOf(false) }
+    val openLogoutDialog = remember { mutableStateOf(false) }
     val version = getVersionInfo(context)
 
-    fun onClickPrepared() {
-        openDialog.value = true
+    fun onClickLogoutConfirm() {
+        onClickLogout()
+        openLogoutDialog.value = false
     }
 
     Surface {
         Column (
             modifier = Modifier
                 .padding(vertical = 6.widthPercent(context).dp)
+                .systemBarsPadding()
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -63,7 +117,7 @@ fun SettingScreen(
             // 인증 배지 신청하기 버튼
             BasicButton(modifier = Modifier
                 .height(74.heightPercent(context).dp)
-                .fillMaxWidth(0.94f), onClick = { onClickPrepared() }, shape = RoundedCornerShape(16.widthPercent(context).dp), colors = ButtonColors(
+                .fillMaxWidth(0.94f), onClick = { openDialog.value = true }, shape = RoundedCornerShape(16.widthPercent(context).dp), colors = ButtonColors(
                 containerColor = Warning300,
                 contentColor = NaturalWhite,
                 disabledContainerColor = Gray300,
@@ -82,12 +136,13 @@ fun SettingScreen(
                 }
             }
             InfoList(
-                onClickPrepared = { onClickPrepared() },
+                onClickPrepared = { openDialog.value = true },
                 onNavigateToPrivacyDetailScreen = onNavigateToPrivacyDetailScreen,
                 onNavigateToAgreeDetailScreen = onNavigateToAgreeDetailScreen,
-                onNavigateToMySettingScreen = onNavigateToMySettingScreen
+                onNavigateToMySettingScreen = onNavigateToMySettingScreen,
+                onClickLogout = { openLogoutDialog.value = true }
             )
-            
+
             Spacer(modifier = Modifier.padding(30.heightPercent(context).dp))
             LocalImageLoader(imageUrl = R.drawable.bottom_logo, Modifier.fillMaxWidth(0.6f))
             Text("Version $version", style = Typography.displayMedium.copy(color = Gray400))
@@ -99,6 +154,17 @@ fun SettingScreen(
                         onConfirmation = { openDialog.value = false },
                         dialogTitle = "공지",
                         dialogText = "출시 준비 중입니다",
+                    )
+                }
+            }
+
+            when {
+                openLogoutDialog.value -> {
+                    Dialog(
+                        onDismissRequest = { openLogoutDialog.value = false },
+                        onConfirmation = { onClickLogoutConfirm() },
+                        dialogTitle = "로그아웃 하시겠습니까?",
+                        dialogText = "로그아웃 시 로그인 화면으로 돌아갑니다.",
                     )
                 }
             }

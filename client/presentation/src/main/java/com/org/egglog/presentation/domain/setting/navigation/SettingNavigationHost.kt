@@ -26,19 +26,17 @@ fun SettingNavigationHost() {
         }
 
         composable(route = SettingRoute.PrivacyDetailScreen.name) {
-            PrivacyDetailScreen(
-                onNavigateToSettingScreen = { navController.navigate(route = SettingRoute.SettingScreen.name) }
-            )
+            PrivacyDetailScreen()
         }
 
         composable(route = SettingRoute.AgreeDetailScreen.name) {
-            AgreeDetailScreen(
-                onNavigateToSettingScreen = { navController.navigate(route = SettingRoute.SettingScreen.name) }
-            )
+            AgreeDetailScreen()
         }
 
         composable(route = SettingRoute.MySettingScreen.name) {
-            MySettingScreen()
+            MySettingScreen(
+                onNavigateToSettingScreen = { navController.navigate(route = SettingRoute.SettingScreen.name) },
+            )
         }
     }
 }

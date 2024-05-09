@@ -1,6 +1,7 @@
 package com.org.egglog.data.community.service
 
 import com.google.android.gms.common.internal.service.Common
+import com.org.egglog.data.community.model.CommunityGroupResponse
 import com.org.egglog.data.community.model.HotPostResponse
 import com.org.egglog.data.community.model.PostDetailResponse
 import com.org.egglog.data.community.model.PostResponse
@@ -43,6 +44,12 @@ interface CommunityService {
         @Header("Authorization") accessToken: String,
         @Path("postId") postId: Int
     ): CommonResponse<String>
+
+    @GET("boards/types")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun getCommunityGroup(
+        @Header("Authorization") accessToken: String
+    ): CommonResponse<CommunityGroupResponse>
 
 
 }

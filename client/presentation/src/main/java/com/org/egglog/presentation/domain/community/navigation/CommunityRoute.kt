@@ -5,7 +5,7 @@ sealed class CommunityRoute(
 ){
     data object PostListScreen: CommunityRoute("PostListScreen")
 
-    data object SearchListScreen: CommunityRoute("SearchListScreen")
+    data object PostSearchScreen: CommunityRoute("PostSearchScreen")
 
     data object PostDetailScreen: CommunityRoute("PostDetailScreen")
 }

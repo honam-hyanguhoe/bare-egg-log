@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonColors
@@ -118,13 +119,14 @@ fun AddInfoScreen(
     Surface(
         Modifier
             .fillMaxSize()
-            .imePadding()) {
+            .systemBarsPadding()
+            .imePadding()
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(color = NaturalWhite)
         ) {
-            Spacer(modifier = Modifier.padding(10.widthPercent(LocalContext.current).dp))
             BasicHeader(
                 title = "추가정보 입력",
                 hasTitle = true,
@@ -180,20 +182,20 @@ fun AddInfoScreen(
                     focusManager = focusManager,
                     placeholder = "사번 입력",
                 )
-            }
-            Spacer(modifier = Modifier.height(40.heightPercent(LocalContext.current).dp))
-            Column(Modifier.fillMaxWidth(), Arrangement.Center, Alignment.CenterHorizontally) {
-                BigButton(
-                    colors = ButtonColors(
-                        containerColor = Warning300,
-                        contentColor = NaturalWhite,
-                        disabledContainerColor = Gray300,
-                        disabledContentColor = NaturalWhite
-                    ),
-                    enabled = empNo.isNotEmpty() && hospital != null && name.isNotEmpty(),
-                    onClick = onClickJoin
-                ) {
-                    Text(text = "회원가입 완료하기", style = Typography.bodyMedium, color = NaturalWhite)
+                Spacer(modifier = Modifier.height(40.heightPercent(LocalContext.current).dp))
+                Column(Modifier.fillMaxWidth(), Arrangement.Center, Alignment.CenterHorizontally) {
+                    BigButton(
+                        colors = ButtonColors(
+                            containerColor = Warning300,
+                            contentColor = NaturalWhite,
+                            disabledContainerColor = Gray300,
+                            disabledContentColor = NaturalWhite
+                        ),
+                        enabled = empNo.isNotEmpty() && hospital != null && name.isNotEmpty(),
+                        onClick = onClickJoin
+                    ) {
+                        Text(text = "회원가입 완료하기", style = Typography.bodyMedium, color = NaturalWhite)
+                    }
                 }
             }
         }

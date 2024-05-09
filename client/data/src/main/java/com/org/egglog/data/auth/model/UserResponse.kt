@@ -1,6 +1,7 @@
 package com.org.egglog.data.auth.model
 
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.org.egglog.data.util.LocalDateTimeSerializer
 import com.org.egglog.domain.auth.model.UserDetail
 import kotlinx.serialization.Contextual
@@ -10,14 +11,14 @@ import java.time.LocalDateTime
 @Entity
 @Serializable
 data class UserResponse(
-    val id: Long,
+    @PrimaryKey val id: Long,
     val email: String,
     val userName: String,
-    @Contextual val selectedHospital: UserHospitalResponse?,
-    @Contextual val hospitalAuth: HospitalAuthResponse?,
     val profileImgUrl: String,
     val userRole: UserRole,
     val userStatus: UserStatus,
+    @Contextual val selectedHospital: UserHospitalResponse?,
+    @Contextual val hospitalAuth: HospitalAuthResponse?,
     val deviceToken: String?,
     val empNo: String?,
     @Serializable(with = LocalDateTimeSerializer::class) val createdAt: LocalDateTime?,

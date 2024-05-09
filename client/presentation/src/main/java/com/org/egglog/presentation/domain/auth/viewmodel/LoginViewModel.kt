@@ -15,7 +15,7 @@ import com.google.firebase.messaging.messaging
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
-import com.org.egglog.domain.auth.model.Refresh
+import com.org.egglog.domain.auth.model.Token
 import com.org.egglog.domain.auth.model.UserFcmTokenParam
 import com.org.egglog.domain.auth.model.UserParam
 import com.org.egglog.domain.auth.usecase.PostLoginUseCase
@@ -134,7 +134,7 @@ class LoginViewModel @Inject constructor(
         launcher.launch(googleSignInClient.signInIntent)
     }
 
-    private fun tokenUtilFunc(type: String, tokens: Refresh?) = intent {
+    private fun tokenUtilFunc(type: String, tokens: Token?) = intent {
         if(tokens?.accessToken?.isNotEmpty() == true && tokens.accessToken.isNotEmpty() && tokens.refreshToken.isNotEmpty()) {
             Log.e("$type > AccessToken : ", tokens.accessToken)
             Log.e("$type > RefreshToken : ", tokens.refreshToken)
@@ -143,6 +143,7 @@ class LoginViewModel @Inject constructor(
                 refreshToken = tokens.refreshToken
             )
             val userDetail = getUserUseCase("Bearer ${tokens.accessToken}").getOrThrow()
+            Log.e("LoginVM", "user: " + userDetail.toString())
             if(userDetail?.selectedHospital == null || userDetail.empNo == null) {
                 setUserStoreUseCase(userDetail)
                 postSideEffect(LoginSideEffect.NavigateToPlusLoginActivity)
@@ -154,7 +155,7 @@ class LoginViewModel @Inject constructor(
                     ""
                 }
                 if(userDetail.deviceToken == null || userDetail.deviceToken != fcmToken) {
-                    val newUser = updateUserFcmTokenUseCase(UserFcmTokenParam(fcmToken)).getOrThrow()
+                    val newUser = updateUserFcmTokenUseCase(tokens.accessToken, UserFcmTokenParam(fcmToken)).getOrThrow()
                     setUserStoreUseCase(newUser)
                 } else setUserStoreUseCase(userDetail)
                 postSideEffect(LoginSideEffect.NavigateToMainActivity)

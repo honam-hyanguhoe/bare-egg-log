@@ -7,10 +7,13 @@ import com.google.firebase.Firebase
 import com.google.firebase.messaging.messaging
 import com.org.egglog.domain.auth.model.AddUserParam
 import com.org.egglog.domain.auth.model.HospitalParam
+import com.org.egglog.domain.auth.model.UserDetail
 import com.org.egglog.domain.auth.model.UserHospital
 import com.org.egglog.domain.auth.usecase.DeleteTokenUseCase
 import com.org.egglog.domain.auth.usecase.DeleteUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.GetAllHospitalUseCase
+import com.org.egglog.domain.auth.usecase.GetTokenUseCase
+import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.PostLogoutUseCase
 import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.UpdateUserJoinUseCase
@@ -33,7 +36,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingViewModel @Inject constructor(
-    private val postLogoutUseCase: PostLogoutUseCase
+    private val getTokenUseCase: GetTokenUseCase,
+    private val postLogoutUseCase: PostLogoutUseCase,
+    private val deleteTokenUseCase: DeleteTokenUseCase,
+    private val deleteUserStoreUseCase: DeleteUserStoreUseCase,
+    private val getUserStoreUseCase: GetUserStoreUseCase
 ): ViewModel(), ContainerHost<SettingState, SettingSideEffect>{
     override val container: Container<SettingState, SettingSideEffect> = container(
         initialState = SettingState(),
@@ -46,21 +53,23 @@ class SettingViewModel @Inject constructor(
         }
     )
 
-    @OptIn(OrbitExperimental::class)
-    fun onNameChange(name: String) = blockingIntent {
-        reduce {
-            state.copy(name = name)
-        }
+    fun onClickLogout() = intent {
+        val tokens = getTokenUseCase()
+        postLogoutUseCase(tokens.first ?: "")
+        deleteTokenUseCase()
+        deleteUserStoreUseCase()
+        postSideEffect(SettingSideEffect.NavigateToLoginActivity)
     }
 }
 
 
 @Immutable
 data class SettingState(
-    val name: String = "",
+    val user: UserDetail? = null,
 )
 
 sealed interface SettingSideEffect {
     class Toast(val message: String): SettingSideEffect
     data object NavigateToMainActivity: SettingSideEffect
+    data object NavigateToLoginActivity: SettingSideEffect
 }
