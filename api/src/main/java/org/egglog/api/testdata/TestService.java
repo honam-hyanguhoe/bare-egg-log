@@ -2,9 +2,7 @@ package org.egglog.api.testdata;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.egglog.api.security.model.dto.request.LoginRequest;
 import org.egglog.api.security.model.dto.response.TokenResponse;
-import org.egglog.api.security.model.service.AuthService;
 import org.egglog.api.security.model.service.TokenService;
 import org.egglog.api.testdata.dto.request.TestLoginRequest;
 import org.egglog.api.user.exception.UserErrorCode;
@@ -51,6 +49,13 @@ public class TestService {
     private final WorkService workService;
     private final WorkTypeService workTypeService;
     private final TokenService tokenService;
+
+    public void testDeleteUser(User user){
+
+    }
+
+
+
     public TokenResponse testLogin(TestLoginRequest request, AuthProvider provider){
         log.debug(" ==== ==== ==== [test login 서비스 실행] ==== ==== ====");
         //회원 가입 일 경우

@@ -227,11 +227,15 @@ private fun PostListScreen(
                         postData.isCommented
                     )
 
-                    PostCard(
-                        profile = profile,
-                        postInfo = postInfo,
-                        postReaction = postReaction,
-                        onClick = { postId -> onClickPost(postId) })
+                    Column {
+                        PostCard(
+                            profile = profile,
+                            postInfo = postInfo,
+                            postReaction = postReaction,
+                            onClick = { postId -> onClickPost(postId) })
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
+
                 }
             } else {
                 item {
