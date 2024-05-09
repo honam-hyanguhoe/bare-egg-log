@@ -11,11 +11,7 @@ import com.org.egglog.presentation.domain.auth.activity.LoginActivity
 import com.org.egglog.presentation.domain.auth.activity.PlusLoginActivity
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
-import okhttp3.MediaType
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.Protocol
 import okhttp3.Response
-import okhttp3.ResponseBody
 import javax.inject.Inject
 
 class RefreshTokenInterceptor @Inject constructor(
@@ -43,17 +39,9 @@ class RefreshTokenInterceptor @Inject constructor(
             runBlocking { tokenDataStore.clear() }
             runBlocking { userDataStore.clear() }
             startLoginActivity()
-            return response.newBuilder()
-                .code(200)
-                .message("")
-                .build()
         } else if(response.code == 418) {
             runBlocking { userDataStore.clear() }
             startPlusLoginActivity()
-            return response.newBuilder()
-                .code(200)
-                .message("")
-                .build()
         }
         return response
     }
