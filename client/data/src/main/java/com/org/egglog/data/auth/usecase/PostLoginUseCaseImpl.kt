@@ -11,8 +11,7 @@ import javax.inject.Inject
 class PostLoginUseCaseImpl @Inject constructor(
     private val userService: UserService
 ): PostLoginUseCase {
-    override suspend fun invoke(provider: String, userParam: UserParam): Result<Token?> = kotlin.runCatching {
-        val requestBody = UserRequest(userParam.name, userParam.email, userParam.profileImgUrl).toRequestBody()
-        userService.login(provider, requestBody).dataBody?.toDomainModel()
+    override suspend fun invoke(provider: String, authToken: String): Result<Token?> = kotlin.runCatching {
+        userService.login(authToken, provider).dataBody?.toDomainModel()
     }
 }
