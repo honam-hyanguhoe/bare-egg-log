@@ -1,9 +1,7 @@
 package org.egglog.api.security.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.egglog.api.security.model.dto.request.LoginRequest;
 import org.egglog.api.security.model.service.AuthService;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.model.entity.enums.AuthProvider;
