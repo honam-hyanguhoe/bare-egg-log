@@ -1,8 +1,8 @@
 package com.org.egglog.domain.main.usecase
 
+import com.org.egglog.domain.main.model.RemainDuty
+
 interface CountRemainingDutyUseCase {
-    suspend operator fun invoke (
-        date : String, // 오늘(YYYY-MM-DD)
-        dateType : String  // WEEK, MONTH
-    )
+
+    suspend operator fun invoke(accessToken: String, today: String, dateType: String) : Result<List<RemainDuty>>
 }
