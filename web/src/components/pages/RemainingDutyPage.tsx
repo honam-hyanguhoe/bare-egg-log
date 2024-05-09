@@ -17,29 +17,36 @@ interface TreeNode {
   children?: TreeNode[];
 }
 
-const RemainingDutyPage = () => {
-  const initialData: TreeNode = {
-    name: "duty",
-    colname: "duty-column",
-    color: "white",
-    remain: 0,
-    children: [
-      { name: "Day", value: 3, color: "#18C5B5" },
-      { name: "Eve", value: 2, color: "#F4D567" },
-      { name: "Night", value: 1, color: "#485E88" },
-      { name: "Off", value: 4, color: "#9B8AFB" },
-    ],
-  };
+// TreeNode 데이터에 대한 초기 상태 설정
+const initialData: TreeNode = {
+  name: "duty",
+  colname: "duty-column",
+  color: "white",
+  remain: 0,
+  children: [
+    { name: "Day", value: 3, color: "#18C5B5" },
+    { name: "Eve", value: 2, color: "#F4D567" },
+    { name: "Night", value: 1, color: "#485E88" },
+    { name: "Off", value: 4, color: "#9B8AFB" },
+  ],
+};
 
+const RemainingDutyPage = () => {
   const [duty, setDuty] = useState<TreeNode>(initialData);
 
   useEffect(() => {
-    window.receiveDataFromApp = (data: string) => {
+    const receiveDataFromApp = (data: string) => {
       console.log("Data received: " + data);
-      const tempData: TreeNode[] = JSON.parse(data);
-      updateData(tempData);
+      try {
+        const tempData: TreeNode[] = JSON.parse(data);
+        updateData(tempData);
+      } catch (error) {
+        console.error("Error parsing JSON data:", error);
+      }
       return `Window updated with: ${data}`;
     };
+
+    window.receiveDataFromApp = receiveDataFromApp;
 
     return () => {
       delete (window as any).receiveDataFromApp;
@@ -47,7 +54,6 @@ const RemainingDutyPage = () => {
   }, []);
 
   const updateData = (newChildren: TreeNode[]) => {
-    console.log("Updating duty with new children:", newChildren);
     setDuty((prevData) => ({
       ...prevData,
       children: newChildren,
@@ -56,7 +62,7 @@ const RemainingDutyPage = () => {
 
   return (
     <GraphContainer>
-      <GraphTitle>호남 들어왔니 {JSON.stringify(duty)}</GraphTitle>
+      <GraphTitle>{JSON.stringify(duty)}</GraphTitle>
       <RemainingDutyGraph data={duty} />
     </GraphContainer>
   );
