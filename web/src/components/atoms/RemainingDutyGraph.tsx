@@ -35,7 +35,7 @@ const RemainingDutyGraph = ({ data }: RemainingDutyGraphProps) => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [data]);
 
   useEffect(() => {
     console.log(`잔여 duty ${JSON.stringify(data)}`);

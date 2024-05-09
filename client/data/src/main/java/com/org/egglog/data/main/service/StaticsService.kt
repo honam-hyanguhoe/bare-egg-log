@@ -29,5 +29,4 @@ interface StaticsService {
         @Query("today") today: String,
         @Query("month") month: String,
     ) : CommonResponse<MonthlyStatsResponse>
-
 }

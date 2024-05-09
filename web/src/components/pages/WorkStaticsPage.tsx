@@ -113,15 +113,9 @@ const WorkStaticsPage = () => {
   // }, []);
 
   // webView (web -> App)
-  const showAndroidToast = () => {
-    window.AndroidBridge.showToast("안녕 호남향우회");
-  };
-
-  useEffect(() => {
-    window.addEventListener("AndroidBridge", async (event) => {
-      console.log(event);
-    });
-  }, []);
+  // const showAndroidToast = () => {
+  //   window.AndroidBridge.showToast("안녕 호남향우회");
+  // };
 
   return (
     <GraphContainer>
@@ -155,8 +149,8 @@ export default WorkStaticsPage;
 const GraphContainer = styled.div`
   background-color: #f2f4f7;
   min-height: 100vh;
-  padding-top: 5px;
-  padding-left: 5px;
+  padding-top: 20x;
+  padding-left: 20px;
   // padding: 40px;
 `;
 const GraphTitle = styled.p`
