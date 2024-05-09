@@ -28,13 +28,19 @@ class WorkViewModel @Inject constructor(
 
     val dataSource = WeeklyDataSource()
     init {
-        getInitalData(LocalDate.now())
+//        getInitalData(LocalDate.now())
+        val initStart =  dataSource.getStartOfWeek(LocalDate.now()).atStartOfDay().minusDays(0).toLocalDate().toString()
+        val initEnd = dataSource.getStartOfWeek(LocalDate.now()).atStartOfDay().plusDays(6).toLocalDate().toString()
+
+        Log.d("weekly", "$initStart ---- $initEnd")
+        loadWork(initStart, initEnd)
     }
 
     private fun loadWork(start : String, end: String) = intent {
-        Log.d("weekly", "근무 일정 초기화")
+
         val tokens = getTokenUseCase()
         val user = getUserStoreUseCase()
+//        Log.d("weekly", "근무 일정 초기화 ${tokens.first}")
 
         val response = getWeeklyWorkUseCase(
             accessToken =  "Bearer ${tokens.first}",
@@ -68,6 +74,9 @@ class WorkViewModel @Inject constructor(
             list
         }
     }
+
+
+
 
     fun getInitalData(localDate: LocalDate) = intent {
         val finalStartDate = dataSource.getStartOfWeek(localDate).minusDays(1)

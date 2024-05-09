@@ -117,6 +117,12 @@ const WorkStaticsPage = () => {
     window.AndroidBridge.showToast("안녕 호남향우회");
   };
 
+  useEffect(() => {
+    window.addEventListener("AndroidBridge", async (event) => {
+      console.log(event);
+    });
+  }, []);
+
   return (
     <GraphContainer>
       {/* <button onClick={() => showAndroidToast}>앱에 있는 알람으로 띄워줘.</button> */}
