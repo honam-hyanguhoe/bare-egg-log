@@ -11,6 +11,12 @@ interface TreeNode {
   color?: string;
 }
 
+declare global {
+  interface Window {
+    receiveDataFromApp: (data: string) => string;
+  }
+}
+
 const remainingDuty = [
   { name: "Day", value: 3, color: "#18C5B5" },
   { name: "Eve", value: 2, color: "#F4D567" },
@@ -42,11 +48,11 @@ const RemainingDutyPage = () => {
       let updatedData = parseData(data);
 
       setData(updatedData);
-      return `윈도우로 변경 test : ${data}`;
+      return `윈도우로 변경 test : ${updatedData}`;
     };
 
     return () => {
-      delete window.receiveDataFromApp;
+      delete (window as any).receiveDataFromApp;
     };
   }, []);
 
@@ -60,7 +66,7 @@ const RemainingDutyPage = () => {
 
   return (
     <GraphContainer>
-      {/* <GraphTitle>제 근무는 언제 끝나죠?</GraphTitle> */}
+      <GraphTitle>호남 들어왔니 {JSON.stringify(data)}</GraphTitle>
       <RemainingDutyGraph data={data} />
     </GraphContainer>
   );
