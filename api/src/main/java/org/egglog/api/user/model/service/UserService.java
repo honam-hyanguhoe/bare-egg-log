@@ -128,7 +128,10 @@ public class UserService {
     @Transactional
     public UserResponse updateUserInfo(User loginUser, UpdateUserRequest request){
         log.debug(" ==== ==== ==== [ 유저 회원 정보 수정 서비스 실행] ==== ==== ====");
-        User updateUser = userJpaRepository.save(loginUser.updateInfo(request.getUserName(), request.getProfileImgUrl()));
+        Hospital selectHospital = hospitalJpaRepository.findById(request.getSelectHospitalId())
+                .orElseThrow(() -> new HospitalException(HospitalErrorCode.NOT_FOUND));
+        User updateUser = userJpaRepository
+                .save(loginUser.updateInfo(request.getUserName(), request.getProfileImgUrl(), selectHospital, request.getEmpNo()));
         Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(updateUser, updateUser.getSelectedHospital());
 
         if (hospitalAuth.isPresent()){
@@ -149,27 +152,6 @@ public class UserService {
         log.debug(" ==== ==== ==== [ 유저 FCM 수정 서비스 실행] ==== ==== ====");
         User updateUser = userJpaRepository.save(loginUser.updateFcmToken(request.getFcmToken()));
         Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(updateUser, updateUser.getSelectedHospital());
-        if (hospitalAuth.isPresent()){
-            return updateUser.toResponse(hospitalAuth.get());
-        }
-        return updateUser.toResponse();
-    }
-
-    /**
-     * 유저 병원 정보 업데이트
-     * @param loginUser 로그인 유저
-     * @param request 유저이름, 유저 프로필 이미지 주소
-     * @return 정보가 변경된 로그인 정보
-     * @author 김형민
-     */
-    @Transactional
-    public UserResponse updateUserHospital(User loginUser, UpdateUserHospitalRequest request){
-        log.debug(" ==== ==== ==== [ 유저 선택 병원 수정 서비스 실행] ==== ==== ====");
-        Hospital selectHospital = hospitalJpaRepository.findById(request.getHospitalId())
-                .orElseThrow(() -> new HospitalException(HospitalErrorCode.NOT_FOUND));
-        //유저 병원 업데이트
-        User updateUser = userJpaRepository.save(loginUser.updateHospital(selectHospital, request.getEmpNo()));
-        Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(updateUser, selectHospital);
         if (hospitalAuth.isPresent()){
             return updateUser.toResponse(hospitalAuth.get());
         }

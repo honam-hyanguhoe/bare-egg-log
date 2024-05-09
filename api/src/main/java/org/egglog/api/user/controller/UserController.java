@@ -97,21 +97,6 @@ public class UserController {
                 MessageUtils.success(userService.updateUserInfo(loginUser, request)));
     }
 
-    /**
-     * 유저 병원 정보 변경
-     * @param loginUser JWT 토큰
-     * @param request 변경할 병원 ID, 사번
-     * @return 변경된 유저 ID, 이메일, 이름, 선택된 병원, 선택된 병원에 대한 인증 정보(없다면 null), 프로필이미지, 유저권한, 유저 상태, 활성 디바이스토큰, 사번, 생성일, 마지막 수정일, 마지막 로그인일
-     * @author 김형민
-     */
-    @PatchMapping("/hospital/info-modify")
-    public ResponseEntity<MessageUtils> modifyHospitalUserInfo(
-            @AuthenticationPrincipal User loginUser,
-            @RequestBody @Valid UpdateUserHospitalRequest request
-    ){
-        return ResponseEntity.ok().body(
-                MessageUtils.success(userService.updateUserHospital(loginUser, request)));
-    }
 
     /**
      * 유저 탈퇴
