@@ -101,6 +101,7 @@ fun PostDetailScreen(
         onChangeComment = viewModel::onChangeComment,
         onClickRecomment = viewModel::onClickRecomment,
         onClickSend = viewModel::onClickSend,
+        onClickLike = viewModel::onClickLike
     )
 }
 
@@ -119,7 +120,8 @@ private fun PostDetailScreen(
     onDeleteComment: (Long) -> Unit,
     onChangeComment: (String) -> Unit,
     onClickRecomment: (Long) -> Unit,
-    onClickSend: () -> Unit
+    onClickSend: () -> Unit,
+    onClickLike: () -> Unit
 ) {
 
 
@@ -178,6 +180,7 @@ private fun PostDetailScreen(
                             postDetailInfo.boardId,
                             postDetailInfo.boardTitle,
                             postDetailInfo.boardContent,
+                            postDetailInfo.boardCreatedAt,
                             postDetailInfo.pictureOne
                         )
                         val postReaction = PostReactionInfo(
@@ -192,7 +195,8 @@ private fun PostDetailScreen(
                             PostCard(
                                 profile = profile,
                                 postInfo = postInfo,
-                                postReaction = postReaction
+                                postReaction = postReaction,
+                                onClickLike = onClickLike
                             )
                         }
                     }

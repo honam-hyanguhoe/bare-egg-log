@@ -1,5 +1,6 @@
 package com.org.egglog.data.community.service
 
+import com.google.android.gms.common.internal.service.Common
 import com.org.egglog.data.community.model.CommentResponse
 import com.org.egglog.data.community.model.CommunityGroupResponse
 import com.org.egglog.data.community.model.HotPostResponse
@@ -73,6 +74,20 @@ interface CommunityService {
     suspend fun createComment(
         @Header("Authorization") accessToken: String,
         @Body requestBody: RequestBody
+    ): CommonResponse<String>
+
+    @POST("boards/like")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun createLike(
+        @Header("Authorization") accessToken: String,
+        @Body requestBody: RequestBody
+    ): CommonResponse<String>
+
+    @DELETE("boards/unlike/{boardId}")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun deleteLike(
+        @Header("Authorization") accessToken: String,
+        @Path("boardId") boardId: Int
     ): CommonResponse<String>
 
 }

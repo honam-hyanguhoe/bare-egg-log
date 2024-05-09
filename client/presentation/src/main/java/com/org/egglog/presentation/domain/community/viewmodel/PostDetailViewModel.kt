@@ -8,7 +8,9 @@ import com.org.egglog.client.data.toUiModel
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.auth.usecase.GetUserUseCase
 import com.org.egglog.domain.community.usecase.CreateCommentUseCase
+import com.org.egglog.domain.community.usecase.CreateLikeUseCase
 import com.org.egglog.domain.community.usecase.DeleteCommentUseCase
+import com.org.egglog.domain.community.usecase.DeleteLikeUseCase
 import com.org.egglog.domain.community.usecase.DeletePostUseCase
 import com.org.egglog.domain.community.usecase.GetCommentListUseCase
 import com.org.egglog.domain.community.usecase.GetPostDetailUseCase
@@ -36,7 +38,9 @@ class PostDetailViewModel @Inject constructor(
     private val deletePostUseCase: DeletePostUseCase,
     private val getCommentListUseCase: GetCommentListUseCase,
     private val deleteCommentUseCase: DeleteCommentUseCase,
-    private val createCommentUseCase: CreateCommentUseCase
+    private val createCommentUseCase: CreateCommentUseCase,
+    private val createLikeUseCase: CreateLikeUseCase,
+    private val deleteLikeUseCase: DeleteLikeUseCase
 ): ViewModel(), ContainerHost<PostDetailState, PostDetailSideEffect> {
 
     private val postId: Int = savedStateHandle.get<Int>("postId") ?: throw IllegalArgumentException("postId is required")
@@ -55,6 +59,7 @@ class PostDetailViewModel @Inject constructor(
         load()
     }
 
+    // 초기 렌더링
     private fun load() = intent {
          accessToken = getTokenUseCase().first!!
 
@@ -65,6 +70,7 @@ class PostDetailViewModel @Inject constructor(
             it!!.toUiModel()
         }.getOrThrow()
 
+        Log.e("PostDetailViewModel", "commentList는 ${getCommentListUseCase("Bearer ${accessToken}", postId)}")
         val commentList = getCommentListUseCase("Bearer ${accessToken}", postId).map {
             it?.map {
                it.toUiModel()
@@ -81,6 +87,7 @@ class PostDetailViewModel @Inject constructor(
         }
     }
 
+    // 게시글 삭제 시
     fun onDeletePost() = intent {
 
         if(deletePostUseCase("Bearer ${accessToken}", postId).isSuccess) {
@@ -91,6 +98,7 @@ class PostDetailViewModel @Inject constructor(
         }
     }
 
+    // 댓글 삭제 시
     fun onDeleteComment(commentId: Long) = intent {
         val result = deleteCommentUseCase("Bearer ${accessToken}", commentId)
 
@@ -103,7 +111,8 @@ class PostDetailViewModel @Inject constructor(
             }.getOrThrow()
             reduce {
                 state.copy (
-                    commentList = newCommentList
+                    commentList = newCommentList,
+                    postDetailInfo = state.postDetailInfo!!.copy(commentCount = state.postDetailInfo!!.commentCount - 1)
                 )
             }
             postSideEffect(PostDetailSideEffect.Toast("댓글이 삭제되었습니다"))
@@ -112,6 +121,7 @@ class PostDetailViewModel @Inject constructor(
         }
     }
 
+    // 댓글 내용 작성시
     @OptIn(OrbitExperimental::class)
     fun onChangeComment(value: String) = blockingIntent {
         reduce {
@@ -121,6 +131,7 @@ class PostDetailViewModel @Inject constructor(
         }
     }
 
+    // 댓글 작성 버튼 클릭시
     fun onClickSend() = intent {
 
         val result = createCommentUseCase("Bearer ${accessToken}", postId, state.comment, state.parentId, "익명의 완숙란")
@@ -148,12 +159,47 @@ class PostDetailViewModel @Inject constructor(
 
     }
 
+    // 답댓달기 클릭시
     fun onClickRecomment(parentId: Long) = intent {
-        Log.e("PostDetailViewModel", "${parentId}번 댓글에 답댓 달고 싶어요")
         reduce {
             state.copy (
                 parentId = parentId
             )
+        }
+    }
+
+    // 좋아요 클릭시
+    fun onClickLike() = intent {
+        Log.e("PostDetailViewModel", "${postId}번 게시글 좋아요 처리 합니다")
+        if (state.postDetailInfo?.isLiked == true) {
+            Log.e("PostDetailViewModel", "${postId}번 게시글 좋아요 삭제 처리 합니다")
+            // 좋아요가 눌러져 있다면, 좋아요 삭제
+            val response: Result<Boolean> = deleteLikeUseCase("Bearer ${accessToken}", postId)
+            // 요청이 성공 했다면 state의 isLiked 값 false로 변경
+            if(response.isSuccess) {
+                reduce {
+                    state.copy (
+                        postDetailInfo = state.postDetailInfo!!.copy(isLiked = false, boardLikeCount = state.postDetailInfo!!.boardLikeCount - 1)
+                    )
+                }
+            } else {
+                postSideEffect(PostDetailSideEffect.Toast("좋아요 처리 실패"))
+            }
+
+        } else {
+            Log.e("PostDetailViewModel", "${postId}번 게시글 좋아요 삽입 처리 합니다")
+            // 좋아요가 눌러져 있지 않다면, 좋아요 삽입
+            val response: Result<Boolean> = createLikeUseCase("Bearer ${accessToken}", postId)
+            // 요청이 성공 했다면 state의 isLiked 값 true로 변경
+            if(response.isSuccess) {
+                reduce {
+                    state.copy (
+                        postDetailInfo = state.postDetailInfo!!.copy(isLiked = true, boardLikeCount = state.postDetailInfo!!.boardLikeCount + 1)
+                    )
+                }
+            } else {
+                postSideEffect(PostDetailSideEffect.Toast("좋아요 처리 실패"))
+            }
         }
     }
 
