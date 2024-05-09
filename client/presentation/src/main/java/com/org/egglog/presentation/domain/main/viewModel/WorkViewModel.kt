@@ -26,6 +26,7 @@ class WorkViewModel @Inject constructor(
         initialState = WorkState(),
         buildSettings = {})
 
+    val dataSource = WeeklyDataSource()
     init {
         getInitalData(LocalDate.now())
     }
@@ -36,7 +37,7 @@ class WorkViewModel @Inject constructor(
         val user = getUserStoreUseCase()
 
         val response = getWeeklyWorkUseCase(
-            accessToken = tokens?.first ?: "",
+            accessToken =  "Bearer ${tokens.first}",
             calendarGroupId = user?.workGroupId ?: 0,
             startDate = start,
             endDate = end
@@ -61,16 +62,12 @@ class WorkViewModel @Inject constructor(
         val currentSize = list.size
         val itemsToAdd = requiredSize - currentSize
 
-        // itemsToAdd가 0보다 클 때만 "none"을 추가
         return if (itemsToAdd > 0) {
-            list + List(itemsToAdd) { "none" }  // 기존 리스트에 "none"을 추가한 새 리스트를 생성
+            list + List(itemsToAdd) { "none" }
         } else {
             list
         }
     }
-
-
-    val dataSource = WeeklyDataSource()
 
     fun getInitalData(localDate: LocalDate) = intent {
         val finalStartDate = dataSource.getStartOfWeek(localDate).minusDays(1)

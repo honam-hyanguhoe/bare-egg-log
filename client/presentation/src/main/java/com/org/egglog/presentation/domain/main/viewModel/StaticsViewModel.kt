@@ -22,14 +22,12 @@ class StaticsViewModel @Inject constructor(
         buildSettings = {})
 
     init {
-        Log.d("stats", "근무 통계 데이터 가져올래")
-        getWorkStatsData()
+//        Log.d("stats", "근무 통계 데이터 가져올래")
+//        getWorkStatsData()
     }
 
     fun getRemainData() = intent {
         val tokens = getTokenUseCase()
-
-
     }
 
     fun getWorkStatsData() = intent {
@@ -37,11 +35,10 @@ class StaticsViewModel @Inject constructor(
 
         Log.d("stats", "${state.date} --- ${state.month} ")
         val result = getWorkStatsUseCase(
-            accessToken = tokens.first ?: "",
+            accessToken =  "Bearer ${tokens.first}",
             date = state.date,
             month = state.month
         )
-
         Log.d("stats", "result!!!!!!! $result")
     }
 }
@@ -52,13 +49,3 @@ data class StaticState(
     val dateType: String = "WEEK"  // or "MONTH"
 )
 
-
-//{"dataHeader":
-//    { "successCode":0, "resultCode":"200 OK", "resultMessage":null }
-//
-//
-//    ,"dataBody":
-//    { "month":"2024-05", "weeks":
-//        [{ "week":1, "data":{ "DAY":6, "NIGHT":7, "EVE":7, "OFF":7 } }]
-//    }
-//})

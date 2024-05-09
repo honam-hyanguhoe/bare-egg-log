@@ -78,18 +78,18 @@ private fun MainScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Spacer(modifier = Modifier.height(30.dp))
-        Box(
-            modifier = Modifier
-                .width(340.widthPercent(context).dp)
-                .height(185.heightPercent(context).dp)
-                .border(
-                    1.dp, NaturalBlack,
-                    RoundedCornerShape(15.dp)
-                )
-        ) {
-            Text(text = "으아. 집 갈래요", style = Typography.displayLarge)
-        }
+//        Spacer(modifier = Modifier.height(30.dp))
+//        Box(
+//            modifier = Modifier
+//                .width(340.widthPercent(context).dp)
+//                .height(185.heightPercent(context).dp)
+//                .border(
+//                    1.dp, NaturalBlack,
+//                    RoundedCornerShape(15.dp)
+//                )
+//        ) {
+//            Text(text = "으아. 집 갈래요", style = Typography.displayLarge)
+//        }
         Spacer(modifier = Modifier.height(30.dp))
         DutyCard(
             startDate = startDate,
