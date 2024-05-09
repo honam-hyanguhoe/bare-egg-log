@@ -30,6 +30,7 @@ import com.org.egglog.presentation.component.organisms.calendars.WeeklyCalendar
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyDataSource
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyUiModel
 import com.org.egglog.presentation.component.organisms.webView.ContentWebView
+import com.org.egglog.presentation.domain.main.viewModel.StaticsViewModel
 import com.org.egglog.presentation.domain.main.viewModel.WorkViewModel
 import com.org.egglog.presentation.theme.Gray100
 import com.org.egglog.presentation.theme.NaturalBlack
@@ -43,10 +44,11 @@ import java.time.LocalDate
 
 @Composable
 fun MainScreen(
-    workViewModel: WorkViewModel = hiltViewModel()
+    workViewModel: WorkViewModel = hiltViewModel(),
+    staticsViewModel : StaticsViewModel = hiltViewModel()
 ) {
     val workState = workViewModel.collectAsState().value
-
+    val statsState = staticsViewModel.collectAsState().value
     MainScreen(
         startDate = workState.startDate,
         labels = workState.labels,

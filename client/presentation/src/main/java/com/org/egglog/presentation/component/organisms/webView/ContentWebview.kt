@@ -60,7 +60,10 @@ fun ContentWebView(
                 View.LAYER_TYPE_HARDWARE, null
             )
             webViewClient = WebViewClient()
+
         }
+
+
     }
 
     webView.addJavascriptInterface(AndroidBridge(context, webView), "AndroidBridge")
@@ -68,24 +71,14 @@ fun ContentWebView(
     Card(
         modifier = Modifier
             .fillMaxSize()
-//            .size(
-//                width = width.widthPercent(context).dp,
-//                height = height.heightPercent(context).dp
-//            )
             .background(color = Gray100)
-//            .border(0.5.dp, Color.Black), shape = RoundedCornerShape(20.dp)
 
     ) {
         AndroidView(
             factory = { webView },
             modifier = Modifier
                 .fillMaxSize()
-//                .size(
-//                    width = width.widthPercent(context).dp,
-//                    height = height.heightPercent(context).dp
-//                )
                 .background(color = Gray100),
-//                .border(0.5.dp, Color.Black),
             update = { view ->
                 val url = url
                 if (view.url != url) {
@@ -93,13 +86,6 @@ fun ContentWebView(
                 }
             })
 
-//        Button(onClick = {
-//            webView.evaluateJavascript("receiveDataFromApp('this is honam')") { result ->
-//                Log.d("webview", result)
-//            }
-//        }) {
-//            Text("Click me")
-//        }
 
     }
 

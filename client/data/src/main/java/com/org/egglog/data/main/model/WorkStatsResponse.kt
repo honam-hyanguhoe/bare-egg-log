@@ -7,12 +7,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class WorkStatsResponse(
     val month : String,
-    val weeks: List<WeekStatsDTO>
+//    val weeks: List<WeekStatsDTO>
 )
 
-fun WorkStatsResponse.toDomainModel(): WorkStats {
-    return WorkStats(
-        month = month,
-        weeks = List<WeekStatsDTO>
-    )
-}
