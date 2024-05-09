@@ -36,34 +36,31 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.firebase.annotations.concurrent.Background
+import androidx.paging.PagingData
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.org.egglog.client.data.PostReactionInfo
 import com.org.egglog.client.data.Profile
+import com.org.egglog.domain.community.model.PostData
 import com.org.egglog.presentation.R
-import com.org.egglog.presentation.component.atoms.buttons.FloatingButton
 import com.org.egglog.presentation.component.atoms.cards.BackgroundCard
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.presentation.component.molecules.cards.HotPostCard
 import com.org.egglog.presentation.component.molecules.headers.NoticeHeader
 import com.org.egglog.presentation.component.organisms.postCard.PostCard
 import com.org.egglog.presentation.data.HotPostInfo
-import com.org.egglog.presentation.data.PreviewPostInfo
 import com.org.egglog.presentation.domain.community.posteditor.activity.PostEditorActivity
 import com.org.egglog.presentation.domain.community.viewmodel.PostListSideEffect
 import com.org.egglog.presentation.domain.community.viewmodel.PostListViewModel
 import com.org.egglog.presentation.theme.BlueGray900
-import com.org.egglog.presentation.theme.NaturalBlack
 import com.org.egglog.presentation.theme.NaturalWhite
 import com.org.egglog.presentation.theme.Typography
 import com.org.egglog.presentation.theme.Warning200
-import com.org.egglog.presentation.utils.Close
 import com.org.egglog.presentation.utils.Edit
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
+import kotlinx.coroutines.flow.Flow
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
@@ -84,7 +81,7 @@ fun PostListScreen(
         hospitalId = state.hospitalId,
         groupId = state.groupId,
         categoryList = state.categoryList,
-        postList = state.postList,
+        postListFlow = state.postListFlow,
         hotPostList = state.hotPostList,
         onClickPost = { postId: Int -> onNavigateToDetailScreen(postId) },
         onClickWriteButton = viewModel::onClickWriteButton,
@@ -98,7 +95,7 @@ private fun PostListScreen(
     hospitalId: Int?,
     groupId: Int?,
     categoryList: List<Pair<Int, String>>,
-    postList: List<PreviewPostInfo>,
+    postListFlow: Flow<PagingData<PostData>>,
     hotPostList: List<HotPostInfo>,
     onClickPost: (postId: Int) -> Unit,
     onClickWriteButton: () -> Unit,
@@ -106,8 +103,9 @@ private fun PostListScreen(
     onClickSearch: () -> Unit
 ) {
     val context = LocalContext.current
-
-    var selectedMenuItem by remember { mutableStateOf<String>(categoryList[0].second) }
+    var selectedMenuItem by remember { mutableStateOf(categoryList[0].second) }
+    val list = postListFlow.collectAsLazyPagingItems()
+    val fabInteractionSource = remember { MutableInteractionSource() }
 
     Column(
         Modifier
@@ -200,43 +198,43 @@ private fun PostListScreen(
                 Spacer(modifier = Modifier.height(30.dp))
             }
 
-            if(postList.isNotEmpty()) {
+            if(list.itemCount != 0) {
                 items(
-                    count = postList.size,
-                    key = { index -> postList[index].boardId }
+                    count = list.itemCount,
+                    key = { index -> list[index]?.boardId ?: "UniqueKey_$index" }
                 ) { index ->
-                    val postData = postList[index]
-                    val profile = Profile(
-                        postData.userId,
-                        postData.tempNickname ?: "익명의 구운란",
-                        postData.hospitalName,
-                        postData.isHospitalAuth
-                    )
-                    val postInfo = com.org.egglog.client.data.PostInfo(
-                        postData.boardId,
-                        postData.boardTitle,
-                        postData.boardContent,
-                        postData.boardCreatedAt,
-                        postData.pictureOne
-                    )
-                    val postReaction = PostReactionInfo(
-                        postData.boardId,
-                        postData.likeCount,
-                        postData.commentCount,
-                        postData.viewCount,
-                        postData.isLiked,
-                        postData.isCommented
-                    )
+                    list[index]?.run {
+                        val profile = Profile(
+                            this.userId,
+                            this.tempNickname ?: "익명의 구운란",
+                            this.hospitalName,
+                            this.isHospitalAuth
+                        )
+                        val postInfo = com.org.egglog.client.data.PostInfo(
+                            this.boardId,
+                            this.boardTitle,
+                            this.boardContent,
+                            this.boardCreatedAt,
+                            this.pictureOne
+                        )
+                        val postReaction = PostReactionInfo(
+                            this.boardId,
+                            this.likeCount,
+                            this.commentCount,
+                            this.viewCount,
+                            this.isLiked,
+                            this.isCommented
+                        )
 
-                    Column {
-                        PostCard(
-                            profile = profile,
-                            postInfo = postInfo,
-                            postReaction = postReaction,
-                            onClick = { postId -> onClickPost(postId) })
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Column {
+                            PostCard(
+                                profile = profile,
+                                postInfo = postInfo,
+                                postReaction = postReaction,
+                                onClick = { postId -> onClickPost(postId) })
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }
                     }
-
                 }
             } else {
                 item {
@@ -253,7 +251,6 @@ private fun PostListScreen(
 
     }
 
-    val fabInteractionSource = remember { MutableInteractionSource() }
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(horizontal = 10.dp, vertical = 10.dp),

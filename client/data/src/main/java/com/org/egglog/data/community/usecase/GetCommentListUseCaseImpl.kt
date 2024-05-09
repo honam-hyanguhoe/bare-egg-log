@@ -11,8 +11,6 @@ class GetCommentListUseCaseImpl @Inject constructor(
     private val communityService: CommunityService
 ): GetCommentListUseCase {
     override suspend fun invoke(accessToken: String, postId: Int): Result<List<CommentData>?> = kotlin.runCatching {
-        Log.e("CommentListUseCaseImpl", "댓글 리스트 조회하러 왔어요")
-        Log.e("CommentListUseCaseImpl", "댓글 리스트는 ${communityService.getCommentList(accessToken, postId).dataBody?.map {it!!.toDomainModel()}}")
         communityService.getCommentList(accessToken, postId).dataBody?.map {it!!.toDomainModel()}
     }
 }

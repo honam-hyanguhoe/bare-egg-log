@@ -1,6 +1,5 @@
 package com.org.egglog.presentation.domain.community.screen
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,27 +10,28 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.PagingData
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.org.egglog.client.data.PostReactionInfo
 import com.org.egglog.client.data.Profile
+import com.org.egglog.domain.community.model.PostData
 import com.org.egglog.presentation.component.atoms.cards.ResultCard
 import com.org.egglog.presentation.component.molecules.headers.SearchHeader
 import com.org.egglog.presentation.component.organisms.postCard.PostCard
-import com.org.egglog.presentation.data.PreviewPostInfo
 import com.org.egglog.presentation.domain.community.viewmodel.PostListViewModel
-import com.org.egglog.presentation.theme.ClientTheme
 import com.org.egglog.presentation.theme.NaturalWhite
 import com.org.egglog.presentation.utils.MessageUtil
 import com.org.egglog.presentation.utils.heightPercent
-import com.org.egglog.presentation.utils.widthPercent
+import kotlinx.coroutines.flow.Flow
 import org.orbitmvi.orbit.compose.collectAsState
 
 @Composable
 fun PostSearchScreen(
     viewModel: PostListViewModel = hiltViewModel(),
-    onNavigateToPostListScreen: () -> Unit
+    onNavigateToPostListScreen: () -> Unit,
+    onNavigateToDetailScreen: (postId: Int) -> Unit
 ) {
     val state = viewModel.collectAsState().value
 
@@ -40,21 +40,23 @@ fun PostSearchScreen(
         searchWord = state.searchWord,
         onChangeSearchWord = viewModel::onSearchChange,
         onClickDone = viewModel::onClickDone,
-        searchList = state.searchList,
-        onClickPost = {}
+        searchListFlow = state.searchListFlow,
+        onClickPost = { postId: Int -> onNavigateToDetailScreen(postId) }
     )
 }
 
 @Composable
-private fun PostSearchScreen (
+private fun PostSearchScreen(
     onNavigateToPostListScreen: () -> Unit,
     searchWord: String?,
     onChangeSearchWord: (String) -> Unit,
     onClickDone: () -> Unit,
-    searchList: List<PreviewPostInfo>,
-    onClickPost: () -> Unit
+    searchListFlow: Flow<PagingData<PostData>>,
+    onClickPost: (postId: Int) -> Unit
 ) {
     val context = LocalContext.current
+    val list = searchListFlow.collectAsLazyPagingItems()
+
     Column(
         Modifier
             .fillMaxSize()
@@ -72,51 +74,53 @@ private fun PostSearchScreen (
         )
 
         LazyColumn(Modifier.padding(start = 20.dp, top = 20.dp, end = 20.dp)) {
-            if(searchList.isEmpty()) {
+            if (list.itemCount == 0) {
                 item {
                     Column {
                         Spacer(modifier = Modifier.height(20.dp))
                         ResultCard(message = MessageUtil.NO_SEARCH_RESULT)
                     }
-
                 }
             } else {
                 items(
-                    count = searchList.size,
-                    key = {index -> searchList[index].boardId}
-                ) {
-                        index ->
-                    val postData = searchList[index]
-                    val profile = Profile(
-                        postData.userId,
-                        postData.tempNickname ?: "익명의 구운란",
-                        postData.hospitalName,
-                        postData.isHospitalAuth
-                    )
-                    val postInfo = com.org.egglog.client.data.PostInfo(
-                        postData.boardId,
-                        postData.boardTitle,
-                        postData.boardContent,
-                        postData.boardCreatedAt,
-                        postData.pictureOne
-                    )
-                    val postReaction = PostReactionInfo(
-                        postData.boardId,
-                        postData.likeCount,
-                        postData.commentCount,
-                        postData.viewCount,
-                        postData.isLiked,
-                        postData.isCommented
-                    )
+                    count = list.itemCount,
+                    key = { index -> list[index]?.boardId ?: "UniqueKey_$index" }
+                ) { index ->
+                    list[index]?.run {
+                        val profile = Profile(
+                            this.userId,
+                            this.tempNickname ?: "익명의 구운란",
+                            this.hospitalName,
+                            this.isHospitalAuth
+                        )
+                        val postInfo = com.org.egglog.client.data.PostInfo(
+                            this.boardId,
+                            this.boardTitle,
+                            this.boardContent,
+                            this.boardCreatedAt,
+                            this.pictureOne
+                        )
+                        val postReaction = PostReactionInfo(
+                            this.boardId,
+                            this.likeCount,
+                            this.commentCount,
+                            this.viewCount,
+                            this.isLiked,
+                            this.isCommented
+                        )
 
-                    PostCard(
-                        profile = profile,
-                        postInfo = postInfo,
-                        postReaction = postReaction,
-                    )
+                        Column {
+                            PostCard(
+                                profile = profile,
+                                postInfo = postInfo,
+                                postReaction = postReaction,
+                                onClick = { postId -> onClickPost(postId) })
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }
+                    }
                 }
+
             }
         }
-
     }
 }

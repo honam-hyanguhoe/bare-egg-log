@@ -42,7 +42,6 @@ import com.org.egglog.presentation.component.molecules.cards.CommentCard
 import com.org.egglog.presentation.component.molecules.headers.BasicHeader
 import com.org.egglog.presentation.component.organisms.postCard.PostCard
 import com.org.egglog.presentation.data.PostDetailInfo
-import com.org.egglog.presentation.data.PreviewPostInfo
 import com.org.egglog.presentation.domain.community.activity.CommunityActivity
 import com.org.egglog.presentation.domain.community.viewmodel.PostDetailSideEffect
 import com.org.egglog.presentation.domain.community.viewmodel.PostDetailViewModel
@@ -257,7 +256,6 @@ private fun PostDetailScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            Log.e("PostDetailScreen", "parentId는 ${parentId}")
             SingleInput(
                 modifier = Modifier.fillMaxWidth(0.8f),
                 text = commentValue,
