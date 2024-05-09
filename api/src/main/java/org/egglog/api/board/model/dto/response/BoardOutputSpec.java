@@ -33,26 +33,26 @@ public class BoardOutputSpec {
 
     private Long groupId;           // 그룹 id
 
-    private Long userId;            // 유저 id
+    private Long hospitalId;        //병원 id
+
+    private Long userId;            // 작성자 id
 
     private String tempNickname;       // 익명 닉네임
 
-    private String profileImgUrl;   // 유저 프로필 사진
+    private String profileImgUrl;   // 작성자 프로필 사진
 
-    private Long commentCount;      // 댓글 개수
+    private long commentCount;      // 댓글 개수
 
-    private Long viewCount;     //조회수
+    private long viewCount;     //조회수
 
-    private Long boardLikeCount;    // 좋아요 수
+    private long boardLikeCount;    // 좋아요 수
 
-    private String hospitalName;    // 사용자 병원명
+    private String hospitalName;    // 작성자 병원명
 
     private Boolean isLiked;        // 좋아요 여부
 
     private Boolean isCommented;        // 댓글 여부
 
     private Boolean isHospitalAuth;     // 인증 여부
-
-//    private List<CommentListOutputSpec> comments;    //댓글
 
 }
