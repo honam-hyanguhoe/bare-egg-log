@@ -34,6 +34,7 @@ import java.util.Map;
 @Setter
 @Builder
 public class CreateWorkRequest {
+    @NotNull(message = "workDate 는 필수 입니다.")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate workDate;
 

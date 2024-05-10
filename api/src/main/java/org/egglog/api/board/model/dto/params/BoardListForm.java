@@ -2,6 +2,7 @@ package org.egglog.api.board.model.dto.params;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -18,6 +19,7 @@ public class BoardListForm {
 
     private String searchWord;  //검색어
 
-    private Long offset;
+    @NotNull(message = "offset은 필수 입니다.")
+    private Long offset; //필수
 
 }

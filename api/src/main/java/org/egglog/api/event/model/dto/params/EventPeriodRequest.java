@@ -2,6 +2,8 @@ package org.egglog.api.event.model.dto.params;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -28,13 +30,19 @@ import java.time.LocalDateTime;
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class EventPeriodRequest {
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime startDate;
+    @NotNull(message = "startDate는 필수 입니다.")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime startDate; //필수
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime endDate;
+    @NotNull(message = "endDate는 필수 입니다.")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime endDate; //필수
 
-    private Long userId;
+    @NotNull(message = "userId는 필수 값 입니다.")
+    @Positive(message = "정확한 ID 값을 입력 해주세요.")
+    private Long userId; //필수
 
-    private Long calendarGroupId;
+    @NotNull(message = "calendarGroupId는 필수 값 입니다.")
+    @Positive(message = "정확한 ID 값을 입력 해주세요.")
+    private Long calendarGroupId; //필수
 }

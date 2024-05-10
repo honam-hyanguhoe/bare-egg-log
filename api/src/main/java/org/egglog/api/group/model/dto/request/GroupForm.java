@@ -1,18 +1,19 @@
 package org.egglog.api.group.model.dto.request;
 
-//import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-//import com.fasterxml.jackson.databind.annotation.JsonNaming;
-//import jakarta.persistence.Column;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class GroupForm {
-    private Integer groupImage;
-    private String groupPassword;
-    private String groupName;
+    @NotNull(message = "groupImage 는 필수입니다.")
+    private Integer groupImage; //필수
+    @NotBlank(message = "groupPassword 는 필수입니다.")
+    private String groupPassword; //필수
+    @NotBlank(message = "groupName 는 필수입니다.")
+    private String groupName; //필수
 }

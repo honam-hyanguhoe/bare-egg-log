@@ -1,5 +1,6 @@
 package org.egglog.api.calendargroup.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.egglog.api.calendargroup.model.dto.params.CalendarGroupListRequest;
 import org.egglog.api.calendargroup.model.dto.request.CreateCalGroupRequest;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
  * |2024-04-20|김도휘|최초 생성|
  * |2024-04-20|김도휘|캘린더 그룹으로 개인 일정 조회 추가|
  * |2024-05-07|김형민|리스트조회, 생성, 삭제 추가|
+ * |2024-05-08|김형민|1차 리펙토링|
  */
 @RestController
 @RequiredArgsConstructor
@@ -41,7 +43,7 @@ public class CalendarGroupController {
     @PostMapping("/create")
     public ResponseEntity<MessageUtils> registerCalendarGroup(
             @AuthenticationPrincipal User loginUser,
-            @RequestBody CreateCalGroupRequest request
+            @RequestBody @Valid CreateCalGroupRequest request
         ) {
         return ResponseEntity.ok()
                 .body(MessageUtils.success(calendarGroupService.registerCalendarGroup(request, loginUser)));

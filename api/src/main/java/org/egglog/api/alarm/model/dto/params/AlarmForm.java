@@ -13,12 +13,12 @@ import java.time.LocalTime;
 @Builder
 public class AlarmForm {
 
-    private LocalTime alarmTime;
+    private LocalTime alarmTime; //필수
 
     private int replayCnt;
 
     private int replayTime;
 
-    private Long workTypeId;     //근무 타입 아이디
+    private Long workTypeId;     //근무 타입 아이디//필수
 
 }
