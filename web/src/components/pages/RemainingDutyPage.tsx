@@ -34,36 +34,32 @@ const initialData: TreeNode = {
 const RemainingDutyPage = () => {
   const [duty, setDuty] = useState<TreeNode>(initialData);
 
-  window.receiveDataFromApp = (data: string) => {
-    console.log("Data received: " + data);
+  // window.receiveDataFromApp = (data: string) => {
+  //   console.log("Data received: " + data);
 
-    setDuty((prevData) => ({
-      ...prevData,
-      children: JSON.parse(data),
-    }));
+  //   setDuty((prevData) => ({
+  //     ...prevData,
+  //     children: JSON.parse(data),
+  //   }));
 
-    return `${duty}`;
-  };
+  //   return `${duty}`;
+  // };
 
-  // useEffect(() => {
-  //   const receiveDataFromApp = (data: string) => {
-  //     console.log("Data received: " + data);
-  //     setDuty(JSON.parse(data));
-  //     // try {
-  //     // const tempData: TreeNode[] = JSON.parse(data);
-  //     // updateData(tempData);
-  //     // } catch (error) {
-  //     //   console.error("Error parsing JSON data:", error);
-  //     // }
-  //     return `Window updated with: ${data}`;
-  //   };
+  useEffect(() => {
+    window.receiveDataFromApp = (data: string) => {
+      console.log("Data received: " + data);
 
-  //   window.receiveDataFromApp = receiveDataFromApp;
+      setDuty((prevData) => ({
+        ...prevData,
+        children: JSON.parse(data),
+      }));
 
-  //   return () => {
-  //     delete (window as any).receiveDataFromApp;
-  //   };
-  // }, []);
+      return `${duty}`;
+    };
+    return () => {
+      delete (window as any).receiveDataFromApp;
+    };
+  }, []);
 
   const updateData = (newChildren: TreeNode[]) => {
     setDuty((prevData) => ({
