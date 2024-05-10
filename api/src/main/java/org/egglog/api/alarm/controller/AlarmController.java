@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.egglog.api.alarm.model.dto.params.AlarmForm;
 import org.egglog.api.alarm.model.dto.params.AlarmModifyForm;
 import org.egglog.api.alarm.model.dto.params.AlarmStatusModifyForm;
+import org.egglog.api.alarm.model.dto.response.AlarmListOutputSpec;
+import org.egglog.api.alarm.model.dto.response.AlarmOutputSpec;
 import org.egglog.api.alarm.model.service.AlarmService;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.utility.utils.MessageUtils;
@@ -13,6 +15,9 @@ import org.egglog.utility.utils.SuccessType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 /**
  * ```
  * ===================[Info]=========================
@@ -39,7 +44,7 @@ public class AlarmController {
      * @return
      */
     @GetMapping("")
-    public ResponseEntity<?> getAlarmList(
+    public ResponseEntity<MessageUtils<List<AlarmListOutputSpec>>> getAlarmList(
             @AuthenticationPrincipal User loginUser
     ) {
         return ResponseEntity.ok().body(MessageUtils.success(alarmService.getAlarmList(loginUser)));
@@ -62,7 +67,7 @@ public class AlarmController {
      * @return
      */
     @PatchMapping("/status")
-    public ResponseEntity<?> modifyAlarmStatus(
+    public ResponseEntity<MessageUtils<AlarmOutputSpec>> modifyAlarmStatus(
             @RequestBody AlarmStatusModifyForm alarmStatusModifyForm,
             @AuthenticationPrincipal User loginUser
     ) {
@@ -77,7 +82,7 @@ public class AlarmController {
      * @return
      */
     @PatchMapping("")
-    public ResponseEntity<?> modifyAlarm(
+    public ResponseEntity<MessageUtils<AlarmOutputSpec>> modifyAlarm(
             @RequestBody @Valid AlarmModifyForm alarmModifyForm,
             @AuthenticationPrincipal User loginUser
     )
@@ -92,7 +97,7 @@ public class AlarmController {
      * @return
      */
     @DeleteMapping("/{alarm_id}")
-    public ResponseEntity<?> deleteAlarm(
+    public ResponseEntity<MessageUtils> deleteAlarm(
             @PathVariable("alarm_id") Long alarmId,
             @AuthenticationPrincipal User loginUser
     ) {

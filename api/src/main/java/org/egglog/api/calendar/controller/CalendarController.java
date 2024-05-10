@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.calendar.model.dto.params.CalendarMonthRequest;
+import org.egglog.api.calendar.model.dto.response.CalendarListResponse;
 import org.egglog.api.calendar.model.service.CalendarService;
 import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.user.model.entity.User;
@@ -29,7 +30,7 @@ public class CalendarController {
     private final CalendarService calendarService;
 
     @GetMapping("/test")
-    public ResponseEntity test(){
+    public ResponseEntity<MessageUtils> test(){
         log.warn(testVal);
         return ResponseEntity.ok().body(MessageUtils.success(testVal));
     }
@@ -43,12 +44,12 @@ public class CalendarController {
     }
 
     @GetMapping("/link")
-    public ResponseEntity<?> getCalendarUrl(@AuthenticationPrincipal User user) {
+    public ResponseEntity<MessageUtils<String>> getCalendarUrl(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(MessageUtils.success(calendarService.getIcsLink(user)));
     }
 
     @GetMapping("/month")
-    public ResponseEntity<?> getCalendarByMonth(@ModelAttribute @Valid CalendarMonthRequest calendarMonthRequest, @AuthenticationPrincipal User user) {
+    public ResponseEntity<MessageUtils<CalendarListResponse>> getCalendarByMonth(@ModelAttribute @Valid CalendarMonthRequest calendarMonthRequest, @AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(MessageUtils.success(calendarService.getCalendarListByMonth(calendarMonthRequest, user)));
     }
 
