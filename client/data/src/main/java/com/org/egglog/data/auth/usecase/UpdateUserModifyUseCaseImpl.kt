@@ -12,7 +12,7 @@ class UpdateUserModifyUseCaseImpl @Inject constructor(
     private val userService: UserService
 ): UpdateUserModifyUseCase {
     override suspend fun invoke(accessToken: String, userModifyParam: UserModifyParam): Result<UserDetail?> = kotlin.runCatching {
-        val requestBody = UserModifyRequest(userModifyParam.userName, userModifyParam.hospitalId, userModifyParam.empNo).toRequestBody()
-        userService.updateUserModify(accessToken, requestBody).dataBody?.toDomainModel()
+        val requestBody = UserModifyRequest(userName = userModifyParam.userName, profileImgUrl = userModifyParam.profileImgUrl, selectHospitalId = userModifyParam.selectHospitalId, empNo = userModifyParam.empNo).toRequestBody()
+        userService.updateUserModify(accessToken = accessToken, requestBody = requestBody).dataBody?.toDomainModel()
     }
 }
