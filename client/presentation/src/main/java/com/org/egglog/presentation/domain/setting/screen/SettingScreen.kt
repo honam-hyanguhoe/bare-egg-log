@@ -212,7 +212,9 @@ fun SettingScreen(
                 }
             }
 
-            BottomNavigator(selectedItem = selectedIdx, onItemSelected = { onSelectedIdx(it) })
+            Box(modifier = Modifier.fillMaxHeight(1f).fillMaxWidth()) {
+                BottomNavigator(selectedItem = selectedIdx, onItemSelected = { onSelectedIdx(it) })
+            }
         }
     }
 }
