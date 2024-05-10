@@ -82,6 +82,7 @@ fun AddInfoScreen(
 
     AddInfoScreen(
         onNavigateToAgreeScreen = onNavigateToAgreeScreen,
+        joinEnabled = state.joinEnabled,
         name = state.name,
         hospital = state.hospital,
         empNo = state.empNo,
@@ -101,6 +102,7 @@ fun AddInfoScreen(
 fun AddInfoScreen(
     onNavigateToAgreeScreen: () -> Unit,
     onSearchChange: (String) -> Unit,
+    joinEnabled: Boolean,
     name: String,
     hospital: UserHospital?,
     empNo: String,

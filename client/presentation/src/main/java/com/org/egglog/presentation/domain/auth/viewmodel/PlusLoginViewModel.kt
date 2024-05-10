@@ -46,6 +46,9 @@ class PlusLoginViewModel @Inject constructor(
             this.exceptionHandler = CoroutineExceptionHandler { _, throwable ->
                 intent {
                     postSideEffect(PlusLoginSideEffect.Toast(message = throwable.message.orEmpty()))
+                    reduce {
+                        state.copy(joinEnabled = true)
+                    }
                 }
             }
         }
@@ -86,6 +89,9 @@ class PlusLoginViewModel @Inject constructor(
     }
 
     fun onClickJoin() = intent {
+        reduce {
+            state.copy(joinEnabled = false)
+        }
         val fcmToken = try {
             Firebase.messaging.token.await()
         } catch (e: Exception) {
@@ -99,6 +105,9 @@ class PlusLoginViewModel @Inject constructor(
             postSideEffect(PlusLoginSideEffect.NavigateToMainActivity)
         } else {
             postSideEffect(PlusLoginSideEffect.Toast("회원가입에 실패했습니다."))
+        }
+        reduce {
+            state.copy(joinEnabled = true)
         }
     }
 
@@ -124,6 +133,7 @@ class PlusLoginViewModel @Inject constructor(
 @Immutable
 data class PlusLoginState(
     val name: String = "",
+    val joinEnabled: Boolean = true,
     val hospital: UserHospital? = null,
     val search: String = "",
     val empNo: String = "",
