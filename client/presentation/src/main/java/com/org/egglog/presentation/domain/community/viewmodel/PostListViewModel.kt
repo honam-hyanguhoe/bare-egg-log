@@ -94,9 +94,6 @@ class PostListViewModel @Inject constructor(
         }
     }
 
-    fun onClickWriteButton() = intent {
-        postSideEffect(PostListSideEffect.NavigateToWriteScreen)
-    }
     fun onSelectCategoryIndex(index: Int) = intent {
 
         if(index == 0) {
@@ -143,5 +140,4 @@ data class PostListState(
 sealed interface PostListSideEffect {
     class Toast(val message: String) : PostListSideEffect
 
-    data object NavigateToWriteScreen : PostListSideEffect
 }

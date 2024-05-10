@@ -19,11 +19,17 @@ class WritePostUserCaseImpl @Inject constructor(
         accessToken: String,
         boardTitle: String,
         boardContent: String,
-        uploadImages: List<ByteArray>
+        uploadImages: List<ByteArray>,
+        groupId: Int?,
+        hospitalId: Int?
     ): Result<Boolean> = kotlin.runCatching {
         // firebase 이미지 업로드 로직
-        val result = imageUploadUseCase.uploadImage(uploadImages, "board")
-        val urls: List<String>? = result.getOrNull()
+        var result: List<String>? = emptyList()
+        if(uploadImages.isNotEmpty()) {
+            result = imageUploadUseCase.uploadImage(uploadImages, "board").getOrNull()
+        }
+
+        val urls: List<String>? = result
         Log.d("커뮤니티", "uploadImage firebase return $urls")
 
         val requestParam = WritePostParam(
@@ -32,7 +38,10 @@ class WritePostUserCaseImpl @Inject constructor(
             pictureOne = urls?.getOrNull(0) ?: "",
             pictureTwo = urls?.getOrNull(1) ?: "",
             pictureThree = urls?.getOrNull(2) ?: "",
-            pictureFour = urls?.getOrNull(3) ?: ""
+            pictureFour = urls?.getOrNull(3) ?: "",
+            tempNickname = "익명의 구운란",
+            groupId = groupId,
+            hospitalId = hospitalId
         )
 
         Log.d("커뮤니티", requestParam.toString())

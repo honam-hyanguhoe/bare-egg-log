@@ -9,7 +9,9 @@ interface WritePostUseCase {
 //        pictureTwo : String,
 //        pictureThree : String,
 //        pictureFour : String,
-        uploadImages: List<ByteArray>
+        uploadImages: List<ByteArray>,
+        groupId: Int?,
+        hospitalId: Int?
     ) : Result<Boolean>
 }
 

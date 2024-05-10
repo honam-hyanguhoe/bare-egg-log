@@ -70,6 +70,8 @@ class PostDetailViewModel @Inject constructor(
             it!!.toUiModel()
         }.getOrThrow()
 
+        Log.e("PostDetailViewMode", "상세 정보는 $postDetailInfo  입니다")
+
         val commentList = getCommentListUseCase("Bearer ${accessToken}", postId).map {
             it?.map {
                it.toUiModel()

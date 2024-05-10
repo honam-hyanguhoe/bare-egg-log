@@ -9,7 +9,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.lifecycleScope
-import com.org.egglog.presentation.domain.community.posteditor.activity.PostEditorActivity
 import com.org.egglog.presentation.domain.main.screen.MainScreen
 import com.org.egglog.presentation.domain.main.viewModel.MainViewModel
 import com.org.egglog.presentation.theme.ClientTheme
