@@ -71,6 +71,7 @@ fun PostListScreen(
     }
     }
     PostListScreen(
+        isHospitalAuth = state.isHospitalAuth,
         categoryName = state.categoryName,
         hospitalId = state.hospitalId,
         groupId = state.groupId,
@@ -86,6 +87,7 @@ fun PostListScreen(
 
 @Composable
 private fun PostListScreen(
+    isHospitalAuth: Boolean,
     categoryName: String,
     hospitalId: Int?,
     groupId: Int?,
@@ -253,7 +255,14 @@ private fun PostListScreen(
         verticalArrangement = Arrangement.Bottom,
         horizontalAlignment = Alignment.End) {
         FloatingActionButton(
-            onClick = onClickWriteButton,
+            onClick = {
+                if(hospitalId != null && !isHospitalAuth) {
+                    // 사용자가 병원 인증 된 유저가 아니면 인증해달라는 toast
+                    Toast.makeText(context, "병원 게시판은 인증된 사용자만 글을 작성할 수 있습니다", Toast.LENGTH_SHORT).show()
+                } else {
+                    onClickWriteButton()
+                }
+                      },
             modifier = Modifier
                 .padding(5.dp),
             shape = FloatingActionButtonDefaults.largeShape,

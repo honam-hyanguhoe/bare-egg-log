@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
+import com.org.egglog.domain.auth.usecase.GetUserUseCase
 import com.org.egglog.domain.community.model.PostData
 import com.org.egglog.domain.community.usecase.GetCommunityGroupUseCase
 import com.org.egglog.domain.community.usecase.GetHotPostListUseCase
@@ -33,6 +34,7 @@ class PostListViewModel @Inject constructor(
     private val getHotPostListUseCase: GetHotPostListUseCase,
     private val getPostListUseCase: GetPostListUseCase,
     private val getCommunityGroupUseCase: GetCommunityGroupUseCase,
+    private val getUserUseCase: GetUserUseCase
 ): ViewModel(), ContainerHost<PostListState, PostListSideEffect>{
 
     private var hotPostList: List<HotPostInfo> = emptyList()
@@ -59,6 +61,8 @@ class PostListViewModel @Inject constructor(
         val tokens = getTokenUseCase()
         accessToken = tokens.first!!
 
+        val userInfo = getUserUseCase("Bearer $accessToken").getOrThrow()
+
         Log.e("PostListViewModel", "token은 ${accessToken}")
         hotPostList = getHotPostListUseCase("Bearer ${accessToken}").map {
             it.map {
@@ -82,6 +86,7 @@ class PostListViewModel @Inject constructor(
 
         reduce {
             state.copy(
+                isHospitalAuth =  userInfo?.hospitalAuth != null,
                 hotPostList = if(hotPostList.isEmpty()) listOf() else hotPostList,
                 postListFlow = postListFlow!!,
                 categoryList = if(categoryList.isEmpty()) listOf((0 to "전체")) else categoryList
@@ -132,6 +137,7 @@ data class PostListState(
     val hotPostList: List<HotPostInfo> = listOf(),
     val postListFlow: Flow<PagingData<PostData>> = emptyFlow(),
     val categoryList: List<Pair<Int, String>> = listOf((0 to "전체")),
+    val isHospitalAuth: Boolean = false,
 )
 
 sealed interface PostListSideEffect {
