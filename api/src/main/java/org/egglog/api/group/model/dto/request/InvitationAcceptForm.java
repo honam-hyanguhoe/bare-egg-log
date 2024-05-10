@@ -1,14 +1,15 @@
 package org.egglog.api.group.model.dto.request;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class InvitationAcceptForm {
-    private String invitationCode;
-    private String password;
+    @NotBlank(message = "invitationCode 는 필수입니다.")
+    private String invitationCode; //필수
+    @NotBlank(message = "password 는 필수입니다.")
+    private String password; //필수
 }
