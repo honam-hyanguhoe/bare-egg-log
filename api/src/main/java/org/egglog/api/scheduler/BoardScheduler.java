@@ -80,8 +80,8 @@ public class BoardScheduler {
                 );
                 //그룹 && 병원 == null -> 전체 게시판
                 if (board.getGroup() == null && board.getHospital() == null) { //전체 게시판이라면
-                    Long viewCount = Objects.requireNonNull(tuple.getScore()).longValue(); //조회수
-                    Long likeCount = boardRepository.getLikeCount(boardId); //좋아요 개수
+                    long viewCount = Objects.requireNonNull(tuple.getScore()).longValue(); //조회수
+                    long likeCount = boardRepository.getLikeCount(boardId); //좋아요 개수
                     boardViewCounts.put(boardId, viewCount + likeCount);
                 }
             }
@@ -93,7 +93,7 @@ public class BoardScheduler {
                     .toList();
 
             // Redis에 저장 (ID 리스트)
-            redisTemplate.opsForValue().set("hotBoards", hotBoardIds.toString(), 1, TimeUnit.MINUTES);
+            redisTemplate.opsForValue().set("hotBoards", hotBoardIds.toString(), 1, TimeUnit.HOURS);
 //            redisTemplate.opsForValue().set("hotBoards", hotBoardIds.toString(), 1, TimeUnit.HOURS);
 
         }
