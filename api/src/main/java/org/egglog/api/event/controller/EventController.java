@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.egglog.api.event.model.dto.params.EventForm;
 import org.egglog.api.event.model.dto.params.EventPeriodRequest;
 import org.egglog.api.event.model.dto.params.EventUpdateForm;
+import org.egglog.api.event.model.dto.response.EventListOutputSpec;
+import org.egglog.api.event.model.dto.response.EventOutputSpec;
 import org.egglog.api.event.model.service.EventService;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.utility.utils.MessageUtils;
@@ -12,6 +14,9 @@ import org.egglog.utility.utils.SuccessType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 /**
  * ```
  * ===================[Info]=========================
@@ -40,7 +45,7 @@ public class EventController {
      * @return
      */
     @PostMapping("")
-    public ResponseEntity<?> registerEvent(@RequestBody @Valid EventForm eventForm, @AuthenticationPrincipal User user) {
+    public ResponseEntity<MessageUtils> registerEvent(@RequestBody @Valid EventForm eventForm, @AuthenticationPrincipal User user) {
         eventService.registerEvent(eventForm, user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }
@@ -53,7 +58,7 @@ public class EventController {
      * @return
      */
     @GetMapping("/{event_id}")
-    public ResponseEntity<?> getEvent(@PathVariable("event_id") Long eventId, @AuthenticationPrincipal User user) {
+    public ResponseEntity<MessageUtils<EventOutputSpec>> getEvent(@PathVariable("event_id") Long eventId, @AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(MessageUtils.success(eventService.getEvent(eventId, user.getId())));
     }
 
@@ -63,7 +68,7 @@ public class EventController {
      * @return
      */
     @GetMapping("")
-    public ResponseEntity<?> getEventList(@AuthenticationPrincipal User user) {
+    public ResponseEntity<MessageUtils<List<EventListOutputSpec>>> getEventList(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(MessageUtils.success(eventService.getEventList(user.getId())));
     }
 //    getCalendarListByMonth
@@ -75,7 +80,7 @@ public class EventController {
      * @return
      */
     @GetMapping("/month")
-    public ResponseEntity<?> getEventListByPeriod(@ModelAttribute @Valid EventPeriodRequest eventPeriodRequest, @AuthenticationPrincipal User user) {
+    public ResponseEntity<MessageUtils<List<EventListOutputSpec>>> getEventListByPeriod(@ModelAttribute @Valid EventPeriodRequest eventPeriodRequest, @AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(MessageUtils.success(eventService.getEventListByPeriod(eventPeriodRequest, user)));
     }
 
@@ -88,7 +93,7 @@ public class EventController {
      * @return
      */
     @PatchMapping("/{event_id}")
-    public ResponseEntity<?> modifyEvent(@PathVariable("event_id") Long eventId,
+    public ResponseEntity<MessageUtils<EventOutputSpec>> modifyEvent(@PathVariable("event_id") Long eventId,
                                          @RequestBody @Valid EventUpdateForm eventUpdateForm, @AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(MessageUtils.success(eventService.modifyEvent(eventId, eventUpdateForm, user.getId())));
     }
@@ -101,7 +106,7 @@ public class EventController {
      * @return
      */
     @DeleteMapping("/{event_id}")
-    public ResponseEntity deleteEvent(
+    public ResponseEntity<MessageUtils> deleteEvent(
             @PathVariable("event_id") Long eventId, @AuthenticationPrincipal User user) {
         eventService.deleteEvent(eventId, user.getId());
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));

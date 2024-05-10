@@ -8,6 +8,7 @@ import org.egglog.api.user.model.dto.request.JoinUserRequest;
 import org.egglog.api.user.model.dto.request.UpdateFcmRequest;
 import org.egglog.api.user.model.dto.request.UpdateUserHospitalRequest;
 import org.egglog.api.user.model.dto.request.UpdateUserRequest;
+import org.egglog.api.user.model.dto.response.UserResponse;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.model.service.UserService;
 import org.egglog.utility.utils.MessageUtils;
@@ -42,7 +43,7 @@ public class UserController {
      * @author 김형민
      */
     @GetMapping("/find")
-    public ResponseEntity<MessageUtils> findUser(
+    public ResponseEntity<MessageUtils<UserResponse>> findUser(
             @AuthenticationPrincipal User loginUser
     ){
         return ResponseEntity.ok().body(
@@ -57,7 +58,7 @@ public class UserController {
      * @author 김형민
      */
     @PatchMapping("/join")
-    public ResponseEntity<MessageUtils> joinUser(
+    public ResponseEntity<MessageUtils<UserResponse>> joinUser(
             @AuthenticationPrincipal User loginUser,
             @RequestBody @Valid JoinUserRequest request
             ){
@@ -73,7 +74,7 @@ public class UserController {
      * @author 김형민
      */
     @PatchMapping("/fcm-modify")
-    public ResponseEntity<MessageUtils> modifyUserFcm(
+    public ResponseEntity<MessageUtils<UserResponse>> modifyUserFcm(
             @AuthenticationPrincipal User loginUser,
             @RequestBody @Valid UpdateFcmRequest request
     ){
@@ -89,7 +90,7 @@ public class UserController {
      * @author 김형민
      */
     @PatchMapping("/info-modify")
-    public ResponseEntity<MessageUtils> modifyUserInfo(
+    public ResponseEntity<MessageUtils<UserResponse>> modifyUserInfo(
             @AuthenticationPrincipal User loginUser,
             @RequestBody @Valid UpdateUserRequest request
             ){
@@ -105,7 +106,7 @@ public class UserController {
      * @author 김형민
      */
     @PatchMapping("/delete")
-    public ResponseEntity<MessageUtils> modifyUserStateDelete(
+    public ResponseEntity<MessageUtils<UserResponse>> modifyUserStateDelete(
             @AuthenticationPrincipal User loginUser
     ){
         return ResponseEntity.ok(MessageUtils.success(userService.deleteUser(loginUser)));

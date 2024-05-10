@@ -63,7 +63,7 @@ public class TestController {
     public ResponseEntity<MessageUtils> creatWorkMockData(
             @AuthenticationPrincipal User loginUser
             ){
-        if (loginUser==null) throw new JwtException(JwtErrorCode.NO_TOKEN);
+        if (loginUser==null) throw new JwtException(JwtErrorCode.NO_TOKEN_FOR_TEST);
         testService.makeWorkListForUser(loginUser);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }

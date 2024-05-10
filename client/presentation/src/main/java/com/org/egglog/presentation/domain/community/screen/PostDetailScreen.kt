@@ -124,7 +124,6 @@ private fun PostDetailScreen(
 ) {
 
 
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -181,7 +180,10 @@ private fun PostDetailScreen(
                             postDetailInfo.boardTitle,
                             postDetailInfo.boardContent,
                             postDetailInfo.boardCreatedAt,
-                            postDetailInfo.pictureOne
+                            postDetailInfo.pictureOne,
+                            postDetailInfo.pictureTwo ?: "",
+                            postDetailInfo.pictureThree ?: "",
+                            postDetailInfo.pictureFour ?: ""
                         )
                         val postReaction = PostReactionInfo(
                             postDetailInfo.boardId,
@@ -206,7 +208,7 @@ private fun PostDetailScreen(
                     }
                 }
 
-                if(commentList!!.isNotEmpty()) {
+                if (commentList!!.isNotEmpty()) {
                     items(
                         count = commentList.size,
                         key = { index -> commentList[index].commentId }
@@ -216,7 +218,8 @@ private fun PostDetailScreen(
                             // 게시글 작성자와 댓글 작성자의 userId 비교
                             val isPostAuthor = commentInfo.userId == userId
                             // 댓글 작성자가 게시글 작성자와 같을 경우 tempNickname을 변경
-                            val tempNickname = if (isPostAuthor) "익명의 구운란" else commentInfo.tempNickname
+                            val tempNickname =
+                                if (isPostAuthor) "익명의 구운란" else commentInfo.tempNickname
 
                             CommentCard(
                                 commentInfo = commentInfo.copy(tempNickname = tempNickname),
@@ -230,9 +233,10 @@ private fun PostDetailScreen(
                                 }
                             )
 
-                            if(commentInfo.recomment.isNotEmpty()) {
+                            if (commentInfo.recomment.isNotEmpty()) {
                                 commentInfo.recomment.forEach { recomment ->
-                                    val recommentTempNickname = if (isPostAuthor) "익명의 구운란" else recomment.tempNickname
+                                    val recommentTempNickname =
+                                        if (isPostAuthor) "익명의 구운란" else recomment.tempNickname
 
                                     CommentCard(
                                         true,
@@ -260,13 +264,16 @@ private fun PostDetailScreen(
             SingleInput(
                 modifier = Modifier.fillMaxWidth(0.8f),
                 text = commentValue,
-                placeholder = if(parentId.toInt() == 0) "댓글을 입력해주세요" else "대댓글을 입력해주세요",
+                placeholder = if (parentId.toInt() == 0) "댓글을 입력해주세요" else "대댓글을 입력해주세요",
                 onValueChange = { commentValue -> onChangeComment(commentValue) },
                 focusManager = focusManager,
             )
             Box(
                 modifier = Modifier
-                    .background(if(commentValue == "") Gray200 else Warning200, RoundedCornerShape(10.dp))
+                    .background(
+                        if (commentValue == "") Gray200 else Warning200,
+                        RoundedCornerShape(10.dp)
+                    )
                     .padding(10.dp)
             ) {
                 CustomIconButton(
@@ -276,7 +283,7 @@ private fun PostDetailScreen(
                     onClick = {
                         onClickSend()
                         focusManager.clearFocus()
-                              },
+                    },
                     enabled = commentValue != ""
                 )
             }

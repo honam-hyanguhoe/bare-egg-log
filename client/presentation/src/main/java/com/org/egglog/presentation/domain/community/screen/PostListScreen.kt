@@ -43,7 +43,6 @@ import com.org.egglog.presentation.component.molecules.cards.HotPostCard
 import com.org.egglog.presentation.component.molecules.headers.NoticeHeader
 import com.org.egglog.presentation.component.organisms.postCard.PostCard
 import com.org.egglog.presentation.data.HotPostInfo
-import com.org.egglog.presentation.domain.community.posteditor.activity.PostEditorActivity
 import com.org.egglog.presentation.domain.community.viewmodel.PostListSideEffect
 import com.org.egglog.presentation.domain.community.viewmodel.PostListViewModel
 import com.org.egglog.presentation.theme.BlueGray900
@@ -62,15 +61,16 @@ fun PostListScreen(
     viewModel: PostListViewModel = hiltViewModel(),
     onNavigateToDetailScreen: (postId: Int) -> Unit,
     onNavigateToSearchScreen: (hospitalId: Int?, groupId: Int?) -> Unit,
+    onNavigateToWriteScreen: (hospitalId: Int?, groupId: Int?) -> Unit
 ) {
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
     viewModel.collectSideEffect { sideEffect -> when(sideEffect) {
         is PostListSideEffect.Toast -> Toast.makeText(context , sideEffect.message, Toast.LENGTH_SHORT).show()
-        PostListSideEffect.NavigateToWriteScreen -> (context.startActivity(Intent(context, PostEditorActivity::class.java)))
     }
     }
     PostListScreen(
+        isHospitalAuth = state.isHospitalAuth,
         categoryName = state.categoryName,
         hospitalId = state.hospitalId,
         groupId = state.groupId,
@@ -78,7 +78,7 @@ fun PostListScreen(
         postListFlow = state.postListFlow,
         hotPostList = state.hotPostList,
         onClickPost = { postId: Int -> onNavigateToDetailScreen(postId) },
-        onClickWriteButton = viewModel::onClickWriteButton,
+        onClickWriteButton = onNavigateToWriteScreen,
         onSelectCategory = viewModel::onSelectCategoryIndex,
         onClickSearch = onNavigateToSearchScreen
     )
@@ -86,6 +86,7 @@ fun PostListScreen(
 
 @Composable
 private fun PostListScreen(
+    isHospitalAuth: Boolean,
     categoryName: String,
     hospitalId: Int?,
     groupId: Int?,
@@ -93,7 +94,7 @@ private fun PostListScreen(
     postListFlow: Flow<PagingData<PostData>>,
     hotPostList: List<HotPostInfo>,
     onClickPost: (postId: Int) -> Unit,
-    onClickWriteButton: () -> Unit,
+    onClickWriteButton: (hospitalId: Int?, groupId: Int?) -> Unit,
     onSelectCategory: (index: Int) -> Unit,
     onClickSearch: (hospitalId: Int?, groupId: Int?) -> Unit
 ) {
@@ -172,8 +173,9 @@ private fun PostListScreen(
                         count = hotPostList.size,
                         key = { index -> "0${hotPostList[index].postId}" }
                     ) { index ->
+                        val tempNickname = hotPostList[index].name ?: "익명의 구운란"
                         HotPostCard(
-                            postInfo = hotPostList[index],
+                            postInfo = hotPostList[index].copy(name = tempNickname),
                             onClickPost = { postId -> onClickPost(postId) })
                     }
                 } else {
@@ -253,7 +255,14 @@ private fun PostListScreen(
         verticalArrangement = Arrangement.Bottom,
         horizontalAlignment = Alignment.End) {
         FloatingActionButton(
-            onClick = onClickWriteButton,
+            onClick = {
+                if(hospitalId != null && !isHospitalAuth) {
+                    // 사용자가 병원 인증 된 유저가 아니면 인증해달라는 toast
+                    Toast.makeText(context, "병원 게시판은 인증된 사용자만 글을 작성할 수 있습니다", Toast.LENGTH_SHORT).show()
+                } else {
+                    onClickWriteButton(hospitalId ?: -1,  groupId ?: -1)
+                }
+                      },
             modifier = Modifier
                 .padding(5.dp),
             shape = FloatingActionButtonDefaults.largeShape,
