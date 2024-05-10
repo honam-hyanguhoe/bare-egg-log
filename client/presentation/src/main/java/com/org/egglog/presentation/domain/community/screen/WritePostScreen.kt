@@ -1,6 +1,6 @@
-package com.org.egglog.presentation.domain.community.posteditor.screen
+package com.org.egglog.presentation.domain.community.screen
 
-import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -26,10 +26,10 @@ import com.org.egglog.presentation.component.atoms.buttons.BigButton
 import com.org.egglog.presentation.component.atoms.inputs.MultiInput
 import com.org.egglog.presentation.component.atoms.inputs.SingleInput
 import com.org.egglog.presentation.component.molecules.headers.BasicHeader
-import com.org.egglog.presentation.domain.community.activity.CommunityActivity
-import com.org.egglog.presentation.domain.community.posteditor.viewmodel.PostSideEffect
-import com.org.egglog.presentation.domain.community.posteditor.viewmodel.WritePostViewModel
+import com.org.egglog.presentation.domain.community.viewmodel.PostSideEffect
+import com.org.egglog.presentation.domain.community.viewmodel.WritePostViewModel
 import com.org.egglog.presentation.theme.ClientTheme
+import com.org.egglog.presentation.theme.Gray200
 import com.org.egglog.presentation.theme.Gray25
 import com.org.egglog.presentation.theme.Gray300
 import com.org.egglog.presentation.theme.NaturalWhite
@@ -42,48 +42,54 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
 fun WritePostScreen(
-    viewModel: WritePostViewModel = hiltViewModel(),
-    onCloseClick: () -> Unit
+    hospitalId: Int?,
+    groupId: Int?,
+    onNavigateToListScreen: () -> Unit,
+    viewModel: WritePostViewModel = hiltViewModel()
 ) {
+
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
-    viewModel.collectSideEffect {
-        sideEffect ->
-        when(sideEffect) {
-            PostSideEffect.NavigateToMainScreen ->
-                {
-                    context.startActivity(
-                        Intent(
-                            context, CommunityActivity::class.java
-                        ).apply {
-                            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                        }
-                    )
-                }
-            is PostSideEffect.Toast -> Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
+
+    viewModel.collectSideEffect { sideEffect ->
+        when (sideEffect) {
+            is PostSideEffect.Toast -> Toast.makeText(
+                context,
+                sideEffect.message,
+                Toast.LENGTH_SHORT
+            ).show()
+            PostSideEffect.NavigateToListScreen -> onNavigateToListScreen()
         }
     }
+
     WritePostScreen(
+        isLoading = state.isLoading,
         title = state.title,
         content = state.content,
-        onTitleChange = viewModel::onTitleChange,
-        onContentChange = viewModel::onContentChange,
-        onCloseClick = onCloseClick,
-        onPostClick = viewModel::onPostClick,
+        onTitleChange = viewModel::onChangeTitle,
+        onContentChange = viewModel::onChangeContent,
+        onCloseClick = onNavigateToListScreen,
+        onPostClick = viewModel::onClickPost,
         viewModel = viewModel
     )
 }
 
 @Composable
 private fun WritePostScreen(
+    isLoading: Boolean,
     title: String,
     content: String,
     onTitleChange: (String) -> Unit,
     onContentChange: (String) -> Unit,
     onCloseClick: () -> Unit,
     onPostClick: () -> Unit,
-    viewModel : WritePostViewModel
+    viewModel: WritePostViewModel
 ) {
+    Log.e(
+        "WritePostScreen",
+        "현재 입력된 값은 $title $content , 그리고 enabled는 ${title !== "" && content != ""}"
+    )
+    Log.e("WritePostScreen", "현재 isLoading은 $isLoading")
     val focusManager = LocalFocusManager.current
     Surface {
         BoxWithConstraints {
@@ -127,7 +133,7 @@ private fun WritePostScreen(
                             height = 150
                         )
                         Spacer(modifier = Modifier.height(24.heightPercent(LocalContext.current).dp))
-                        Text(text = "사진(선택)", style = Typography.displayLarge)
+                        Text(text = "사진 (선택)", style = Typography.displayLarge)
                         Spacer(modifier = Modifier.height(12.heightPercent(LocalContext.current).dp))
                         ImageUploader(viewModel = viewModel)
                     }
@@ -136,33 +142,20 @@ private fun WritePostScreen(
                     colors = ButtonColors(
                         contentColor = NaturalWhite,
                         containerColor = Warning300,
-                        disabledContainerColor = Gray25,
-                        disabledContentColor = Gray300
-                    ), onClick = onPostClick
+                        disabledContainerColor = Gray300,
+                        disabledContentColor = NaturalWhite
+                    ), onClick = {
+                        onPostClick()
+                    },
+                    enabled = (title != "" && content != "") // title과 content 값이 없으면 disabled
                 ) {
                     Text(
                         style = Typography.bodyLarge,
-                        text = "작성완료"
+                        color = NaturalWhite,
+                        text = "작성 완료"
                     )
                 }
             }
         }
-    }
-}
-
-
-@Preview
-@Composable
-fun WritePostPreviewScreen() {
-    ClientTheme {
-        WritePostScreen(
-            title = "",
-            content = "",
-            onTitleChange = {},
-            onContentChange = {},
-            onCloseClick = {},
-            onPostClick = {},
-            viewModel = hiltViewModel()
-        )
     }
 }
