@@ -34,7 +34,7 @@
         </activity>
 
         <!-- MAIN -->
-        <activity android:name=".domain.main.activity.MainActivity" />
+        <activity android:name=".domain.main.activity.MainActivity" android:hardwareAccelerated="true" />
 
         <!-- SETTING -->
         <activity android:name=".domain.setting.activity.SettingActivity"

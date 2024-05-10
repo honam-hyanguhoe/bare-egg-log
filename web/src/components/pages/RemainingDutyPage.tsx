@@ -4,7 +4,7 @@ import RemainingDutyGraph from "../atoms/RemainingDutyGraph";
 
 declare global {
   interface Window {
-    receiveDataFromApp: (data: string) => string;
+    receiveDataFromApp: (data: string) => void;
   }
 }
 
@@ -34,7 +34,32 @@ const initialData: TreeNode = {
 const RemainingDutyPage = () => {
   const [duty, setDuty] = useState<TreeNode>(initialData);
 
+  // useEffect(() => {
+  //   const handleDataReceive = (data: string) => {
+  //     console.log("Data received: " + data);
+
+  //     try {
+  //       const newChildren = JSON.parse(data);
+  //       setDuty((prevData) => ({
+  //         ...prevData,
+  //         children: newChildren,
+  //       }));
+  //     } catch (error) {
+  //       console.error("Failed to parse incoming data", error);
+  //     }
+  //   };
+
+  //   window.receiveDataFromApp = handleDataReceive;
+
+  //   return () => {
+
+  //       delete window.receiveDataFromApp;
+
+  //   };
+  // }, []);
+
   window.receiveDataFromApp = (data: string) => {
+    delete (window as any).receiveDataFromApp;
     console.log("Data received: " + data);
 
     setDuty((prevData) => ({
@@ -42,15 +67,8 @@ const RemainingDutyPage = () => {
       children: JSON.parse(data),
     }));
 
-    return `${JSON.stringify(data)}`;
+    return `remainData in web ${JSON.stringify(data)}`;
   };
-
-  // const updateData = (newChildren: TreeNode[]) => {
-  //   setDuty((prevData) => ({
-  //     ...prevData,
-  //     children: newChildren,
-  //   }));
-  // };
 
   return (
     <GraphContainer>

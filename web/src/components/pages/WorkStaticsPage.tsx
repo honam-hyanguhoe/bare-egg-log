@@ -8,9 +8,6 @@ interface DataItem {
   values: number[];
 }
 
-const getRandomValues = () => {
-  return Array.from({ length: 4 }, () => Math.floor(Math.random() * 7));
-};
 const monthlyData = [
   {
     month: "2024-05",
@@ -69,7 +66,11 @@ const monthlyData = [
   },
 ];
 
-declare var AndroidBridge: any;
+declare global {
+  interface Window {
+    receiveStatsFromApp: (data: string) => void;
+  }
+}
 const WorkStaticsPage = () => {
   const initialData: DataItem[] = [
     { name: "5월 1주", values: [1, 3, 4, 5] },
@@ -99,11 +100,11 @@ const WorkStaticsPage = () => {
 
   const [staticsData, setStaticsData] = useState<DataItem[]>(initialData);
 
-  useEffect(() => {
-    setStaticsData(newData1);
-  }, []);
+  // useEffect(() => {
+  //   setStaticsData(newData1);
+  // }, []);
 
-  window.receiveDataFromApp = (data: string) => {
+  window.receiveStatsFromApp = (data: string) => {
     console.log("statics data received: " + data);
 
     // setDuty((prevData) => ({
@@ -113,7 +114,7 @@ const WorkStaticsPage = () => {
     console.log("statics data 옴" + [JSON.parse(data)]);
     setStaticsData([JSON.parse(data)]);
 
-    return `${staticsData}`;
+    return `staticsData in web${JSON.stringify(data)}`;
   };
 
   // const [data, setData] = useState<DataItem[]>(initialData);
