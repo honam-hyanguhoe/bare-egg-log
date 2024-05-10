@@ -48,7 +48,9 @@ class StaticsViewModel @Inject constructor(
     private fun getWorkStatsData(accessToken: String) = intent {
         val result = getWorkStatsUseCase(
             accessToken = accessToken,
-            date = state.date,
+            date = "2024-05-22",
+//            date = state.date,
+//            month = "2024-04-01"
             month = state.month
         ).getOrNull()
         if (result != null) {
