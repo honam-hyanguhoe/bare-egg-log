@@ -38,12 +38,13 @@ fun NoticeHeader(
     onClickMenus : () -> Unit = {},
     options: List<String> = listOf(""),
     selectedOption: String? = null,
-    onSelect: (String) -> Unit = {}
+    onSelect: (String) -> Unit = {},
+    padding : Int = 0
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-//            .padding(vertical = 20.dp)
+            .padding(vertical = padding.dp)
             .background(NaturalWhite)
 //            .border(1.dp, NaturalBlack)
     ) {

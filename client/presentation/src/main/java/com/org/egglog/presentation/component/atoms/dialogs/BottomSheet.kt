@@ -44,11 +44,11 @@ fun BottomSheet(
                 .height(height)
         ) {
             sheetContent()
-            Button(onClick = {
-                scope.launch { bottomSheetState.hide() }
-            }) {
-                Text("이렇게 숨겨지면 배신")
-            }
+//            Button(onClick = {
+//                scope.launch { bottomSheetState.hide() }
+//            }) {
+//                Text("이렇게 숨겨지면 배신")
+//            }
         }
     }
 }

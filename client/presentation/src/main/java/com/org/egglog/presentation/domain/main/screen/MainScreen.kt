@@ -55,7 +55,7 @@ import java.time.LocalDate
 @Composable
 fun MainScreen(
     workViewModel: WorkViewModel = hiltViewModel(),
-    staticsViewModel : StaticsViewModel = hiltViewModel()
+    staticsViewModel: StaticsViewModel = hiltViewModel()
 ) {
     val workState = workViewModel.collectAsState().value
     val statsState = staticsViewModel.collectAsState().value
@@ -67,7 +67,12 @@ fun MainScreen(
     }
     staticsViewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
-            is StaticSideEffect.Toast -> Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
+            is StaticSideEffect.Toast -> Toast.makeText(
+                context,
+                sideEffect.message,
+                Toast.LENGTH_SHORT
+            ).show()
+
             StaticSideEffect.NavigateToSettingActivity -> {
                 context.startActivity(
                     Intent(
@@ -77,6 +82,7 @@ fun MainScreen(
                     }
                 )
             }
+
             StaticSideEffect.NavigateToCommunityActivity -> {
                 context.startActivity(
                     Intent(
@@ -86,6 +92,7 @@ fun MainScreen(
                     }
                 )
             }
+
             StaticSideEffect.NavigateToGroupActivity -> {
                 context.startActivity(
                     Intent(
@@ -120,8 +127,8 @@ private fun MainScreen(
     onNextClick: (LocalDate) -> Unit,
     labels: List<String>,
     selected: MutableState<String>,
-    remainData : String,
-    statsData : String,
+    remainData: String,
+    statsData: String,
     selectedIdx: Int,
     onSelectedIdx: (Int) -> Unit
 ) {
@@ -167,7 +174,9 @@ private fun MainScreen(
             Spacer(modifier = Modifier.height(30.dp))
             StaticsCard(statsData = statsData)
         }
-        Box(modifier = Modifier.fillMaxHeight(1f).fillMaxWidth()) {
+        Box(modifier = Modifier
+            .fillMaxHeight(1f)
+            .fillMaxWidth()) {
             BottomNavigator(selectedItem = selectedIdx, onItemSelected = { onSelectedIdx(it) })
         }
     }
@@ -204,8 +213,8 @@ fun DutyCard(
 
 @Composable
 fun RemainCard(
-    selected : MutableState<String>,
-    remainData : String
+    selected: MutableState<String>,
+    remainData: String
 ) {
     val context = LocalContext.current
     Log.d("remain", "remain Card ${remainData}")
@@ -221,7 +230,13 @@ fun RemainCard(
             style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
         )
 
-        RemainContentWebView(width = 320, height = 340, url = "https://www.egg-log.org/remain", data = remainData, selected=selected)
+        RemainContentWebView(
+            width = 320,
+            height = 340,
+            url = "https://www.egg-log.org/remain",
+            data = remainData,
+            selected = selected
+        )
     }
 
 }
@@ -243,7 +258,14 @@ fun StaticsCard(
             modifier = Modifier.padding(start = 10.dp),
             style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
         )
-        StatsContentWebView(width = 320, height = 360, url = "https://www.egg-log.org/statics" , data = statsData, selected = null, type="stats")
+        StatsContentWebView(
+            width = 320,
+            height = 360,
+            url = "https://www.egg-log.org/statics",
+            data = statsData,
+            selected = null,
+            type = "stats"
+        )
     }
 }
 
