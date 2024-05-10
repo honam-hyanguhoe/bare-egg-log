@@ -161,7 +161,7 @@ fun RemainCard(
             style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
         )
 
-        ContentWebView(width = 320, height = 350, url = "https://www.egg-log.org/remain", data = remainData, selected=selected)
+        ContentWebView(width = 320, height = 340, url = "https://www.egg-log.org/remain", data = remainData, selected=selected)
     }
 
 }
@@ -183,7 +183,7 @@ fun StaticsCard(
             modifier = Modifier.padding(start = 10.dp),
             style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
         )
-//        ContentWebView(width = 320, height = 350, url = "https://www.egg-log.org/statics" , data = statsData)
+        ContentWebView(width = 320, height = 360, url = "https://www.egg-log.org/statics" , data = statsData, selected = null, type="stats")
     }
 }
 

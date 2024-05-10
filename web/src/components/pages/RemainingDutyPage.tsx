@@ -36,10 +36,6 @@ const RemainingDutyPage = () => {
 
   window.receiveDataFromApp = (data: string) => {
     console.log("Data received: " + data);
-    // setDuty(JSON.parse(data));
-
-    // const tempData: TreeNode[] = JSON.parse(data);
-    // console.log("tempData" + tempData);
 
     setDuty((prevData) => ({
       ...prevData,

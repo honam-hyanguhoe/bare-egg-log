@@ -168,7 +168,7 @@ export default WorkStaticsPage;
 const GraphContainer = styled.div`
   background-color: #f2f4f7;
   min-height: 100vh;
-  padding-left: 30px;
+  padding-left: 10px;
 `;
 
 const TypeListContainer = styled.div`
