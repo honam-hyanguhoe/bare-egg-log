@@ -22,6 +22,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.wear.compose.material.Button
+import androidx.wear.compose.material.Text
 import com.org.egglog.presentation.domain.main.AndroidBridge
 import com.org.egglog.presentation.domain.main.viewModel.StaticsViewModel
 import com.org.egglog.presentation.theme.Gray100
@@ -34,7 +36,7 @@ import org.orbitmvi.orbit.compose.collectAsState
 fun StatsContentWebView(
     width: Int = 300,
     height: Int = 270,
-    url: String = "https://www.egg-log.org/",
+    url: String = "https://www.egg-log.org/stats",
     selected: MutableState<String>?,
     data : String = "",
     type : String = "Stats",
@@ -66,7 +68,7 @@ fun StatsContentWebView(
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
             if (url == "https://www.egg-log.org/stats") {
-                val script = "javascript:receiveDataFromApp('${state.statsData.replace("\"", "\\\"")}')"
+                val script = "javascript:receiveStatsFromApp('${state.statsData.replace("\"", "\\\"")}')"
                 webView.evaluateJavascript(script) { value ->
                     Log.d("web-stats", "web-stats $value")
                 }
@@ -89,9 +91,9 @@ fun StatsContentWebView(
 
     LaunchedEffect(key1 = state.statsData) {
         Log.d("web-stats", "기기 ${state.statsData}")
-        val script = "javascript:receiveDataFromApp('${state.statsData.replace("\"", "\\\"")}')"
+        val script = "javascript:receiveStatsFromApp('${state.statsData.replace("\"", "\\\"")}')"
         webView.evaluateJavascript(script) { value ->
-            Log.d("WebView", "돌아옴 기기 $value")
+            Log.d("web-stats", "돌아옴 기기 $value")
         }
     }
 
@@ -107,5 +109,15 @@ fun StatsContentWebView(
                 .height(height.heightPercent(context).dp)
                 .width(width.widthPercent(context).dp)
         )
+    }
+
+    Button(onClick = {
+        Log.d("web-stats", "버튼 기기 ${state.statsData}")
+        val script = "javascript:receiveStatsFromApp('${state.statsData.replace("\"", "\\\"")}')"
+        webView.evaluateJavascript(script) { value ->
+            Log.d("web-stats", "버튼 돌아와 $value")
+        }
+    }) {
+        Text(text = "hi")
     }
 }
