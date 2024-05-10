@@ -8,19 +8,16 @@ import android.view.View
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.annotation.ContentView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -31,26 +28,31 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.org.egglog.client.data.RadioButtonColorInfo
+import com.org.egglog.presentation.component.atoms.buttons.CustomIconButton
 import com.org.egglog.presentation.component.atoms.buttons.RadioLabelButton
-import com.org.egglog.presentation.component.molecules.radioButtons.DayRadioButton
 import com.org.egglog.presentation.domain.main.AndroidBridge
+import com.org.egglog.presentation.domain.main.viewModel.StaticsViewModel
 import com.org.egglog.presentation.theme.Gray100
-import com.org.egglog.presentation.theme.Indigo400
 import com.org.egglog.presentation.theme.NaturalBlack
 import com.org.egglog.presentation.theme.Typography
-import com.org.egglog.presentation.theme.Warning300
+import com.org.egglog.presentation.utils.ArrowLeft
+import com.org.egglog.presentation.utils.ArrowRight
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
+import org.orbitmvi.orbit.compose.collectAsState
+
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun ContentWebView(
     width: Int = 300,
     height: Int = 270,
     url: String = "https://www.egg-log.org/",
-    data: String = "",
     selected: MutableState<String>?,
-    type : String = "remain"
+    data : String = "",
+    type : String = "remain",
+    viewModel : StaticsViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val webView = remember {
@@ -70,9 +72,10 @@ fun ContentWebView(
             }
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
             webViewClient = WebViewClient()
-            loadUrl(url)
         }
     }
+
+    val state = viewModel.collectAsState().value
 
     DisposableEffect(Unit) {
         webView.addJavascriptInterface(AndroidBridge(context, webView), "AndroidBridge")
@@ -82,14 +85,33 @@ fun ContentWebView(
         }
     }
 
-    LaunchedEffect(key1 = url) {
-        Log.d("webView", "웹뷰 띄울게요")
-        webView.loadUrl(url)
+    LaunchedEffect(key1 = state.remainData) {
+        if (state.remainData.isNotEmpty()) {
+            Log.d("WebView", "Updating webView with new remainData")
+            val script = "javascript:receiveDataFromApp('${state.remainData.replace("\"", "\\\"")}')"
+            webView.evaluateJavascript(script) { value ->
+                Log.d("WebView", "JavaScript response: $value")
+            }
+        }
     }
 
-    if(type == "remain"){
+    LaunchedEffect(key1 = url) {
+        Log.d("webview","초기로딩 ${state.remainData}")
+
+        webView.loadUrl(url)
+
+        if (state.remainData.isNotEmpty()) {
+            Log.d("WebView", "Updating webView with new remainData")
+            val script = "javascript:receiveDataFromApp('${state.remainData.replace("\"", "\\\"")}')"
+            webView.evaluateJavascript(script) { value ->
+                Log.d("WebView", "JavaScript response: $value")
+            }
+        }
+    }
+    
+    if (type == "remain") {
         val radioList = arrayListOf("Week", "Month")
-        Row(Modifier.fillMaxWidth().padding(top = 10.dp, start=10.dp)) {
+        Row(Modifier.fillMaxWidth().padding(top = 10.dp, start = 10.dp)) {
             radioList.mapIndexed { index, text ->
                 if (selected != null) {
                     RadioLabelButton(
@@ -97,10 +119,6 @@ fun ContentWebView(
                         isSelected = selected.value == text,
                         onClick = { clickedIdx ->
                             selected.value = clickedIdx
-                            val script = "javascript:receiveDataFromApp('${data.replace("\"", "\\\"")}')"
-                            webView.evaluateJavascript(script) { value ->
-                                Log.d("WebView", "JavaScript response: $value")
-                            }
                         },
                         radioButtonColorInfo = RadioButtonColorInfo(
                             selectedBorderColor = NaturalBlack,
@@ -116,36 +134,26 @@ fun ContentWebView(
                     )
                 }
                 if (index != radioList.size - 1) Spacer(
-                    modifier = Modifier.padding(
-                        3.widthPercent(context).dp
-                    )
+                    modifier = Modifier.padding(3.widthPercent(context).dp)
                 )
             }
         }
-
-
     }
-
 
     Card(
         modifier = Modifier
-//            .fillMaxSize()
-//            .height(height.heightPercent(context).dp)
             .fillMaxHeight()
             .width(width.widthPercent(context).dp)
-            .background(color = Warning300)
-//            .background(color = Gray100)
+            .background(color = Gray100, shape = RoundedCornerShape(20.dp))
     ) {
         AndroidView(
             factory = { webView },
             modifier = Modifier
                 .height(height.heightPercent(context).dp)
                 .width(width.widthPercent(context).dp)
-//                .fillMaxSize()
         )
     }
 }
-
 
 class NoScrollWebView(context: Context) : WebView(context) {
     override fun onTouchEvent(event: MotionEvent?): Boolean {
