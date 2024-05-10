@@ -1,5 +1,6 @@
 package com.org.egglog.presentation.domain.community.screen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +22,7 @@ import com.org.egglog.presentation.component.atoms.cards.ResultCard
 import com.org.egglog.presentation.component.molecules.headers.SearchHeader
 import com.org.egglog.presentation.component.organisms.postCard.PostCard
 import com.org.egglog.presentation.domain.community.viewmodel.PostListViewModel
+import com.org.egglog.presentation.domain.community.viewmodel.PostSearchViewModel
 import com.org.egglog.presentation.theme.NaturalWhite
 import com.org.egglog.presentation.utils.MessageUtil
 import com.org.egglog.presentation.utils.heightPercent
@@ -29,7 +31,9 @@ import org.orbitmvi.orbit.compose.collectAsState
 
 @Composable
 fun PostSearchScreen(
-    viewModel: PostListViewModel = hiltViewModel(),
+    hospitalId: Int?,
+    groupId: Int?,
+    viewModel: PostSearchViewModel = hiltViewModel(),
     onNavigateToPostListScreen: () -> Unit,
     onNavigateToDetailScreen: (postId: Int) -> Unit
 ) {

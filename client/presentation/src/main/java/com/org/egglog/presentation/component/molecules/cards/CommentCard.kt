@@ -49,10 +49,11 @@ fun CommentCard(isRecomment: Boolean = false, commentInfo: CommentInfo, myUserId
             Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
                 ProfileItem(
                     profile = Profile(
-                        commentInfo.userId,
+                        myUserId,
                         hospital = commentInfo.hospitalName,
                         name = commentInfo.tempNickname,
-                        isAuth = commentInfo.isHospitalAuth
+                        isAuth = commentInfo.isHospitalAuth,
+                        commentUserId = commentInfo.userId
                     ),
                     type = "post",
                     // TODO {* createdAt 어떻게 되는지 확인 *}

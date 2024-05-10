@@ -1,11 +1,8 @@
 package com.org.egglog.presentation.domain.community.screen
 
-import android.app.ProgressDialog.show
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,16 +20,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -68,7 +61,7 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 fun PostListScreen(
     viewModel: PostListViewModel = hiltViewModel(),
     onNavigateToDetailScreen: (postId: Int) -> Unit,
-    onNavigateToSearchScreen: () -> Unit,
+    onNavigateToSearchScreen: (hospitalId: Int?, groupId: Int?) -> Unit,
 ) {
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
@@ -78,6 +71,7 @@ fun PostListScreen(
     }
     }
     PostListScreen(
+        categoryName = state.categoryName,
         hospitalId = state.hospitalId,
         groupId = state.groupId,
         categoryList = state.categoryList,
@@ -86,12 +80,13 @@ fun PostListScreen(
         onClickPost = { postId: Int -> onNavigateToDetailScreen(postId) },
         onClickWriteButton = viewModel::onClickWriteButton,
         onSelectCategory = viewModel::onSelectCategoryIndex,
-        onClickSearch = onNavigateToSearchScreen,
+        onClickSearch = onNavigateToSearchScreen
     )
 }
 
 @Composable
 private fun PostListScreen(
+    categoryName: String,
     hospitalId: Int?,
     groupId: Int?,
     categoryList: List<Pair<Int, String>>,
@@ -100,12 +95,13 @@ private fun PostListScreen(
     onClickPost: (postId: Int) -> Unit,
     onClickWriteButton: () -> Unit,
     onSelectCategory: (index: Int) -> Unit,
-    onClickSearch: () -> Unit
+    onClickSearch: (hospitalId: Int?, groupId: Int?) -> Unit
 ) {
     val context = LocalContext.current
     var selectedMenuItem by remember { mutableStateOf(categoryList[0].second) }
     val list = postListFlow.collectAsLazyPagingItems()
     val fabInteractionSource = remember { MutableInteractionSource() }
+    var scrollState = rememberLazyListState()
 
     Column(
         Modifier
@@ -120,22 +116,22 @@ private fun PostListScreen(
         NoticeHeader(
             hasSearch = true,
             hasMenu = true,
-            title = selectedMenuItem,
+            title = categoryName,
             selectedOption = selectedMenuItem,
             options = categoryList.map {it. second},
-            onClickSearch = onClickSearch,
+            onClickSearch = { onClickSearch(hospitalId?:-1, groupId?: -1) },
             onClickNotification = {},
             onSelect = {
                 selectedMenuItem = it
-                var selectedPair = categoryList.find { it.second == selectedMenuItem}
-                var index = categoryList.indexOf(selectedPair)
+                val selectedPair = categoryList.find { it.second == selectedMenuItem}
+                val index = categoryList.indexOf(selectedPair)
                 onSelectCategory(index)
             }
         )
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        LazyColumn(Modifier.padding(10.dp)) {
+        LazyColumn(state = scrollState, modifier = Modifier.padding(10.dp)) {
             item {
                 BackgroundCard(margin=0.dp, padding=0.dp, color= Warning200, borderRadius=10.dp, onClickCard = null) {
                     Row(

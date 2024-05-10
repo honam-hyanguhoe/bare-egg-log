@@ -2,6 +2,7 @@ package com.org.egglog.presentation.domain.community.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.community.model.PostData
@@ -15,6 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.annotation.OrbitExperimental
@@ -30,13 +32,15 @@ class PostListViewModel @Inject constructor(
     private val getTokenUseCase: GetTokenUseCase,
     private val getHotPostListUseCase: GetHotPostListUseCase,
     private val getPostListUseCase: GetPostListUseCase,
-    private val getCommunityGroupUseCase: GetCommunityGroupUseCase
+    private val getCommunityGroupUseCase: GetCommunityGroupUseCase,
 ): ViewModel(), ContainerHost<PostListState, PostListSideEffect>{
 
     private var hotPostList: List<HotPostInfo> = emptyList()
     private var groupList: CommunityGroupInfo ?= null
     private var accessToken: String ?= ""
     private var categoryList =  mutableListOf<Pair<Int, String>>()
+    private var groupId: Int? = null
+    private var hospitalId: Int? = null
 
     override val container: Container<PostListState, PostListSideEffect> = container(
         initialState = PostListState(),
@@ -88,10 +92,7 @@ class PostListViewModel @Inject constructor(
     fun onClickWriteButton() = intent {
         postSideEffect(PostListSideEffect.NavigateToWriteScreen)
     }
-
     fun onSelectCategoryIndex(index: Int) = intent {
-        var groupId: Int ?= null
-        var hospitalId: Int ?= null
 
         if(index == 0) {
             groupId = null
@@ -106,6 +107,7 @@ class PostListViewModel @Inject constructor(
 
         reduce {
             state.copy (
+                categoryName = categoryList[index].second,
                 groupId = groupId,
                 hospitalId = hospitalId,
             )
@@ -120,35 +122,16 @@ class PostListViewModel @Inject constructor(
         }
     }
 
-    @OptIn(OrbitExperimental::class)
-    fun onSearchChange(value: String) = blockingIntent {
-        reduce {
-            state.copy (
-                searchWord = value
-            )
-        }
-    }
-
-    fun onClickDone() = intent {
-        val searchListFlow = getPostListUseCase("Bearer ${accessToken}", state.hospitalId, state.groupId, state.searchWord).getOrThrow()
-
-        reduce {
-            state.copy (
-                searchListFlow = searchListFlow!!
-            )
-        }
-    }
-
 }
 
 data class PostListState(
+    val categoryName: String = "전체",
     val hospitalId: Int? = null,
     val groupId: Int? = null,
     val searchWord: String? = null,
     val hotPostList: List<HotPostInfo> = listOf(),
     val postListFlow: Flow<PagingData<PostData>> = emptyFlow(),
     val categoryList: List<Pair<Int, String>> = listOf((0 to "전체")),
-    val searchListFlow: Flow<PagingData<PostData>> = emptyFlow()
 )
 
 sealed interface PostListSideEffect {

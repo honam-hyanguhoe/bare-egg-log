@@ -26,18 +26,24 @@ fun CommunityNavigationHost() {
                         route = "${CommunityRoute.PostDetailScreen.name}/$postId"
                     )
                 },
-                onNavigateToSearchScreen = {
+                onNavigateToSearchScreen = { hospitalId, groupId ->
                     navController.navigate(
-                        route = CommunityRoute.PostSearchScreen.name
+                        route = "${CommunityRoute.PostSearchScreen.name}/$hospitalId/$groupId"
                     )
                 }
             )
         }
 
         composable(
-            route = CommunityRoute.PostSearchScreen.name
+            route = "${CommunityRoute.PostSearchScreen.name}/{hospitalId}/{groupId}",
+            arguments = listOf(navArgument("hospitalId") {type = NavType.IntType}, navArgument("groupId") {type = NavType.IntType})
         ) {
+            backStackEntry ->
+            val hospitalId = backStackEntry.arguments?.getInt("hospitalId")
+            val groupId = backStackEntry.arguments?.getInt("groupId")
             PostSearchScreen(
+                hospitalId = hospitalId?: -1,
+                groupId = groupId?: -1,
                 onNavigateToPostListScreen = {
                     navController.navigate(
                         route = CommunityRoute.PostListScreen.name,
