@@ -74,7 +74,7 @@ class SettingViewModel @Inject constructor(
             0 -> postSideEffect(SettingSideEffect.Toast("출시 준비 중입니다."))
             1 -> postSideEffect(SettingSideEffect.Toast("출시 준비 중입니다."))
             2 -> postSideEffect(SettingSideEffect.NavigateToMainActivity)
-            3 -> postSideEffect(SettingSideEffect.NavigateToCommunityActivity)
+            3 -> postSideEffect(SettingSideEffect.Toast("출시 준비 중입니다."))
         }
     }
 }

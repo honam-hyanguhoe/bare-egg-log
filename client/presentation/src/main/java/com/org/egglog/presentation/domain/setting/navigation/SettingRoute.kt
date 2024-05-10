@@ -5,5 +5,6 @@ sealed class SettingRoute(val name: String) {
     data object PrivacyDetailScreen: SettingRoute("PrivacyDetailScreen")
     data object SettingScreen: SettingRoute("SettingScreen")
     data object MySettingScreen: SettingRoute("MySettingScreen")
+    data object CalendarSettingScreen: SettingRoute("CalendarSettingScreen")
 
 }
