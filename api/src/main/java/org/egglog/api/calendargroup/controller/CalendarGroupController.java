@@ -88,7 +88,7 @@ public class CalendarGroupController {
      * @author 김도휘
      */
     @GetMapping("/events")
-    public ResponseEntity<?> getEventListByCalendarGroupIds(
+    public ResponseEntity<MessageUtils> getEventListByCalendarGroupIds(
             @ModelAttribute CalendarGroupListRequest request,
             @AuthenticationPrincipal User user
     ) {
