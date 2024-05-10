@@ -84,15 +84,20 @@ class StaticsViewModel @Inject constructor(
 
         Log.d("stats", result.toString())
 
-        val gson = Gson()
-        val jsonData = gson.toJson(result)
 
-        Log.d("stats", "gson result --- $jsonData")
-//        WorkStats(month=2024-05, weeks=[WeekStats(week=1, data=WeekData(DAY=3, EVE=3, NIGHT=0, OFF=3))])
-        reduce {
-            state.copy( remainData = jsonData)
+        if(result != null){
+            Log.d("remain", result.toString())
+
+            val gson = Gson()
+            val jsonData = gson.toJson(result)
+
+            Log.d("stats", "gson result --- $jsonData")
+
+            reduce {
+                state.copy( remainData = jsonData)
+            }
         }
-
+//        WorkStats(month=2024-05, weeks=[WeekStats(week=1, data=WeekData(DAY=3, EVE=3, NIGHT=0, OFF=3))])
     }
 }
 

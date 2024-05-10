@@ -1,7 +1,9 @@
 package com.org.egglog.presentation.component.organisms.webView
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -11,9 +13,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
@@ -32,22 +37,25 @@ import com.org.egglog.presentation.component.atoms.buttons.RadioLabelButton
 import com.org.egglog.presentation.component.molecules.radioButtons.DayRadioButton
 import com.org.egglog.presentation.domain.main.AndroidBridge
 import com.org.egglog.presentation.theme.Gray100
+import com.org.egglog.presentation.theme.Indigo400
 import com.org.egglog.presentation.theme.NaturalBlack
 import com.org.egglog.presentation.theme.Typography
+import com.org.egglog.presentation.theme.Warning300
+import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun ContentWebView(
     width: Int = 300,
-    height: Int = 250,
+    height: Int = 270,
     url: String = "https://www.egg-log.org/",
     data: String = "",
-    selected: MutableState<String>,
-//    type : String = "remain"
+    selected: MutableState<String>?,
+    type : String = "remain"
 ) {
     val context = LocalContext.current
     val webView = remember {
-        WebView(context).apply {
+        NoScrollWebView(context).apply {
             settings.apply {
                 javaScriptEnabled = true
                 allowContentAccess = true
@@ -80,33 +88,34 @@ fun ContentWebView(
         webView.loadUrl(url)
     }
 
-    val type = "remain"
     if(type == "remain"){
         val radioList = arrayListOf("Week", "Month")
         Row(Modifier.fillMaxWidth()) {
             radioList.mapIndexed { index, text ->
-                RadioLabelButton(
-                    text = text,
-                    isSelected = selected.value == text,
-                    onClick = { clickedIdx ->
-                        selected.value = clickedIdx
-                        val script = "javascript:receiveDataFromApp('${data.replace("\"", "\\\"")}')"
-                        webView.evaluateJavascript(script) { value ->
-                            Log.d("WebView", "JavaScript response: $value")
-                        }
-                    },
-                    radioButtonColorInfo = RadioButtonColorInfo(
-                        selectedBorderColor = NaturalBlack,
-                        selectedContainerColor = NaturalBlack,
-                        selectedTextColor = Gray100,
-                        unSelectedBorderColor = NaturalBlack,
-                        unSelectedContainerColor = Gray100,
-                        unSelectedTextColor = NaturalBlack
-                    ),
-                    textStyle = Typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                    width = 64,
-                    padding = 8
-                )
+                if (selected != null) {
+                    RadioLabelButton(
+                        text = text,
+                        isSelected = selected.value == text,
+                        onClick = { clickedIdx ->
+                            selected.value = clickedIdx
+                            val script = "javascript:receiveDataFromApp('${data.replace("\"", "\\\"")}')"
+                            webView.evaluateJavascript(script) { value ->
+                                Log.d("WebView", "JavaScript response: $value")
+                            }
+                        },
+                        radioButtonColorInfo = RadioButtonColorInfo(
+                            selectedBorderColor = NaturalBlack,
+                            selectedContainerColor = NaturalBlack,
+                            selectedTextColor = Gray100,
+                            unSelectedBorderColor = NaturalBlack,
+                            unSelectedContainerColor = Gray100,
+                            unSelectedTextColor = NaturalBlack
+                        ),
+                        textStyle = Typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                        width = 64,
+                        padding = 8
+                    )
+                }
                 if (index != radioList.size - 1) Spacer(
                     modifier = Modifier.padding(
                         3.widthPercent(context).dp
@@ -121,14 +130,32 @@ fun ContentWebView(
 
     Card(
         modifier = Modifier
-            .fillMaxSize()
-            .background(color = Gray100)
+//            .fillMaxSize()
+//            .height(height.heightPercent(context).dp)
+            .fillMaxHeight()
+            .width(width.widthPercent(context).dp)
+            .background(color = Warning300)
+//            .background(color = Gray100)
     ) {
         AndroidView(
             factory = { webView },
             modifier = Modifier
-                .fillMaxSize()
-                .background(color = Gray100)
+                .height(height.heightPercent(context).dp)
+                .width(width.widthPercent(context).dp)
+//                .fillMaxSize()
         )
+    }
+}
+
+
+class NoScrollWebView(context: Context) : WebView(context) {
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (event?.action == MotionEvent.ACTION_MOVE)
+            return false
+        return super.onTouchEvent(event)
+    }
+
+    override fun onScrollChanged(l: Int, t: Int, oldl: Int, oldt: Int) {
+        super.onScrollChanged(l, t, l, t)
     }
 }
