@@ -154,11 +154,15 @@ public class BoardService {
             List<BoardListOutputSpec> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getOffset(), size);
             log.info("boardList 쿼리 실행");
             for (BoardListOutputSpec board : boardList) {
+                log.info("boardId: {}", board.getBoardId());
                 User writer = userJpaRepository.findById(board.getUserId()).orElseThrow(
                         () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
                 );
                 long viewCount = redisViewCountUtil.getViewCount(String.valueOf(board.getBoardId())); //하루 동안의 조회수
-                Long hitCnt = viewCount + board.getViewCount();
+                log.info("redis view count: {}", viewCount);
+                long hitCnt = viewCount + board.getViewCount();
+                log.info("redis + db 조회수 합산: {}", hitCnt);
+                log.info("db 조회수: {}", board.getViewCount());
 
                 //사용자의 병원 인증 정보
                 Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(writer, writer.getSelectedHospital());
@@ -201,6 +205,7 @@ public class BoardService {
 
     /**
      * 급상승 게시물 조회
+     * 좋아요 + 댓글 상위 2개
      *
      * @param user
      * @return
