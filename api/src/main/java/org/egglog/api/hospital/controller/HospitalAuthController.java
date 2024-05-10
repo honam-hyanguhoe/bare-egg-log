@@ -1,5 +1,6 @@
 package org.egglog.api.hospital.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.hospital.model.dto.request.CreateHospitalAuthRequest;
@@ -43,7 +44,7 @@ public class HospitalAuthController {
     @PostMapping("/create")
     public ResponseEntity<MessageUtils> createAuth(
             @AuthenticationPrincipal User loginUser,
-            @RequestBody CreateHospitalAuthRequest request
+            @RequestBody @Valid CreateHospitalAuthRequest request
             ){
         return ResponseEntity.ok().body(
                 MessageUtils.success(hospitalAuthService.createHospitalAuth(loginUser, request)));
