@@ -1,5 +1,6 @@
 package com.org.egglog.presentation.domain.setting.screen
 
+import android.app.Activity
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -51,7 +52,6 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 @Composable
 fun MySettingScreen(
     viewModel: MySettingViewModel = hiltViewModel(),
-    onNavigateToSettingScreen: () -> Unit
 ) {
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
@@ -71,7 +71,6 @@ fun MySettingScreen(
     }
 
     MySettingScreen(
-        onNavigateToSettingScreen = onNavigateToSettingScreen,
         enabledModify = state.enabledModify,
         enabledDelete = state.enabledDelete,
         user = state.user,
@@ -92,7 +91,6 @@ fun MySettingScreen(
 
 @Composable
 fun MySettingScreen(
-    onNavigateToSettingScreen: () -> Unit,
     enabledModify: Boolean,
     enabledDelete: Boolean,
     user: UserDetail?,
@@ -126,7 +124,7 @@ fun MySettingScreen(
                 hasTitle = true,
                 hasArrow = true,
                 hasProgressBar = true,
-                onClickBack = onNavigateToSettingScreen,
+                onClickBack = { (context as? Activity)?.onBackPressed() },
                 onClickLink = { },
                 onClickMenus = { },
                 selectedOption = null
@@ -244,8 +242,6 @@ fun MySettingScreen(
 @Composable
 private fun MySettingScreenPreview() {
     ClientTheme {
-        MySettingScreen(
-            onNavigateToSettingScreen = { }
-        )
+        MySettingScreen()
     }
 }

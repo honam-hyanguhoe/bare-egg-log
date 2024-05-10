@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.org.egglog.presentation.component.molecules.bottomNavigator.BottomNavigator
 import com.org.egglog.presentation.domain.auth.activity.LoginActivity
-import com.org.egglog.presentation.domain.auth.viewmodel.PlusLoginSideEffect
 import com.org.egglog.presentation.domain.community.activity.CommunityActivity
 import com.org.egglog.presentation.domain.group.activity.GroupActivity
 import com.org.egglog.presentation.domain.main.activity.MainActivity
@@ -56,6 +55,7 @@ fun SettingScreen(
     viewModel: SettingViewModel = hiltViewModel(),
     onNavigateToPrivacyDetailScreen: () -> Unit,
     onNavigateToAgreeDetailScreen: () -> Unit,
+    onNavigateToCalendarSettingScreen: () -> Unit,
     onNavigateToMySettingScreen: () -> Unit
 ) {
     val context = LocalContext.current
@@ -105,11 +105,12 @@ fun SettingScreen(
     SettingScreen(
         onNavigateToPrivacyDetailScreen = onNavigateToPrivacyDetailScreen,
         onNavigateToAgreeDetailScreen = onNavigateToAgreeDetailScreen,
+        onSelectedIdx = viewModel::onSelectedIdx,
+        onNavigateToCalendarSettingScreen = onNavigateToCalendarSettingScreen,
         onNavigateToMySettingScreen = onNavigateToMySettingScreen,
         onClickLogout = viewModel::onClickLogout,
         logoutEnabled = state.logoutEnabled,
-        selectedIdx = state.selectedIdx,
-        onSelectedIdx = viewModel::onSelectedIdx
+        selectedIdx = state.selectedIdx
     )
 }
 
@@ -118,6 +119,7 @@ fun SettingScreen(
     onNavigateToPrivacyDetailScreen: () -> Unit,
     onNavigateToAgreeDetailScreen: () -> Unit,
     onNavigateToMySettingScreen: () -> Unit,
+    onNavigateToCalendarSettingScreen: () -> Unit,
     onClickLogout: () -> Unit,
     logoutEnabled: Boolean,
     selectedIdx: Int,
@@ -181,6 +183,7 @@ fun SettingScreen(
                     onNavigateToPrivacyDetailScreen = onNavigateToPrivacyDetailScreen,
                     onNavigateToAgreeDetailScreen = onNavigateToAgreeDetailScreen,
                     onNavigateToMySettingScreen = onNavigateToMySettingScreen,
+                    onNavigateToCalendarSettingScreen = onNavigateToCalendarSettingScreen,
                     onClickLogout = { openLogoutDialog.value = true }
                 )
 
@@ -226,7 +229,8 @@ private fun SettingScreenPreview() {
         SettingScreen(
             onNavigateToPrivacyDetailScreen = {},
             onNavigateToAgreeDetailScreen = {},
-            onNavigateToMySettingScreen = {}
+            onNavigateToMySettingScreen = {},
+            onNavigateToCalendarSettingScreen = {}
         )
     }
 }
