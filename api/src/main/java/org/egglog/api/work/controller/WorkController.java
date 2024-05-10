@@ -112,7 +112,7 @@ public class WorkController {
     @GetMapping("/find/upcoming/{dateType}")
     public ResponseEntity<MessageUtils> findUpcomingCountWorkList(
             @AuthenticationPrincipal User loginUser,
-            @RequestParam("today")
+            @RequestParam(value = "today", required = true)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate today,
             @PathVariable DateType dateType
             ){
@@ -132,9 +132,9 @@ public class WorkController {
     @GetMapping("/find/completed")
     public ResponseEntity<MessageUtils> findCompletedCountWorkList(
             @AuthenticationPrincipal User loginUser,
-            @RequestParam("today")
+            @RequestParam(value = "today", required = true)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate today,
-            @RequestParam("month")
+            @RequestParam(value = "month", required = true)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate month
     ){
         return ResponseEntity.ok().body(
