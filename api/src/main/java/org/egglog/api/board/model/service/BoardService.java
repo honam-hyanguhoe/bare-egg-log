@@ -154,6 +154,7 @@ public class BoardService {
             List<BoardListOutputSpec> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getOffset(), size);
             log.info("boardList 쿼리 실행");
             for (BoardListOutputSpec board : boardList) {
+                log.info("boardId: {}", board.getBoardId());
                 User writer = userJpaRepository.findById(board.getUserId()).orElseThrow(
                         () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
                 );
@@ -161,6 +162,7 @@ public class BoardService {
                 log.info("redis view count: {}", viewCount);
                 long hitCnt = viewCount + board.getViewCount();
                 log.info("redis + db 조회수 합산: {}", hitCnt);
+                log.info("db 조회수: {}", board.getViewCount());
 
                 //사용자의 병원 인증 정보
                 Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(writer, writer.getSelectedHospital());
