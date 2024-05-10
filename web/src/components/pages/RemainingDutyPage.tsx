@@ -34,39 +34,23 @@ const initialData: TreeNode = {
 const RemainingDutyPage = () => {
   const [duty, setDuty] = useState<TreeNode>(initialData);
 
-  // window.receiveDataFromApp = (data: string) => {
-  //   console.log("Data received: " + data);
+  window.receiveDataFromApp = (data: string) => {
+    console.log("Data received: " + data);
 
-  //   setDuty((prevData) => ({
-  //     ...prevData,
-  //     children: JSON.parse(data),
-  //   }));
-
-  //   return `${duty}`;
-  // };
-
-  useEffect(() => {
-    window.receiveDataFromApp = (data: string) => {
-      console.log("Data received: " + data);
-
-      setDuty((prevData) => ({
-        ...prevData,
-        children: JSON.parse(data),
-      }));
-
-      return `${duty}`;
-    };
-    return () => {
-      delete (window as any).receiveDataFromApp;
-    };
-  }, []);
-
-  const updateData = (newChildren: TreeNode[]) => {
     setDuty((prevData) => ({
       ...prevData,
-      children: newChildren,
+      children: JSON.parse(data),
     }));
+
+    return `${JSON.stringify(data)}`;
   };
+
+  // const updateData = (newChildren: TreeNode[]) => {
+  //   setDuty((prevData) => ({
+  //     ...prevData,
+  //     children: newChildren,
+  //   }));
+  // };
 
   return (
     <GraphContainer>

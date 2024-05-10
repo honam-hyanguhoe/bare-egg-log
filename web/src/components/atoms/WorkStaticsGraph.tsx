@@ -23,7 +23,7 @@ const WorkStaticsGraph = ({ data }: WorkStaticsGraphProps) => {
   useEffect(() => {
     const handleResize = () => {
       setDimensions({
-        width: window.innerWidth > 500 ? 500 : window.innerWidth * 0.95,
+        width: window.innerWidth > 500 ? 500 : window.innerWidth * 0.99,
         height: window.innerHeight > 300 ? 300 : window.innerHeight * 0.5,
       });
     };

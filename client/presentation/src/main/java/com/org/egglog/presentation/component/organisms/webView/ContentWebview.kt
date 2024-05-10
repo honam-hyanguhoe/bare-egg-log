@@ -55,6 +55,7 @@ fun ContentWebView(
     viewModel : StaticsViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+
     val webView = remember {
         NoScrollWebView(context).apply {
             settings.apply {
@@ -72,11 +73,13 @@ fun ContentWebView(
             }
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
             webViewClient = WebViewClient()
+
+
         }
     }
 
-    val state = viewModel.collectAsState().value
 
+    val state = viewModel.collectAsState().value
     DisposableEffect(Unit) {
         webView.addJavascriptInterface(AndroidBridge(context, webView), "AndroidBridge")
         onDispose {
@@ -87,7 +90,7 @@ fun ContentWebView(
 
     LaunchedEffect(key1 = state.remainData) {
         if (state.remainData.isNotEmpty()) {
-            Log.d("WebView", "Updating webView with new remainData")
+            Log.d("WebView", "보이냐고 왜 안보이냐고")
             val script = "javascript:receiveDataFromApp('${state.remainData.replace("\"", "\\\"")}')"
             webView.evaluateJavascript(script) { value ->
                 Log.d("WebView", "JavaScript response: $value")
@@ -96,17 +99,9 @@ fun ContentWebView(
     }
 
     LaunchedEffect(key1 = url) {
-        Log.d("webview","초기로딩 ${state.remainData}")
+
 
         webView.loadUrl(url)
-
-        if (state.remainData.isNotEmpty()) {
-            Log.d("WebView", "Updating webView with new remainData")
-            val script = "javascript:receiveDataFromApp('${state.remainData.replace("\"", "\\\"")}')"
-            webView.evaluateJavascript(script) { value ->
-                Log.d("WebView", "JavaScript response: $value")
-            }
-        }
     }
     
     if (type == "remain") {
