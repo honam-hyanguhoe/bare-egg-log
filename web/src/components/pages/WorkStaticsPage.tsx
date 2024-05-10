@@ -46,8 +46,8 @@ const monthlyData = [
         week: "4",
         data: {
           DAY: 0,
-          EVE: 0,
-          NIGHT: 0,
+          EVE: 3,
+          NIGHT: 4,
           OFF: 0,
         },
       },
@@ -97,7 +97,26 @@ const WorkStaticsPage = () => {
   const newData1: DataItem[] = normalizeData(monthlyData);
   console.log(`${JSON.stringify(newData1)}`);
 
-  const [data, setData] = useState<DataItem[]>(initialData);
+  const [staticsData, setStaticsData] = useState<DataItem[]>(initialData);
+
+  useEffect(() => {
+    setStaticsData(newData1);
+  }, []);
+
+  window.receiveDataFromApp = (data: string) => {
+    console.log("statics data received: " + data);
+
+    // setDuty((prevData) => ({
+    //   ...prevData,
+    //   children: JSON.parse(data),
+    // }));
+    console.log("statics data 옴" + [JSON.parse(data)]);
+    setStaticsData([JSON.parse(data)]);
+
+    return `${staticsData}`;
+  };
+
+  // const [data, setData] = useState<DataItem[]>(initialData);
 
   // useEffect(() => {
   //   const updateData = () => {
@@ -139,7 +158,7 @@ const WorkStaticsPage = () => {
           <TypeText>OFF</TypeText>
         </TypeContainer>
       </TypeListContainer>
-      <WorkStaticsGraph data={data} />
+      <WorkStaticsGraph data={staticsData} />
     </GraphContainer>
   );
 };
@@ -149,19 +168,12 @@ export default WorkStaticsPage;
 const GraphContainer = styled.div`
   background-color: #f2f4f7;
   min-height: 100vh;
-  padding-top: 20x;
-  padding-left: 20px;
-  // padding: 40px;
+  padding-left: 30px;
 `;
-const GraphTitle = styled.p`
-  font-size: 25px;
-  font-family: "Line-Seed-Sans-App";
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 20px;
-`;
+
 const TypeListContainer = styled.div`
   display: flex;
+  padding-top: 30px;
   gap: 14px;
 `;
 

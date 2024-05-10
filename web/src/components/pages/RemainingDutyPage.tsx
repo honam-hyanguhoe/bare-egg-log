@@ -46,8 +46,6 @@ const RemainingDutyPage = () => {
       children: JSON.parse(data),
     }));
 
-    // updateData(tempData);
-
     return `${duty}`;
   };
 

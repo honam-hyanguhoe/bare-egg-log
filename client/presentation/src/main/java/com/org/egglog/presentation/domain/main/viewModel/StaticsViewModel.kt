@@ -56,7 +56,6 @@ class StaticsViewModel @Inject constructor(
             today = state.today,
             dateType = state.dateType
         ).getOrNull()
-//        Log.d("remain", "viewModel result!!!!!!! ${result.getOrNull()}")
 
         if(result != null){
             Log.d("remain", result.toString())
@@ -65,7 +64,7 @@ class StaticsViewModel @Inject constructor(
             val jsonData = gson.toJson(result)
 
             Log.d("remain", "gson result --- $jsonData")
-//    [RemainDuty(name=OFF, value=3, color=#9B8AFB), RemainDuty(name=DAY, value=1, color=#18C5B5)]
+
             reduce {
                 state.copy( remainData = jsonData)
             }

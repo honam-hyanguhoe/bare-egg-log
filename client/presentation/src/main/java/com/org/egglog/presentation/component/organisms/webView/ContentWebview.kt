@@ -42,7 +42,8 @@ fun ContentWebView(
     height: Int = 250,
     url: String = "https://www.egg-log.org/",
     data: String = "",
-    selected: MutableState<String>
+    selected: MutableState<String>,
+//    type : String = "remain"
 ) {
     val context = LocalContext.current
     val webView = remember {
@@ -62,6 +63,7 @@ fun ContentWebView(
             }
             setLayerType(View.LAYER_TYPE_HARDWARE, null)
             webViewClient = WebViewClient()
+            loadUrl(url)
         }
     }
 
@@ -73,43 +75,49 @@ fun ContentWebView(
         }
     }
 
-
     LaunchedEffect(key1 = url) {
+        Log.d("webView", "웹뷰 띄울게요")
         webView.loadUrl(url)
     }
 
-    val radioList = arrayListOf("Week", "Month")
-    Row(Modifier.fillMaxWidth()) {
-        radioList.mapIndexed { index, text ->
-            RadioLabelButton(
-                text = text,
-                isSelected = selected.value == text,
-                onClick = { clickedIdx ->
-                    selected.value = clickedIdx
-                    val script = "javascript:receiveDataFromApp('${data.replace("\"", "\\\"")}')"
-                    webView.evaluateJavascript(script) { value ->
-                        Log.d("WebView", "JavaScript response: $value")
-                    }
-                },
-                radioButtonColorInfo = RadioButtonColorInfo(
-                    selectedBorderColor = NaturalBlack,
-                    selectedContainerColor = NaturalBlack,
-                    selectedTextColor = Gray100,
-                    unSelectedBorderColor = NaturalBlack,
-                    unSelectedContainerColor = Gray100,
-                    unSelectedTextColor = NaturalBlack
-                ),
-                textStyle = Typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                width = 64,
-                padding = 8
-            )
-            if (index != radioList.size - 1) Spacer(
-                modifier = Modifier.padding(
-                    3.widthPercent(context).dp
+    val type = "remain"
+    if(type == "remain"){
+        val radioList = arrayListOf("Week", "Month")
+        Row(Modifier.fillMaxWidth()) {
+            radioList.mapIndexed { index, text ->
+                RadioLabelButton(
+                    text = text,
+                    isSelected = selected.value == text,
+                    onClick = { clickedIdx ->
+                        selected.value = clickedIdx
+                        val script = "javascript:receiveDataFromApp('${data.replace("\"", "\\\"")}')"
+                        webView.evaluateJavascript(script) { value ->
+                            Log.d("WebView", "JavaScript response: $value")
+                        }
+                    },
+                    radioButtonColorInfo = RadioButtonColorInfo(
+                        selectedBorderColor = NaturalBlack,
+                        selectedContainerColor = NaturalBlack,
+                        selectedTextColor = Gray100,
+                        unSelectedBorderColor = NaturalBlack,
+                        unSelectedContainerColor = Gray100,
+                        unSelectedTextColor = NaturalBlack
+                    ),
+                    textStyle = Typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                    width = 64,
+                    padding = 8
                 )
-            )
+                if (index != radioList.size - 1) Spacer(
+                    modifier = Modifier.padding(
+                        3.widthPercent(context).dp
+                    )
+                )
+            }
         }
+
+
     }
+
 
     Card(
         modifier = Modifier

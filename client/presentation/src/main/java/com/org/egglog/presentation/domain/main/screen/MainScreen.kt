@@ -148,7 +148,7 @@ fun RemainCard(
     remainData : String
 ) {
     val context = LocalContext.current
-
+    Log.d("remain", "remain Card ${remainData}")
     Column(
         modifier = Modifier
             .width(320.widthPercent(context).dp)
