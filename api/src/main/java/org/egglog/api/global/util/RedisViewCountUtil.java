@@ -46,8 +46,12 @@ public class RedisViewCountUtil {
         redis.opsForZSet().incrementScore("view_count_board:", boardId, 1);
     }
 
+//    public Set<ZSetOperations.TypedTuple<String>> getAllViewedBoards() {
+//        return redis.opsForZSet().reverseRangeWithScores("view_count_board:", 0, -1);
+//    }
+
     public Set<ZSetOperations.TypedTuple<String>> getAllViewedBoards() {
-        return redis.opsForZSet().reverseRangeWithScores("view_count_board:", 0, -1);
+        return redis.opsForZSet().reverseRangeWithScores("view_count_board:", 0, 1);
     }
 
     public void deleteViewCount(String boardId, String userId) {

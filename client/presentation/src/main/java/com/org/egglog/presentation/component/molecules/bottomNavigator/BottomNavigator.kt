@@ -14,7 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.org.egglog.presentation.utils.Calendar
@@ -41,10 +40,10 @@ fun BottomNavigator(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .shadow(4.dp, shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp))
             .clip(
                 RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
-            ),
+            )
+        ,
         containerColor = NaturalWhite,
         contentColor = NaturalBlack,
         tonalElevation = 0.dp,
