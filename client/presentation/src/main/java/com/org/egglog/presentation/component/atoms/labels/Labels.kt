@@ -38,6 +38,8 @@ fun Labels(text: String, size: String? = null, onClick: (()->Unit)? = null) {
         else -> None
     }
 
+//    val colors : Color = Color(android.graphics.Color.parseColor("#ffff"))
+
     var textStyle = when(size) {
         "big" -> Typography.labelLarge
         else -> Typography.labelMedium

@@ -2,6 +2,7 @@ package com.org.egglog.presentation.component.organisms.webView
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -24,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -165,6 +167,11 @@ class NoScrollWebView(context: Context) : WebView(context) {
     override fun onScrollChanged(l: Int, t: Int, oldl: Int, oldt: Int) {
         super.onScrollChanged(l, t, l, t)
     }
+
+    override fun setBackgroundColor(color: Int) {
+        super.setBackgroundColor(color)
+    }
+
 }
 
 //            webViewClient = object : WebViewClient() {

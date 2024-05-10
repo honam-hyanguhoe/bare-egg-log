@@ -67,19 +67,20 @@ fun StatsContentWebView(
     webView.webViewClient = object : WebViewClient() {
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
-            if (url == "https://www.egg-log.org/stats") {
+            if (url == "https://www.egg-log.org/statics") {
+                Log.d("web-stats", "버튼 기기 ${state.statsData}")
                 val script = "javascript:receiveStatsFromApp('${state.statsData.replace("\"", "\\\"")}')"
                 webView.evaluateJavascript(script) { value ->
-                    Log.d("web-stats", "web-stats $value")
+                    Log.d("web-stats",  "초기 로딩 statics $value")
                 }
             }
         }
     }
 
     DisposableEffect(Unit) {
-        webView.addJavascriptInterface(AndroidBridge(context, webView), "AndroidBridge")
+//        webView.addJavascriptInterface(AndroidBridge(context, webView), "AndroidBridge")
         onDispose {
-            webView.removeJavascriptInterface("AndroidBridge")
+//            webView.removeJavascriptInterface("AndroidBridge")
             webView.destroy()
         }
     }
@@ -93,7 +94,7 @@ fun StatsContentWebView(
         Log.d("web-stats", "기기 ${state.statsData}")
         val script = "javascript:receiveStatsFromApp('${state.statsData.replace("\"", "\\\"")}')"
         webView.evaluateJavascript(script) { value ->
-            Log.d("web-stats", "돌아옴 기기 $value")
+            Log.d("web-stats", "stats 돌아옴 기기 $value")
         }
     }
 
@@ -111,13 +112,13 @@ fun StatsContentWebView(
         )
     }
 
-    Button(onClick = {
-        Log.d("web-stats", "버튼 기기 ${state.statsData}")
-        val script = "javascript:receiveStatsFromApp('${state.statsData.replace("\"", "\\\"")}')"
-        webView.evaluateJavascript(script) { value ->
-            Log.d("web-stats", "버튼 돌아와 $value")
-        }
-    }) {
-        Text(text = "hi")
-    }
+//    Button(onClick = {
+//        Log.d("web-stats", "버튼 기기 ${state.statsData}")
+//        val script = "javascript:receiveStatsFromApp('${state.statsData.replace("\"", "\\\"")}')"
+//        webView.evaluateJavascript(script) { value ->
+//            Log.d("web-stats", "버튼 돌아와 $value")
+//        }
+//    }) {
+//        Text(text = "hi")
+//    }
 }
