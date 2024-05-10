@@ -176,7 +176,7 @@ fun StaticsCard(
         modifier = Modifier
             .width(320.widthPercent(context).dp)
             .background(color = Gray100, shape = RoundedCornerShape(20.dp))
-            .padding(8.dp, 15.dp, 8.dp, 25.dp)
+            .padding(8.dp, 15.dp, 8.dp, 25.dp),
     ) {
         Text(
             text = "내 근무 통계",

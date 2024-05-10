@@ -10,7 +10,6 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.annotation.ContentView
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -90,7 +89,7 @@ fun ContentWebView(
 
     if(type == "remain"){
         val radioList = arrayListOf("Week", "Month")
-        Row(Modifier.fillMaxWidth()) {
+        Row(Modifier.fillMaxWidth().padding(top = 10.dp, start=10.dp)) {
             radioList.mapIndexed { index, text ->
                 if (selected != null) {
                     RadioLabelButton(
