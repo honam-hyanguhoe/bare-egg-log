@@ -2,6 +2,7 @@ package org.egglog.api.calendargroup.model.dto.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.user.model.entity.User;
@@ -14,6 +15,7 @@ import org.egglog.api.user.model.entity.User;
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class CreateCalGroupRequest {
 
+    @NotBlank(message = "alias는 필수 값입니다.")
     private String alias;
     private String url;
 

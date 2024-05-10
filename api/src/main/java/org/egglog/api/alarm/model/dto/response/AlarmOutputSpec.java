@@ -27,4 +27,5 @@ public class AlarmOutputSpec {
     private String workTypeTitle;
 
     private String workTypeColor;
+
 }

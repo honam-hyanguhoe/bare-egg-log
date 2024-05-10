@@ -1,5 +1,6 @@
 package org.egglog.api.group.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.group.model.dto.request.GroupForm;
@@ -18,7 +19,19 @@ import org.egglog.api.user.model.entity.User;
 
 import java.util.List;
 
-
+/**
+ * ```
+ * ===================[Info]=========================
+ * packageName    : org.egglog.api.group.controller
+ * fileName      : GroupController
+ * description    : 유저의 그룹 관리하는 컨트롤러
+ * =================================================
+ * ```
+ * |DATE|AUTHOR|NOTE|
+ * |:---:|:---:|:---:|
+ * |2024-04-24|김다희|최초 생성|
+ * |2024-05-10|김형민|검증 추가|
+ */
 @RestController
 @RequestMapping("/v1/groups")
 @RequiredArgsConstructor
@@ -35,7 +48,7 @@ public class GroupController {
 
     @PostMapping("/invitation/accept")
     public ResponseEntity acceptInvitaion(
-            @RequestBody InvitationAcceptForm acceptForm,
+            @RequestBody @Valid InvitationAcceptForm acceptForm,
             @AuthenticationPrincipal User user){
         groupService.acceptInvitation(acceptForm,user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.NO_CONTENT));
@@ -109,7 +122,7 @@ public class GroupController {
 
     @PostMapping("")
     public ResponseEntity generateGroup(
-            @RequestBody GroupForm groupForm,
+            @RequestBody @Valid GroupForm groupForm,
             @AuthenticationPrincipal User user
     ){
         groupService.generateGroup(groupForm,user);
@@ -117,7 +130,7 @@ public class GroupController {
     }
 
     @GetMapping("/duty/{groupId}")
-    public ResponseEntity getGroupDuty(@AuthenticationPrincipal User user,@PathVariable("groupId") Long groupId, @RequestParam("date") String date){
+    public ResponseEntity getGroupDuty(@AuthenticationPrincipal User user, @PathVariable("groupId") Long groupId, @RequestParam("date") String date){
         return ResponseEntity.ok().body(MessageUtils.success(groupService.getGroupDuty(groupId,user,date)));
     }
 }

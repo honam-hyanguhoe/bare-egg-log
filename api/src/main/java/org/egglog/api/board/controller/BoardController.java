@@ -1,6 +1,7 @@
 
 package org.egglog.api.board.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.egglog.api.board.model.dto.params.*;
 import org.egglog.api.board.model.service.BoardService;
@@ -39,7 +40,7 @@ public class BoardController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> registerBoard(@RequestBody BoardForm boardForm, @AuthenticationPrincipal User user) {
+    public ResponseEntity<?> registerBoard(@RequestBody @Valid BoardForm boardForm, @AuthenticationPrincipal User user) {
         boardService.registerBoard(boardForm, user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }
@@ -56,14 +57,14 @@ public class BoardController {
     }
 
     @PatchMapping("/{board_id}")
-    public ResponseEntity<?> modifyBoard(@PathVariable("board_id") Long boardId, @RequestBody BoardUpdateForm boardUpdateForm, @AuthenticationPrincipal User user) {
+    public ResponseEntity<?> modifyBoard(@PathVariable("board_id") Long boardId, @RequestBody @Valid BoardUpdateForm boardUpdateForm, @AuthenticationPrincipal User user) {
 
         return ResponseEntity.ok().body(MessageUtils.success(boardService.modifyBoard(boardId, boardUpdateForm, user)));
     }
 
     //좋아요
     @PostMapping("/like")
-    public ResponseEntity<?> registerLike(@RequestBody LikeForm likeForm, @AuthenticationPrincipal User user) {
+    public ResponseEntity<?> registerLike(@RequestBody @Valid LikeForm likeForm, @AuthenticationPrincipal User user) {
         boardService.registerLike(likeForm, user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }

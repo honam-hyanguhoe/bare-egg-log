@@ -1,5 +1,6 @@
 package org.egglog.api.calendar.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.calendar.model.dto.params.CalendarMonthRequest;
@@ -47,7 +48,7 @@ public class CalendarController {
     }
 
     @GetMapping("/month")
-    public ResponseEntity<?> getCalendarByMonth(@ModelAttribute CalendarMonthRequest calendarMonthRequest, @AuthenticationPrincipal User user) {
+    public ResponseEntity<?> getCalendarByMonth(@ModelAttribute @Valid CalendarMonthRequest calendarMonthRequest, @AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(MessageUtils.success(calendarService.getCalendarListByMonth(calendarMonthRequest, user)));
     }
 
