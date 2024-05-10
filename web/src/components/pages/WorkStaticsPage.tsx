@@ -90,11 +90,16 @@ const WorkStaticsPage = () => {
     delete (window as any).receiveStatsFromApp;
     console.log("statics data received: " + data);
 
-    console.log("statics data 옴" + [data]);
+    console.log("statics data 옴" + JSON.parse(data));
+    const emptyList = [];
     // JSON.parse(data);
     // setStaticsData();
     // setStaticsData([JSON.parse(data)]);
+    emptyList.push(JSON.parse(data));
 
+    const normalData = normalizeData(emptyList);
+    console.log("normalData" + normalData);
+    setStaticsData(normalData);
     return `staticsData in web${JSON.stringify(data)}`;
   };
 
