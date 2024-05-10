@@ -3,7 +3,6 @@ package com.org.egglog.presentation.domain.main.screen
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,10 +23,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.org.egglog.presentation.component.molecules.radioButtons.DayRadioButton
 import com.org.egglog.presentation.component.organisms.calendars.WeeklyCalendar
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyUiModel
-import com.org.egglog.presentation.component.organisms.webView.ContentWebView
+import com.org.egglog.presentation.component.organisms.webView.RemainContentWebView
+import com.org.egglog.presentation.component.organisms.webView.StatsContentWebView
 import com.org.egglog.presentation.domain.main.viewModel.StaticsViewModel
 import com.org.egglog.presentation.domain.main.viewModel.WorkViewModel
 import com.org.egglog.presentation.theme.Gray100
@@ -161,7 +159,7 @@ fun RemainCard(
             style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
         )
 
-        ContentWebView(width = 320, height = 340, url = "https://www.egg-log.org/remain", data = remainData, selected=selected)
+        RemainContentWebView(width = 320, height = 340, url = "https://www.egg-log.org/remain", data = remainData, selected=selected)
     }
 
 }
@@ -183,7 +181,7 @@ fun StaticsCard(
             modifier = Modifier.padding(start = 10.dp),
             style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
         )
-        ContentWebView(width = 320, height = 360, url = "https://www.egg-log.org/statics" , data = statsData, selected = null, type="stats")
+        StatsContentWebView(width = 320, height = 360, url = "https://www.egg-log.org/statics" , data = statsData, selected = null, type="stats")
     }
 }
 

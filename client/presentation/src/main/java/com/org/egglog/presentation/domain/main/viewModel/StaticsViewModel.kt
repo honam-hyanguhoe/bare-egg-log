@@ -41,7 +41,7 @@ class StaticsViewModel @Inject constructor(
             getWorkStatsData("Bearer ${tokenResult}")
             getRemainData("Bearer ${tokenResult}")
         } else {
-            Log.e("ViewModel", "Failed to fetch token")
+            Log.e("webview", "Failed to fetch token")
         }
     }
 
@@ -55,7 +55,7 @@ class StaticsViewModel @Inject constructor(
             val jsonData = Gson().toJson(result)
             reduce { state.copy(statsData = jsonData) }
         } else {
-            Log.e("ViewModel", "Failed to fetch work stats data")
+            Log.e("webview", "Failed to fetch work stats data")
         }
     }
 
@@ -80,9 +80,9 @@ class StaticsViewModel @Inject constructor(
 data class StaticState(
     val date: String = LocalDate.now().toString(),
     val month: String = LocalDate.now().toString(),
-    val dateType: String = "MONTH",
+    val dateType: String = "WEEK",
     val today : String = LocalDate.now().toString(),
-    val remainData : String = "",
+    val remainData : String = "있니",
     val statsData : String = ""
 )
 
