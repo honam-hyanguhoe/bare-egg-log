@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Surface
@@ -36,7 +37,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,6 +51,8 @@ import com.org.egglog.presentation.component.atoms.buttons.HalfMiddleButton
 import com.org.egglog.presentation.component.atoms.buttons.MiddleButton
 import com.org.egglog.presentation.component.atoms.dialogs.BottomSheet
 import com.org.egglog.presentation.component.atoms.icons.Icon
+import com.org.egglog.presentation.component.atoms.inputs.PassInput
+import com.org.egglog.presentation.component.atoms.inputs.SingleInput
 import com.org.egglog.presentation.component.molecules.bottomNavigator.BottomNavigator
 import com.org.egglog.presentation.component.molecules.headers.NoticeHeader
 import com.org.egglog.presentation.domain.community.activity.CommunityActivity
@@ -163,15 +169,17 @@ private fun GroupListScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.9f),
+//                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
             Spacer(modifier = Modifier.height(5.dp))
-            NoticeHeader(title = "그룹", padding = 15)
+            NoticeHeader(title = "그룹", horizontalPadding = 20, verticalPadding = 10)
             Spacer(modifier = Modifier.height(5.dp))
             LazyColumn(
                 modifier = Modifier
@@ -190,38 +198,44 @@ private fun GroupListScreen(
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                 }
-            }
 
-            Spacer(modifier = Modifier.height(10.dp))
+                item{
+                    Spacer(modifier = Modifier.height(10.dp))
 
-            MiddleButton(
-                onClick = {
-                    Log.d("groupList", "클릭")
-                    setShowBottomSheet(true)
-                },
-                colors = ButtonColors(
-                    contentColor = Warning25,
-                    containerColor = Warning300,
-                    disabledContentColor = Gray25,
-                    disabledContainerColor = Gray300
-                )
-            ) {
-                Row(
-                    Modifier.fillMaxSize(),
-                    Arrangement.SpaceBetween,
-                    Alignment.CenterVertically
-                ) {
-                    Text(
-                        style = Typography.displayLarge,
-                        text = "그룹을 만들고 동료를 초대해보세요"
-                    )
-                    Icon(
-                        AddBox,
-                        Modifier.size(24.widthPercent(LocalContext.current).dp),
-                        NaturalWhite
-                    )
+                    MiddleButton(
+                        onClick = {
+                            Log.d("groupList", "클릭")
+                            setShowBottomSheet(true)
+                        },
+                        colors = ButtonColors(
+                            contentColor = Warning25,
+                            containerColor = Warning300,
+                            disabledContentColor = Gray25,
+                            disabledContainerColor = Gray300
+                        )
+                    ) {
+                        Row(
+                            Modifier.fillMaxSize(),
+                            Arrangement.SpaceBetween,
+                            Alignment.CenterVertically
+                        ) {
+                            Text(
+                                style = Typography.displayLarge,
+                                text = "그룹을 만들고 동료를 초대해보세요"
+                            )
+                            Icon(
+                                AddBox,
+                                Modifier.size(24.widthPercent(LocalContext.current).dp),
+                                NaturalWhite
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(50.dp))
                 }
+
             }
+
+
         }
 
         Box(
@@ -233,6 +247,10 @@ private fun GroupListScreen(
         }
     }
 
+    val pin = remember { mutableStateOf("") }
+    val text1 = remember { mutableStateOf("") }
+    val focusManager = LocalFocusManager.current
+
     if (showBottomSheet) {
         BottomSheet(
             height = 300.dp,
@@ -242,31 +260,54 @@ private fun GroupListScreen(
 
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .border(1.dp, NaturalBlack),
+                    .fillMaxWidth(),
+//                    .border(1.dp, NaturalBlack),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(
-                    text = "그룹 이름을 입력해주세요",
-                    style = Typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
-                )
-                Text(
-                    text = "비밀번호를 입력해주세요",
-                    style = Typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
-                )
-
+                Column(
+                    modifier = Modifier
+                        .width(320.widthPercent(context).dp),
+//                        .border(1.dp, Success400),
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "그룹 이름을 입력해주세요",
+                        style = Typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Start
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    SingleInput(
+                        text = text1.value,
+                        onValueChange = { text1.value = it },
+                        focusManager = focusManager,
+                        placeholder = "사번 입력",
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(15.dp))
+                    Text(
+                        text = "비밀번호를 입력해주세요",
+                        style = Typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Start
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    PassInput(pin = pin.value, onValueChange = { pin.value = it })
+                }
+                Spacer(modifier = Modifier.height(10.dp))
                 Row(
                     modifier = Modifier
-                        .width(320.widthPercent(context).dp)
-                        .border(
-                            1.dp,
-                            NaturalBlack
-                        ),
-                    horizontalArrangement = Arrangement.Center,
+                        .width(320.widthPercent(context).dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     HalfBigButton(
+                        modifier = Modifier.width(150.widthPercent(context).dp),
                         onClick = { Log.d("clicked: ", "clicked!!!!") },
                         colors = ButtonColors(
                             contentColor = Gray25,
@@ -276,12 +317,13 @@ private fun GroupListScreen(
                         )
                     ) {
                         Text(
-                            style = Typography.headlineSmall,
+                            style = Typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                             text = "취소"
                         )
                     }
 
                     HalfBigButton(
+                        modifier = Modifier.width(150.widthPercent(context).dp),
                         onClick = { Log.d("clicked: ", "clicked!!!!") },
                         colors = ButtonColors(
                             contentColor = NaturalWhite,
@@ -292,12 +334,13 @@ private fun GroupListScreen(
                         )
                     ) {
                         Text(
-                            style = Typography.headlineSmall,
+                            style = Typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                             text = "등록"
                         )
                     }
                 }
 
+                Spacer(modifier = Modifier.height(10.dp))
             }
 
         }

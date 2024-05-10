@@ -37,7 +37,8 @@ class GroupListViewModel @Inject constructor(
     init {
         getGroupList()
     }
-    private fun getGroupList() = intent{
+
+    private fun getGroupList() = intent {
         val tokens = getTokenUseCase()
 
         val result = getGroupListUseCase(
@@ -47,7 +48,7 @@ class GroupListViewModel @Inject constructor(
     }
 
     fun onSelectedIdx(selectedIdx: Int) = intent {
-        when(selectedIdx) {
+        when (selectedIdx) {
             0 -> postSideEffect(GroupListSideEffect.NavigateToCalendarScreen)
             2 -> postSideEffect(GroupListSideEffect.NavigateToHomeScreen)
             3 -> postSideEffect(GroupListSideEffect.NavigateToCommunityScreen)
@@ -61,8 +62,18 @@ data class GroupListState(
         Group(id = 1, master = "김다희", name = "호남 향우회", memberCount = 2, image = 1),
         Group(id = 2, master = "박철수", name = "서울 친구들", memberCount = 5, image = 2),
         Group(id = 3, master = "이영희", name = "동네 친구들", memberCount = 3, image = 3),
-    ),
-    val statsData : String = "",
+        Group(id = 1, master = "김다희", name = "호남 향우회", memberCount = 2, image = 1),
+        Group(id = 2, master = "박철수", name = "서울 친구들", memberCount = 5, image = 2),
+        Group(id = 3, master = "이영희", name = "동네 친구들", memberCount = 3, image = 3),
+        Group(id = 1, master = "김다희", name = "호남 향우회", memberCount = 2, image = 1),
+        Group(id = 2, master = "박철수", name = "서울 친구들", memberCount = 5, image = 2),
+        Group(id = 3, master = "이영희", name = "동네 친구들", memberCount = 3, image = 3),
+        Group(id = 1, master = "김다희", name = "호남 향우회", memberCount = 2, image = 1),
+        Group(id = 2, master = "박철수", name = "서울 친구들", memberCount = 5, image = 2),
+        Group(id = 3, master = "이영희", name = "동네 친구들", memberCount = 3, image = 3),
+
+        ),
+    val statsData: String = "",
     val selectedIdx: Int = 2
 )
 

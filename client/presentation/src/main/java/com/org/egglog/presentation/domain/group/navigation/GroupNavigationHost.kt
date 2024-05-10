@@ -5,17 +5,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.org.egglog.presentation.domain.community.posteditor.navigation.PostEditorRoute
-import com.org.egglog.presentation.domain.community.posteditor.screen.WritePostScreen
-import com.org.egglog.presentation.domain.community.posteditor.viewmodel.WritePostViewModel
 import com.org.egglog.presentation.domain.group.screen.GroupListScreen
+import com.org.egglog.presentation.domain.group.viewmodel.GroupListViewModel
 
 @Composable
 fun GroupNavigationHost(
 
 ) {
     val navController = rememberNavController()
-    val sharedViewModel : WritePostViewModel = viewModel()
+    val sharedViewModel : GroupListViewModel = viewModel()
 
     NavHost(
         navController = navController, startDestination = GroupRoute.GroupListScreen.name
