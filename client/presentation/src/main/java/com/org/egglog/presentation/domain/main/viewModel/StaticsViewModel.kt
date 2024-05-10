@@ -17,7 +17,6 @@ import org.orbitmvi.orbit.viewmodel.container
 import java.time.LocalDate
 import javax.inject.Inject
 
-
 @HiltViewModel
 class StaticsViewModel @Inject constructor(
     private val getTokenUseCase: GetTokenUseCase,
@@ -32,83 +31,59 @@ class StaticsViewModel @Inject constructor(
     val selected: MutableState<String> = _selected
 
     fun setSelected(newValue: String) = intent {
-        _selected.value = newValue
-        Log.d("remain", "newValue -- ${newValue} ")
-
-        reduce {
-            state.copy(
-                dateType = _selected.value
-            )
-        }
-        getRemainData()
-    }
-    init {
-        Log.d("stats", "근무 통계 데이터 가져올래")
-        getWorkStatsData()
-        getRemainData()
+        reduce { state.copy(dateType = newValue) }
+        updateData()
     }
 
-
-    private fun getRemainData() = intent {
-        val tokens = getTokenUseCase()
-        val result = countRemainingDutyUseCase(
-            accessToken =  "Bearer ${tokens.first}",
-            today = state.today,
-            dateType = state.dateType
-        ).getOrNull()
-
-        if(result != null){
-            Log.d("remain", result.toString())
-
-            val gson = Gson()
-            val jsonData = gson.toJson(result)
-
-            Log.d("remain", "gson result --- $jsonData")
-
-            reduce {
-                state.copy( remainData = jsonData)
-            }
-
+    private fun updateData() = intent {
+        val tokenResult = getTokenUseCase().first
+        if (tokenResult != null) {
+            getWorkStatsData("Bearer ${tokenResult}")
+            getRemainData("Bearer ${tokenResult}")
+        } else {
+            Log.e("ViewModel", "Failed to fetch token")
         }
     }
 
-    private fun getWorkStatsData() = intent {
-        val tokens = getTokenUseCase()
-
-        Log.d("stats", "${state.date} --- ${state.month} ")
+    private fun getWorkStatsData(accessToken: String) = intent {
         val result = getWorkStatsUseCase(
-            accessToken =  "Bearer ${tokens.first}",
+            accessToken = accessToken,
             date = state.date,
             month = state.month
         ).getOrNull()
-
-        Log.d("stats", result.toString())
-
-
-        if(result != null){
-            Log.d("remain", result.toString())
-
-            val gson = Gson()
-            val jsonData = gson.toJson(result)
-
-            Log.d("stats", "gson result --- $jsonData")
-
-            reduce {
-                state.copy( remainData = jsonData)
-            }
+        if (result != null) {
+            val jsonData = Gson().toJson(result)
+            reduce { state.copy(statsData = jsonData) }
+        } else {
+            Log.e("ViewModel", "Failed to fetch work stats data")
         }
-//        WorkStats(month=2024-05, weeks=[WeekStats(week=1, data=WeekData(DAY=3, EVE=3, NIGHT=0, OFF=3))])
+    }
+
+    private fun getRemainData(accessToken: String) = intent {
+        val result = countRemainingDutyUseCase(
+            accessToken = accessToken,
+            today = state.today,
+            dateType = state.dateType
+        ).getOrNull()
+        if (result != null) {
+            val jsonData = Gson().toJson(result)
+            reduce { state.copy(remainData = jsonData) }
+        } else {
+            Log.e("ViewModel", "Failed to fetch remaining duty data")
+        }
+    }
+    init {
+        updateData()
     }
 }
 
 data class StaticState(
     val date: String = LocalDate.now().toString(),
     val month: String = LocalDate.now().toString(),
-    val dateType: String = "WEEK",
+    val dateType: String = "MONTH",
     val today : String = LocalDate.now().toString(),
     val remainData : String = "",
     val statsData : String = ""
 )
-
 
 

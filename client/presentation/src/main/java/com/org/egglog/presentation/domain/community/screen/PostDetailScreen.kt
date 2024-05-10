@@ -144,7 +144,8 @@ private fun PostDetailScreen(
                     hasArrow = true,
                     hasMore = true,
                     onClickBack = onNavigateToPostListScreen,
-                    options = listOf("수정하기", "삭제하기"),
+//                    options = listOf("수정하기", "삭제하기"),
+                    options = listOf("삭제하기"),
                     selectedOption = selectedMenuItem,
                     onSelect = {
                         selectedMenuItem = it

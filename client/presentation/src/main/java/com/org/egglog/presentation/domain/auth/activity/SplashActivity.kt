@@ -79,7 +79,7 @@ class SplashActivity : AppCompatActivity() {
                     } else setUserStoreUseCase(userDetail)
                     startActivity(
                         Intent(
-                            this@SplashActivity, MainActivity::class.java
+                            this@SplashActivity, SettingActivity::class.java
                         ).apply {
                             flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                         }

@@ -71,6 +71,8 @@ fun MySettingScreen(
 
     MySettingScreen(
         onNavigateToSettingScreen = onNavigateToSettingScreen,
+        enabledModify = state.enabledModify,
+        enabledDelete = state.enabledDelete,
         user = state.user,
         name = state.name,
         hospital = state.hospital,
@@ -90,6 +92,8 @@ fun MySettingScreen(
 @Composable
 fun MySettingScreen(
     onNavigateToSettingScreen: () -> Unit,
+    enabledModify: Boolean,
+    enabledDelete: Boolean,
     user: UserDetail?,
     onSearchChange: (String) -> Unit,
     name: String,
@@ -182,10 +186,15 @@ fun MySettingScreen(
                         disabledContentColor = NaturalWhite
                     ),
                     enabled = ((empNo.isNotEmpty() && hospital != null && name.isNotEmpty()) &&
-                                    (empNo != user?.empNo || hospital.hospitalName != user.selectedHospital?.hospitalName || name != user.userName)),
+                                    (empNo != user?.empNo || hospital.hospitalName != user.selectedHospital?.hospitalName || name != user.userName) && enabledModify),
                     onClick = { onClickModify() }
                 ) {
-                    Text(text = "수정하기", style = Typography.bodyMedium, color = NaturalWhite)
+                    Text(
+                        text = if(empNo.isEmpty() || hospital == null || name.isEmpty()) "빈 값이 존재합니다"
+                        else if(empNo == user?.empNo && hospital.hospitalName == user.selectedHospital?.hospitalName && name == user.userName) "수정된 값이 없습니다"
+                        else if(!enabledModify) ""
+                        else "수정하기"
+                        , style = Typography.bodyMedium, color = NaturalWhite)
                 }
             }
 
@@ -217,6 +226,7 @@ fun MySettingScreen(
                         onConfirmation = { onClickDelete() },
                         dialogTitle = "정말 탈퇴하시겠습니까?",
                         dialogText = "이 작업은 되돌릴 수 없습니다.",
+                        enabled = enabledDelete,
                     )
                 }
             }
