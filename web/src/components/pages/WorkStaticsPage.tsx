@@ -132,6 +132,7 @@ export default WorkStaticsPage;
 
 const GraphContainer = styled.div`
   background-color: #f2f4f7;
+  max-height: 100vh;
   min-height: 100vh;
   padding-left: 10px;
 `;

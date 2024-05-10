@@ -57,6 +57,7 @@ const RemainingDutyPage = () => {
 export default RemainingDutyPage;
 
 const GraphContainer = styled.div`
+  max-height: 100vh;
   min-height: 100vh;
   background-color: #f2f4f7;
 `;
