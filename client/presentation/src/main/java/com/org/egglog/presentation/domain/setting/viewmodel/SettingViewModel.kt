@@ -72,7 +72,7 @@ class SettingViewModel @Inject constructor(
     fun onSelectedIdx(selectedIdx: Int) = intent {
         when(selectedIdx) {
             0 -> postSideEffect(SettingSideEffect.Toast("출시 준비 중입니다."))
-            1 -> postSideEffect(SettingSideEffect.Toast("출시 준비 중입니다."))
+            1 -> postSideEffect(SettingSideEffect.NavigateToGroupActivity)
             2 -> postSideEffect(SettingSideEffect.NavigateToMainActivity)
             3 -> postSideEffect(SettingSideEffect.Toast("출시 준비 중입니다."))
         }
