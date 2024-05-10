@@ -34,33 +34,9 @@ const initialData: TreeNode = {
 const RemainingDutyPage = () => {
   const [duty, setDuty] = useState<TreeNode>(initialData);
 
-  // useEffect(() => {
-  //   const handleDataReceive = (data: string) => {
-  //     console.log("Data received: " + data);
-
-  //     try {
-  //       const newChildren = JSON.parse(data);
-  //       setDuty((prevData) => ({
-  //         ...prevData,
-  //         children: newChildren,
-  //       }));
-  //     } catch (error) {
-  //       console.error("Failed to parse incoming data", error);
-  //     }
-  //   };
-
-  //   window.receiveDataFromApp = handleDataReceive;
-
-  //   return () => {
-
-  //       delete window.receiveDataFromApp;
-
-  //   };
-  // }, []);
-
   window.receiveDataFromApp = (data: string) => {
     delete (window as any).receiveDataFromApp;
-    console.log("Data received: " + data);
+    console.log("remain Data received: " + data);
 
     setDuty((prevData) => ({
       ...prevData,
@@ -104,4 +80,28 @@ const GraphTitle = styled.p`
 //     }]`;
 //   const tempData: TreeNode[] = JSON.parse(data);
 //   updateData(tempData);
+// }, []);
+
+// useEffect(() => {
+//   const handleDataReceive = (data: string) => {
+//     console.log("Data received: " + data);
+
+//     try {
+//       const newChildren = JSON.parse(data);
+//       setDuty((prevData) => ({
+//         ...prevData,
+//         children: newChildren,
+//       }));
+//     } catch (error) {
+//       console.error("Failed to parse incoming data", error);
+//     }
+//   };
+
+//   window.receiveDataFromApp = handleDataReceive;
+
+//   return () => {
+
+//       delete window.receiveDataFromApp;
+
+//   };
 // }, []);

@@ -52,7 +52,9 @@ class StaticsViewModel @Inject constructor(
             month = state.month
         ).getOrNull()
         if (result != null) {
+            Log.d("web-stats", "result ${result}")
             val jsonData = Gson().toJson(result)
+            Log.d("web-stats", "view model ${jsonData}")
             reduce { state.copy(statsData = jsonData) }
         } else {
             Log.e("webview", "Failed to fetch work stats data")
@@ -67,6 +69,7 @@ class StaticsViewModel @Inject constructor(
         ).getOrNull()
         if (result != null) {
             val jsonData = Gson().toJson(result)
+            Log.d("remain", "view model--- ${jsonData}")
             reduce { state.copy(remainData = jsonData) }
         } else {
             Log.e("ViewModel", "Failed to fetch remaining duty data")
