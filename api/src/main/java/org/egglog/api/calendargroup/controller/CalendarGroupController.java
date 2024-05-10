@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.egglog.api.calendargroup.model.dto.params.CalendarGroupListRequest;
 import org.egglog.api.calendargroup.model.dto.request.CreateCalGroupRequest;
+import org.egglog.api.calendargroup.model.dto.response.CalendarGroupEventListResponse;
+import org.egglog.api.calendargroup.model.dto.response.CalendarGroupResponse;
 import org.egglog.api.calendargroup.model.service.CalendarGroupService;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.utility.utils.MessageUtils;
@@ -11,6 +13,9 @@ import org.egglog.utility.utils.SuccessType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 /**
  * ```
  * ===================[Info]=========================
@@ -41,7 +46,7 @@ public class CalendarGroupController {
      * @author 김형민
      */
     @PostMapping("/create")
-    public ResponseEntity<MessageUtils> registerCalendarGroup(
+    public ResponseEntity<MessageUtils<CalendarGroupResponse>> registerCalendarGroup(
             @AuthenticationPrincipal User loginUser,
             @RequestBody @Valid CreateCalGroupRequest request
         ) {
@@ -73,7 +78,7 @@ public class CalendarGroupController {
      * @author 김형민
      */
     @GetMapping("/find/list")
-    public ResponseEntity<MessageUtils> findList(
+    public ResponseEntity<MessageUtils<List<CalendarGroupResponse>>> findList(
             @AuthenticationPrincipal User loginUser
     ){
         return ResponseEntity.ok()
@@ -88,7 +93,7 @@ public class CalendarGroupController {
      * @author 김도휘
      */
     @GetMapping("/events")
-    public ResponseEntity<?> getEventListByCalendarGroupIds(
+    public ResponseEntity<MessageUtils<List<CalendarGroupEventListResponse>>> getEventListByCalendarGroupIds(
             @ModelAttribute CalendarGroupListRequest request,
             @AuthenticationPrincipal User user
     ) {

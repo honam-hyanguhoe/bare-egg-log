@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.worktype.model.dto.request.CreateWorkTypeRequest;
 import org.egglog.api.worktype.model.dto.request.EditWorkTypeRequest;
+import org.egglog.api.worktype.model.dto.response.WorkTypeResponse;
 import org.egglog.api.worktype.model.entity.WorkTag;
 import org.egglog.api.worktype.model.service.WorkTypeService;
 import org.egglog.utility.utils.MessageUtils;
@@ -14,6 +15,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalTime;
+import java.util.List;
+
 /**
  * ```
  * ===================[Info]=========================
@@ -43,7 +46,7 @@ public class WorkTypeController {
      * @author 김형민
      */
     @GetMapping("/list")
-    public ResponseEntity<MessageUtils> getWorkTypeList(
+    public ResponseEntity<MessageUtils<List<WorkTypeResponse>>> getWorkTypeList(
             @AuthenticationPrincipal User loginUser
     ) {
         return ResponseEntity.ok()
@@ -58,7 +61,7 @@ public class WorkTypeController {
      * @author 김형민
      */
     @PostMapping("/create")
-    public ResponseEntity<MessageUtils> registerWorkType(
+    public ResponseEntity<MessageUtils<WorkTypeResponse>> registerWorkType(
             @AuthenticationPrincipal User loginUser,
             @RequestBody @Valid CreateWorkTypeRequest request) {
         return ResponseEntity.ok()
@@ -88,7 +91,7 @@ public class WorkTypeController {
      * @return 수정된 근무타입ID, 이름, 색상, 근무 이미지, 태그 속성, 시작시각, 근무시간
      */
     @PutMapping("/edit")
-    public ResponseEntity<MessageUtils> updateWorkType(
+    public ResponseEntity<MessageUtils<WorkTypeResponse>> updateWorkType(
             @AuthenticationPrincipal User loginUser,
             @RequestBody @Valid EditWorkTypeRequest request
     ) {

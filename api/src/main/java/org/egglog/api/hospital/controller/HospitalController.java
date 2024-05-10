@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.hospital.model.dto.request.FindHospitalListRequest;
+import org.egglog.api.hospital.model.dto.response.UserHospitalResponse;
 import org.egglog.api.hospital.model.service.HospitalService;
 import org.egglog.utility.utils.MessageUtils;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * ```
@@ -38,7 +41,7 @@ public class HospitalController {
      * @return
      */
     @GetMapping("/list")
-    public ResponseEntity<MessageUtils> findHospitalList(
+    public ResponseEntity<MessageUtils<List<UserHospitalResponse>>> findHospitalList(
             @Valid @ModelAttribute FindHospitalListRequest request
             ){
         return ResponseEntity.ok().body(MessageUtils.success(hospitalService.findList(request)));
