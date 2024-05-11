@@ -65,6 +65,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.mnode.ical4j/ical4j
     implementation group: 'org.mnode.ical4j', name: 'ical4j', version: '4.0.0-rc5'
+    // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
+    testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.6'
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.6'
 
     // webflux 추가
     implementation 'org.springframework.boot:spring-boot-starter-webflux'

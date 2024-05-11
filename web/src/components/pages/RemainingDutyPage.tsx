@@ -4,7 +4,7 @@ import RemainingDutyGraph from "../atoms/RemainingDutyGraph";
 
 declare global {
   interface Window {
-    receiveDataFromApp: (data: string) => string;
+    receiveDataFromApp: (data: string) => void;
   }
 }
 
@@ -35,22 +35,16 @@ const RemainingDutyPage = () => {
   const [duty, setDuty] = useState<TreeNode>(initialData);
 
   window.receiveDataFromApp = (data: string) => {
-    console.log("Data received: " + data);
+    delete (window as any).receiveDataFromApp;
+    console.log("remain Data received: " + data);
 
     setDuty((prevData) => ({
       ...prevData,
       children: JSON.parse(data),
     }));
 
-    return `${JSON.stringify(data)}`;
+    return `remainData in web ${JSON.stringify(data)}`;
   };
-
-  // const updateData = (newChildren: TreeNode[]) => {
-  //   setDuty((prevData) => ({
-  //     ...prevData,
-  //     children: newChildren,
-  //   }));
-  // };
 
   return (
     <GraphContainer>
@@ -63,6 +57,7 @@ const RemainingDutyPage = () => {
 export default RemainingDutyPage;
 
 const GraphContainer = styled.div`
+  max-height: 100vh;
   min-height: 100vh;
   background-color: #f2f4f7;
 `;
@@ -86,4 +81,28 @@ const GraphTitle = styled.p`
 //     }]`;
 //   const tempData: TreeNode[] = JSON.parse(data);
 //   updateData(tempData);
+// }, []);
+
+// useEffect(() => {
+//   const handleDataReceive = (data: string) => {
+//     console.log("Data received: " + data);
+
+//     try {
+//       const newChildren = JSON.parse(data);
+//       setDuty((prevData) => ({
+//         ...prevData,
+//         children: newChildren,
+//       }));
+//     } catch (error) {
+//       console.error("Failed to parse incoming data", error);
+//     }
+//   };
+
+//   window.receiveDataFromApp = handleDataReceive;
+
+//   return () => {
+
+//       delete window.receiveDataFromApp;
+
+//   };
 // }, []);

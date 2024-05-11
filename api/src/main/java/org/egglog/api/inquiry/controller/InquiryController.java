@@ -40,7 +40,7 @@ public class InquiryController {
     }
 
     @GetMapping("/{inquiry_id}")
-    public ResponseEntity getInquiry(@PathVariable("inquiry_id") Long inquiryId){
+    public ResponseEntity<MessageUtils<InquiryDto>> getInquiry(@PathVariable("inquiry_id") Long inquiryId){
         InquiryDto inquiryDto = inquiryService.getInquiry(inquiryId);
         return ResponseEntity.ok().body(MessageUtils.success(inquiryDto));
     }

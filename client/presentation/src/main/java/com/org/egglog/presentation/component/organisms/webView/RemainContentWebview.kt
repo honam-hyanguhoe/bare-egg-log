@@ -2,6 +2,7 @@ package com.org.egglog.presentation.component.organisms.webView
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -24,28 +25,26 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.org.egglog.client.data.RadioButtonColorInfo
-import com.org.egglog.presentation.component.atoms.buttons.CustomIconButton
 import com.org.egglog.presentation.component.atoms.buttons.RadioLabelButton
 import com.org.egglog.presentation.domain.main.AndroidBridge
 import com.org.egglog.presentation.domain.main.viewModel.StaticsViewModel
 import com.org.egglog.presentation.theme.Gray100
 import com.org.egglog.presentation.theme.NaturalBlack
 import com.org.egglog.presentation.theme.Typography
-import com.org.egglog.presentation.utils.ArrowLeft
-import com.org.egglog.presentation.utils.ArrowRight
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
 import org.orbitmvi.orbit.compose.collectAsState
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun ContentWebView(
+fun RemainContentWebView(
     width: Int = 300,
     height: Int = 270,
     url: String = "https://www.egg-log.org/",
@@ -55,6 +54,8 @@ fun ContentWebView(
     viewModel : StaticsViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val state = viewModel.collectAsState().value
+
 
     val webView = remember {
         NoScrollWebView(context).apply {
@@ -71,15 +72,22 @@ fun ContentWebView(
                 displayZoomControls = false
                 builtInZoomControls = false
             }
-            setLayerType(View.LAYER_TYPE_HARDWARE, null)
-            webViewClient = WebViewClient()
-
-
         }
     }
 
+    webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
+    webView.webViewClient = object : WebViewClient() {
+        override fun onPageFinished(view: WebView?, url: String?) {
+            super.onPageFinished(view, url)
+            if (url == "https://www.egg-log.org/remain") {
+                val script = "javascript:receiveDataFromApp('${state.remainData.replace("\"", "\\\"")}')"
+                webView.evaluateJavascript(script) { value ->
+                    Log.d("WebView", "??? $value")
+                }
+            }
+        }
+    }
 
-    val state = viewModel.collectAsState().value
     DisposableEffect(Unit) {
         webView.addJavascriptInterface(AndroidBridge(context, webView), "AndroidBridge")
         onDispose {
@@ -88,21 +96,20 @@ fun ContentWebView(
         }
     }
 
+    LaunchedEffect(key1 = url) {
+       Log.d("webview", "초기로딩")
+        webView.loadUrl(url)
+    }
+
     LaunchedEffect(key1 = state.remainData) {
-        if (state.remainData.isNotEmpty()) {
-            Log.d("WebView", "보이냐고 왜 안보이냐고")
-            val script = "javascript:receiveDataFromApp('${state.remainData.replace("\"", "\\\"")}')"
-            webView.evaluateJavascript(script) { value ->
-                Log.d("WebView", "JavaScript response: $value")
-            }
+        Log.d("webview", "기기 ${state.remainData}")
+        val script = "javascript:receiveDataFromApp('${state.remainData.replace("\"", "\\\"")}')"
+        webView.evaluateJavascript(script) { value ->
+            Log.d("WebView", "돌아옴 기기 $value")
         }
     }
 
-    LaunchedEffect(key1 = url) {
 
-
-        webView.loadUrl(url)
-    }
     
     if (type == "remain") {
         val radioList = arrayListOf("Week", "Month")
@@ -160,4 +167,29 @@ class NoScrollWebView(context: Context) : WebView(context) {
     override fun onScrollChanged(l: Int, t: Int, oldl: Int, oldt: Int) {
         super.onScrollChanged(l, t, l, t)
     }
+
+    override fun setBackgroundColor(color: Int) {
+        super.setBackgroundColor(color)
+    }
+
 }
+
+//            webViewClient = object : WebViewClient() {
+//                override fun onPageFinished(view: WebView?, url: String?) {
+//                    super.onPageFinished(view, url)
+//                    val initialScript = "javascript:receiveDataFromApp('${state.remainData.replace("\"", "\\\"")}')"
+//                    evaluateJavascript(initialScript) { value ->
+//                        Log.d("WebView", "초기 데이터 전송 $value")
+//                    }
+//                }
+//            }
+
+//    LaunchedEffect(key1 = state.remainData) {
+//        if (state.remainData.isNotEmpty()) {
+//            Log.d("WebView", "보이냐고 왜 안보이냐고")
+//            val script = "javascript:receiveDataFromApp('${state.remainData.replace("\"", "\\\"")}')"
+//            webView.evaluateJavascript(script) { value ->
+//                Log.d("WebView", "JavaScript response: $value")
+//            }
+//        }
+//    }

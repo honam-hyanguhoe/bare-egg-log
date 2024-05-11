@@ -87,7 +87,7 @@ public class BoardScheduler {
             }
             // 합산된 점수 기준으로 상위 2개 게시물 ID만 추출
             List<Long> hotBoardIds = boardViewCounts.entrySet().stream()
-                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+//                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                     .map(Map.Entry::getKey)
                     .limit(2)
                     .toList();

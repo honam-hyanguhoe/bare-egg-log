@@ -1,8 +1,10 @@
 package com.org.egglog.presentation.component.molecules.bottomNavigator
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -40,17 +42,16 @@ fun BottomNavigator(
     NavigationBar(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(4.dp, shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp))
+            .shadow(elevation = 15.dp, shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
             .clip(
-                RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
-            ),
-        containerColor = NaturalWhite,
+                RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+            )
+        ,
+        containerColor = Gray25,
         contentColor = NaturalBlack,
         tonalElevation = 0.dp,
-            windowInsets = NavigationBarDefaults.windowInsets,
+        windowInsets = NavigationBarDefaults.windowInsets,
     ) {
-        Spacer(modifier = Modifier.padding(2.heightPercent(LocalContext.current).dp))
-
         itemList.forEachIndexed { index, item ->
             NavigationBarItem(
                 selected = selectedItem == index,
@@ -63,11 +64,11 @@ fun BottomNavigator(
                 colors = NavigationBarItemColors(
                     selectedIconColor = Warning300,
                     selectedTextColor = Warning300,
-                    selectedIndicatorColor = Warning200.copy(alpha = 0.3f),
-                    unselectedIconColor = Gray500,
-                    unselectedTextColor = Gray500,
-                    disabledIconColor = Gray300,
-                    disabledTextColor = Gray300
+                    selectedIndicatorColor = Warning300.copy(alpha = 0.3f),
+                    unselectedIconColor = NaturalBlack,
+                    unselectedTextColor = NaturalBlack,
+                    disabledIconColor = NaturalBlack,
+                    disabledTextColor = NaturalBlack
                 )
             )
         }

@@ -1,6 +1,8 @@
 package org.egglog.api.group.repository.jpa;
 
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.egglog.api.group.model.dto.response.GroupPreviewDto;
@@ -20,18 +22,25 @@ public class GroupCustomQueryImpl implements GroupCustomQuery{
     @Override
     public Optional<List<GroupPreviewDto>> findGroupByUserId(Long userId){
         List<Tuple> results = jpaQueryFactory
-                .select(group.groupImage, group.groupName, group.id, group.admin)
+                .select(group.groupImage, group.groupName, group.id, group.admin, Expressions.as(groupMember.count(),"memberCount"))
                 .from(groupMember)
                 .leftJoin(groupMember.group, group)
                 .where(groupMember.user.id.eq(userId))
+                .groupBy(group.id)
                 .fetch();
 
         List<GroupPreviewDto> dtos = results.stream().map(tuple -> {
+            NumberPath<Long> memberCountPath = Expressions.numberPath(Long.class, "memberCount");
+            Integer memberCount = 0;
+            if(tuple.get(memberCountPath)!=null){
+                memberCount=tuple.get(memberCountPath).intValue();
+            }
             return GroupPreviewDto.builder()
                     .groupImage(tuple.get(group.groupImage))
                     .groupName(tuple.get(group.groupName))
                     .groupId(tuple.get(group.id))
                     .admin(tuple.get(group.admin))
+                    .memberCount(memberCount)
                     .build();
         }).collect(Collectors.toList());
 

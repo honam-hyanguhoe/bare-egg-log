@@ -34,7 +34,7 @@
         </activity>
 
         <!-- MAIN -->
-        <activity android:name=".domain.main.activity.MainActivity" />
+        <activity android:name=".domain.main.activity.MainActivity" android:hardwareAccelerated="true" />
 
         <!-- SETTING -->
         <activity android:name=".domain.setting.activity.SettingActivity"
@@ -42,6 +42,9 @@
 
         <activity android:name=".domain.community.posteditor.activity.PostEditorActivity" />
         <activity android:name=".domain.community.activity.CommunityActivity"/>
+
+        <!-- GROUP -->
+        <activity android:name=".domain.group.activity.GroupActivity"/>
 
         <service
             android:name=".utils.FcmReceiveService"

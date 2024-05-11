@@ -2,6 +2,8 @@ package org.egglog.api.testdata;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.egglog.api.group.model.dto.request.GroupForm;
+import org.egglog.api.group.model.dto.request.InvitationAcceptForm;
 import org.egglog.api.security.exception.AuthException;
 import org.egglog.api.security.exception.JwtErrorCode;
 import org.egglog.api.security.exception.JwtException;
@@ -63,8 +65,16 @@ public class TestController {
     public ResponseEntity<MessageUtils> creatWorkMockData(
             @AuthenticationPrincipal User loginUser
             ){
-        if (loginUser==null) throw new JwtException(JwtErrorCode.NO_TOKEN);
+        if (loginUser==null) throw new JwtException(JwtErrorCode.NO_TOKEN_FOR_TEST);
         testService.makeWorkListForUser(loginUser);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
+    }
+
+    @PostMapping("/need/group-users")
+    public ResponseEntity<MessageUtils> createGroupUsers(
+            @RequestBody @Valid InvitationAcceptForm request
+    ){
+        testService.giveGroupUsers(request);
+        return ResponseEntity.ok().body(MessageUtils.success((SuccessType.CREATE)));
     }
 }

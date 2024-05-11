@@ -84,8 +84,8 @@ const WorkStaticsGraph = ({ data }: WorkStaticsGraphProps) => {
         .tickFormat(() => "");
     };
 
-    const barWidth = xScale.bandwidth() / dataRef.current[0].values.length + 2;
-
+    // const barWidth = xScale.bandwidth() / dataRef.current[0].values.length + 2;
+    const barWidth = 12;
     ["DAY", "EVE", "NIGHT", "OFF"].forEach((className, i) => {
       console.log(`className ${className} / ${i}`);
       barSvg

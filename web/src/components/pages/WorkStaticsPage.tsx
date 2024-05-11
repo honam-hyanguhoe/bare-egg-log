@@ -8,68 +8,55 @@ interface DataItem {
   values: number[];
 }
 
-const getRandomValues = () => {
-  return Array.from({ length: 4 }, () => Math.floor(Math.random() * 7));
-};
 const monthlyData = [
   {
     month: "2024-05",
     weeks: [
       {
-        week: "1",
         data: {
           DAY: 7,
           EVE: 6,
           NIGHT: 5,
           OFF: 4,
         },
+        week: "1",
       },
       {
+        data: {
+          DAY: 0,
+          EVE: 0,
+          NIGHT: 0,
+          OFF: 0,
+        },
         week: "2",
-        data: {
-          DAY: 0,
-          EVE: 0,
-          NIGHT: 0,
-          OFF: 0,
-        },
       },
       {
+        data: {
+          DAY: 3,
+          EVE: 4,
+          NIGHT: 5,
+          OFF: 0,
+        },
         week: "3",
-        data: {
-          DAY: 0,
-          EVE: 0,
-          NIGHT: 0,
-          OFF: 0,
-        },
       },
       {
-        week: "4",
         data: {
           DAY: 0,
           EVE: 3,
           NIGHT: 4,
           OFF: 0,
         },
-      },
-    ],
-  },
-  {
-    month: "2024-06",
-    weeks: [
-      {
-        week: "1",
-        data: {
-          DAY: 3,
-          EVE: 4,
-          NIGHT: 2,
-          OFF: 1,
-        },
+        week: "4",
       },
     ],
   },
 ];
 
-declare var AndroidBridge: any;
+declare global {
+  interface Window {
+    receiveStatsFromApp: (data: string) => string;
+  }
+}
 const WorkStaticsPage = () => {
   const initialData: DataItem[] = [
     { name: "5월 1주", values: [1, 3, 4, 5] },
@@ -97,49 +84,27 @@ const WorkStaticsPage = () => {
   const newData1: DataItem[] = normalizeData(monthlyData);
   console.log(`${JSON.stringify(newData1)}`);
 
-  const [staticsData, setStaticsData] = useState<DataItem[]>(initialData);
+  const [staticsData, setStaticsData] = useState<DataItem[]>(newData1);
 
-  useEffect(() => {
-    setStaticsData(newData1);
-  }, []);
-
-  window.receiveDataFromApp = (data: string) => {
+  window.receiveStatsFromApp = (data: string) => {
+    delete (window as any).receiveStatsFromApp;
     console.log("statics data received: " + data);
 
-    // setDuty((prevData) => ({
-    //   ...prevData,
-    //   children: JSON.parse(data),
-    // }));
-    console.log("statics data 옴" + [JSON.parse(data)]);
-    setStaticsData([JSON.parse(data)]);
+    console.log("statics data 옴" + JSON.parse(data));
+    const emptyList = [];
+    // JSON.parse(data);
+    // setStaticsData();
+    // setStaticsData([JSON.parse(data)]);
+    emptyList.push(JSON.parse(data));
 
-    return `${staticsData}`;
+    const normalData = normalizeData(emptyList);
+    console.log("normalData" + normalData);
+    setStaticsData(normalData);
+    return `staticsData in web${JSON.stringify(data)}`;
   };
-
-  // const [data, setData] = useState<DataItem[]>(initialData);
-
-  // useEffect(() => {
-  //   const updateData = () => {
-  //     const newData: DataItem[] = normalizeData(monthlyData);
-  //     console.log(`${JSON.stringify(newData)}`);
-  //     // const newData: DataItem[] = initialData;
-  //     setData(newData);
-  //   };
-
-  //   const interval = setInterval(updateData, 5000);
-
-  //   return () => clearInterval(interval);
-  // }, []);
-
-  // webView (web -> App)
-  // const showAndroidToast = () => {
-  //   window.AndroidBridge.showToast("안녕 호남향우회");
-  // };
 
   return (
     <GraphContainer>
-      {/* <button onClick={() => showAndroidToast}>앱에 있는 알람으로 띄워줘.</button> */}
-
       <TypeListContainer>
         <TypeContainer>
           <Label borderColor="#18C5B5" bgColor="#18C5B5" />
@@ -167,6 +132,7 @@ export default WorkStaticsPage;
 
 const GraphContainer = styled.div`
   background-color: #f2f4f7;
+  max-height: 100vh;
   min-height: 100vh;
   padding-left: 10px;
 `;
@@ -189,3 +155,23 @@ const TypeText = styled.div`
   font-weight: 600;
   color: #767676;
 `;
+
+// const [data, setData] = useState<DataItem[]>(initialData);
+
+// useEffect(() => {
+//   const updateData = () => {
+//     const newData: DataItem[] = normalizeData(monthlyData);
+//     console.log(`${JSON.stringify(newData)}`);
+//     // const newData: DataItem[] = initialData;
+//     setData(newData);
+//   };
+
+//   const interval = setInterval(updateData, 5000);
+
+//   return () => clearInterval(interval);
+// }, []);
+
+// webView (web -> App)
+// const showAndroidToast = () => {
+//   window.AndroidBridge.showToast("안녕 호남향우회");
+// };
