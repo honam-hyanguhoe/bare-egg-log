@@ -16,6 +16,8 @@ class App : Application() {
                 Toast.makeText(this, "세션만료. 로그아웃 되었습니다.", Toast.LENGTH_SHORT).show()
             } else if(e.message?.contains("HTTP 418") == true && e.message?.contains("retrofit2.HttpException") == true) {
                 Toast.makeText(this, "추가정보가 부족합니다.", Toast.LENGTH_SHORT).show()
+            } else if(e.message?.contains("HTTP 502") == true && e.message?.contains("retrofit2.HttpException") == true) {
+                Toast.makeText(this, "서버 점검 중입니다.", Toast.LENGTH_SHORT).show()
             } else if(e.message?.contains("No address associated with hostname") == true){
                 Toast.makeText(this, "네트워크 에러가 발생했습니다.", Toast.LENGTH_SHORT).show()
             } else {

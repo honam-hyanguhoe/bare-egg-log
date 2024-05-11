@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.org.egglog.presentation.domain.setting.screen.AgreeDetailScreen
+import com.org.egglog.presentation.domain.setting.screen.CalendarAddScreen
 import com.org.egglog.presentation.domain.setting.screen.CalendarSettingScreen
 import com.org.egglog.presentation.domain.setting.screen.MySettingScreen
 import com.org.egglog.presentation.domain.setting.screen.PrivacyDetailScreen
@@ -32,7 +33,9 @@ fun SettingNavigationHost() {
         }
 
         composable(route = SettingRoute.CalendarSettingScreen.name) {
-            CalendarSettingScreen()
+            CalendarSettingScreen(
+                onNavigationToCalendarAddScreen = { navController.navigate(route = SettingRoute.CalendarAddScreen.name) }
+            )
         }
 
         composable(route = SettingRoute.AgreeDetailScreen.name) {
@@ -41,6 +44,10 @@ fun SettingNavigationHost() {
 
         composable(route = SettingRoute.MySettingScreen.name) {
             MySettingScreen()
+        }
+
+        composable(route = SettingRoute.CalendarAddScreen.name) {
+            CalendarAddScreen()
         }
     }
 }
