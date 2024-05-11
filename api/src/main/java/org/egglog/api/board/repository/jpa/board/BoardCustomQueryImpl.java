@@ -118,8 +118,8 @@ public class BoardCustomQueryImpl implements BoardCustomQuery {
     @Override
     public List<BoardListOutputSpec> findBoardList(String keyword, Long groupId, Long hospitalId, Long offset, int size) {
         BooleanExpression whereClause = board.isNotNull()
-                .and(groupId != null ? board.group.id.eq(groupId) : null)
-                .and(hospitalId != null ? board.hospital.id.eq(hospitalId) : null)
+                .and(groupId != null ? board.group.id.eq(groupId) :  board.group.id.isNull())
+                .and(hospitalId != null ? board.hospital.id.eq(hospitalId) : board.hospital.id.isNull())
                 .and(keyword != null && !keyword.isEmpty() ? searchKeyword(keyword) : null);
 
         List<Tuple> results = jpaQueryFactory
