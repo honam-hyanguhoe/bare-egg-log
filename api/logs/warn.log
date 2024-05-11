@@ -1,0 +1,3 @@
+[2024-05-10 10:57:19:20600][http-nio-8010-exec-1] WARN  o.e.api.logging.LogTestController - warn 로그 발생 : 로직상 유효성이 확인되었으며, 예상 가능한 문제일 경우 표시합니다.
+[2024-05-10 10:57:19:20804][http-nio-8010-exec-2] WARN  o.a.c.util.SessionIdGeneratorBase - Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took [155] milliseconds.
+[2024-05-10 10:57:21:22715][http-nio-8010-exec-3] WARN  o.e.api.logging.LogTestController - warn 로그 발생 : 로직상 유효성이 확인되었으며, 예상 가능한 문제일 경우 표시합니다.
