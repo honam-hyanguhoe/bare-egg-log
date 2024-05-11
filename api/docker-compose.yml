@@ -9,7 +9,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     volumes:
-      - /home/ubuntu/services/main:/var/logs/main:rwo
+      - /home/ubuntu/services/main:/var/logs/main:rw
     environment:
       - TZ=Asia/Seoul
     ports:
