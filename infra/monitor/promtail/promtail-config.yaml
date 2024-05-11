@@ -1,0 +1,52 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: https://monitor.egg-log.org/loki/loki/api/v1/push
+
+scrape_configs:
+  - job_name: main-debug
+    static_configs:
+      - targets:
+          - main:8010
+        labels:
+          job: main-debug-logs
+          __path__: /home/ubuntu/services/main/debug.log
+
+    pipeline_stages:
+      - multiline:
+          firstline: '^\[.+?\]\[.+?\]\sDEBUG'
+          max_wait_time: 1s
+          max_lines: 500
+
+  - job_name: main-warn
+    static_configs:
+      - targets:
+          - main:8010
+        labels:
+          job: main-warn-logs
+          __path__: /home/ubuntu/services/main/warn.log
+
+    pipeline_stages:
+      - multiline:
+          firstline: '^\[.+?\]\[.+?\]\sWARN'
+          max_wait_time: 1s
+          max_lines: 500
+
+  - job_name: main-error
+    static_configs:
+      - targets:
+          - main:8010
+        labels:
+          job: main-error-logs
+          __path__: /home/ubuntu/services/main/error.log
+
+    pipeline_stages:
+      - multiline:
+          firstline: '^\[.+?\]\[.+?\]\sERROR'
+          max_wait_time: 1s
+          max_lines: 500
