@@ -13,6 +13,7 @@ import com.org.egglog.domain.community.usecase.GetPostListUseCase
 import com.org.egglog.presentation.data.CommunityGroupInfo
 import com.org.egglog.presentation.data.HotPostInfo
 import com.org.egglog.presentation.data.toUiModel
+import com.org.egglog.presentation.domain.setting.viewmodel.SettingSideEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.Flow
@@ -124,6 +125,15 @@ class PostListViewModel @Inject constructor(
         }
     }
 
+    fun onSelectedIdx(selectedIdx: Int) = intent {
+        when(selectedIdx) {
+            0 -> postSideEffect(PostListSideEffect.Toast("출시 준비 중입니다.")) // 일정 페이지로 이동
+            1 -> postSideEffect(PostListSideEffect.Toast("출시 준비 중입니다.")) // 그룹 페이지로 이동
+            2 -> postSideEffect(PostListSideEffect.NavigateToMainActivity) // 메인 페이지로 이동
+            4 -> postSideEffect(PostListSideEffect.NavigateToSettingActivity) // 설정 페이지로 이동
+        }
+    }
+
 }
 
 data class PostListState(
@@ -135,9 +145,18 @@ data class PostListState(
     val postListFlow: Flow<PagingData<PostData>> = emptyFlow(),
     val categoryList: List<Pair<Int, String>> = listOf((0 to "전체")),
     val isHospitalAuth: Boolean = false,
+    val selectedIdx: Int = 3,
 )
 
 sealed interface PostListSideEffect {
     class Toast(val message: String) : PostListSideEffect
+
+    data object NavigateToMainActivity: PostListSideEffect
+
+    data object NavigateToGroupActivity: PostListSideEffect
+
+    data object NavigateToSettingActivity: PostListSideEffect
+
+
 
 }

@@ -40,7 +40,6 @@ fun BottomNavigator(
     NavigationBar(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight()
             .shadow(4.dp, shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp))
             .clip(
                 RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
