@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  promtail:
+    image: grafana/promtail:3.0.0
+    container_name: promtail
+    restart: always
+    ports:
+      - 9080:9080
+    volumes:
+      - /var/lib/docker/:/var/lib/docker:ro
+      - ./promtail-config.yaml:/mnt/config/promtail-config.yaml
+    command:
+      - '--config.file=/mnt/config/promtail-config.yaml'
+    networks:
+      - jenkins_egg-log-net
+volumes:
+  promtail_date: {}
+networks:
+  jenkins_egg-log-net:
+    external: true
