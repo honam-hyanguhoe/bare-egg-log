@@ -38,8 +38,8 @@ fun GroupButton(
     val context = LocalContext.current
     val image = when (groupImage) {
         1 -> R.drawable.dark
-        2 -> R.drawable.dark
-        3 -> R.drawable.dark
+        2 -> R.drawable.cry
+        3 -> R.drawable.vacation
         else -> R.drawable.cry
     }
     Surface(

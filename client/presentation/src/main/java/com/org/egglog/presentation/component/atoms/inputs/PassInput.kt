@@ -12,7 +12,7 @@ fun PassInput(pin: String, onValueChange: (String) -> Unit) {
 
     ComposePinInput(
         value = pin,
-        cellBorderWidth = 2.widthPercent(context).dp,
+        cellBorderWidth = 1.widthPercent(context).dp,
         cellBorderColor = Warning300,
         focusedCellBorderColor = Warning400,
         onValueChange = onValueChange,

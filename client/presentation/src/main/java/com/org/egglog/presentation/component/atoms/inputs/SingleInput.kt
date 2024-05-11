@@ -1,5 +1,6 @@
 package com.org.egglog.presentation.component.atoms.inputs
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import com.org.egglog.presentation.theme.*
 import com.org.egglog.presentation.utils.widthPercent
@@ -24,7 +26,7 @@ fun SingleInput(
         placeholder: String,
         onValueChange: (String) -> Unit,
     focusManager: FocusManager,
-    keyboardOptions: KeyboardOptions = KeyboardOptions()
+    keyboardOptions: KeyboardOptions = KeyboardOptions(),
 ) {
     val context = LocalContext.current
     OutlinedTextField(
@@ -46,8 +48,9 @@ fun SingleInput(
         onValueChange = onValueChange,
         keyboardActions = KeyboardActions(
             onDone = {
+                Log.d("groupList", "keyboardDone")
                 focusManager.clearFocus()
-            }, 
+            },
             onNext = {
                 focusManager.moveFocus(FocusDirection.Next)
             }

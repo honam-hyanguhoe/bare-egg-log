@@ -139,28 +139,17 @@ private fun MainScreen(
             .background(NaturalWhite)
             .fillMaxSize()
             .systemBarsPadding(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.92f)
+                .fillMaxHeight(0.9f)
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
-//        Spacer(modifier = Modifier.height(30.dp))
-//        Box(
-//            modifier = Modifier
-//                .width(340.widthPercent(context).dp)
-//                .height(185.heightPercent(context).dp)
-//                .border(
-//                    1.dp, NaturalBlack,
-//                    RoundedCornerShape(15.dp)
-//                )
-//        ) {
-//            Text(text = "으아. 집 갈래요", style = Typography.displayLarge)
-//        }
             Spacer(modifier = Modifier.height(30.dp))
             DutyCard(
                 startDate = startDate,
@@ -174,11 +163,7 @@ private fun MainScreen(
             Spacer(modifier = Modifier.height(30.dp))
             StaticsCard(statsData = statsData)
         }
-        Box(modifier = Modifier
-            .fillMaxHeight(1f)
-            .fillMaxWidth()) {
-            BottomNavigator(selectedItem = selectedIdx, onItemSelected = { onSelectedIdx(it) })
-        }
+        BottomNavigator(selectedItem = selectedIdx, onItemSelected = { onSelectedIdx(it) })
     }
 }
 

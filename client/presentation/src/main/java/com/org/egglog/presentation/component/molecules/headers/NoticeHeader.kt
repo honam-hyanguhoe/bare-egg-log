@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.org.egglog.presentation.R
@@ -39,14 +40,14 @@ fun NoticeHeader(
     options: List<String> = listOf(""),
     selectedOption: String? = null,
     onSelect: (String) -> Unit = {},
-    padding : Int = 0
+    horizontalPadding : Int = 0,
+    verticalPadding : Int = 0
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = padding.dp)
+            .padding(horizontal = horizontalPadding.dp, vertical = verticalPadding.dp)
             .background(NaturalWhite)
-//            .border(1.dp, NaturalBlack)
     ) {
         Column (
             modifier = Modifier.fillMaxWidth()
@@ -103,13 +104,12 @@ fun NoticeHeaderContents(
             } else {
                 Text(
                     text = title,
-                    style = Typography.bodyLarge,
+                    style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
                     color = NaturalBlack,
                     textAlign = TextAlign.Center,
                 )
 
                 if (hasMenu) {
-
                     ScrollableMenus(
                         iconShape = ArrowDown,
                         horizontalOffset = -80.dp,
@@ -126,14 +126,14 @@ fun NoticeHeaderContents(
         ) {
             if (hasSearch) {
                 CustomIconButton(
-                    size = 25.dp,
+                    size = 35.dp,
                     imageVector = Search,
                     color = NaturalBlack,
                     onClick = onClickSearch
                 )
             }
             CustomIconButton(
-                size = 25.dp,
+                size = 35.dp,
                 imageVector = Notification,
                 color = NaturalBlack,
                 onClick = onClickNotification
