@@ -4,6 +4,7 @@ import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
@@ -143,14 +145,11 @@ private fun GroupListScreen(
     onGroupPasswordChange: (String) -> Unit,
     createGroup: () -> Unit,
 ) {
-    val scrollState = rememberScrollState()
-    val context = LocalContext.current
-
     Column(
         modifier = Modifier
             .background(NaturalWhite)
-            .fillMaxSize()
-            .systemBarsPadding(),
+            .fillMaxSize(),
+//            .systemBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
@@ -159,7 +158,6 @@ private fun GroupListScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.9f),
-//                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
@@ -184,8 +182,6 @@ private fun GroupListScreen(
                 }
 
                 item {
-                    Spacer(modifier = Modifier.height(5.dp))
-
                     MiddleButton(
                         onClick = {
                             Log.d("groupList", "클릭")
@@ -214,19 +210,9 @@ private fun GroupListScreen(
                     }
                     Spacer(modifier = Modifier.height(50.dp))
                 }
-
             }
-
-
         }
-
-        Box(
-            modifier = Modifier
-                .fillMaxHeight(1f)
-                .fillMaxWidth()
-        ) {
-            BottomNavigator(selectedItem = selectedIdx, onItemSelected = { onSelectedIdx(it) })
-        }
+        BottomNavigator(selectedItem = selectedIdx, onItemSelected = { onSelectedIdx(it) })
     }
 
 
@@ -248,7 +234,6 @@ private fun GroupListScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheetContent(
     groupName: String,
@@ -258,13 +243,6 @@ fun BottomSheetContent(
     createGroup: () -> Unit,
     setShowBottomSheet: (Boolean) -> Unit,
 ) {
-//    val scope = rememberCoroutineScope()
-//    val bottomSheetState = rememberModalBottomSheetState(
-//        skipPartiallyExpanded = true,
-//    )
-
-
-
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
@@ -291,10 +269,7 @@ fun BottomSheetContent(
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done
                 ),
-                onImeActionPerformed = {
-
-                }
-                )
+            )
             Spacer(modifier = Modifier.height(15.dp))
             Text(
                 text = "비밀번호를 입력해주세요", style = Typography.headlineSmall.copy(

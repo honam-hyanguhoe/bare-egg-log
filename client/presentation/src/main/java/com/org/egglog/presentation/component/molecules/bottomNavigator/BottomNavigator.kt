@@ -1,8 +1,10 @@
 package com.org.egglog.presentation.component.molecules.bottomNavigator
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -14,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.org.egglog.presentation.utils.Calendar
@@ -40,17 +43,16 @@ fun BottomNavigator(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
+            .shadow(elevation = 15.dp, shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
             .clip(
-                RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
+                RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
             )
         ,
-        containerColor = NaturalWhite,
+        containerColor = Gray25,
         contentColor = NaturalBlack,
         tonalElevation = 0.dp,
-            windowInsets = NavigationBarDefaults.windowInsets,
+        windowInsets = NavigationBarDefaults.windowInsets,
     ) {
-        Spacer(modifier = Modifier.padding(2.heightPercent(LocalContext.current).dp))
-
         itemList.forEachIndexed { index, item ->
             NavigationBarItem(
                 selected = selectedItem == index,
@@ -63,11 +65,11 @@ fun BottomNavigator(
                 colors = NavigationBarItemColors(
                     selectedIconColor = Warning300,
                     selectedTextColor = Warning300,
-                    selectedIndicatorColor = Warning200.copy(alpha = 0.3f),
-                    unselectedIconColor = Gray500,
-                    unselectedTextColor = Gray500,
-                    disabledIconColor = Gray300,
-                    disabledTextColor = Gray300
+                    selectedIndicatorColor = Warning300.copy(alpha = 0.3f),
+                    unselectedIconColor = NaturalBlack,
+                    unselectedTextColor = NaturalBlack,
+                    disabledIconColor = NaturalBlack,
+                    disabledTextColor = NaturalBlack
                 )
             )
         }

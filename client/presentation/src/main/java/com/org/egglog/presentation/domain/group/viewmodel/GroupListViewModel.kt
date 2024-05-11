@@ -147,7 +147,7 @@ class GroupListViewModel @Inject constructor(
 data class GroupListState(
     val groupList: List<Group> = emptyList(),
     val statsData: String = "",
-    val selectedIdx: Int = 2,
+    val selectedIdx: Int = 1,
     val groupName: String = "",
     val groupPassword: String = "",
     val groupImage: Int = 1,

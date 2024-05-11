@@ -27,7 +27,6 @@ fun SingleInput(
         onValueChange: (String) -> Unit,
     focusManager: FocusManager,
     keyboardOptions: KeyboardOptions = KeyboardOptions(),
-    onImeActionPerformed: () -> Unit = {}
 ) {
     val context = LocalContext.current
     OutlinedTextField(
@@ -51,8 +50,7 @@ fun SingleInput(
             onDone = {
                 Log.d("groupList", "keyboardDone")
                 focusManager.clearFocus()
-                onImeActionPerformed()
-            }, 
+            },
             onNext = {
                 focusManager.moveFocus(FocusDirection.Next)
             }
