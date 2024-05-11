@@ -26,6 +26,7 @@ public class GroupCustomQueryImpl implements GroupCustomQuery{
                 .from(groupMember)
                 .leftJoin(groupMember.group, group)
                 .where(groupMember.user.id.eq(userId))
+                .groupBy(group.id)
                 .fetch();
 
         List<GroupPreviewDto> dtos = results.stream().map(tuple -> {
