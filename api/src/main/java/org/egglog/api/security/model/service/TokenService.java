@@ -55,7 +55,7 @@ public class TokenService {
                 refreshTokenRepository.delete(token); //토큰 지우고
                 User user = userJpaRepository.findById(id).orElseThrow(() -> new UserException(UserErrorCode.DELETED_USER));
                 userJpaRepository.save(user.doLogout()); //로그아웃 처리후
-                throw new JwtException(JwtErrorCode.INVALID_TOKEN); //로그인 재요청
+                throw new JwtException(JwtErrorCode.INVALID_REFRESH_TOKEN); //로그인 재요청
             }
             if(refreshTokenRequest.equals(token.getRefreshToken())){
                 //마지막으로 발행된 리프레쉬 토큰과 요청이 들어온 리프레쉬토큰이 같다면 -> 정상적으로 재발행한다.
@@ -70,10 +70,10 @@ public class TokenService {
                 unsafeTokenRepository.save(token.toUnSafeToken());
                 User user = userJpaRepository.findById(id).orElseThrow(() -> new UserException(UserErrorCode.DELETED_USER));
                 userJpaRepository.save(user.doLogout()); //로그아웃 처리후
-                throw new JwtException(JwtErrorCode.INVALID_TOKEN);//로그인 재 요청
+                throw new JwtException(JwtErrorCode.INVALID_REFRESH_TOKEN);//로그인 재 요청
             }
         }
-        throw new JwtException(JwtErrorCode.INVALID_TOKEN);
+        throw new JwtException(JwtErrorCode.INVALID_REFRESH_TOKEN);
     }
 
 }

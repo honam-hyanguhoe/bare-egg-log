@@ -20,7 +20,7 @@ data class PostDetailInfo(
     val viewCount: Long,
     val boardLikeCount: Long,
     val hospitalName: String? = "",
-    val isLiked: Boolean,
+    var isLiked: Boolean,
     val isCommented: Boolean,
     val isHospitalAuth: Boolean,
 )

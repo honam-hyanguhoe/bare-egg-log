@@ -16,6 +16,8 @@ data class WritePostParam(
     val pictureThree : String,
     val pictureFour : String,
     val tempNickname : String = "익명의 구운란",
+    val groupId: Int? = null,
+    val hospitalId: Int? = null,
 ){
     fun toRequestBody() : RequestBody{
         return Json.encodeToString(this).toRequestBody()

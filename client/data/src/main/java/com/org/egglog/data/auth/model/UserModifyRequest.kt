@@ -9,7 +9,8 @@ import okhttp3.RequestBody.Companion.toRequestBody
 @Serializable
 data class UserModifyRequest(
     val userName: String,
-    val hospitalId: Long,
+    val profileImgUrl: String,
+    val selectHospitalId: Long,
     val empNo: String
 ) {
     fun toRequestBody(): RequestBody {

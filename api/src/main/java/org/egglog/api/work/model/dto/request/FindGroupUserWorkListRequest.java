@@ -33,8 +33,11 @@ public class FindGroupUserWorkListRequest {
     @Positive(message = "정확한 ID 값을 입력 해주세요.")
     private Long targetUserId;
 
+    @NotNull(message = "startDate 는 필수 입니다.")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate startDate;
+
+    @NotNull(message = "endDate 는 필수 입니다.")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate endDate;
 }

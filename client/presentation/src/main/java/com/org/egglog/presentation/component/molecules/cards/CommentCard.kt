@@ -32,6 +32,7 @@ import com.org.egglog.presentation.utils.widthPercent
 import com.org.egglog.presentation.component.atoms.icons.Icon
 import com.org.egglog.presentation.component.atoms.profileItem.ProfileItem
 import com.org.egglog.presentation.theme.*
+import com.org.egglog.presentation.utils.CalculateTimeDifference
 
 @Composable
 fun CommentCard(isRecomment: Boolean = false, commentInfo: CommentInfo, myUserId: Long, onDeleteClick: (Long) -> Unit, onRecommentClick: (Long) -> Unit) {
@@ -48,14 +49,15 @@ fun CommentCard(isRecomment: Boolean = false, commentInfo: CommentInfo, myUserId
             Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
                 ProfileItem(
                     profile = Profile(
-                        commentInfo.userId,
+                        myUserId,
                         hospital = commentInfo.hospitalName,
                         name = commentInfo.tempNickname,
-                        isAuth = commentInfo.isHospitalAuth
+                        isAuth = commentInfo.isHospitalAuth,
+                        commentUserId = commentInfo.userId
                     ),
                     type = "post",
                     // TODO {* createdAt 어떻게 되는지 확인 *}
-                    createdAt = commentInfo.commentCreateAt
+                    createdAt = CalculateTimeDifference(commentInfo.commentCreateAt)
                 )
                 if (commentInfo.userId == myUserId) {
                     Surface(onClick = { onDeleteClick(commentInfo.commentId) }, modifier = Modifier.height(20.heightPercent(context).dp), shape = RoundedCornerShape(4.widthPercent(context).dp), contentColor = NaturalWhite, color = NaturalWhite) {

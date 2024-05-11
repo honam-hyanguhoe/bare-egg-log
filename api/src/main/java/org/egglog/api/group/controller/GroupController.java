@@ -1,13 +1,12 @@
 package org.egglog.api.group.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.group.model.dto.request.GroupForm;
 import org.egglog.api.group.model.dto.request.GroupUpdateForm;
 import org.egglog.api.group.model.dto.request.InvitationAcceptForm;
-import org.egglog.api.group.model.dto.response.GroupDto;
-import org.egglog.api.group.model.dto.response.GroupMemberDto;
-import org.egglog.api.group.model.dto.response.GroupPreviewDto;
+import org.egglog.api.group.model.dto.response.*;
 import org.egglog.api.group.model.service.GroupService;
 import org.egglog.utility.utils.MessageUtils;
 import org.egglog.utility.utils.SuccessType;
@@ -18,7 +17,19 @@ import org.egglog.api.user.model.entity.User;
 
 import java.util.List;
 
-
+/**
+ * ```
+ * ===================[Info]=========================
+ * packageName    : org.egglog.api.group.controller
+ * fileName      : GroupController
+ * description    : 유저의 그룹 관리하는 컨트롤러
+ * =================================================
+ * ```
+ * |DATE|AUTHOR|NOTE|
+ * |:---:|:---:|:---:|
+ * |2024-04-24|김다희|최초 생성|
+ * |2024-05-10|김형민|검증 추가|
+ */
 @RestController
 @RequestMapping("/v1/groups")
 @RequiredArgsConstructor
@@ -28,21 +39,21 @@ public class GroupController {
 
     //TODO kafka 적용해 이벤트 큐에 파싱 요청 송신하는 형태로 작성할 것
     @PostMapping("/duty")
-    public ResponseEntity generateGroupDuty(@AuthenticationPrincipal User user){
+    public ResponseEntity<MessageUtils> generateGroupDuty(@AuthenticationPrincipal User user){
         Long userId=1L;
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }
 
     @PostMapping("/invitation/accept")
-    public ResponseEntity acceptInvitaion(
-            @RequestBody InvitationAcceptForm acceptForm,
+    public ResponseEntity<MessageUtils> acceptInvitaion(
+            @RequestBody @Valid InvitationAcceptForm acceptForm,
             @AuthenticationPrincipal User user){
         groupService.acceptInvitation(acceptForm,user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.NO_CONTENT));
     }
 
     @GetMapping("/invitaion/{group_id}")
-    public ResponseEntity getInvitation(
+    public ResponseEntity<MessageUtils<String>> getInvitation(
             @PathVariable("group_id") Long groupId,
             @AuthenticationPrincipal User user
     ){
@@ -51,7 +62,7 @@ public class GroupController {
     }
 
     @DeleteMapping("/{group_id}/{member_id}")
-    public ResponseEntity deleteGroupMember(
+    public ResponseEntity<MessageUtils> deleteGroupMember(
             @PathVariable("group_id") Long groupId,
             @PathVariable("member_id") Long memberId,
             @AuthenticationPrincipal User user
@@ -61,7 +72,7 @@ public class GroupController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity getGroupList(
+    public ResponseEntity<MessageUtils> getGroupList(
             @AuthenticationPrincipal User user
     ){
         List<GroupPreviewDto> groupList = groupService.getGroupList(user);
@@ -69,7 +80,7 @@ public class GroupController {
     }
 
     @GetMapping("/{group_id}")
-    public ResponseEntity retrieveGroup(@PathVariable("group_id") Long groupId,
+    public ResponseEntity<MessageUtils> retrieveGroup(@PathVariable("group_id") Long groupId,
             @AuthenticationPrincipal User user
     ){
         GroupDto group = groupService.retrieveGroup(groupId,user);
@@ -78,7 +89,7 @@ public class GroupController {
 
     //수정 데이터 확인용 전송
     @PatchMapping("/{group_id}")
-    public ResponseEntity updateGroup(
+    public ResponseEntity<MessageUtils> updateGroup(
             @PathVariable("group_id") Long groupId,
             @RequestBody GroupUpdateForm groupUpdateForm,
             @AuthenticationPrincipal User user
@@ -88,7 +99,7 @@ public class GroupController {
     }
 
     @PatchMapping("/{group_id}/{member_id}")
-    public ResponseEntity updateGroupMember(
+    public ResponseEntity<MessageUtils<BossChangeDto>> updateGroupMember(
             @PathVariable("group_id") Long groupId,
             @PathVariable("member_id") Long memberId,
             @AuthenticationPrincipal User user
@@ -99,7 +110,7 @@ public class GroupController {
     }
 
     @DeleteMapping("/exit/{group_id}")
-    public ResponseEntity exitGroup(
+    public ResponseEntity<MessageUtils> exitGroup(
             @PathVariable("group_id") Long groupId,
             @AuthenticationPrincipal User user
     ){
@@ -108,8 +119,8 @@ public class GroupController {
     }
 
     @PostMapping("")
-    public ResponseEntity generateGroup(
-            @RequestBody GroupForm groupForm,
+    public ResponseEntity<MessageUtils> generateGroup(
+            @RequestBody @Valid GroupForm groupForm,
             @AuthenticationPrincipal User user
     ){
         groupService.generateGroup(groupForm,user);
@@ -117,7 +128,11 @@ public class GroupController {
     }
 
     @GetMapping("/duty/{groupId}")
-    public ResponseEntity getGroupDuty(@AuthenticationPrincipal User user,@PathVariable("groupId") Long groupId, @RequestParam("date") String date){
+    public ResponseEntity<MessageUtils<GroupDutySummary>> getGroupDuty(
+            @AuthenticationPrincipal User user,
+            @PathVariable("groupId") Long groupId,
+            @RequestParam("date") String date
+    ){
         return ResponseEntity.ok().body(MessageUtils.success(groupService.getGroupDuty(groupId,user,date)));
     }
 }

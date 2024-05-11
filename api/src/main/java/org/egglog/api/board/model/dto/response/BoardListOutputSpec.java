@@ -50,6 +50,7 @@ public class BoardListOutputSpec {
         this.boardCreatedAt = board.getCreatedAt();
         this.tempNickname = board.getTempNickname();
         this.commentCount = commentCount;
+        this.viewCount = board.getViewCount();
         this.likeCount = likeCount;
         this.pictureOne = board.getPictureOne();
         this.userId = board.getUser().getId();

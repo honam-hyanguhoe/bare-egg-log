@@ -42,7 +42,6 @@ import com.org.egglog.presentation.component.molecules.cards.CommentCard
 import com.org.egglog.presentation.component.molecules.headers.BasicHeader
 import com.org.egglog.presentation.component.organisms.postCard.PostCard
 import com.org.egglog.presentation.data.PostDetailInfo
-import com.org.egglog.presentation.data.PreviewPostInfo
 import com.org.egglog.presentation.domain.community.activity.CommunityActivity
 import com.org.egglog.presentation.domain.community.viewmodel.PostDetailSideEffect
 import com.org.egglog.presentation.domain.community.viewmodel.PostDetailViewModel
@@ -101,6 +100,7 @@ fun PostDetailScreen(
         onChangeComment = viewModel::onChangeComment,
         onClickRecomment = viewModel::onClickRecomment,
         onClickSend = viewModel::onClickSend,
+        onClickLike = viewModel::onClickLike
     )
 }
 
@@ -119,9 +119,9 @@ private fun PostDetailScreen(
     onDeleteComment: (Long) -> Unit,
     onChangeComment: (String) -> Unit,
     onClickRecomment: (Long) -> Unit,
-    onClickSend: () -> Unit
+    onClickSend: () -> Unit,
+    onClickLike: () -> Unit
 ) {
-
 
 
     Column(
@@ -143,7 +143,8 @@ private fun PostDetailScreen(
                     hasArrow = true,
                     hasMore = true,
                     onClickBack = onNavigateToPostListScreen,
-                    options = listOf("수정하기", "삭제하기"),
+//                    options = listOf("수정하기", "삭제하기"),
+                    options = listOf("삭제하기"),
                     selectedOption = selectedMenuItem,
                     onSelect = {
                         selectedMenuItem = it
@@ -178,7 +179,11 @@ private fun PostDetailScreen(
                             postDetailInfo.boardId,
                             postDetailInfo.boardTitle,
                             postDetailInfo.boardContent,
-                            postDetailInfo.pictureOne
+                            postDetailInfo.boardCreatedAt,
+                            postDetailInfo.pictureOne,
+                            postDetailInfo.pictureTwo ?: "",
+                            postDetailInfo.pictureThree ?: "",
+                            postDetailInfo.pictureFour ?: ""
                         )
                         val postReaction = PostReactionInfo(
                             postDetailInfo.boardId,
@@ -192,7 +197,8 @@ private fun PostDetailScreen(
                             PostCard(
                                 profile = profile,
                                 postInfo = postInfo,
-                                postReaction = postReaction
+                                postReaction = postReaction,
+                                onClickLike = onClickLike
                             )
                         }
                     }
@@ -202,7 +208,7 @@ private fun PostDetailScreen(
                     }
                 }
 
-                if(commentList!!.isNotEmpty()) {
+                if (commentList!!.isNotEmpty()) {
                     items(
                         count = commentList.size,
                         key = { index -> commentList[index].commentId }
@@ -212,7 +218,8 @@ private fun PostDetailScreen(
                             // 게시글 작성자와 댓글 작성자의 userId 비교
                             val isPostAuthor = commentInfo.userId == userId
                             // 댓글 작성자가 게시글 작성자와 같을 경우 tempNickname을 변경
-                            val tempNickname = if (isPostAuthor) "익명의 구운란" else commentInfo.tempNickname
+                            val tempNickname =
+                                if (isPostAuthor) "익명의 구운란" else commentInfo.tempNickname
 
                             CommentCard(
                                 commentInfo = commentInfo.copy(tempNickname = tempNickname),
@@ -226,9 +233,10 @@ private fun PostDetailScreen(
                                 }
                             )
 
-                            if(commentInfo.recomment.isNotEmpty()) {
+                            if (commentInfo.recomment.isNotEmpty()) {
                                 commentInfo.recomment.forEach { recomment ->
-                                    val recommentTempNickname = if (isPostAuthor) "익명의 구운란" else recomment.tempNickname
+                                    val recommentTempNickname =
+                                        if (isPostAuthor) "익명의 구운란" else recomment.tempNickname
 
                                     CommentCard(
                                         true,
@@ -253,17 +261,19 @@ private fun PostDetailScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            Log.e("PostDetailScreen", "parentId는 ${parentId}")
             SingleInput(
                 modifier = Modifier.fillMaxWidth(0.8f),
                 text = commentValue,
-                placeholder = if(parentId.toInt() == 0) "댓글을 입력해주세요" else "대댓글을 입력해주세요",
+                placeholder = if (parentId.toInt() == 0) "댓글을 입력해주세요" else "대댓글을 입력해주세요",
                 onValueChange = { commentValue -> onChangeComment(commentValue) },
                 focusManager = focusManager,
             )
             Box(
                 modifier = Modifier
-                    .background(if(commentValue == "") Gray200 else Warning200, RoundedCornerShape(10.dp))
+                    .background(
+                        if (commentValue == "") Gray200 else Warning200,
+                        RoundedCornerShape(10.dp)
+                    )
                     .padding(10.dp)
             ) {
                 CustomIconButton(
@@ -273,7 +283,7 @@ private fun PostDetailScreen(
                     onClick = {
                         onClickSend()
                         focusManager.clearFocus()
-                              },
+                    },
                     enabled = commentValue != ""
                 )
             }

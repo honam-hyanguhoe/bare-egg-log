@@ -4,7 +4,7 @@ import RemainingDutyGraph from "../atoms/RemainingDutyGraph";
 
 declare global {
   interface Window {
-    receiveDataFromApp: (data: string) => string;
+    receiveDataFromApp: (data: string) => void;
   }
 }
 
@@ -35,52 +35,20 @@ const RemainingDutyPage = () => {
   const [duty, setDuty] = useState<TreeNode>(initialData);
 
   window.receiveDataFromApp = (data: string) => {
-    console.log("Data received: " + data);
-    // setDuty(JSON.parse(data));
-
-    const tempData: TreeNode[] = JSON.parse(data);
-    console.log("tempData" + tempData);
+    delete (window as any).receiveDataFromApp;
+    console.log("remain Data received: " + data);
 
     setDuty((prevData) => ({
       ...prevData,
       children: JSON.parse(data),
     }));
 
-    updateData(tempData);
-
-    return `${data}`;
-  };
-
-  // useEffect(() => {
-  //   const receiveDataFromApp = (data: string) => {
-  //     console.log("Data received: " + data);
-  //     setDuty(JSON.parse(data));
-  //     // try {
-  //     // const tempData: TreeNode[] = JSON.parse(data);
-  //     // updateData(tempData);
-  //     // } catch (error) {
-  //     //   console.error("Error parsing JSON data:", error);
-  //     // }
-  //     return `Window updated with: ${data}`;
-  //   };
-
-  //   window.receiveDataFromApp = receiveDataFromApp;
-
-  //   return () => {
-  //     delete (window as any).receiveDataFromApp;
-  //   };
-  // }, []);
-
-  const updateData = (newChildren: TreeNode[]) => {
-    setDuty((prevData) => ({
-      ...prevData,
-      children: newChildren,
-    }));
+    return `remainData in web ${JSON.stringify(data)}`;
   };
 
   return (
     <GraphContainer>
-      <GraphTitle id="title">{JSON.stringify(duty)}</GraphTitle>
+      {/* <GraphTitle id="title">{JSON.stringify(duty)}</GraphTitle> */}
       <RemainingDutyGraph data={duty} />
     </GraphContainer>
   );
@@ -89,6 +57,7 @@ const RemainingDutyPage = () => {
 export default RemainingDutyPage;
 
 const GraphContainer = styled.div`
+  max-height: 100vh;
   min-height: 100vh;
   background-color: #f2f4f7;
 `;
@@ -112,4 +81,28 @@ const GraphTitle = styled.p`
 //     }]`;
 //   const tempData: TreeNode[] = JSON.parse(data);
 //   updateData(tempData);
+// }, []);
+
+// useEffect(() => {
+//   const handleDataReceive = (data: string) => {
+//     console.log("Data received: " + data);
+
+//     try {
+//       const newChildren = JSON.parse(data);
+//       setDuty((prevData) => ({
+//         ...prevData,
+//         children: newChildren,
+//       }));
+//     } catch (error) {
+//       console.error("Failed to parse incoming data", error);
+//     }
+//   };
+
+//   window.receiveDataFromApp = handleDataReceive;
+
+//   return () => {
+
+//       delete window.receiveDataFromApp;
+
+//   };
 // }, []);

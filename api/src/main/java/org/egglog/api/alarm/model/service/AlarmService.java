@@ -40,14 +40,13 @@ public class AlarmService {
 
     private final WorkTypeJpaRepository workTypeJpaRepository;
 
-    public List<AlarmListOutputSpec> getAlarmList(Long userId) {
-        User user = userJpaRepository.findById(userId).orElseThrow(
-                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-        );
+    @Transactional(readOnly = true)
+    public List<AlarmListOutputSpec> getAlarmList(User loginUser) {
+
         List<AlarmListOutputSpec> alarmListOutputSpecList = new ArrayList<>();
 
         try {
-            List<Alarm> alarmList = alarmRepository.findAlarmList(userId);
+            List<Alarm> alarmList = alarmRepository.findAlarmList(loginUser.getId());
 
             for (Alarm alarm : alarmList) {
                 AlarmListOutputSpec alarmListOutputSpec = AlarmListOutputSpec.builder()
@@ -75,81 +74,48 @@ public class AlarmService {
      * 알람 On / Off
      *
      * @param alarmStatusModifyForm
-     * @param userId
+     * @param loginUser
      * @return
      */
     @Transactional
-    public AlarmOutputSpec modifyAlarmStatus(AlarmStatusModifyForm alarmStatusModifyForm, Long userId) {
-        User user = userJpaRepository.findById(userId).orElseThrow(
-                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-        );
-        Alarm alarm = alarmRepository.findById(alarmStatusModifyForm.getAlarmId()).orElseThrow(
+    public AlarmOutputSpec modifyAlarmStatus(AlarmStatusModifyForm alarmStatusModifyForm, User loginUser) {
+        Alarm alarm = alarmRepository.findWithUserAndWorkTypeById(alarmStatusModifyForm.getAlarmId()).orElseThrow(
                 () -> new AlarmException(AlarmErrorCode.NO_EXIST_ALARM)
         );
-        WorkType workType = workTypeJpaRepository.findById(alarm.getWorkType().getId()).orElseThrow(
-                () -> new WorkTypeException(WorkTypeErrorCode.NO_EXIST_WORKTYPE)
-        );
+        WorkType workType = alarm.getWorkType();
+        if (!alarm.getUser().equals(loginUser)) throw new UserException(UserErrorCode.ACCESS_DENIED);
 
         alarm.setIsAlarmOn(alarmStatusModifyForm.getIsAlarmOn());
-
-        AlarmOutputSpec alarmOutputSpec = AlarmOutputSpec.builder()
-                .alarmId(alarmStatusModifyForm.getAlarmId())
-                .alarmTime(alarm.getAlarmTime())
-                .alarmReplayCnt(alarm.getReplayCnt())
-                .alarmReplayTime(alarm.getReplayTime())
-                .isAlarmOn(alarmStatusModifyForm.getIsAlarmOn())
-                .workTypeTitle(workType.getTitle())
-                .build();
-
-        return alarmOutputSpec;
+        return alarm.toOutputSpec(workType.getTitle());
     }
 
-    public void registerAlarm(AlarmForm alarmForm, Long userId) {
-        WorkType workType = workTypeJpaRepository.findById(alarmForm.getWorkTypeId()).orElseThrow(
+    public void registerAlarm(AlarmForm alarmForm, User loginUser) {
+        WorkType workType = workTypeJpaRepository.findWithUserById(alarmForm.getWorkTypeId()).orElseThrow(
                 () -> new WorkTypeException(WorkTypeErrorCode.NO_EXIST_WORKTYPE)
         );
-        User user = userJpaRepository.findById(userId).orElseThrow(
-                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-        );
-
+        if (!workType.getUser().equals(loginUser)) throw new UserException(UserErrorCode.ACCESS_DENIED);
         Alarm alarm = Alarm.builder()
                 .alarmTime(alarmForm.getAlarmTime())
                 .replayCnt(alarmForm.getReplayCnt())
                 .replayTime(alarmForm.getReplayTime())
                 .isAlarmOn(false)
                 .workType(workType)
-                .user(user)
+                .user(loginUser)
                 .build();
 
         alarmRepository.save(alarm);
     }
 
     @Transactional
-    public AlarmOutputSpec modifyAlarm(AlarmModifyForm alarmModifyForm, Long userId) {
-        WorkType workType = workTypeJpaRepository.findById(alarmModifyForm.getWorkTypeId()).orElseThrow(
-                () -> new WorkTypeException(WorkTypeErrorCode.NO_EXIST_WORKTYPE)
-        );
-        User user = userJpaRepository.findById(userId).orElseThrow(
-                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-        );
-        Alarm alarm = alarmRepository.findById(alarmModifyForm.getAlarmId()).orElseThrow(
-                () -> new AlarmException(AlarmErrorCode.NO_EXIST_ALARM)
-        );
+    public AlarmOutputSpec modifyAlarm(AlarmModifyForm alarmModifyForm, User loginUser) {
+        WorkType editWorkType = workTypeJpaRepository.findById(alarmModifyForm.getWorkTypeId()).orElseThrow(() -> new WorkTypeException(WorkTypeErrorCode.NO_EXIST_WORKTYPE));
+        Alarm alarm = alarmRepository.findWithUserById(alarmModifyForm.getAlarmId()).orElseThrow(() -> new AlarmException(AlarmErrorCode.NO_EXIST_ALARM));
 
-        alarm.setAlarmTime(alarmModifyForm.getAlarmTime());
-        alarm.setReplayCnt(alarmModifyForm.getReplayCnt());
-        alarm.setReplayTime(alarmModifyForm.getReplayTime());
+        if (!alarm.getUser().equals(loginUser)) throw new UserException(UserErrorCode.ACCESS_DENIED);
 
-        AlarmOutputSpec alarmOutputSpec = AlarmOutputSpec.builder()
-                .alarmId(alarmModifyForm.getAlarmId())
-                .alarmTime(alarmModifyForm.getAlarmTime())
-                .alarmReplayCnt(alarmModifyForm.getReplayCnt())
-                .alarmReplayTime(alarmModifyForm.getReplayTime())
-                .isAlarmOn(alarm.getIsAlarmOn())
-                .workTypeTitle(workType.getTitle())
-                .build();
-
-        return alarmOutputSpec;
+        return alarmRepository.save(
+                alarm.modify(alarmModifyForm.getAlarmTime(), alarmModifyForm.getReplayCnt(), alarmModifyForm.getReplayTime(), editWorkType))
+                .toOutputSpec(editWorkType.getTitle());
     }
 
     /**
@@ -157,17 +123,13 @@ public class AlarmService {
      *
      * @param alarmId
      */
-    public void deleteAlarm(Long alarmId) {
-        Alarm alarm = alarmRepository.findById(alarmId).orElseThrow(
-                () -> new AlarmException(AlarmErrorCode.NO_EXIST_ALARM)
-        );
+    @Transactional
+    public void deleteAlarm(Long alarmId, User loginUser) {
+        Alarm alarm = alarmRepository.findWithUserById(alarmId).orElseThrow(
+                () -> new AlarmException(AlarmErrorCode.NO_EXIST_ALARM));
+        if (!alarm.getUser().equals(loginUser)) throw new UserException(UserErrorCode.ACCESS_DENIED);
 
-        try {
-            alarmRepository.delete(alarm);
-
-        } catch (Exception e) {
-            throw new AlarmException(AlarmErrorCode.TRANSACTION_ERROR);
-        }
+        alarmRepository.delete(alarm);
     }
 
 }
