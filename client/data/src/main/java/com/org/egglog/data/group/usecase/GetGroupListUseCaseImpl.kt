@@ -12,11 +12,9 @@ class GetGroupListUseCaseImpl @Inject constructor(
     private val groupService: GroupService
 ) : GetGroupListUseCase {
     override suspend fun invoke(accessToken: String): Result<List<Group>?> = kotlin.runCatching {
-        Log.d("groupList", "accessToken ${accessToken}")
         val response = groupService.getGroupList(accessToken)
 
-        Log.d("groupList", response.dataBody.toString())
-        response.dataBody?.mapNotNull { it.toDomainModel() } ?: null
+        response.dataBody?.map { it.toDomainModel() }
     }
 }
 

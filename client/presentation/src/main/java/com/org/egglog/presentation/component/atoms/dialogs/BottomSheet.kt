@@ -4,12 +4,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
@@ -22,16 +25,23 @@ fun BottomSheet(
     height: Dp,
     showBottomSheet: Boolean,
     onDismiss: () -> Unit,
-    sheetContent: @Composable () -> Unit
+    sheetContent: @Composable () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true,
     )
 
+    LaunchedEffect(showBottomSheet) {
+        if (showBottomSheet) {
+            bottomSheetState.show()
+        } else {
+            bottomSheetState.hide()
+        }
+    }
+
     ModalBottomSheet(
         onDismissRequest = { onDismiss() },
-//        modifier = Modifier.fillMaxHeight(),
         sheetState = bottomSheetState,
         containerColor = White,
         contentColor = NaturalBlack,
@@ -44,11 +54,6 @@ fun BottomSheet(
                 .height(height)
         ) {
             sheetContent()
-//            Button(onClick = {
-//                scope.launch { bottomSheetState.hide() }
-//            }) {
-//                Text("이렇게 숨겨지면 배신")
-//            }
         }
     }
 }

@@ -4,9 +4,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Group(
-    val id: Long,
-    val master: String,
-    val name: String,
+    val groupId: Long,
+    val admin: String,
+    val groupName: String,
+    val groupImage: Int,
     val memberCount: Int,
-    val image: Int,
 )
