@@ -1,9 +1,8 @@
 package org.egglog.api.security.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.egglog.api.security.model.dto.request.LoginRequest;
+import org.egglog.api.security.model.dto.response.TokenResponse;
 import org.egglog.api.security.model.service.AuthService;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.model.entity.enums.AuthProvider;
@@ -33,7 +32,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login/{provider}")
-    public ResponseEntity<MessageUtils> login(
+    public ResponseEntity<MessageUtils<TokenResponse>> login(
             @RequestHeader String accessToken,
             @PathVariable(name = "provider") AuthProvider authProvider
             ){
@@ -61,7 +60,7 @@ public class AuthController {
      * @author 김형민
      */
     @PostMapping("/refresh")
-    public ResponseEntity<MessageUtils> refresh(@RequestHeader String refreshToken){
+    public ResponseEntity<MessageUtils<TokenResponse>> refresh(@RequestHeader String refreshToken){
         return ResponseEntity.ok().body(MessageUtils.success(authService.refresh(refreshToken)));
     }
 

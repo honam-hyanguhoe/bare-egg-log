@@ -80,20 +80,20 @@ public class BoardScheduler {
                 );
                 //그룹 && 병원 == null -> 전체 게시판
                 if (board.getGroup() == null && board.getHospital() == null) { //전체 게시판이라면
-                    Long viewCount = Objects.requireNonNull(tuple.getScore()).longValue(); //조회수
-                    Long likeCount = boardRepository.getLikeCount(boardId); //좋아요 개수
+                    long viewCount = Objects.requireNonNull(tuple.getScore()).longValue(); //조회수
+                    long likeCount = boardRepository.getLikeCount(boardId); //좋아요 개수
                     boardViewCounts.put(boardId, viewCount + likeCount);
                 }
             }
             // 합산된 점수 기준으로 상위 2개 게시물 ID만 추출
             List<Long> hotBoardIds = boardViewCounts.entrySet().stream()
-                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+//                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                     .map(Map.Entry::getKey)
                     .limit(2)
                     .toList();
 
             // Redis에 저장 (ID 리스트)
-            redisTemplate.opsForValue().set("hotBoards", hotBoardIds.toString(), 1, TimeUnit.MINUTES);
+            redisTemplate.opsForValue().set("hotBoards", hotBoardIds.toString(), 1, TimeUnit.HOURS);
 //            redisTemplate.opsForValue().set("hotBoards", hotBoardIds.toString(), 1, TimeUnit.HOURS);
 
         }

@@ -27,9 +27,6 @@ public class Comment extends BaseEntity {
     @Column(name = "parent_id")
     private Long parentId;  //부모 댓글
 
-    @Column(name = "comment_depth")
-    private int depth;  //댓글 깊이
-
     private String tempNickname;    //익명 닉네임
 
     @ManyToOne(fetch = FetchType.LAZY)

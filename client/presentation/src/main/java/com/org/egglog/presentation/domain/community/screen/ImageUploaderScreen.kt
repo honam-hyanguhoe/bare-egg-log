@@ -1,6 +1,5 @@
-package com.org.egglog.presentation.domain.community.posteditor.screen
+package com.org.egglog.presentation.domain.community.screen
 
-import android.app.Activity
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -31,7 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.org.egglog.presentation.component.atoms.icons.Icon
-import com.org.egglog.presentation.domain.community.posteditor.viewmodel.WritePostViewModel
+import com.org.egglog.presentation.domain.community.viewmodel.WritePostViewModel
 import com.org.egglog.presentation.theme.Gray200
 import com.org.egglog.presentation.theme.NaturalBlack
 import com.org.egglog.presentation.utils.Add
@@ -60,7 +59,6 @@ fun ImageUploader(
     )
 }
 
-
 @Composable
 private fun ImageUploader(
     isClicked: () -> Unit,
@@ -71,7 +69,7 @@ private fun ImageUploader(
         ImageUploadButton(
             isClicked = { isClicked() }
         )
-        
+
         Spacer(modifier = Modifier.width(10.dp))
 
         LazyRow(
@@ -132,4 +130,3 @@ fun ImageUploadBox(
         }
     }
 }
-

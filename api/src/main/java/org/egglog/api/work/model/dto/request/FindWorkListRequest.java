@@ -25,10 +25,11 @@ import java.time.LocalDate;
 @Setter
 @Builder
 public class FindWorkListRequest {
-
+    @NotNull(message = "startDate 는 필수 입니다.")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate startDate;
 
+    @NotNull(message = "endDate 는 필수 입니다.")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate endDate;
 }

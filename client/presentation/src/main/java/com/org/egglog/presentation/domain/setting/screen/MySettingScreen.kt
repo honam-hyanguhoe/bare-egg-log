@@ -1,5 +1,6 @@
 package com.org.egglog.presentation.domain.setting.screen
 
+import android.app.Activity
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -41,6 +42,7 @@ import com.org.egglog.presentation.domain.auth.activity.LoginActivity
 import com.org.egglog.presentation.domain.setting.viewmodel.MySettingSideEffect
 import com.org.egglog.presentation.domain.setting.viewmodel.MySettingViewModel
 import com.org.egglog.presentation.theme.*
+import com.org.egglog.presentation.utils.addFocusCleaner
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
 import kotlinx.coroutines.flow.Flow
@@ -50,7 +52,6 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 @Composable
 fun MySettingScreen(
     viewModel: MySettingViewModel = hiltViewModel(),
-    onNavigateToSettingScreen: () -> Unit
 ) {
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
@@ -70,7 +71,8 @@ fun MySettingScreen(
     }
 
     MySettingScreen(
-        onNavigateToSettingScreen = onNavigateToSettingScreen,
+        enabledModify = state.enabledModify,
+        enabledDelete = state.enabledDelete,
         user = state.user,
         name = state.name,
         hospital = state.hospital,
@@ -89,7 +91,8 @@ fun MySettingScreen(
 
 @Composable
 fun MySettingScreen(
-    onNavigateToSettingScreen: () -> Unit,
+    enabledModify: Boolean,
+    enabledDelete: Boolean,
     user: UserDetail?,
     onSearchChange: (String) -> Unit,
     name: String,
@@ -111,113 +114,124 @@ fun MySettingScreen(
     Surface {
         Column(
             Modifier
-                .padding(horizontal = 8.widthPercent(context).dp)
+                .fillMaxSize()
                 .systemBarsPadding()
                 .imePadding()
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .addFocusCleaner(focusManager)
         ) {
             BasicHeader(
                 title = "내 정보 수정",
                 hasTitle = true,
                 hasArrow = true,
                 hasProgressBar = true,
-                onClickBack = onNavigateToSettingScreen,
+                onClickBack = { (context as? Activity)?.onBackPressed() },
                 onClickLink = { },
                 onClickMenus = { },
                 selectedOption = null
             )
-
             Column(
-                Modifier.fillMaxWidth().padding(vertical = 30.heightPercent(context).dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                Modifier
+                    .padding(horizontal = 8.widthPercent(context).dp)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
             ) {
-                ProfileCard(user)
-            }
-
-            Text(text = "이름 수정", style = Typography.headlineMedium)
-            Text(text = "수정하신 이름은 그룹원에게 보입니다.", style = Typography.displayMedium, color = Gray400)
-            Spacer(modifier = Modifier.height(16.heightPercent(context).dp))
-            SingleInput(
-                modifier = Modifier.fillMaxWidth(),
-                text = name,
-                onValueChange = onNameChange,
-                focusManager = focusManager,
-                placeholder = "이름 입력",
-            )
-            Spacer(modifier = Modifier.height(30.heightPercent(context).dp))
-
-            Text(text = "병원(근무지) 입력", style = Typography.headlineMedium)
-            Text(text = "현재 근무 하시는 병원(근무지)을 입력해 주세요", style = Typography.displayMedium, color = Gray400)
-            Spacer(modifier = Modifier.height(16.heightPercent(context).dp))
-            SearchDropDownHospital(
-                list = hospitalsFlow.collectAsLazyPagingItems(),
-                placeholder = hospital?.hospitalName ?: "Select Hospital",
-                onSearchChange = onSearchChange,
-                onSelected = onHospitalSelected,
-                onClickDone = onClickDone,
-                search = search,
-                defaultText = hospital?.hospitalName ?: ""
-            )
-            Spacer(modifier = Modifier.height(30.heightPercent(context).dp))
-
-            Text(text = "사번 입력", style = Typography.headlineMedium)
-            Text(text = "현재 근무 근무지의 사번은 입력해 주세요", style = Typography.displayMedium, color = Gray400)
-            Spacer(modifier = Modifier.height(16.heightPercent(context).dp))
-            SingleInput(
-                modifier = Modifier.fillMaxWidth(),
-                text = empNo,
-                onValueChange = onEmpNoChange,
-                focusManager = focusManager,
-                placeholder = "사번 입력",
-            )
-            Spacer(modifier = Modifier.height(40.heightPercent(context).dp))
-
-            Column(Modifier.fillMaxWidth(), Arrangement.Center, Alignment.CenterHorizontally) {
-                BigButton(
-                    colors = ButtonColors(
-                        containerColor = Warning300,
-                        contentColor = NaturalWhite,
-                        disabledContainerColor = Gray300,
-                        disabledContentColor = NaturalWhite
-                    ),
-                    enabled = ((empNo.isNotEmpty() && hospital != null && name.isNotEmpty()) &&
-                                    (empNo != user?.empNo || hospital.hospitalName != user.selectedHospital?.hospitalName || name != user.userName)),
-                    onClick = { onClickModify() }
+                Column(
+                    Modifier.fillMaxWidth().padding(vertical = 30.heightPercent(context).dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = "수정하기", style = Typography.bodyMedium, color = NaturalWhite)
+                    ProfileCard(user)
                 }
-            }
 
-            Spacer(modifier = Modifier.height(20.heightPercent(context).dp))
-            HorizontalDivider(color = Gray200)
-            Spacer(modifier = Modifier.height(20.heightPercent(context).dp))
-            Text(text = "회원 탈퇴", style = Typography.headlineMedium)
-            Text(text = "회원 탈퇴 시 계정의 모든 정보가 삭제되며, 취소할 수 없습니다.", style = Typography.displayMedium, color = Gray400)
-            Spacer(modifier = Modifier.height(14.heightPercent(context).dp))
-            Column(Modifier.fillMaxWidth(), Arrangement.Center, Alignment.CenterHorizontally) {
-                BigButton(
-                    colors = ButtonColors(
-                        containerColor = Gray400,
-                        contentColor = NaturalWhite,
-                        disabledContainerColor = Gray400,
-                        disabledContentColor = NaturalWhite
-                    ),
-                    onClick = { openDialog.value = true }
-                ) {
-                    Text(text = "회원 탈퇴", style = Typography.bodyMedium, color = NaturalWhite)
+                Text(text = "이름 수정", style = Typography.headlineMedium)
+                Text(text = "수정하신 이름은 그룹원에게 보입니다.", style = Typography.displayMedium, color = Gray400)
+                Spacer(modifier = Modifier.height(16.heightPercent(context).dp))
+                SingleInput(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = name,
+                    onValueChange = onNameChange,
+                    focusManager = focusManager,
+                    placeholder = "이름 입력",
+                )
+                Spacer(modifier = Modifier.height(30.heightPercent(context).dp))
+
+                Text(text = "병원(근무지) 입력", style = Typography.headlineMedium)
+                Text(text = "현재 근무 하시는 병원(근무지)을 입력해 주세요", style = Typography.displayMedium, color = Gray400)
+                Spacer(modifier = Modifier.height(16.heightPercent(context).dp))
+                SearchDropDownHospital(
+                    list = hospitalsFlow.collectAsLazyPagingItems(),
+                    placeholder = hospital?.hospitalName ?: "Select Hospital",
+                    onSearchChange = onSearchChange,
+                    onSelected = onHospitalSelected,
+                    onClickDone = onClickDone,
+                    search = search,
+                    defaultText = hospital?.hospitalName ?: ""
+                )
+                Spacer(modifier = Modifier.height(30.heightPercent(context).dp))
+
+                Text(text = "사번 입력", style = Typography.headlineMedium)
+                Text(text = "현재 근무 근무지의 사번은 입력해 주세요", style = Typography.displayMedium, color = Gray400)
+                Spacer(modifier = Modifier.height(16.heightPercent(context).dp))
+                SingleInput(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = empNo,
+                    onValueChange = onEmpNoChange,
+                    focusManager = focusManager,
+                    placeholder = "사번 입력",
+                )
+                Spacer(modifier = Modifier.height(40.heightPercent(context).dp))
+
+                Column(Modifier.fillMaxWidth(), Arrangement.Center, Alignment.CenterHorizontally) {
+                    BigButton(
+                        colors = ButtonColors(
+                            containerColor = Warning300,
+                            contentColor = NaturalWhite,
+                            disabledContainerColor = Gray300,
+                            disabledContentColor = NaturalWhite
+                        ),
+                        enabled = ((empNo.isNotEmpty() && hospital != null && name.isNotEmpty()) &&
+                                (empNo != user?.empNo || hospital.hospitalName != user.selectedHospital?.hospitalName || name != user.userName) && enabledModify),
+                        onClick = { onClickModify() }
+                    ) {
+                        Text(
+                            text = if(empNo.isEmpty() || hospital == null || name.isEmpty()) "빈 값이 존재합니다"
+                            else if(empNo == user?.empNo && hospital.hospitalName == user.selectedHospital?.hospitalName && name == user.userName) "수정된 값이 없습니다"
+                            else if(!enabledModify) ""
+                            else "수정하기"
+                            , style = Typography.bodyMedium, color = NaturalWhite)
+                    }
                 }
-            }
-            Spacer(modifier = Modifier.height(14.heightPercent(context).dp))
 
-            when {
-                openDialog.value -> {
-                    Dialog(
-                        onDismissRequest = { openDialog.value = false },
-                        onConfirmation = { onClickDelete() },
-                        dialogTitle = "정말 탈퇴하시겠습니까?",
-                        dialogText = "이 작업은 되돌릴 수 없습니다.",
-                    )
+                Spacer(modifier = Modifier.height(20.heightPercent(context).dp))
+                HorizontalDivider(color = Gray200)
+                Spacer(modifier = Modifier.height(20.heightPercent(context).dp))
+                Text(text = "회원 탈퇴", style = Typography.headlineMedium)
+                Text(text = "회원 탈퇴 시 계정의 모든 정보가 삭제되며, 취소할 수 없습니다.", style = Typography.displayMedium, color = Gray400)
+                Spacer(modifier = Modifier.height(14.heightPercent(context).dp))
+                Column(Modifier.fillMaxWidth(), Arrangement.Center, Alignment.CenterHorizontally) {
+                    BigButton(
+                        colors = ButtonColors(
+                            containerColor = Gray400,
+                            contentColor = NaturalWhite,
+                            disabledContainerColor = Gray400,
+                            disabledContentColor = NaturalWhite
+                        ),
+                        onClick = { openDialog.value = true }
+                    ) {
+                        Text(text = "회원 탈퇴", style = Typography.bodyMedium, color = NaturalWhite)
+                    }
+                }
+                Spacer(modifier = Modifier.height(14.heightPercent(context).dp))
+
+                when {
+                    openDialog.value -> {
+                        Dialog(
+                            onDismissRequest = { openDialog.value = false },
+                            onConfirmation = { onClickDelete() },
+                            dialogTitle = "정말 탈퇴하시겠습니까?",
+                            dialogText = "이 작업은 되돌릴 수 없습니다.",
+                            enabled = enabledDelete,
+                        )
+                    }
                 }
             }
         }
@@ -228,8 +242,6 @@ fun MySettingScreen(
 @Composable
 private fun MySettingScreenPreview() {
     ClientTheme {
-        MySettingScreen(
-            onNavigateToSettingScreen = { }
-        )
+        MySettingScreen()
     }
 }

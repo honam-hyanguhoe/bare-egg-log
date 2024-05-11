@@ -46,6 +46,9 @@ class MySettingViewModel @Inject constructor(
             this.exceptionHandler = CoroutineExceptionHandler { _, throwable ->
                 intent {
                     postSideEffect(MySettingSideEffect.Toast(message = throwable.message.orEmpty()))
+                    reduce {
+                        state.copy(enabledDelete = true, enabledModify = true)
+                    }
                 }
             }
         }
@@ -113,22 +116,31 @@ class MySettingViewModel @Inject constructor(
     }
 
     fun onClickDelete() = intent {
+        reduce {
+            state.copy(enabledDelete = false)
+        }
         val tokens = getTokenUseCase()
         updateUserDeleteUseCase("Bearer ${tokens.first.orEmpty()}")
         deleteTokenUseCase()
         deleteUserStoreUseCase()
         postSideEffect(MySettingSideEffect.Toast("탈퇴가 완료되었습니다."))
         postSideEffect(MySettingSideEffect.NavigateToLoginActivity)
+        reduce {
+            state.copy(enabledDelete = true)
+        }
     }
 
     fun onClickModify() = intent {
-        val tokens = getTokenUseCase()
-        val user = updateUserModifyUseCase("Bearer ${tokens.first.orEmpty()}", UserModifyParam(userName = state.name, hospitalId = state.hospital?.hospitalId ?: 0, empNo = state.empNo)).getOrThrow()
-        setUserStoreUseCase(user)
         reduce {
-            state.copy(user = user)
+            state.copy(enabledModify = false)
         }
+        val tokens = getTokenUseCase()
+        val user = updateUserModifyUseCase("Bearer ${tokens.first.orEmpty()}", UserModifyParam(userName = state.name, profileImgUrl = state.user?.profileImgUrl ?: "", selectHospitalId = state.hospital?.hospitalId ?: 0, empNo = state.empNo)).getOrThrow()
+        setUserStoreUseCase(user)
         postSideEffect(MySettingSideEffect.Toast("수정이 완료되었습니다."))
+        reduce {
+            state.copy(enabledModify = true, user = user)
+        }
     }
 }
 
@@ -140,7 +152,9 @@ data class MySettingState(
     val hospital: UserHospital? = null,
     val search: String = "",
     val empNo: String = "",
-    val hospitalsFlow: Flow<PagingData<UserHospital>> = emptyFlow()
+    val hospitalsFlow: Flow<PagingData<UserHospital>> = emptyFlow(),
+    val enabledModify: Boolean = true,
+    val enabledDelete: Boolean = true
 )
 
 sealed interface MySettingSideEffect {

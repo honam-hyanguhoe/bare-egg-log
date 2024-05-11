@@ -18,7 +18,6 @@ import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.repository.jpa.UserJpaRepository;
-import org.egglog.api.user.repository.jpa.UserQueryRepositoryImpl;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -67,7 +66,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 Token token = refreshTokenRepository.findById(user.getId()).orElseThrow(() -> new JwtException(JwtErrorCode.NOT_EXISTS_TOKEN));
                 refreshTokenRepository.delete(token); //토큰 지우고
                 userJpaRepository.save(user.doLogout()); //로그아웃 처리후
-                throw new JwtException(JwtErrorCode.INVALID_TOKEN); //로그인 재요청
+                throw new JwtException(JwtErrorCode.INVALID_REFRESH_TOKEN); //로그인 재요청
             }
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);

@@ -16,14 +16,14 @@ const WorkStaticsGraph = ({ data }: WorkStaticsGraphProps) => {
   const backgroundColor = "#F2F4F7";
 
   const [dimensions, setDimensions] = useState({
-    width: window.innerWidth > 500 ? 500 : window.innerWidth * 0.95,
+    width: window.innerWidth > 500 ? 500 : window.innerWidth * 0.99,
     height: window.innerHeight > 300 ? 300 : window.innerHeight * 0.5,
   });
 
   useEffect(() => {
     const handleResize = () => {
       setDimensions({
-        width: window.innerWidth > 500 ? 500 : window.innerWidth * 0.95,
+        width: window.innerWidth > 500 ? 500 : window.innerWidth * 0.99,
         height: window.innerHeight > 300 ? 300 : window.innerHeight * 0.5,
       });
     };
@@ -84,8 +84,8 @@ const WorkStaticsGraph = ({ data }: WorkStaticsGraphProps) => {
         .tickFormat(() => "");
     };
 
-    const barWidth = xScale.bandwidth() / dataRef.current[0].values.length + 2;
-
+    // const barWidth = xScale.bandwidth() / dataRef.current[0].values.length + 2;
+    const barWidth = 12;
     ["DAY", "EVE", "NIGHT", "OFF"].forEach((className, i) => {
       console.log(`className ${className} / ${i}`);
       barSvg

@@ -5,6 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.work.model.dto.request.*;
+import org.egglog.api.work.model.dto.response.WorkListResponse;
+import org.egglog.api.work.model.dto.response.WorkResponse;
+import org.egglog.api.work.model.dto.response.completed.CompletedWorkCountResponse;
+import org.egglog.api.work.model.dto.response.upcoming.UpComingCountWorkResponse;
 import org.egglog.api.work.model.dto.response.upcoming.enums.DateType;
 import org.egglog.api.work.model.service.WorkService;
 import org.egglog.utility.utils.MessageUtils;
@@ -15,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 
 /**
@@ -46,7 +51,7 @@ public class WorkController {
      * @author 김형민
      */
     @PostMapping("/create")
-    public ResponseEntity<MessageUtils> createWork(
+    public ResponseEntity<MessageUtils<List<WorkResponse>>> createWork(
             @AuthenticationPrincipal User loginUser,
             @RequestBody @Valid CreateWorkListRequest request
     ){
@@ -62,7 +67,7 @@ public class WorkController {
      * @author 김형민
      */
     @PatchMapping("/update")
-    public ResponseEntity<MessageUtils> updateWork(
+    public ResponseEntity<MessageUtils<List<WorkResponse>>> updateWork(
             @AuthenticationPrincipal User loginUser,
             @RequestBody @Valid EditAndDeleteWorkListRequest request
     ){
@@ -77,7 +82,7 @@ public class WorkController {
      * @author 김형민
      */
     @GetMapping("/find")
-    public ResponseEntity<MessageUtils> findWorkList(
+    public ResponseEntity<MessageUtils<WorkListResponse>> findWorkList(
             @AuthenticationPrincipal User loginUser,
             @ModelAttribute @Valid FindWorkListRequest request
     ){
@@ -93,7 +98,7 @@ public class WorkController {
      * @author 김형민
      */
     @GetMapping("/find/user")
-    public ResponseEntity<MessageUtils> findGroupUserWorkList(
+    public ResponseEntity<MessageUtils<List<WorkResponse>>> findGroupUserWorkList(
             @AuthenticationPrincipal User loginUser,
             @ModelAttribute @Valid FindGroupUserWorkListRequest request
     ){
@@ -110,9 +115,9 @@ public class WorkController {
      * @author 김형민
      */
     @GetMapping("/find/upcoming/{dateType}")
-    public ResponseEntity<MessageUtils> findUpcomingCountWorkList(
+    public ResponseEntity<MessageUtils<List<UpComingCountWorkResponse>>> findUpcomingCountWorkList(
             @AuthenticationPrincipal User loginUser,
-            @RequestParam("today")
+            @RequestParam(value = "today", required = true)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate today,
             @PathVariable DateType dateType
             ){
@@ -130,11 +135,11 @@ public class WorkController {
      * @author 김형민
      */
     @GetMapping("/find/completed")
-    public ResponseEntity<MessageUtils> findCompletedCountWorkList(
+    public ResponseEntity<MessageUtils<CompletedWorkCountResponse>> findCompletedCountWorkList(
             @AuthenticationPrincipal User loginUser,
-            @RequestParam("today")
+            @RequestParam(value = "today", required = true)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate today,
-            @RequestParam("month")
+            @RequestParam(value = "month", required = true)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate month
     ){
         return ResponseEntity.ok().body(

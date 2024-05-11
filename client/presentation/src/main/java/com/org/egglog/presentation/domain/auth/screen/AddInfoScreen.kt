@@ -47,6 +47,7 @@ import kotlinx.coroutines.flow.Flow
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.org.egglog.presentation.utils.addFocusCleaner
 
 @Composable
 fun AddInfoScreen(
@@ -82,6 +83,7 @@ fun AddInfoScreen(
 
     AddInfoScreen(
         onNavigateToAgreeScreen = onNavigateToAgreeScreen,
+        joinEnabled = state.joinEnabled,
         name = state.name,
         hospital = state.hospital,
         empNo = state.empNo,
@@ -101,6 +103,7 @@ fun AddInfoScreen(
 fun AddInfoScreen(
     onNavigateToAgreeScreen: () -> Unit,
     onSearchChange: (String) -> Unit,
+    joinEnabled: Boolean,
     name: String,
     hospital: UserHospital?,
     empNo: String,
@@ -121,6 +124,7 @@ fun AddInfoScreen(
             .fillMaxSize()
             .systemBarsPadding()
             .imePadding()
+            .addFocusCleaner(focusManager)
     ) {
         Column(
             modifier = Modifier
@@ -191,7 +195,7 @@ fun AddInfoScreen(
                             disabledContainerColor = Gray300,
                             disabledContentColor = NaturalWhite
                         ),
-                        enabled = empNo.isNotEmpty() && hospital != null && name.isNotEmpty(),
+                        enabled = (empNo.isNotEmpty() && hospital != null && name.isNotEmpty()) && joinEnabled,
                         onClick = onClickJoin
                     ) {
                         Text(text = "회원가입 완료하기", style = Typography.bodyMedium, color = NaturalWhite)

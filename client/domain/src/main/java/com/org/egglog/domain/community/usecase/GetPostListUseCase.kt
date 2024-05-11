@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface GetPostListUseCase {
 
-//    suspend operator fun invoke(): Result<Flow<PagingData<PostData>>>
-        suspend operator fun invoke(accessToken: String, hospitalId: Int?, groupId: Int?, searchWord: String?, lastBoardId: Int?): Result<List<PostData?>>
+    suspend operator fun invoke(accessToken: String, hospitalId: Int?, groupId: Int?, searchWord: String?): Result<Flow<PagingData<PostData>>?>
 
 }

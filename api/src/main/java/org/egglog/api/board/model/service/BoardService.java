@@ -66,7 +66,6 @@ public class BoardService {
 
     //댓글
     private final CommentRepository commentRepository;
-    private final CommentService commentService;
 
     //병원
     private final HospitalAuthJpaRepository hospitalAuthJpaRepository;
@@ -155,11 +154,15 @@ public class BoardService {
             List<BoardListOutputSpec> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getOffset(), size);
             log.info("boardList 쿼리 실행");
             for (BoardListOutputSpec board : boardList) {
+                log.info("boardId: {}", board.getBoardId());
                 User writer = userJpaRepository.findById(board.getUserId()).orElseThrow(
                         () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
                 );
                 long viewCount = redisViewCountUtil.getViewCount(String.valueOf(board.getBoardId())); //하루 동안의 조회수
-                Long hitCnt = viewCount + board.getViewCount();
+                log.info("redis view count: {}", viewCount);
+                long hitCnt = viewCount + board.getViewCount();
+                log.info("redis + db 조회수 합산: {}", hitCnt);
+                log.info("db 조회수: {}", board.getViewCount());
 
                 //사용자의 병원 인증 정보
                 Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(writer, writer.getSelectedHospital());
@@ -200,12 +203,13 @@ public class BoardService {
         return boardListOutputSpecList;
     }
 
-        /**
-         * 급상승 게시물 조회
-         *
-         * @param user
-         * @return
-         */
+    /**
+     * 급상승 게시물 조회
+     * 좋아요 + 댓글 상위 2개
+     *
+     * @param user
+     * @return
+     */
     public List<BoardListOutputSpec> getHotBoardList(User user) {
         List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
 
@@ -319,6 +323,12 @@ public class BoardService {
 
         } else if (boardForm.getGroupId() == null && boardForm.getHospitalId() != null) {
             // 병원 게시판
+            //글 작성자가 해당 병원 게시판에 인증이 되었는지 검증
+            Optional<HospitalAuth> byUserAndHospital = hospitalAuthJpaRepository.findByUserAndHospital(user, user.getSelectedHospital());
+            if (byUserAndHospital.isEmpty()) {
+                throw new BoardException(BoardErrorCode.HOSPITAL_AUTH_ERROR); //해당 병원 인증이 필요합니다.
+            }
+
             Hospital hospital = hospitalJpaRepository.findById(boardForm.getHospitalId()).orElseThrow(
                     () -> new HospitalException(HospitalErrorCode.NOT_FOUND)
             );
@@ -513,7 +523,10 @@ public class BoardService {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
         );
-
+        //작성자
+        User writer = userJpaRepository.findById(board.getUser().getId()).orElseThrow(
+                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
+        );
         BoardOutputSpec boardOutputSpec = null;
 
         try {
@@ -523,25 +536,22 @@ public class BoardService {
             }
             long viewCount = redisViewCountUtil.getViewCount(String.valueOf(boardId)); //하루 동안의 조회수
 
-            Long commentCnt = commentRepository.getCommentCount(board.getId());
-            Long likeCnt = boardRepository.getLikeCount(board.getId());
-            Long hitCnt = viewCount + board.getViewCount();     // DB + redis
+            long commentCnt = commentRepository.getCommentCount(board.getId());
+            long likeCnt = boardRepository.getLikeCount(board.getId());
+            long hitCnt = viewCount + board.getViewCount();     // DB + redis
 
             boolean isUserLiked = false;  //좋아요 누른 여부
-            boolean isCommented = false;    //댓글 유무 여부
+            boolean isCommented = false;  //댓글 유무 여부
 
-            if (commentCnt != null) {
+            if (commentCnt != 0) {
                 isCommented = true;
             }
-            //사용자가 이미 좋아요를 눌렀는지
+            //로그인 사용자가 이미 좋아요를 눌렀는지
             if (!isNotLiked(user.getId(), board.getId())) {
                 isUserLiked = true;
             }
             //사용자의 병원 인증 정보
-            Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(user, user.getSelectedHospital());
-
-            //게시물에 대한 댓글(댓글이 없다면 빈 리스트로 리턴)
-            List<CommentListOutputSpec> commentList = commentService.getCommentList(boardId);
+            Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(writer, writer.getSelectedHospital());
 
             boardOutputSpec = BoardOutputSpec.builder()
                     .boardId(boardId)
@@ -555,27 +565,30 @@ public class BoardService {
                     .viewCount(hitCnt)
                     .userId(user.getId())
                     .tempNickname(board.getTempNickname())
-                    .profileImgUrl(user.getProfileImgUrl())
+                    .profileImgUrl(writer.getProfileImgUrl())
                     .commentCount(commentCnt)
                     .boardLikeCount(likeCnt)
                     .isLiked(isUserLiked)
                     .isCommented(isCommented)
-//                    .comments(commentList)
+                    .hospitalName(writer.getSelectedHospital().getHospitalName())
                     .build();
 
             //병원 인증배지가 없다면
             if (hospitalAuth.isEmpty()) {
                 boardOutputSpec.setIsHospitalAuth(false);
             }
-            if (hospitalAuth.isPresent()) {
+            else {
                 boardOutputSpec.setIsHospitalAuth(hospitalAuth.get().getAuth());
             }
+
             if (board.getGroup() != null) {
                 boardOutputSpec.setGroupId(board.getGroup().getId());
             }
             if (board.getHospital() != null) {
-                boardOutputSpec.setHospitalName(board.getHospital().getHospitalName());
+                boardOutputSpec.setHospitalId(board.getHospital().getId());
+
             }
+
 
         } catch (DataAccessException e) {
             throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);

@@ -58,37 +58,40 @@ public class CommentService {
             if (commentResult.isPresent()) {
                 //댓글이 있다면
                 for (Comment comment : commentResult.get()) {
-                    List<RecommentOutputSpec> recomments = new ArrayList<>();
-                    Optional<List<Comment>> recommentResult = commentRepository.getRecommentListByCommentId(comment.getId());
+                    //부모 댓글(대댓글 X)
+                    if (comment.getParentId() == 0) {
+                        List<RecommentOutputSpec> recomments = new ArrayList<>();
+                        Optional<List<Comment>> recommentResult = commentRepository.getRecommentListByCommentId(comment.getId());
 
-                    //대댓글이 있다면
-                    if (recommentResult.isPresent()) {
-                        for (Comment recomment : recommentResult.get()) {
-                            RecommentOutputSpec recommentListOutputSpec = RecommentOutputSpec.builder()
-                                    .commentId(recomment.getId())
-                                    .commentContent(recomment.getContent())
-                                    .hospitalName(recomment.getUser().getSelectedHospital().getHospitalName())
-                                    .userId(recomment.getUser().getId())
-                                    .tempNickname(recomment.getTempNickname())
-//                                    .commentCreateAt(recomment.getCreatedAt())
-                                    .profileImgUrl(recomment.getUser().getProfileImgUrl())
-                                    .build();
+                        //대댓글이 있다면
+                        if (recommentResult.isPresent()) {
+                            for (Comment recomment : recommentResult.get()) {
+                                RecommentOutputSpec recommentListOutputSpec = RecommentOutputSpec.builder()
+                                        .commentId(recomment.getId())
+                                        .commentContent(recomment.getContent())
+                                        .hospitalName(recomment.getUser().getSelectedHospital().getHospitalName())
+                                        .userId(recomment.getUser().getId())
+                                        .tempNickname(recomment.getTempNickname())
+                                        .commentCreateAt(recomment.getCreatedAt())
+                                        .profileImgUrl(recomment.getUser().getProfileImgUrl())
+                                        .build();
 
-                            recomments.add(recommentListOutputSpec);
+                                recomments.add(recommentListOutputSpec);
+                            }
                         }
-                    }
-                    CommentListOutputSpec commentListOutputSpec = CommentListOutputSpec.builder()
-                            .commentId(comment.getId())
-                            .commentContent(comment.getContent())
-                            .hospitalName(comment.getUser().getSelectedHospital().getHospitalName())
-                            .userId(comment.getUser().getId())
-                            .tempNickname(comment.getTempNickname())
-//                            .commentCreateAt(comment.getCreatedAt())
-                            .profileImgUrl(comment.getUser().getProfileImgUrl())
-                            .recomments(recomments)
-                            .build();
+                        CommentListOutputSpec commentListOutputSpec = CommentListOutputSpec.builder()
+                                .commentId(comment.getId())
+                                .commentContent(comment.getContent())
+                                .hospitalName(comment.getUser().getSelectedHospital().getHospitalName())
+                                .userId(comment.getUser().getId())
+                                .tempNickname(comment.getTempNickname())
+                                .commentCreateAt(comment.getCreatedAt())
+                                .profileImgUrl(comment.getUser().getProfileImgUrl())
+                                .recomments(recomments)
+                                .build();
 
-                    commentList.add(commentListOutputSpec);
+                        commentList.add(commentListOutputSpec);
+                    }
                 }
             }
         } catch (PersistenceException e) {
@@ -124,7 +127,6 @@ public class CommentService {
         Comment comment = Comment.builder()
                 .content(commentForm.getCommentContent())
                 .parentId(commentForm.getParentId())
-                .depth(commentForm.getCommentDepth())
                 .tempNickname(commentForm.getTempNickname())
                 .user(user)
                 .board(board)
@@ -164,6 +166,11 @@ public class CommentService {
             //접속자와 작성자가 같다면 삭제 가능
             if (comment.getUser().getId().equals(userId)) {
                 commentRepository.delete(comment);
+                //해당 댓글에 달린 대댓글이 있다면 함께 삭제
+                Optional<List<Comment>> recommentListByCommentId = commentRepository.getRecommentListByCommentId(commentId);
+                if (recommentListByCommentId.isPresent()) {
+                    commentRepository.deleteAll(recommentListByCommentId.get());
+                }
             }
 
         } catch (DataAccessException e) {
