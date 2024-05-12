@@ -26,6 +26,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,7 +42,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.org.egglog.client.data.UserInfo
 import com.org.egglog.client.ui.molecules.radioButtons.WorkRadioButton
+import com.org.egglog.domain.group.model.Member
 import com.org.egglog.presentation.R
+import com.org.egglog.presentation.component.atoms.buttons.GroupProfileButton
 import com.org.egglog.presentation.component.atoms.buttons.ProfileButton
 import com.org.egglog.presentation.component.atoms.buttons.ThinButton
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
@@ -65,6 +69,12 @@ fun GroupDetailScreen(
 ) {
     val groupDetailState = groupDetailViewModel.collectAsState().value
     val context = LocalContext.current
+    val selected = groupDetailViewModel.selected
+    LaunchedEffect(selected.value) {
+        groupDetailViewModel.setSelected(selected.value)
+        Log.d("groupDetail", "radio ${selected.value}")
+    }
+
 
     GroupDetailScreen(
         groupName = groupDetailState.groupInfo.groupName,
@@ -75,21 +85,25 @@ fun GroupDetailScreen(
         onPrevClick = groupDetailViewModel::onPrevClick,
         onNextClick = groupDetailViewModel::onNextClick,
         startDate = groupDetailState.startDate,
-        onDateClick = groupDetailViewModel::onDateClick
+        onDateClick = groupDetailViewModel::onDateClick,
+        selected = selected,
+        selectedDuty = groupDetailState.selectedDuty
     )
 }
 
 @Composable
 private fun GroupDetailScreen(
-    groupName : String,
-    memberCount : Int,
-    adminName : String,
-    onClickBack : () -> Unit,
+    groupName: String,
+    memberCount: Int,
+    adminName: String,
+    onClickBack: () -> Unit,
     startDate: LocalDate,
     calendarUiModel: WeeklyUiModel,
     onPrevClick: (LocalDate) -> Unit,
     onNextClick: (LocalDate) -> Unit,
     onDateClick: (WeeklyUiModel.Date) -> Unit,
+    selected: MutableState<String>,
+    selectedDuty: List<Member>
 ) {
 //    val dataSource = WeeklyDataSource()
 //    val calendarUiModel by remember { mutableStateOf(dataSource.getData(lastSelectedDate = dataSource.today)) }
@@ -105,7 +119,11 @@ private fun GroupDetailScreen(
     ) {
         item {
             BasicHeader(
-                hasArrow = true, hasMore = true, hasInvitationButton = true, onClickBack = onClickBack, options = options
+                hasArrow = true,
+                hasMore = true,
+                hasInvitationButton = true,
+                onClickBack = onClickBack,
+                options = options
             )
         }
         item {
@@ -114,7 +132,7 @@ private fun GroupDetailScreen(
                 memberCount = memberCount,
                 adminName = adminName,
 
-            )
+                )
         }
         item {
             Spacer(modifier = Modifier.height(5.dp))
@@ -128,7 +146,10 @@ private fun GroupDetailScreen(
         }
         item {
             Spacer(modifier = Modifier.height(5.dp))
-            MembersCard()
+            MembersCard(
+                selected = selected,
+                selectedDuty = selectedDuty
+            )
         }
         item {
             Spacer(modifier = Modifier.height(30.dp))
@@ -139,9 +160,9 @@ private fun GroupDetailScreen(
 
 @Composable
 private fun GroupInfoCard(
-    groupName : String,
-    memberCount : Int,
-    adminName : String
+    groupName: String,
+    memberCount: Int,
+    adminName: String
 ) {
     val context = LocalContext.current
     Column(
@@ -157,8 +178,7 @@ private fun GroupInfoCard(
                     strokeWidth = strokeWidth
                 )
             }
-            .padding(8.dp, 15.dp, 8.dp, 0.dp)
-        ,
+            .padding(8.dp, 15.dp, 8.dp, 0.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -171,9 +191,13 @@ private fun GroupInfoCard(
             horizontalAlignment = Alignment.Start
         ) {
             Text(
-                style = Typography.titleLarge.copy(fontWeight = FontWeight.Bold), text = "$groupName 모여라"
+                style = Typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                text = "$groupName 모여라"
             )
-            Text(style = Typography.displayLarge.copy(fontWeight = FontWeight.Medium), text = "멤버 $memberCount · 그룹장 $adminName")
+            Text(
+                style = Typography.displayLarge.copy(fontWeight = FontWeight.Medium),
+                text = "멤버 $memberCount · 그룹장 $adminName"
+            )
 
             Spacer(modifier = Modifier.height(20.dp))
             ThinButton(
@@ -197,6 +221,7 @@ private fun GroupInfoCard(
         }
     }
 }
+
 @Composable
 fun DutyCard(
     startDate: LocalDate,
@@ -232,23 +257,13 @@ fun DutyCard(
 }
 
 
-
-
 @Composable
-private fun MembersCard() {
+private fun MembersCard(
+    selected: MutableState<String>,
+    selectedDuty: List<Member>
+) {
     val context = LocalContext.current
     val radioList = arrayListOf("Day", "Eve", "Night", "Off", "Etc")
-    val selected = remember { mutableStateOf("Day") }
-    val tempUserInfo = UserInfo(
-        profileImgUrl = "https://cataas.com/cat",
-        userName = "김호남",
-        empNo = "",
-        userId = 0,
-        userEmail = "",
-    )
-    val memberList = listOf(
-        tempUserInfo, tempUserInfo, tempUserInfo, tempUserInfo, tempUserInfo, tempUserInfo
-    )
 
     Column(
         modifier = Modifier
@@ -258,7 +273,10 @@ private fun MembersCard() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.Start
     ) {
-        Text(text = "함께 일할 동료는 누구일까요?", style = Typography.headlineSmall.copy(fontWeight = FontWeight.Bold))
+        Text(
+            text = "함께 일할 동료는 누구일까요?",
+            style = Typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
+        )
         Spacer(modifier = Modifier.height(5.dp))
         Row(
             horizontalArrangement = Arrangement.Start,
@@ -275,39 +293,46 @@ private fun MembersCard() {
         }
 
         WorkRadioButton(radioList = radioList, selected = selected)
-        Column(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(15.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            memberList.chunked(5).forEach { rowItems ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    rowItems.forEach { member ->
-                        ProfileButton(
-                            onClick = { /* 클릭 이벤트 처리 */ },
-                            userInfo = member,
-                            isSelected = false,
-                            isMine = false,
-                        )
-                    }
-
-                    if (rowItems.size < 5) {
-                        repeat(5 - rowItems.size) {
-                            Spacer(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(4.dp)
+        if (selectedDuty.isEmpty()) {
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .height(108.heightPercent(context).dp))
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(15.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                selectedDuty.chunked(5).forEach { rowItems ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        rowItems.forEach { member ->
+                            GroupProfileButton(
+                                onClick = { /* 클릭 이벤트 처리 */ },
+                                userInfo = member,
+                                isSelected = false,
+                                isMine = false,
                             )
+                        }
+                        if (rowItems.size < 5) {
+                            repeat(5 - rowItems.size) {
+                                Spacer(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(4.dp)
+                                )
+                            }
                         }
                     }
                 }
             }
+
         }
+
 
     }
 }
@@ -363,7 +388,10 @@ private fun MemberCalendar() {
             .padding(8.dp, 15.dp, 8.dp, 0.dp)
 //            .border(1.dp, NaturalBlack)
     ) {
-        Text(text = "2024. 04", style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold))
+        Text(
+            text = "2024. 04",
+            style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
+        )
         Spacer(modifier = Modifier.height(10.dp))
         GroupCalenar(currentYear = currentYear, currentMonth = currentMonth, workList)
 

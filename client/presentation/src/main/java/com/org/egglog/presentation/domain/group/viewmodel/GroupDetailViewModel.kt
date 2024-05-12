@@ -1,12 +1,17 @@
 package com.org.egglog.presentation.domain.group.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.res.integerResource
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.group.model.Admin
 import com.org.egglog.domain.group.model.Group
 import com.org.egglog.domain.group.model.GroupInfo
+import com.org.egglog.domain.group.model.Member
+import com.org.egglog.domain.group.usecase.GetGroupDutyUseCase
 import com.org.egglog.domain.group.usecase.GetGroupInfoUseCase
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyDataSource
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyUiModel
@@ -25,6 +30,7 @@ import javax.inject.Inject
 class GroupDetailViewModel @Inject constructor(
     private val getTokenUseCase: GetTokenUseCase,
     private val groupInfoUseCase: GetGroupInfoUseCase,
+    private val groupDutyUseCase: GetGroupDutyUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel(), ContainerHost<GroupDetailState, Nothing> {
     override val container: Container<GroupDetailState, Nothing> =
@@ -35,27 +41,66 @@ class GroupDetailViewModel @Inject constructor(
                 }
             }
         })
+    val groupId = savedStateHandle.get<Long>("groupId")
+        ?: throw IllegalStateException("GroupId must be provided")
+    private val _selected = mutableStateOf("Day")
+    val selected: MutableState<String> = _selected
+
+    fun setSelected(newValue: String) = intent {
+        reduce { state.copy(dutyType = newValue) }
+        updateData()
+    }
+
+    fun updateData() = intent {
+        val tempDuty: List<Member> = when (state.dutyType) {
+            "Day" -> state.day
+            "Eve" -> state.eve
+            "Night" -> state.night
+            "Off" -> state.off
+            "Etc" -> state.etc
+            else -> emptyList()
+        }
+
+        reduce {
+            state.copy(
+                selectedDuty = tempDuty
+            )
+        }
+    }
 
     init {
-        val groupId = savedStateHandle.get<Long>("groupId")
-            ?: throw IllegalStateException("GroupId must be provided")
         Log.d("groupDetail", "groupId $groupId")
-        getGroupInfo(groupId)
-
         loadInit()
     }
 
     private fun loadInit() = intent {
-        Log.d("groupDetail", "시작 지점 ${state.currentWeekDays}")
-        Log.d("groupDetail", "시작 지점 ${state.startDate}   ${state.endDate}")
+        getGroupInfo(groupId = groupId)
+        getGroupDuty()
+    }
 
-        val initDays: WeeklyUiModel = WeeklyDataSource().getData(
-            LocalDate.now().minusDays(1),
-            LocalDate.now()
+    private fun getGroupDuty() = intent {
+        val tokens = getTokenUseCase()
+
+        Log.d(
+            "groupDetail",
+            "${tokens.first} ${state.groupInfo.id} ${state.currentWeekDays.selectedDate.date.toString()}"
         )
+        val result = groupDutyUseCase(
+            accessToken = "Bearer ${tokens.first}",
+            groupId = groupId,
+            date = state.currentWeekDays.selectedDate.date.toString()
+        ).getOrNull()
+        Log.d("groupDetail", "getGroupDuty $result")
 
-        Log.d("groupDetail", "$initDays")
-
+        reduce {
+            state.copy(
+                day = result?.day ?: emptyList(),
+                eve = result?.eve ?: emptyList(),
+                night = result?.night ?: emptyList(),
+                off = result?.off ?: emptyList(),
+                etc = result?.etc ?: emptyList(),
+            )
+        }
     }
 
     private fun getGroupInfo(groupId: Long) = intent {
@@ -97,7 +142,11 @@ class GroupDetailViewModel @Inject constructor(
 
         Log.d("groupDetail", "${state.currentWeekDays}")
         Log.d("groupDetail", " ${state.startDate} ---- ${state.endDate}")
+
+        getGroupDuty()
+        updateData()
     }
+
 
     fun onDateClick(date: WeeklyUiModel.Date) = intent {
         Log.d("groupDetail", "onDateClick!")
@@ -115,6 +164,9 @@ class GroupDetailViewModel @Inject constructor(
             )
         }
         Log.d("groupDetail", "선택한 근무 ${state.currentWeekDays.selectedDate}")
+
+        getGroupDuty()
+        updateData()
     }
 
     fun onNextClick(localDate: LocalDate) = intent {
@@ -139,12 +191,23 @@ class GroupDetailViewModel @Inject constructor(
 
         Log.d("groupDetail", "${calendarUiModel}")
         Log.d("groupDetail", "${state.startDate} ---- ${state.endDate}")
+        getGroupDuty()
+        updateData()
+    }
 
+
+    fun copyInvitationLink() = intent {
+        reduce {
+            state.copy(
+
+            )
+        }
     }
 }
 
 
 data class GroupDetailState(
+    val dutyType: String = "Day",
     val groupInfo: GroupInfo = GroupInfo(
         id = 0,
         isAdmin = false,
@@ -167,5 +230,16 @@ data class GroupDetailState(
     ),
     val startDate: LocalDate = LocalDate.now(),
     val endDate: LocalDate = LocalDate.now(),
+
+    // member duty
+    val day: List<Member> = emptyList(),
+    val eve: List<Member> = emptyList(),
+    val night: List<Member> = emptyList(),
+    val off: List<Member> = emptyList(),
+    val etc: List<Member> = emptyList(),
+    val selectedDuty: List<Member> = emptyList(),
+
+    // invitation
+    val invitationCode : String = ""
 )
 

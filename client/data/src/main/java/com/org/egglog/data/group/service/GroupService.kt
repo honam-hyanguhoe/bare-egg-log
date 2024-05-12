@@ -1,5 +1,6 @@
 package com.org.egglog.data.group.service
 
+import com.org.egglog.data.group.model.GroupDutyResponse
 import com.org.egglog.data.group.model.GroupInfoResponse
 import com.org.egglog.data.group.model.GroupResponse
 import com.org.egglog.data.main.model.stats.RemainDutyResponse
@@ -34,5 +35,29 @@ interface GroupService {
         @Header("Authorization") accessToken: String,
         @Path("groupId") groupId: Long,
     ): CommonResponse<GroupInfoResponse>
+
+    @GET("groups/duty/{groupId}")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun getGroupDuty(
+        @Header("Authorization") accessToken: String,
+        @Path("groupId") groupId: Long,
+        @Query("date") date : String
+    ): CommonResponse<GroupDutyResponse?>
+
+
+    // invitation
+    @GET("groups/invitaion/{groupId}")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun getInvitationCode(
+        @Header("Authorization") accessToken: String,
+        @Path("groupId") groupId: Long,
+    ): CommonResponse<String?>
+
+    @POST("groups/invitation/accept")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun inviteMember(
+        @Header("Authorization") accessToken: String,
+        @Body requestBody: RequestBody
+    ): CommonResponse<String?>
 }
 
