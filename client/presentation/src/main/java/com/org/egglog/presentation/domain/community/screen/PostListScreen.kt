@@ -50,6 +50,7 @@ import com.org.egglog.presentation.domain.community.viewmodel.PostListSideEffect
 import com.org.egglog.presentation.domain.community.viewmodel.PostListViewModel
 import com.org.egglog.presentation.domain.group.activity.GroupActivity
 import com.org.egglog.presentation.domain.main.activity.MainActivity
+import com.org.egglog.presentation.domain.myCalendar.activity.MyCalendarActivity
 import com.org.egglog.presentation.domain.setting.activity.SettingActivity
 import com.org.egglog.presentation.theme.Error200
 import com.org.egglog.presentation.theme.NaturalBlack
@@ -102,6 +103,16 @@ fun PostListScreen(
                 context.startActivity(
                     Intent(
                         context, SettingActivity::class.java
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                )
+            }
+
+            PostListSideEffect.NavigateToMyCalendarActivity -> {
+                context.startActivity(
+                    Intent(
+                        context, MyCalendarActivity::class.java
                     ).apply {
                         flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                     }

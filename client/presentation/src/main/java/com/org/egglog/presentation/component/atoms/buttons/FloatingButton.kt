@@ -48,8 +48,7 @@ fun FloatingButton(
     Column(
             modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = horizontalPadding, vertical = verticalPadding)
-                    .border(1.dp, NaturalBlack),
+                    .padding(horizontal = horizontalPadding, vertical = verticalPadding),
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.End
     ) {
@@ -130,7 +129,7 @@ fun ColumnScope.ExtendedFab(
                 contentColor = NaturalWhite,
                 elevation = FloatingActionButtonDefaults.elevation(),
         ) {
-            Text(text = "근무 설정", textAlign = TextAlign.End)
+            Text(text = "캘린더 설정", textAlign = TextAlign.End)
         }
     }
 }

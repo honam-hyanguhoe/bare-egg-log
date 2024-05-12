@@ -17,8 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
 import com.org.egglog.presentation.theme.*
@@ -41,12 +43,12 @@ fun Labels(text: String, size: String? = null, onClick: (()->Unit)? = null) {
 //    val colors : Color = Color(android.graphics.Color.parseColor("#ffff"))
 
     var textStyle = when(size) {
-        "big" -> Typography.labelLarge
-        else -> Typography.labelMedium
+        "big" -> Typography.labelLarge.copy(fontWeight = FontWeight.SemiBold)
+        else -> Typography.labelMedium.copy(fontSize = 10.sp)
     }
 
-    val width = if (size == "big") 70.widthPercent(LocalContext.current).dp else 42.widthPercent(LocalContext.current).dp
-    val height = if (size == "big") 30.heightPercent(LocalContext.current).dp else 18.heightPercent(LocalContext.current).dp
+    val width = if (size == "big") 75.widthPercent(LocalContext.current).dp else 42.widthPercent(LocalContext.current).dp
+    val height = if (size == "big") 34.heightPercent(LocalContext.current).dp else 18.heightPercent(LocalContext.current).dp
     val border = if (size == "big") 50.widthPercent(LocalContext.current).dp else 4.widthPercent(LocalContext.current).dp
 
     Box(modifier = Modifier
