@@ -3,12 +3,14 @@ package com.org.egglog.data.setting.di
 import com.org.egglog.data.setting.usecase.DeleteCalendarGroupUseCaseImpl
 import com.org.egglog.data.setting.usecase.GetCalendarGroupListUseCaseImpl
 import com.org.egglog.data.setting.usecase.GetCalendarGroupMapStoreUseCaseImpl
+import com.org.egglog.data.setting.usecase.GetWorkTypeListUseCaseImpl
 import com.org.egglog.data.setting.usecase.PostCalendarGroupUseCaseImpl
 import com.org.egglog.data.setting.usecase.PostCalendarSyncUseCaseImpl
 import com.org.egglog.data.setting.usecase.SetCalendarGroupMapStoreUseCaseImpl
 import com.org.egglog.domain.setting.usecase.DeleteCalendarGroupUseCase
 import com.org.egglog.domain.setting.usecase.GetCalendarGroupListUseCase
 import com.org.egglog.domain.setting.usecase.GetCalendarGroupMapStoreUseCase
+import com.org.egglog.domain.setting.usecase.GetWorkTypeListUseCase
 import com.org.egglog.domain.setting.usecase.PostCalendarGroupUseCase
 import com.org.egglog.domain.setting.usecase.PostCalendarSyncUseCase
 import com.org.egglog.domain.setting.usecase.SetCalendarGroupMapStoreUseCase
@@ -37,4 +39,7 @@ abstract class SettingModule {
 
     @Binds
     abstract fun bindPostCalendarGroupUseCase(uc: PostCalendarGroupUseCaseImpl): PostCalendarGroupUseCase
+
+    @Binds
+    abstract fun bindGetWorkTypeListUseCase(uc: GetWorkTypeListUseCaseImpl): GetWorkTypeListUseCase
 }

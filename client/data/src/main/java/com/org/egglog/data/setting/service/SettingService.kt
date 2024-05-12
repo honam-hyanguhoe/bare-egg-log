@@ -2,6 +2,7 @@ package com.org.egglog.data.setting.service
 
 import com.org.egglog.data.retrofit.CommonResponse
 import com.org.egglog.data.setting.model.CalendarGroupResponse
+import com.org.egglog.data.setting.model.WorkTypeResponse
 import com.org.egglog.domain.setting.model.CalendarGroup
 import okhttp3.RequestBody
 import retrofit2.http.Body
@@ -38,4 +39,10 @@ interface SettingService {
     suspend fun postCalendarSync(
         @Header("Authorization") accessToken: String
     ): CommonResponse<Unit?>
+
+    @GET("worktypes/list")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun getWorkTypeList(
+        @Header("Authorization") accessToken: String
+    ): CommonResponse<List<WorkTypeResponse>?>
 }

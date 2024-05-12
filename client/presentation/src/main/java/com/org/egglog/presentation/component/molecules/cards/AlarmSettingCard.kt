@@ -17,7 +17,7 @@ import com.org.egglog.presentation.utils.widthPercent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import com.org.egglog.presentation.R
-import com.org.egglog.client.data.ScheduleInfo
+import com.org.egglog.presentation.data.ScheduleInfo
 import com.org.egglog.presentation.component.atoms.cards.BackgroundCard
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.presentation.component.atoms.toggle.Toggle

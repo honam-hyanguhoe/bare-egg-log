@@ -1,6 +1,5 @@
 package com.org.egglog.presentation.domain.setting.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.org.egglog.domain.setting.usecase.GetCalendarGroupMapStoreUseCase
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
@@ -42,7 +41,7 @@ class CalendarSettingViewModel @Inject constructor(
             this.exceptionHandler = CoroutineExceptionHandler { _, throwable ->
                 intent {
                     postSideEffect(CalendarSettingSideEffect.Toast(message = throwable.message.orEmpty()))
-                    reduce { state.copy(syncEnabled = true, addEnabled = true) }
+                    reduce { state.copy(deleteEnabled = true, syncEnabled = true, addEnabled = true) }
                 }
             }
         }

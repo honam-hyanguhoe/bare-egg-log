@@ -1,4 +1,4 @@
-package com.org.egglog.client.data
+package com.org.egglog.presentation.data
 
 import androidx.compose.ui.graphics.Color
 
