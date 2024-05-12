@@ -3,5 +3,7 @@
     <style name="Theme.Client" parent="@style/Theme.AppCompat.NoActionBar">
         <!-- 기존 스플레시 스크린 삭제 -->
         <item name="android:windowIsTranslucent">true</item>
+        <!-- 엑티비티 이동시 에니메이션 삭제 -->
+        <item name="android:windowAnimationStyle">@null</item>
     </style>
 </resources>

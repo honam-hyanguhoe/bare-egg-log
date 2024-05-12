@@ -26,6 +26,7 @@ fun InfoList(
     onNavigateToAgreeDetailScreen: () -> Unit,
     onNavigateToMySettingScreen: () -> Unit,
     onNavigateToCalendarSettingScreen: () -> Unit,
+    onNavigateToWorkSettingScreen: () -> Unit,
     onClickLogout: () -> Unit
 ) {
     val context = LocalContext.current
@@ -34,7 +35,7 @@ fun InfoList(
         .padding(10.widthPercent(context).dp)) {
         SettingButton(onClick = { onNavigateToMySettingScreen() }, text =  "내 정보 설정", color = Gray600, icon = MySetting)
         SettingButton(onClick = { onClickPrepared() }, text =  "알림 설정", color = Gray600, icon = Notification)
-        SettingButton(onClick = { onClickPrepared() }, text =  "근무 설정", color = Gray600, icon = WorkSetting)
+        SettingButton(onClick = { onNavigateToWorkSettingScreen() }, text =  "근무 설정", color = Gray600, icon = WorkSetting)
         SettingButton(onClick = { onNavigateToCalendarSettingScreen() }, text =  "캘린더 설정", color = Gray600, icon = Calendar)
         SettingButton(onClick = { onNavigateToPrivacyDetailScreen() }, text =  "개인정보 처리방침", color = Gray600, icon = PersonalSetting)
         SettingButton(onClick = { onNavigateToAgreeDetailScreen() }, text =  "이용약관", color = Gray600, icon = Agree)

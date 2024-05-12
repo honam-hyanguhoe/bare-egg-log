@@ -2,8 +2,8 @@ package com.org.egglog.presentation.domain.setting.screen
 
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,7 +18,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -56,7 +55,8 @@ fun SettingScreen(
     onNavigateToPrivacyDetailScreen: () -> Unit,
     onNavigateToAgreeDetailScreen: () -> Unit,
     onNavigateToCalendarSettingScreen: () -> Unit,
-    onNavigateToMySettingScreen: () -> Unit
+    onNavigateToMySettingScreen: () -> Unit,
+    onNavigateToWorkSettingScreen: () -> Unit
 ) {
     val context = LocalContext.current
     val state = viewModel.collectAsState().value
@@ -108,6 +108,7 @@ fun SettingScreen(
         onSelectedIdx = viewModel::onSelectedIdx,
         onNavigateToCalendarSettingScreen = onNavigateToCalendarSettingScreen,
         onNavigateToMySettingScreen = onNavigateToMySettingScreen,
+        onNavigateToWorkSettingScreen = onNavigateToWorkSettingScreen,
         onClickLogout = viewModel::onClickLogout,
         logoutEnabled = state.logoutEnabled,
         selectedIdx = state.selectedIdx
@@ -120,6 +121,7 @@ fun SettingScreen(
     onNavigateToAgreeDetailScreen: () -> Unit,
     onNavigateToMySettingScreen: () -> Unit,
     onNavigateToCalendarSettingScreen: () -> Unit,
+    onNavigateToWorkSettingScreen: () -> Unit,
     onClickLogout: () -> Unit,
     logoutEnabled: Boolean,
     selectedIdx: Int,
@@ -136,11 +138,18 @@ fun SettingScreen(
         openLogoutDialog.value = false
     }
 
-    Surface {
+    Column(
+        modifier = Modifier
+            .background(NaturalWhite)
+            .fillMaxSize()
+            .systemBarsPadding(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .systemBarsPadding(),
+                .fillMaxWidth()
+                .fillMaxHeight(0.9f),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(18.heightPercent(context).dp))
@@ -148,12 +157,10 @@ fun SettingScreen(
             Spacer(modifier = Modifier.height(18.heightPercent(context).dp))
             Column (
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.92f)
-                    .padding(vertical = 6.widthPercent(context).dp)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
+                Spacer(modifier = Modifier.padding(4.heightPercent(context).dp))
                 // 인증 배지 신청하기 버튼
                 BasicButton(modifier = Modifier
                     .height(68.heightPercent(context).dp)
@@ -161,11 +168,11 @@ fun SettingScreen(
                     onClick = { openDialog.value = true },
                     shape = RoundedCornerShape(16.widthPercent(context).dp),
                     colors = ButtonColors(
-                    containerColor = Warning300,
-                    contentColor = NaturalWhite,
-                    disabledContainerColor = Gray300,
-                    disabledContentColor = NaturalWhite
-                )) {
+                        containerColor = Warning300,
+                        contentColor = NaturalWhite,
+                        disabledContainerColor = Gray300,
+                        disabledContentColor = NaturalWhite
+                    )) {
                     Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                         Row(verticalAlignment = Alignment.CenterVertically,) {
                             LocalImageLoader(imageUrl = R.drawable.small_fry, Modifier.size(32.widthPercent(context).dp))
@@ -184,12 +191,14 @@ fun SettingScreen(
                     onNavigateToAgreeDetailScreen = onNavigateToAgreeDetailScreen,
                     onNavigateToMySettingScreen = onNavigateToMySettingScreen,
                     onNavigateToCalendarSettingScreen = onNavigateToCalendarSettingScreen,
+                    onNavigateToWorkSettingScreen = onNavigateToWorkSettingScreen,
                     onClickLogout = { openLogoutDialog.value = true }
                 )
 
                 Spacer(modifier = Modifier.padding(30.heightPercent(context).dp))
                 LocalImageLoader(imageUrl = R.drawable.bottom_logo, Modifier.fillMaxWidth(0.52f))
                 Text("Version $version", style = Typography.displayMedium.copy(color = Gray400))
+                Spacer(modifier = Modifier.padding(4.heightPercent(context).dp))
 
                 when {
                     openDialog.value -> {
@@ -214,11 +223,8 @@ fun SettingScreen(
                     }
                 }
             }
-
-            Box(modifier = Modifier.fillMaxHeight(1f).fillMaxWidth()) {
-                BottomNavigator(selectedItem = selectedIdx, onItemSelected = { onSelectedIdx(it) })
-            }
         }
+        BottomNavigator(selectedItem = selectedIdx, onItemSelected = { onSelectedIdx(it) })
     }
 }
 
@@ -230,7 +236,8 @@ private fun SettingScreenPreview() {
             onNavigateToPrivacyDetailScreen = {},
             onNavigateToAgreeDetailScreen = {},
             onNavigateToMySettingScreen = {},
-            onNavigateToCalendarSettingScreen = {}
+            onNavigateToCalendarSettingScreen = {},
+            onNavigateToWorkSettingScreen = {}
         )
     }
 }
