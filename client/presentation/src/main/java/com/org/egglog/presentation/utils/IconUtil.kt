@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SubdirectoryArrowRight
 import androidx.compose.material.icons.filled.SupervisedUserCircle
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.outlined.RemoveRedEye
@@ -71,3 +72,4 @@ val CommentBorder = Icons.Default.ChatBubbleOutline
 val Agree = Icons.Default.Verified
 val Link = Icons.Default.Link
 val Send = Icons.AutoMirrored.Outlined.Send
+val Sync = Icons.Default.Sync

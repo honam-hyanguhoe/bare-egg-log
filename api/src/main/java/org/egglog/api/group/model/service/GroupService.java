@@ -107,6 +107,7 @@ public class GroupService {
      * @param memberId
      * @param user
      */
+    @Transactional
     public void deleteGroupMember(Long groupId, Long memberId, User user) {
         GroupMember boss = groupMemberService.getAdminMember(groupId);
         if(boss.getUser().getId()==user.getId()) {
@@ -196,6 +197,7 @@ public class GroupService {
      * @param memberId
      * @param user
      */
+    @Transactional
     public BossChangeDto updateGroupMember(Long groupId, Long memberId, User user) {
         GroupMember boss = groupMemberService.getGroupMember(groupId, user.getId());
         //사용자가 그룹장이 아니라면 권한 에러 403
@@ -230,6 +232,7 @@ public class GroupService {
      * @param groupId
      * @param user
      */
+    @Transactional
     public void exitGroup(Long groupId, User user) {
         GroupMember userInfo = groupMemberService.getGroupMember(groupId, user.getId());
         //그룹장인지 확인

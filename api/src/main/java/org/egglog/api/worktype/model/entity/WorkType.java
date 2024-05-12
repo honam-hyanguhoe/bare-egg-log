@@ -54,6 +54,7 @@ public class WorkType {
                 .build();
     }
 
+
     public WorkType edit(String title, String color, String workTypeImgUrl, LocalTime startTime, LocalTime workTime){
         this.title = title;
         this.workTag = WorkTag.ETC;

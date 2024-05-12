@@ -8,6 +8,7 @@ import com.org.egglog.data.main.service.StaticsService
 import com.org.egglog.data.main.service.WorkService
 import com.org.egglog.data.community.service.CommunityService
 import com.org.egglog.data.group.service.GroupService
+import com.org.egglog.data.setting.service.SettingService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -55,6 +56,11 @@ class RetrofitModule {
     @Provides
     fun provideUserService(retrofit: Retrofit): UserService {
         return retrofit.create(UserService::class.java)
+    }
+
+    @Provides
+    fun provideSettingService(retrofit: Retrofit): SettingService {
+        return retrofit.create(SettingService::class.java)
     }
 
     @Provides

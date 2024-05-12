@@ -3,6 +3,7 @@ package com.org.egglog.presentation.domain.community.screen
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,13 +41,19 @@ import com.org.egglog.domain.community.model.PostData
 import com.org.egglog.presentation.R
 import com.org.egglog.presentation.component.atoms.cards.BackgroundCard
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
+import com.org.egglog.presentation.component.molecules.bottomNavigator.BottomNavigator
 import com.org.egglog.presentation.component.molecules.cards.HotPostCard
 import com.org.egglog.presentation.component.molecules.headers.NoticeHeader
 import com.org.egglog.presentation.component.organisms.postCard.PostCard
 import com.org.egglog.presentation.data.HotPostInfo
 import com.org.egglog.presentation.domain.community.viewmodel.PostListSideEffect
 import com.org.egglog.presentation.domain.community.viewmodel.PostListViewModel
-import com.org.egglog.presentation.theme.BlueGray900
+import com.org.egglog.presentation.domain.group.activity.GroupActivity
+import com.org.egglog.presentation.domain.main.activity.MainActivity
+import com.org.egglog.presentation.domain.myCalendar.activity.MyCalendarActivity
+import com.org.egglog.presentation.domain.setting.activity.SettingActivity
+import com.org.egglog.presentation.theme.Error200
+import com.org.egglog.presentation.theme.NaturalBlack
 import com.org.egglog.presentation.theme.NaturalWhite
 import com.org.egglog.presentation.theme.Typography
 import com.org.egglog.presentation.theme.Warning200
@@ -65,11 +73,56 @@ fun PostListScreen(
 ) {
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
-    viewModel.collectSideEffect { sideEffect -> when(sideEffect) {
-        is PostListSideEffect.Toast -> Toast.makeText(context , sideEffect.message, Toast.LENGTH_SHORT).show()
-    }
+    viewModel.collectSideEffect { sideEffect ->
+        when (sideEffect) {
+            is PostListSideEffect.Toast -> Toast.makeText(
+                context, sideEffect.message, Toast.LENGTH_SHORT
+            ).show()
+
+            PostListSideEffect.NavigateToGroupActivity -> {
+                context.startActivity(
+                    Intent(
+                        context, GroupActivity::class.java
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                )
+            }
+
+            PostListSideEffect.NavigateToMainActivity -> {
+                context.startActivity(
+                    Intent(
+                        context, MainActivity::class.java
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                )
+            }
+
+            PostListSideEffect.NavigateToSettingActivity -> {
+                context.startActivity(
+                    Intent(
+                        context, SettingActivity::class.java
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                )
+            }
+
+            PostListSideEffect.NavigateToMyCalendarActivity -> {
+                context.startActivity(
+                    Intent(
+                        context, MyCalendarActivity::class.java
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                )
+            }
+        }
     }
     PostListScreen(
+        selectedIdx = state.selectedIdx,
+        onSelectedIdx = viewModel::onSelectedIdx,
         isHospitalAuth = state.isHospitalAuth,
         categoryName = state.categoryName,
         hospitalId = state.hospitalId,
@@ -86,6 +139,8 @@ fun PostListScreen(
 
 @Composable
 private fun PostListScreen(
+    selectedIdx: Int,
+    onSelectedIdx: (Int) -> Unit,
     isHospitalAuth: Boolean,
     categoryName: String,
     hospitalId: Int?,
@@ -103,80 +158,150 @@ private fun PostListScreen(
     val list = postListFlow.collectAsLazyPagingItems()
     val fabInteractionSource = remember { MutableInteractionSource() }
     var scrollState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+    val refreshingState = remember { mutableStateOf(false) }
 
     Column(
         Modifier
             .fillMaxSize()
             .background(NaturalWhite)
-            .padding(
-                start = 10.widthPercent(context).dp,
-                top = 20.heightPercent(context).dp,
-                end = 10.widthPercent(context).dp
-            )
     ) {
-        NoticeHeader(
-            hasSearch = true,
-            hasMenu = true,
-            title = categoryName,
-            selectedOption = selectedMenuItem,
-            options = categoryList.map {it. second},
-            onClickSearch = { onClickSearch(hospitalId?:-1, groupId?: -1) },
-            onClickNotification = {},
-            onSelect = {
-                selectedMenuItem = it
-                val selectedPair = categoryList.find { it.second == selectedMenuItem}
-                val index = categoryList.indexOf(selectedPair)
-                onSelectCategory(index)
-            }
-        )
+        Column(
+            Modifier
+                .fillMaxHeight(0.92f)
+                .padding(
+                    start = 10.widthPercent(context).dp,
+                    top = 20.heightPercent(context).dp,
+                    end = 10.widthPercent(context).dp
+                )
+        ) {
+            NoticeHeader(hasSearch = true,
+                hasMenu = true,
+                title = categoryName,
+                selectedOption = selectedMenuItem,
+                options = categoryList.map { it.second },
+                onClickSearch = { onClickSearch(hospitalId ?: -1, groupId ?: -1) },
+                onClickNotification = {},
+                onSelect = {
+                    selectedMenuItem = it
+                    val selectedPair = categoryList.find { it.second == selectedMenuItem }
+                    val index = categoryList.indexOf(selectedPair)
+                    onSelectCategory(index)
+                })
 
-        Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-        LazyColumn(state = scrollState, modifier = Modifier.padding(10.dp)) {
-            item {
-                BackgroundCard(margin=0.dp, padding=0.dp, color= Warning200, borderRadius=10.dp, onClickCard = null) {
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.padding(vertical = 14.dp, horizontal = 4.dp)){
-                            Text(text = "에그로그에 친구를 초대하고,", style= Typography.displayLarge)
-                            Text(text = "친구와 함께 일정을 공유하세요!", style= Typography.displayLarge)
-                        }
-
-                        Column(
-                            Modifier
-                                .fillMaxHeight()
-                                .height(70.heightPercent(context).dp)
-                                .padding(top = 10.dp, end = 14.dp),
-                            verticalArrangement = Arrangement.Bottom,
-                            horizontalAlignment = Alignment.End) {
-                            LocalImageLoader(imageUrl = R.drawable.dark, Modifier.size(60.dp))
-                        }
-                    }
-                }
-            }
-
-            if(groupId==null && hospitalId==null) {
+            LazyColumn(state = scrollState, modifier = Modifier.padding(10.dp)) {
                 item {
-                    Column {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(text = "\uD83D\uDD25 급상승 게시글")
-                        Spacer(modifier = Modifier.height(8.dp))
+                    BackgroundCard(
+                        margin = 0.dp,
+                        padding = 0.dp,
+                        color = Warning200,
+                        borderRadius = 10.dp,
+                        onClickCard = null
+                    ) {
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(Modifier.padding(vertical = 14.dp, horizontal = 4.dp)) {
+                                Text(text = "에그로그에 친구를 초대하고,", style = Typography.displayLarge)
+                                Text(
+                                    text = "친구와 함께 일정을 공유하세요!",
+                                    style = Typography.displayLarge
+                                )
+                            }
+
+                            Column(
+                                Modifier
+                                    .fillMaxHeight()
+                                    .height(70.heightPercent(context).dp)
+                                    .padding(top = 10.dp, end = 14.dp),
+                                verticalArrangement = Arrangement.Bottom,
+                                horizontalAlignment = Alignment.End
+                            ) {
+                                LocalImageLoader(
+                                    imageUrl = R.drawable.dark,
+                                    Modifier.size(60.dp)
+                                )
+                            }
+                        }
                     }
                 }
 
-                if (hotPostList.isNotEmpty()) {
-                    items(
-                        count = hotPostList.size,
-                        key = { index -> "0${hotPostList[index].postId}" }
-                    ) { index ->
-                        val tempNickname = hotPostList[index].name ?: "익명의 구운란"
-                        HotPostCard(
-                            postInfo = hotPostList[index].copy(name = tempNickname),
-                            onClickPost = { postId -> onClickPost(postId) })
+                if (groupId == null && hospitalId == null) {
+                    item {
+                        Column {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(text = "\uD83D\uDD25 급상승 게시글")
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    }
+
+                    if (hotPostList.isNotEmpty()) {
+                        items(count = hotPostList.size,
+                            key = { index -> "0${hotPostList[index].postId}" }) { index ->
+                            val tempNickname = hotPostList[index].name ?: "익명의 구운란"
+                            HotPostCard(postInfo = hotPostList[index].copy(name = tempNickname),
+                                onClickPost = { postId -> onClickPost(postId) })
+                        }
+                    } else {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 20.dp, bottom = 10.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(text = "아직 급상승 게시글이 없어요")
+                            }
+                        }
+                    }
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(30.dp))
+                }
+
+                if (list.itemCount != 0) {
+                    items(count = list.itemCount,
+                        key = { index ->
+                            list[index]?.boardId ?: "UniqueKey_$index"
+                        }) { index ->
+                        list[index]?.run {
+                            val profile = Profile(
+                                this.userId,
+                                this.tempNickname ?: "익명의 구운란",
+                                this.hospitalName,
+                                this.isHospitalAuth
+                            )
+                            val postInfo = com.org.egglog.client.data.PostInfo(
+                                this.boardId,
+                                this.boardTitle,
+                                this.boardContent,
+                                this.boardCreatedAt,
+                                this.pictureOne
+                            )
+                            val postReaction = PostReactionInfo(
+                                this.boardId,
+                                this.likeCount,
+                                this.commentCount,
+                                this.viewCount,
+                                this.isLiked,
+                                this.isCommented
+                            )
+
+                            Column {
+                                PostCard(profile = profile,
+                                    postInfo = postInfo,
+                                    postReaction = postReaction,
+                                    onClick = { postId -> onClickPost(postId) })
+                                Spacer(modifier = Modifier.height(10.dp))
+                            }
+                        }
                     }
                 } else {
                     item {
@@ -186,90 +311,61 @@ private fun PostListScreen(
                                 .padding(top = 20.dp, bottom = 10.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(text = "아직 급상승 게시글이 없어요")
+                            Text(text = "아직 등록된 게시글이 없어요")
                         }
                     }
                 }
             }
 
-            item {
-                Spacer(modifier = Modifier.height(30.dp))
-            }
-
-            if(list.itemCount != 0) {
-                items(
-                    count = list.itemCount,
-                    key = { index -> list[index]?.boardId ?: "UniqueKey_$index" }
-                ) { index ->
-                    list[index]?.run {
-                        val profile = Profile(
-                            this.userId,
-                            this.tempNickname ?: "익명의 구운란",
-                            this.hospitalName,
-                            this.isHospitalAuth
-                        )
-                        val postInfo = com.org.egglog.client.data.PostInfo(
-                            this.boardId,
-                            this.boardTitle,
-                            this.boardContent,
-                            this.boardCreatedAt,
-                            this.pictureOne
-                        )
-                        val postReaction = PostReactionInfo(
-                            this.boardId,
-                            this.likeCount,
-                            this.commentCount,
-                            this.viewCount,
-                            this.isLiked,
-                            this.isCommented
-                        )
-
-                        Column {
-                            PostCard(
-                                profile = profile,
-                                postInfo = postInfo,
-                                postReaction = postReaction,
-                                onClick = { postId -> onClickPost(postId) })
-                            Spacer(modifier = Modifier.height(10.dp))
-                        }
-                    }
-                }
-            } else {
-                item {
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 20.dp, bottom = 10.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = "아직 등록된 게시글이 없어요")
-                    }
-                }
-            }
         }
+        BottomNavigator(selectedItem = selectedIdx, onItemSelected = { onSelectedIdx(it) })
 
     }
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(horizontal = 10.dp, vertical = 10.dp),
-        verticalArrangement = Arrangement.Bottom,
-        horizontalAlignment = Alignment.End) {
+    // Floating Action Button 영역
+    CustomFloatingActionButton(
+        hospitalId = hospitalId,
+        groupId = groupId,
+        isHospitalAuth = isHospitalAuth,
+        onClickWriteButton
+    )
+}
+
+@Composable
+fun CustomFloatingActionButton(
+    hospitalId: Int?,
+    groupId: Int?,
+    isHospitalAuth: Boolean,
+    onClickWriteButton: (Int, Int) -> Unit
+) {
+    val context = LocalContext.current
+    val fabInteractionSource = remember { MutableInteractionSource() }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.92f)
+            .padding(horizontal = 10.dp),
+        contentAlignment = Alignment.BottomEnd
+    ) {
         FloatingActionButton(
             onClick = {
-                if(hospitalId != null && !isHospitalAuth) {
+                if (hospitalId != null && !isHospitalAuth) {
                     // 사용자가 병원 인증 된 유저가 아니면 인증해달라는 toast
-                    Toast.makeText(context, "병원 게시판은 인증된 사용자만 글을 작성할 수 있습니다", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "병원 게시판은 인증된 사용자만 작성할 수 있습니다", Toast.LENGTH_SHORT)
+                        .show()
                 } else {
-                    onClickWriteButton(hospitalId ?: -1,  groupId ?: -1)
+                    onClickWriteButton(hospitalId ?: -1, groupId ?: -1)
                 }
-                      },
+            },
             modifier = Modifier
                 .padding(5.dp),
             shape = FloatingActionButtonDefaults.largeShape,
-            containerColor = BlueGray900,
+            containerColor = NaturalBlack,
             contentColor = NaturalWhite,
             elevation = FloatingActionButtonDefaults.elevation(),
-            interactionSource = fabInteractionSource) {
+            interactionSource = fabInteractionSource
+        ) {
             Icon(imageVector = Edit, contentDescription = "fab Icon")
         }
     }
