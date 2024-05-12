@@ -1,6 +1,7 @@
 package com.org.egglog.presentation.component.organisms.calendars.weeklyData
 
 
+import android.util.Log
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -16,18 +17,20 @@ class WeeklyDataSource {
         }
 
     fun getStartOfWeek(date: LocalDate): LocalDate {
-        return date.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY))
+        return date.with(TemporalAdjusters.previous(DayOfWeek.SUNDAY))
     }
 
     fun getEndOfWeek(date : LocalDate) : LocalDate {
-        return date.with(TemporalAdjusters.previousOrSame(DayOfWeek.SATURDAY))
+        return date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY))
     }
     // 시작 날짜(startDate)와 마지막으로 선택된 날짜(lastSelectedDate)를 인자로 받아, 그 주간의 날짜들과 UI 모델을 생성
     // firstDayOfWeek는 startDate에서 일주일 전의 일요일을 계산하며, endDayOfWeek는 이 날짜로부터 일주일 후의 날짜
     fun getData(startDate: LocalDate = today, lastSelectedDate: LocalDate): WeeklyUiModel {
-        val firstDayOfWeek = startDate.minusWeeks(1).with(DayOfWeek.SUNDAY)
+        val firstDayOfWeek = startDate.with(DayOfWeek.SUNDAY)
         val endDayOfWeek = firstDayOfWeek.plusDays(7)
         val visibleDates = getDatesBetween(firstDayOfWeek, endDayOfWeek)
+
+        Log.d("groupDetail", "GetData $firstDayOfWeek  $endDayOfWeek  $visibleDates")
         return toUiModel(visibleDates, lastSelectedDate)
     }
 

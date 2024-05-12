@@ -33,7 +33,7 @@ fun ProfileButton(onClick: () -> Unit, userInfo: UserInfo, isSelected: Boolean, 
     val name = if (isMine) "${userInfo.userName}(나)" else userInfo.userName
     Surface(
         onClick = onClick,
-        modifier = Modifier.size(82.widthPercent(context).dp, 108.heightPercent(context).dp),
+        modifier = Modifier.size(62.widthPercent(context).dp, 108.heightPercent(context).dp),
         shape = RoundedCornerShape(24.widthPercent(context).dp),
         color = if(isSelected) Gray200 else Color.Transparent
     ) {
@@ -52,7 +52,7 @@ fun ProfileButton(onClick: () -> Unit, userInfo: UserInfo, isSelected: Boolean, 
                     )
                     Spacer(Modifier.padding(2.widthPercent(context).dp))
                 }
-                Text(style = Typography.bodyMedium, text = name)
+                Text(style = Typography.bodySmall, text = name)
             }
         }
     }

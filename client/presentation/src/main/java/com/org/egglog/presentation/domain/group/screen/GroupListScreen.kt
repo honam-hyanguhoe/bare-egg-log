@@ -69,7 +69,8 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
 fun GroupListScreen(
-    groupListViewModel: GroupListViewModel = hiltViewModel()
+    groupListViewModel: GroupListViewModel = hiltViewModel(),
+    onNavigateToGroupDetailScreen: (groupId: Long) -> Unit,
 ) {
     val groupListState = groupListViewModel.collectAsState().value
     val context = LocalContext.current
@@ -128,7 +129,8 @@ fun GroupListScreen(
         groupPassword = groupListState.groupPassword,
         onGroupNameChange = groupListViewModel::onChangeGroupName,
         onGroupPasswordChange = groupListViewModel::onChangeGroupPassword,
-        createGroup = groupListViewModel::createGroup
+        createGroup = groupListViewModel::createGroup,
+        onClickGroup = { groupId: Long -> onNavigateToGroupDetailScreen(groupId) }
     )
 }
 
@@ -144,12 +146,13 @@ private fun GroupListScreen(
     onGroupNameChange: (String) -> Unit,
     onGroupPasswordChange: (String) -> Unit,
     createGroup: () -> Unit,
+    onClickGroup: (groupId: Long) -> Unit
 ) {
     Column(
         modifier = Modifier
             .background(NaturalWhite)
-            .fillMaxSize(),
-//            .systemBarsPadding(),
+            .fillMaxSize()
+            .systemBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
@@ -171,7 +174,7 @@ private fun GroupListScreen(
             ) {
                 items(groupList) { group ->
                     GroupButton(
-                        onClick = { },
+                        onClick = { onClickGroup(group.groupId) },
                         groupMaster = group.admin,
                         groupName = group.groupName,
                         memberCnt = group.memberCount,

@@ -22,13 +22,13 @@ import java.util.Calendar
 
 @Composable
 fun GroupCalenar(
-        currentYear: MutableState<Int>,
-        currentMonth: MutableState<Int>,
-        workList: Map<String, Map<String, String>>
+    currentYear: MutableState<Int>,
+    currentMonth: MutableState<Int>,
+    workList: Map<String, Map<String, String>>
 ) {
 
-
-    Column(Modifier
+    Column(
+        Modifier
             .fillMaxWidth()
     ) {
         GroupCalendarHeader()
@@ -42,22 +42,28 @@ fun GroupCalenar(
 fun GroupCalendarHeader() {
     val nameList = listOf("아", "일", "월", "화", "수", "목", "금", "토")
 
-    Row(Modifier
+    Row(
+        Modifier
             .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
     }
     Spacer(modifier = Modifier.height(16.dp))
     Row() {
         nameList.forEach {
-            Box(modifier = Modifier
+            Box(
+                modifier = Modifier
                     .weight(1f),
-                    contentAlignment = Alignment.Center) {
+                contentAlignment = Alignment.Center
+            ) {
                 Text(
-                        text = it,
-                        style = Typography.displayMedium,
-                        color = if(it.equals("일")) Error600 else if(it.equals("토")) Blue700 else if(it.equals("아"))  NaturalWhite else NaturalBlack
+                    text = it,
+                    style = Typography.displayMedium,
+                    color = if (it.equals("일")) Error600 else if (it.equals("토")) Blue700 else if (it.equals(
+                            "아"
+                        )
+                    ) NaturalWhite else NaturalBlack
                 )
             }
         }
@@ -67,9 +73,9 @@ fun GroupCalendarHeader() {
 
 @Composable
 fun GroupDayList(
-        currentYear: MutableState<Int>,
-        currentMonth: MutableState<Int>,
-        workList: Map<String, Map<String, String>>,
+    currentYear: MutableState<Int>,
+    currentMonth: MutableState<Int>,
+    workList: Map<String, Map<String, String>>,
 ) {
     val time = remember { mutableStateOf(Calendar.getInstance()) }
     val date = time.value
@@ -91,16 +97,17 @@ fun GroupDayList(
     Column {
         repeat(thisMonthWeeksCount) { week ->
             Row {
-                Column(modifier = Modifier
+                Column(
+                    modifier = Modifier
                         .padding(4.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                        )
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                )
                 {
                     Text(
-                            text = "",
+                        text = "",
 //                            Modifier.border(1.dp, NaturalBlack),
-                            style = Typography.displayMedium
+                        style = Typography.displayMedium
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     workList.entries.forEachIndexed { index, (user, workMap) ->
@@ -134,34 +141,35 @@ fun GroupDayList(
 
                     val dateString = "${currentYear.value}-${formattedMonth}-${formattedDay}"
                     val workContent = workList.flatMap { it.value.entries }
-                            .find { it.key == dateString }
-                            ?.value
+                        .find { it.key == dateString }
+                        ?.value
 
                     if (resultDay in 1..thisMonthDayMax) {
                         // 달력 날짜 범위 내
                         Box(
-                                modifier = Modifier
-                                        .weight(1f)
-                                        .padding(4.dp),
-                                contentAlignment = Alignment.TopCenter
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(4.dp),
+                            contentAlignment = Alignment.TopCenter
                         ) {
                             Column(
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                        text = resultDay.toString(),
-                                        style = Typography.displayMedium,
-                                        color = when (dayOfWeek) {
-                                            Calendar.SUNDAY -> Error600
-                                            0 -> Blue700
-                                            else -> NaturalBlack
-                                        }
+                                    text = resultDay.toString(),
+                                    style = Typography.displayMedium,
+                                    color = when (dayOfWeek) {
+                                        Calendar.SUNDAY -> Error600
+                                        0 -> Blue700
+                                        else -> NaturalBlack
+                                    }
                                 )
                                 Spacer(modifier = Modifier.height(10.dp))
 
                                 // 해당 날짜에 근무 내용이 있는 사용자 리스트 가져오기
-                                val usersWithWork = workList.filterValues { it.containsKey(dateString) }
+                                val usersWithWork =
+                                    workList.filterValues { it.containsKey(dateString) }
                                 // 각 사용자별로 근무 내용 표시
                                 usersWithWork.forEach { (user, workMap) ->
                                     Labels(text = "${workMap[dateString]}")
@@ -173,14 +181,14 @@ fun GroupDayList(
                     } else {
                         // 달력 날짜 범위 밖
                         Box(
-                                modifier = Modifier
-                                        .weight(1f)
-                                        .padding(4.dp),
-                                contentAlignment = Alignment.TopCenter
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(4.dp),
+                            contentAlignment = Alignment.TopCenter
                         ) {
                             Column(
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Spacer(modifier = Modifier.height(10.dp))
                             }
