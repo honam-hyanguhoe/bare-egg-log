@@ -40,11 +40,14 @@
         <activity android:name=".domain.setting.activity.SettingActivity"
             android:windowSoftInputMode="adjustResize" />
 
-        <activity android:name=".domain.community.posteditor.activity.PostEditorActivity" />
+<!--        <activity android:name=".domain.community.posteditor.activity.PostEditorActivity" />-->
         <activity android:name=".domain.community.activity.CommunityActivity"/>
 
         <!-- GROUP -->
         <activity android:name=".domain.group.activity.GroupActivity"/>
+
+        <!-- MY CALENDAR -->
+        <activity android:name=".domain.myCalendar.activity.MyCalendarActivity" />
 
         <service
             android:name=".utils.FcmReceiveService"

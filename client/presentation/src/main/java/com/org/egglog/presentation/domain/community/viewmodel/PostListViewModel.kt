@@ -127,8 +127,8 @@ class PostListViewModel @Inject constructor(
 
     fun onSelectedIdx(selectedIdx: Int) = intent {
         when(selectedIdx) {
-            0 -> postSideEffect(PostListSideEffect.Toast("출시 준비 중입니다.")) // 일정 페이지로 이동
-            1 -> postSideEffect(PostListSideEffect.Toast("출시 준비 중입니다.")) // 그룹 페이지로 이동
+            0 -> postSideEffect(PostListSideEffect.NavigateToMyCalendarActivity) // 일정 페이지로 이동
+            1 -> postSideEffect(PostListSideEffect.NavigateToGroupActivity) // 그룹 페이지로 이동
             2 -> postSideEffect(PostListSideEffect.NavigateToMainActivity) // 메인 페이지로 이동
             4 -> postSideEffect(PostListSideEffect.NavigateToSettingActivity) // 설정 페이지로 이동
         }
@@ -151,6 +151,7 @@ data class PostListState(
 sealed interface PostListSideEffect {
     class Toast(val message: String) : PostListSideEffect
 
+    data object NavigateToMyCalendarActivity: PostListSideEffect
     data object NavigateToMainActivity: PostListSideEffect
 
     data object NavigateToGroupActivity: PostListSideEffect
