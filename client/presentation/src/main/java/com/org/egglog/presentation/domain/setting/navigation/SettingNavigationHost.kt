@@ -10,6 +10,7 @@ import com.org.egglog.presentation.domain.setting.screen.CalendarSettingScreen
 import com.org.egglog.presentation.domain.setting.screen.MySettingScreen
 import com.org.egglog.presentation.domain.setting.screen.PrivacyDetailScreen
 import com.org.egglog.presentation.domain.setting.screen.SettingScreen
+import com.org.egglog.presentation.domain.setting.screen.WorkSettingScreen
 
 @Composable
 fun SettingNavigationHost() {
@@ -25,6 +26,7 @@ fun SettingNavigationHost() {
                 onNavigateToAgreeDetailScreen = { navController.navigate(route = SettingRoute.AgreeDetailScreen.name) },
                 onNavigateToMySettingScreen = { navController.navigate(route = SettingRoute.MySettingScreen.name) },
                 onNavigateToCalendarSettingScreen = { navController.navigate(route = SettingRoute.CalendarSettingScreen.name) },
+                onNavigateToWorkSettingScreen = { navController.navigate(route = SettingRoute.WorkSettingScreen.name) },
             )
         }
 
@@ -48,6 +50,10 @@ fun SettingNavigationHost() {
 
         composable(route = SettingRoute.CalendarAddScreen.name) {
             CalendarAddScreen()
+        }
+
+        composable(route = SettingRoute.WorkSettingScreen.name) {
+            WorkSettingScreen()
         }
     }
 }
