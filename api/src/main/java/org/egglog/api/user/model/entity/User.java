@@ -9,6 +9,7 @@ import org.egglog.api.user.model.dto.response.UserResponse;
 import org.egglog.api.user.model.entity.enums.AuthProvider;
 import org.egglog.api.user.model.entity.enums.UserRole;
 import org.egglog.api.user.model.entity.enums.UserStatus;
+import org.egglog.api.work.model.entity.Work;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,14 +31,17 @@ import java.util.*;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @EntityListeners(AuditingEntityListener.class)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(nullable = false, unique = true, length = 254, name = "user_email")
+    @EqualsAndHashCode.Include
     private String email;
 
     @Column(length = 255, name = "user_password")
@@ -222,6 +226,5 @@ public class User implements UserDetails {
         user.setUserRole(UserRole.GENERAL_USER);
         return user;
     }
-
 }
 

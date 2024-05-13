@@ -31,7 +31,7 @@ public class GroupMemberService {
 
     public GroupMember getGroupMember(Long groupId, Long userId) {
         GroupMember member = groupMemberRepository
-                .findGroupMemberByGroupIdAndUserId(groupId,userId)
+                .findGroupMemberByGroupIdAndUserId(groupId, userId)
                 .orElseThrow(()->new GroupMemberException(GroupMemberErrorCode.NOT_FOUND));
         return member;
     }

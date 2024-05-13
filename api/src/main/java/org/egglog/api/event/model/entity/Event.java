@@ -13,12 +13,14 @@ import java.time.LocalDateTime;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(indexes = {@Index(name = "idx_calendar_group_id", columnList = "calendar_group_id"),@Index(name = "index_event_uuid",columnList = "event_uuid")})
 @Builder(toBuilder = true)
 public class Event {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     @Column(name = "event_id")
     private Long id;
 

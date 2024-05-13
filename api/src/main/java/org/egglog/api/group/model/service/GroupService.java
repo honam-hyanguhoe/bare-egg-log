@@ -1,5 +1,6 @@
 package org.egglog.api.group.model.service;
 
+import com.google.firebase.messaging.Notification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.group.exception.GroupErrorCode;
@@ -13,6 +14,8 @@ import org.egglog.api.group.model.entity.GroupMember;
 import org.egglog.api.group.model.entity.InvitationCode;
 import org.egglog.api.group.repository.redis.GroupInvitationRepository;
 import org.egglog.api.group.repository.jpa.GroupRepository;
+import org.egglog.api.notification.model.entity.FCMTopic;
+import org.egglog.api.notification.model.service.FCMService;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.utility.utils.RandomStringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,6 +35,7 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupInvitationRepository groupInvitationRepository;
 
+    private final FCMService fcmService;
 
     /**
      * 초대수락 메서드
@@ -66,6 +70,23 @@ public class GroupService {
                     .isAdmin(false)
                     .build();
             groupMemberService.createGroupMember(newMember);
+
+            //1. 그룹에 새 멤버가 추가되었다면 해당 그룹 토픽으로 FCM 알림 발송
+            FCMTopic topic = FCMTopic.builder()
+                    .topic(FCMTopic.TopicEnum.group)
+                    .topicId(group.getId())
+                    .build();
+            Notification notification = Notification.builder()
+                    .setTitle("[EGGLOG]")
+                    .setBody(group.getGroupName()+"의 그룹에 새 멤버가 추가 되었습니다. 축하해주세요!")
+                    .build();
+            fcmService.sendNotificationToTopic(topic, notification);
+
+            //2. 그룹에 가입되었다면 해당 그룹 토픽 구독
+            String loginUserDeviceToken = user.getDeviceToken();
+            if (loginUserDeviceToken!=null){
+                fcmService.subscribeToTopic(loginUserDeviceToken, topic);
+            }
         }else{
             throw new GroupException(GroupErrorCode.NOT_MATCH_INVITATION);
         }
@@ -110,10 +131,26 @@ public class GroupService {
     @Transactional
     public void deleteGroupMember(Long groupId, Long memberId, User user) {
         GroupMember boss = groupMemberService.getAdminMember(groupId);
-        if(boss.getUser().getId()==user.getId()) {
+        if(boss.getUser().equals(user)) {
             //그룹에 해당 멤버가 존재하는지 검증하고 삭제
             GroupMember member = groupMemberService.getGroupMember(groupId, memberId);
             groupMemberService.deleteGroupMember(member);
+
+            //해당 멤버가 삭제되었다면 해당 유저의 토픽 구독 취소
+            String userDeviceToken = member.getUser().getDeviceToken();
+            FCMTopic topic = FCMTopic.builder()
+                    .topic(FCMTopic.TopicEnum.group)
+                    .topicId(groupId)
+                    .build();
+            if (userDeviceToken!=null){
+                fcmService.unsubscribeFromTopic(userDeviceToken, topic);//구독 취소
+                //해당 유저에 알림 발송
+                Notification notification = Notification.builder()
+                        .setTitle("[EGGLOG]")
+                        .setBody(member.getGroup().getGroupName()+" 에서 퇴장 당했습니다.")
+                        .build();
+                fcmService.sendPersonalNotification(userDeviceToken, notification);
+            }
         }
     }
 
@@ -244,6 +281,18 @@ public class GroupService {
                 //더이상 남은 사용자가 없으니 그룹 삭제
                 Group group = groupRepository.findById(groupId).orElseThrow(()->new GroupException(GroupErrorCode.NOT_FOUND));
                 groupRepository.delete(group);
+
+                //해당 멤버가 삭제되었다면 해당 유저의 토픽 구독 취소
+                String loginUserDeviceToken = user.getDeviceToken();
+                FCMTopic topic = FCMTopic.builder()
+                        .topic(FCMTopic.TopicEnum.group)
+                        .topicId(groupId)
+                        .build();
+                if (loginUserDeviceToken!=null){
+                    fcmService.unsubscribeFromTopic(loginUserDeviceToken, topic);
+                }
+
+
             }else{
                 throw new GroupException(GroupErrorCode.GROUP_ROLE_NOT_MATCH);
             }

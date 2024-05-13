@@ -6,6 +6,7 @@ import org.egglog.api.user.model.entity.User;
 import org.egglog.api.worktype.model.dto.response.WorkTypeResponse;
 
 import java.time.LocalTime;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -13,11 +14,13 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class WorkType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "work_type_id")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "work_type_title")

@@ -17,10 +17,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
 @Table(name = "`Inquiries`")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Inquiry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "inquiry_id")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
