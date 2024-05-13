@@ -72,7 +72,7 @@ public class UserService {
         //todo 1. 기본 태그 자동 생성
         workTypeJpaRepository.saveAll(getDefaultWorkTypes(loginUser));
         //todo 2. 근무 일정 캘린더 그룹 자동 생성
-        CalendarGroup workGroup = calendarGroupRepository.save(CalendarGroup.builder().alias("근무 일정").user(loginUser).build());
+        CalendarGroup workGroup = calendarGroupRepository.save(CalendarGroup.builder().alias("[EGGLOG] 기본 캘린더").user(loginUser).build());
         return userJpaRepository.save(loginUser.join(request.getUserName(), hospital, request.getEmpNo(), request.getFcmToken(), workGroup.getId()))
                 .toResponse();
     }
