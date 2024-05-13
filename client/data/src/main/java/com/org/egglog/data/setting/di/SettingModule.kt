@@ -8,8 +8,8 @@ import com.org.egglog.data.setting.usecase.GetWorkTypeListUseCaseImpl
 import com.org.egglog.data.setting.usecase.PostCalendarGroupUseCaseImpl
 import com.org.egglog.data.setting.usecase.PostCalendarSyncUseCaseImpl
 import com.org.egglog.data.setting.usecase.PostWorkTypeUseCaseImpl
-import com.org.egglog.data.setting.usecase.PutWorkTypeUseCaseImpl
 import com.org.egglog.data.setting.usecase.SetCalendarGroupMapStoreUseCaseImpl
+import com.org.egglog.data.setting.usecase.UpdateWorkTypeUseCaseImpl
 import com.org.egglog.domain.setting.usecase.DeleteCalendarGroupUseCase
 import com.org.egglog.domain.setting.usecase.DeleteWorkTypeUseCase
 import com.org.egglog.domain.setting.usecase.GetCalendarGroupListUseCase
@@ -18,8 +18,8 @@ import com.org.egglog.domain.setting.usecase.GetWorkTypeListUseCase
 import com.org.egglog.domain.setting.usecase.PostCalendarGroupUseCase
 import com.org.egglog.domain.setting.usecase.PostCalendarSyncUseCase
 import com.org.egglog.domain.setting.usecase.PostWorkTypeUseCase
-import com.org.egglog.domain.setting.usecase.PutWorkTypeUseCase
 import com.org.egglog.domain.setting.usecase.SetCalendarGroupMapStoreUseCase
+import com.org.egglog.domain.setting.usecase.UpdateWorkTypeUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -56,5 +56,5 @@ abstract class SettingModule {
     abstract fun bindDeleteWorkTypeUseCase(uc: DeleteWorkTypeUseCaseImpl): DeleteWorkTypeUseCase
 
     @Binds
-    abstract fun bindPutWorkTypeUseCase(uc: PutWorkTypeUseCaseImpl): PutWorkTypeUseCase
+    abstract fun bindUpdateWorkTypeUseCase(uc: UpdateWorkTypeUseCaseImpl): UpdateWorkTypeUseCase
 }

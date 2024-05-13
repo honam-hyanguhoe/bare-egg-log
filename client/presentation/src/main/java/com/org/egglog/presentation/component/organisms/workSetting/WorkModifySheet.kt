@@ -134,16 +134,16 @@ fun WorkModifySheet(
             HalfBigButton(colors = ButtonColors(
                 containerColor = Gray300,
                 contentColor = NaturalWhite,
-                disabledContentColor = Gray300,
-                disabledContainerColor = NaturalWhite
+                disabledContentColor = NaturalWhite,
+                disabledContainerColor = Gray300
             ), onClick = { onDismiss() }) {
                 Text(text = "취소", color = NaturalWhite)
             }
             HalfBigButton(colors = ButtonColors(
                 containerColor = Warning300,
                 contentColor = NaturalWhite,
-                disabledContentColor = Gray300,
-                disabledContainerColor = NaturalWhite
+                disabledContentColor = NaturalWhite,
+                disabledContainerColor = Gray300
             ), enabled = color.isNotEmpty() && title.isNotEmpty(), onClick = { onClickModify() }) {
                 Text(text = "수정", color = NaturalWhite)
             }

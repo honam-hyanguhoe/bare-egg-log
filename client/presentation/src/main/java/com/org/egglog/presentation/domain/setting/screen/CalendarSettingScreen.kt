@@ -122,7 +122,7 @@ fun CalendarSettingScreen(
                 }
 
                 calendarGroupList?.map {calendarGroup ->
-                    CalendarSettingSwiper(onDelete = { onClickDelete(calendarGroup.calendarGroupId) }, deleteEnabled = deleteEnabled, enabled = user?.workGroupId == calendarGroup.calendarGroupId) {
+                    CalendarSettingSwiper(onDelete = { onClickDelete(calendarGroup.calendarGroupId) }, deleteEnabled = user?.workGroupId != calendarGroup.calendarGroupId && deleteEnabled, enabled = user?.workGroupId != calendarGroup.calendarGroupId) {
                         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
                             Text(text = "${if(calendarGroup.isBasic) "[기본]" else "[구독]"} ${calendarGroup.alias}", style = Typography.bodyMedium)
                             Toggle(checked = calendarGroup.isEnabled, onCheckedChange = {

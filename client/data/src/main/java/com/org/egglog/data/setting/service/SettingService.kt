@@ -10,6 +10,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -61,10 +62,11 @@ interface SettingService {
         @Path("workTypeId") workTypeId: Long
     ): CommonResponse<Unit?>
 
-    @PUT("worktypes/edit")
+    @PATCH("worktypes/edit/{workTypeId}")
     @Headers("Content-Type:application/json; charset=UTF8")
     suspend fun putWorkType(
         @Header("Authorization") accessToken: String,
+        @Path("workTypeId") workTypeId: Long,
         @Body requestBody: RequestBody
     ): CommonResponse<WorkTypeResponse?>
 }

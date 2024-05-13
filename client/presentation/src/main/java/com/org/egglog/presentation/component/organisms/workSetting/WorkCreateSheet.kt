@@ -129,8 +129,8 @@ fun WorkCreateSheet(
         BigButton(colors = ButtonColors(
             containerColor = Warning300,
             contentColor = NaturalWhite,
-            disabledContentColor = Gray300,
-            disabledContainerColor = NaturalWhite
+            disabledContentColor = NaturalWhite,
+            disabledContainerColor = Gray300
         ), enabled = addEnabled && color.isNotEmpty() && title.isNotEmpty(), onClick = { onClickAdd() }) {
             Text(text = "추가하기", color = NaturalWhite)
         }

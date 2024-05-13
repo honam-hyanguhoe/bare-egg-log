@@ -4,12 +4,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.setting.model.WorkType
-import com.org.egglog.domain.setting.model.WorkTypeModifyParam
 import com.org.egglog.domain.setting.model.WorkTypeParam
 import com.org.egglog.domain.setting.usecase.DeleteWorkTypeUseCase
 import com.org.egglog.domain.setting.usecase.GetWorkTypeListUseCase
 import com.org.egglog.domain.setting.usecase.PostWorkTypeUseCase
-import com.org.egglog.domain.setting.usecase.PutWorkTypeUseCase
+import com.org.egglog.domain.setting.usecase.UpdateWorkTypeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
@@ -29,7 +28,7 @@ class WorkSettingViewModel @Inject constructor(
     private val getTokenUseCase: GetTokenUseCase,
     private val getWorkTypeListUseCase: GetWorkTypeListUseCase,
     private val postWorkTypeUseCase: PostWorkTypeUseCase,
-    private val putWorkTypeUseCase: PutWorkTypeUseCase,
+    private val updateWorkTypeUseCase: UpdateWorkTypeUseCase,
     private val deleteWorkTypeUseCase: DeleteWorkTypeUseCase
 ): ViewModel(), ContainerHost<WorkSettingState, WorkSettingSideEffect>{
     override val container: Container<WorkSettingState, WorkSettingSideEffect> = container(
@@ -54,7 +53,7 @@ class WorkSettingViewModel @Inject constructor(
 
     fun getWorkListInit() = intent {
         val tokens = getTokenUseCase()
-        val workTypeList = getWorkTypeListUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}").getOrNull()
+        val workTypeList = getWorkTypeListUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}").getOrThrow()
         reduce { state.copy(workTypeList = workTypeList ?: emptyList()) }
     }
 
@@ -69,7 +68,8 @@ class WorkSettingViewModel @Inject constructor(
     fun onClickModify() = intent {
         reduce { state.copy(modifyEnabled = false) }
         val tokens = getTokenUseCase()
-        putWorkTypeUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}", workTypeModifyParam = WorkTypeModifyParam(workTypeId = state.selectedWorkType?.workTypeId ?: 0L, title = state.title, color = state.color, workTypeImgUrl = state.selectedWorkType?.workTypeImgUrl, startTime = state.startTime, workTime = state.endTime)).getOrThrow()
+        updateWorkTypeUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}", workTypeId = state.selectedWorkType?.workTypeId ?: 0L, workTypeParam = WorkTypeParam(title = state.title, color = state.color, workTypeImgUrl = state.selectedWorkType?.workTypeImgUrl, startTime = state.startTime, workTime = state.endTime)).getOrThrow()
+        postSideEffect(WorkSettingSideEffect.Toast("수정 되었습니다."))
         reduce { state.copy(title = "", color = "", showModifyBottomSheet = false, modifyEnabled = true, selectedWorkType = null) }
     }
 
@@ -77,7 +77,8 @@ class WorkSettingViewModel @Inject constructor(
         val tokens = getTokenUseCase()
         if(selected == "삭제") {
             reduce { state.copy(addEnabled = false) }
-            deleteWorkTypeUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}", workTypeId = workType.workTypeId)
+            deleteWorkTypeUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}", workTypeId = workType.workTypeId).getOrThrow()
+            postSideEffect(WorkSettingSideEffect.Toast("삭제 되었습니다."))
             reduce { state.copy(addEnabled = true) }
         } else if(selected == "수정") {
             reduce { state.copy(selectedWorkType = workType, showModifyBottomSheet = true, title = workType.title, color =  workType.color) }
