@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.org.egglog.domain.auth.model.UserDetail
 import com.org.egglog.domain.setting.model.CalendarGroup
 import com.org.egglog.presentation.component.atoms.buttons.SettingSpaceBetweenButton
 import com.org.egglog.presentation.component.atoms.icons.Icon
@@ -66,7 +67,8 @@ fun CalendarSettingScreen(
         onClickSync = viewModel::onClickSync,
         syncEnabled = state.syncEnabled,
         deleteEnabled = state.deleteEnabled,
-        addEnabled = state.addEnabled
+        addEnabled = state.addEnabled,
+        user = state.user
     )
 }
 
@@ -80,7 +82,8 @@ fun CalendarSettingScreen(
     onClickSync: () -> Unit,
     syncEnabled: Boolean,
     deleteEnabled: Boolean,
-    addEnabled: Boolean
+    addEnabled: Boolean,
+    user: UserDetail?
 ) {
     val context = LocalContext.current
     val currentDate = LocalDate.now()
@@ -119,7 +122,7 @@ fun CalendarSettingScreen(
                 }
 
                 calendarGroupList?.map {calendarGroup ->
-                    CalendarSettingSwiper(onDelete = { onClickDelete(calendarGroup.calendarGroupId) }, deleteEnabled = deleteEnabled) {
+                    CalendarSettingSwiper(onDelete = { onClickDelete(calendarGroup.calendarGroupId) }, deleteEnabled = user?.workGroupId != calendarGroup.calendarGroupId && deleteEnabled, enabled = user?.workGroupId != calendarGroup.calendarGroupId) {
                         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
                             Text(text = "${if(calendarGroup.isBasic) "[기본]" else "[구독]"} ${calendarGroup.alias}", style = Typography.bodyMedium)
                             Toggle(checked = calendarGroup.isEnabled, onCheckedChange = {

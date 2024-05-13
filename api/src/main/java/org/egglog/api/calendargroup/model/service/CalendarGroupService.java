@@ -59,7 +59,10 @@ public class CalendarGroupService {
     @Transactional
     public void deleteCalendarGroup(Long calendarGroupId, User loginUser) {
         log.debug(" ==== ==== ==== [ 캘린더 그룹 삭제 서비스 실행 ] ==== ==== ====");
-        if (loginUser.getWorkGroupId()==calendarGroupId) throw new CalendarGroupException(CalendarGroupErrorCode.NOT_CONTROL_WORKGROUP);
+        log.debug(" ==== ==== ==== [ calendarGroupId = {} loginUser.getWorkGroupId() = {} ] ==== ==== ==== ",calendarGroupId, loginUser.getWorkGroupId());
+        log.debug(" ==== ==== ==== [ loginUser.getWorkGroupId() == calendarGroupId = {}  ==== ==== ==== ", loginUser.getWorkGroupId() == calendarGroupId);
+        log.debug(" ==== ==== ==== [ loginUser.getWorkGroupId().equal(calendarGroupId) = {}  ==== ==== ==== ", loginUser.getWorkGroupId().equals(calendarGroupId));
+        if (loginUser.getWorkGroupId().equals(calendarGroupId)) throw new CalendarGroupException(CalendarGroupErrorCode.NOT_CONTROL_WORKGROUP);
         CalendarGroup calendarGroup = calendarGroupRepository.findCalendarGroupWithUserById(calendarGroupId)
                 .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
         if (calendarGroup.getUser().equals(loginUser)) throw new UserException(UserErrorCode.ACCESS_DENIED);

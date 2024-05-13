@@ -313,11 +313,11 @@ fun ScheduleList() {
             content = "봉선동 성내 식당",
             onClickMore = {})
 
-        SmallScheduleCard(work = "day", startTime = "12:00", endTime = "13:00", onClickMore = {})
-
-        SmallScheduleCard(work = "night", startTime = "12:00", endTime = "13:00", onClickMore = {})
-
-        SmallScheduleCard(work = "eve", startTime = "12:00", endTime = "13:00", onClickMore = {})
+//        SmallScheduleCard(work = "day", startTime = "12:00", endTime = "13:00", onClickMore = {})
+//
+//        SmallScheduleCard(work = "night", startTime = "12:00", endTime = "13:00", onClickMore = {})
+//
+//        SmallScheduleCard(work = "eve", startTime = "12:00", endTime = "13:00", onClickMore = {})
     }
 }
 

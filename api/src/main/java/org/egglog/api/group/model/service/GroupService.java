@@ -123,7 +123,7 @@ public class GroupService {
      * @return
      */
     public List<GroupPreviewDto> getGroupList(User user) {
-        List<GroupPreviewDto> groupList = groupRepository.findGroupByUserId(user.getId()).orElse(null);
+        List<GroupPreviewDto> groupList = groupRepository.findGroupByUserId(user.getId());
         return groupList;
     }
 
@@ -257,19 +257,23 @@ public class GroupService {
      * @param groupForm
      * @param user
      */
+    @Transactional
     public void generateGroup(GroupForm groupForm, User user) {
         Group newGroup = Group.builder()
-                .admin(user.getName())
                 .groupImage(groupForm.getGroupImage())
                 .groupName(groupForm.getGroupName())
                 .password(passwordEncoder.encode(groupForm.getGroupPassword()))
                 .build();
+
         GroupMember newGroupMember = GroupMember
                 .builder()
                 .isAdmin(true)
                 .group(newGroup)
                 .user(user)
                 .build();
+
+        newGroup.setAdmin(newGroupMember);
+
         try {
             groupRepository.save(newGroup);
             groupMemberService.createGroupMember(newGroupMember);

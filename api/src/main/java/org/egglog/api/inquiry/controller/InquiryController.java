@@ -1,5 +1,6 @@
 package org.egglog.api.inquiry.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.inquiry.model.dto.request.InquiryRegistForm;
@@ -35,12 +36,14 @@ public class InquiryController {
     /**
      * 문의 생성
      * @param user 로그인한 유저(JWT 토큰)
-     * @param registForm 제목, 본문
+     * @param registForm 이메일, 제목, 본문
      * @return
      * @author 김다희
      */
     @PostMapping("")
-    public ResponseEntity<MessageUtils> generateInquiry(InquiryRegistForm registForm, @AuthenticationPrincipal User user){
+    public ResponseEntity<MessageUtils> generateInquiry(
+            @RequestBody @Valid InquiryRegistForm registForm,
+            @AuthenticationPrincipal User user){
         inquiryService.generateInquiry(registForm,user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }

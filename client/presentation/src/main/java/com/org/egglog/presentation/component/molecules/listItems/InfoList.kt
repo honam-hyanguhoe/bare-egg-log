@@ -26,6 +26,7 @@ fun InfoList(
     onNavigateToAgreeDetailScreen: () -> Unit,
     onNavigateToMySettingScreen: () -> Unit,
     onNavigateToCalendarSettingScreen: () -> Unit,
+    onNavigateToAskSettingScreen: () -> Unit,
     onNavigateToWorkSettingScreen: () -> Unit,
     onClickLogout: () -> Unit
 ) {
@@ -39,7 +40,7 @@ fun InfoList(
         SettingButton(onClick = { onNavigateToCalendarSettingScreen() }, text =  "캘린더 설정", color = Gray600, icon = Calendar)
         SettingButton(onClick = { onNavigateToPrivacyDetailScreen() }, text =  "개인정보 처리방침", color = Gray600, icon = PersonalSetting)
         SettingButton(onClick = { onNavigateToAgreeDetailScreen() }, text =  "이용약관", color = Gray600, icon = Agree)
-        SettingButton(onClick = { onClickPrepared()  }, text =  "문의하기", color = Gray600, icon = Ask)
+        SettingButton(onClick = { onNavigateToAskSettingScreen()  }, text =  "문의하기", color = Gray600, icon = Ask)
         SettingButton(onClick = { onClickLogout() }, text =  "로그아웃", color = Error500, icon = Logout)
     }
 }

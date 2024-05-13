@@ -1,6 +1,8 @@
 package org.egglog.api.board.model.service;
 
 
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import jakarta.persistence.PersistenceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,8 @@ import org.egglog.api.global.util.RedisViewCountUtil;
 import org.egglog.api.hospital.exception.HospitalErrorCode;
 import org.egglog.api.hospital.exception.HospitalException;
 import org.egglog.api.hospital.model.entity.Hospital;
+import org.egglog.api.notification.model.entity.FCMTopic;
+import org.egglog.api.notification.model.service.FCMService;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
@@ -78,6 +82,8 @@ public class BoardService {
 
     private final StringRedisTemplate redisTemplate;    //급상승 게시물
 
+    private final FCMService fcmService;
+
     /**
      * 게시판 조회
      * 검색 포함
@@ -86,67 +92,6 @@ public class BoardService {
      * @param user
      * @return
      */
-//    public List<BoardListOutputSpec> getBoardList(BoardListForm boardListForm, User user) {
-//        List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
-//        int size = 10;
-//        try {
-//            List<Board> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getOffset(), size);
-//
-//            for (Board board : boardList) {
-//                Long commentCnt = commentRepository.getCommentCount(board.getId());
-//                Long likeCnt = boardRepository.getLikeCount(board.getId());
-//                long viewCount = redisViewCountUtil.getViewCount(String.valueOf(board.getId())); //하루 동안의 조회수
-//                Long hitCnt = viewCount + board.getViewCount();
-//
-//                //사용자의 병원 인증 정보
-//                Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(user, user.getSelectedHospital());
-//
-//                boolean isUserLiked = false;  //좋아요 누른 여부
-//                boolean isCommented = false;    //댓글 유무 여부
-//
-//                if (commentCnt != null) {
-//                    isCommented = true;
-//                }
-//                //사용자가 이미 좋아요를 눌렀는지
-//                if (!isNotLiked(user.getId(), board.getId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
-//                    isUserLiked = true;
-//                }
-//
-//                BoardListOutputSpec boardListOutputSpec = BoardListOutputSpec.builder()
-//                        .boardId(board.getId())
-//                        .boardTitle(board.getTitle())
-//                        .boardContent(board.getContent())
-//                        .boardCreatedAt(board.getCreatedAt())
-//                        .tempNickname(board.getTempNickname())
-//                        .viewCount(hitCnt)
-//                        .commentCount(commentCnt)
-//                        .likeCount(likeCnt)
-//                        .isLiked(isUserLiked)  //좋아요 여부
-//                        .isCommented(isCommented)   //댓글 유무
-//                        .userId(board.getUser().getId())    //작성자
-//                        .hospitalName(user.getSelectedHospital().getHospitalName()) //병원명
-//                        .build();
-//
-//                //병원 인증배지가 없다면
-//                if (hospitalAuth.isEmpty()) {
-//                    boardListOutputSpec.setIsHospitalAuth(false);
-//                }
-//                //있다면
-//                hospitalAuth.ifPresent(auth -> boardListOutputSpec.setIsHospitalAuth(auth.getAuth()));
-//
-//                boardListOutputSpecList.add(boardListOutputSpec);
-//            }
-//
-//        } catch (DataAccessException e) {
-//            throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            throw new BoardException(BoardErrorCode.UNKNOWN_ERROR);
-//        }
-//
-//        return boardListOutputSpecList;
-//    }
-
     public List<BoardListOutputSpec> getBoardList(BoardListForm boardListForm, User user) {
         List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
         int size = 10;
@@ -340,7 +285,20 @@ public class BoardService {
         }
 
         try {
-            boardRepository.save(board);  //저장
+            Board saveBoard = boardRepository.save(board);//저장
+            if (saveBoard.getBoardType().equals(BoardType.GROUP)){
+                //그룹 게시판에 글이 등록되었다면 푸시알림 발송
+                FCMTopic topic = FCMTopic.builder()
+                        .topic(FCMTopic.TopicEnum.group)
+                        .topicId(boardForm.getGroupId())
+                        .build();
+                Notification notification = Notification.builder()
+                        .setTitle(boardForm.getBoardTitle())
+                        .setBody(boardForm.getBoardContent())
+                        .setImage(boardForm.getPictureOne() != null ? boardForm.getPictureOne() : null)
+                        .build();
+                fcmService.sendNotificationToTopic(topic, notification);
+            }
 
         } catch (PersistenceException e) {
             throw new BoardException(BoardErrorCode.TRANSACTION_ERROR);
@@ -691,10 +649,8 @@ public class BoardService {
                 .build();
 
         //사용자의 그룹리스트
-        Optional<List<GroupPreviewDto>> groupByUserId = groupRepository.findGroupByUserId(user.getId());
-        if (groupByUserId.isPresent()) {
-            boardTypeListOutputSpec.setGroupList(groupByUserId.get());
-        }
+        List<GroupPreviewDto> groupByUserId = groupRepository.findGroupByUserId(user.getId());
+        boardTypeListOutputSpec.setGroupList(groupByUserId);
         return boardTypeListOutputSpec;
     }
 }
