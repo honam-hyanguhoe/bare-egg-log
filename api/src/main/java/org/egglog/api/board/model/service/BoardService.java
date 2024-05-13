@@ -253,14 +253,14 @@ public class BoardService {
                 .tempNickname(boardForm.getTempNickname())
                 .user(user)
                 .build();
-
+        Group group = null;
         // 전체 게시판
         if (boardForm.getGroupId() == null && boardForm.getHospitalId() == null) {
             board.setBoardType(BoardType.ALL);
 
         } else if (boardForm.getGroupId() != null && boardForm.getHospitalId() == null) {
             //그룹 게시판
-            Group group = groupRepository.findById(boardForm.getGroupId()).orElseThrow(
+            group = groupRepository.findById(boardForm.getGroupId()).orElseThrow(
                     () -> new GroupException(GroupErrorCode.NOT_FOUND)
             );
             board.setBoardType(BoardType.GROUP);
@@ -286,15 +286,15 @@ public class BoardService {
 
         try {
             Board saveBoard = boardRepository.save(board);//저장
-            if (saveBoard.getBoardType().equals(BoardType.GROUP)){
+            if (saveBoard.getBoardType().equals(BoardType.GROUP) && group!=null){
                 //그룹 게시판에 글이 등록되었다면 푸시알림 발송
                 FCMTopic topic = FCMTopic.builder()
                         .topic(FCMTopic.TopicEnum.group)
                         .topicId(boardForm.getGroupId())
                         .build();
                 Notification notification = Notification.builder()
-                        .setTitle(boardForm.getBoardTitle())
-                        .setBody(boardForm.getBoardContent())
+                        .setTitle("[EGGLOG] "+group.getGroupName()+" 커뮤니티에 새 글이 올라왔습니다.")
+                        .setBody(boardForm.getBoardTitle())
                         .setImage(boardForm.getPictureOne() != null ? boardForm.getPictureOne() : null)
                         .build();
                 fcmService.sendNotificationToTopic(topic, notification);
