@@ -95,6 +95,7 @@ fun GroupDetailScreen(
 
     GroupDetailScreen(
         groupName = groupDetailState.groupInfo.groupName,
+        isAdmin = groupDetailState.groupInfo.isAdmin,
         memberCount = (groupDetailState.groupInfo.groupMembers?.size?.plus(1)) ?: 1,
         adminName = groupDetailState.groupInfo.admin?.userName ?: "",
         onClickBack = onNavigateToGroupListScreen,
@@ -129,6 +130,7 @@ fun GroupDetailScreen(
 @Composable
 private fun GroupDetailScreen(
     groupName: String,
+    isAdmin : Boolean = false,
     memberCount: Int,
     adminName: String,
     onClickBack: () -> Unit,
@@ -180,7 +182,12 @@ private fun GroupDetailScreen(
                     selectedOption = it
                     Log.d("menus", "it $it")
                     if (it == "그룹 설정") {
-                        setShowBottomSheet(true)
+                        if(isAdmin){
+//                            Toast.makeText(context,"그룹장입니다", Toast.LENGTH_SHORT).show()
+                            setShowBottomSheet(true)
+                        }else{
+                            Toast.makeText(context,"접근 권한이 없습니다.", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             )
