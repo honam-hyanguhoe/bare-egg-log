@@ -55,7 +55,7 @@ public class CommentController {
             @RequestBody CommentForm commentForm,
             @AuthenticationPrincipal User user
     ) {
-        commentService.registerComment(commentForm, user.getId());
+        commentService.registerComment(commentForm, user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }
 
@@ -70,7 +70,7 @@ public class CommentController {
             @PathVariable Long commentId,
             @AuthenticationPrincipal User user
     ) {
-        commentService.deleteComment(commentId, user.getId());
+        commentService.deleteComment(commentId, user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.DELETE));
     }
 }

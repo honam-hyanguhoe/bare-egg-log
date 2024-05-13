@@ -17,4 +17,5 @@ public interface BoardCustomQuery {
 
     List<BoardListOutputSpec> findBoardList(String keyword, Long groupId, Long hospitalId, Long offset, int size);
 
+    Optional<Board> findWithUserById(Long boardId);
 }
