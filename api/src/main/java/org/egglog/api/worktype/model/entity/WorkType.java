@@ -56,12 +56,11 @@ public class WorkType {
 
 
     public WorkType edit(String title, String color, String workTypeImgUrl, LocalTime startTime, LocalTime workTime){
-        this.title = title;
-        this.workTag = WorkTag.ETC;
-        this.color = color;
-        this.workTypeImgUrl = workTypeImgUrl;
-        this.startTime = startTime;
-        this.workTime = workTime;
+        this.title = title!=null ? title : this.title;
+        this.color = color!=null ? color : this.color;
+        this.workTypeImgUrl = workTypeImgUrl!=null ? workTypeImgUrl : this.workTypeImgUrl;
+        this.startTime = startTime!=null ? startTime : this.startTime;
+        this.workTime = workTime!=null ? workTime : this.workTime;
         return this;
     }
 }

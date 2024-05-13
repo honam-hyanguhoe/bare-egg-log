@@ -90,12 +90,13 @@ public class WorkTypeController {
      * @param request 근무타입ID, 이름, 색상, 근무 이미지, 태그 속성, 시작시각, 근무시간
      * @return 수정된 근무타입ID, 이름, 색상, 근무 이미지, 태그 속성, 시작시각, 근무시간
      */
-    @PutMapping("/edit")
+    @PatchMapping("/edit/{workTypeId}")
     public ResponseEntity<MessageUtils<WorkTypeResponse>> updateWorkType(
             @AuthenticationPrincipal User loginUser,
-            @RequestBody @Valid EditWorkTypeRequest request
+            @RequestBody @Valid EditWorkTypeRequest request,
+            @PathVariable Long workTypeId
     ) {
         return ResponseEntity.ok().body(
-                MessageUtils.success(workTypeService.editWorkType(loginUser, request)));
+                MessageUtils.success(workTypeService.editWorkType(loginUser, request, workTypeId)));
     }
 }

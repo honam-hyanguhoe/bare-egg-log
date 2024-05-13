@@ -28,9 +28,6 @@ import java.time.LocalTime;
 @Setter
 @Builder
 public class EditWorkTypeRequest {
-    @NotNull(message = "수정한 근무 타입 아이디를 입력해주세요.")
-    @Positive(message = "병원 아이디 값을 입력 해 주세요.")
-    private Long workTypeId;
 
     @NotBlank(message = "태그 이름은 필수 입니다.")
     private String title;        //태그 이름 필수 너무길지 않게

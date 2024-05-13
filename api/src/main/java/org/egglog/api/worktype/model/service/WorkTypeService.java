@@ -34,11 +34,11 @@ public class WorkTypeService {
     }
 
     @Transactional
-    public WorkTypeResponse editWorkType(User loginUser, EditWorkTypeRequest request){
+    public WorkTypeResponse editWorkType(User loginUser, EditWorkTypeRequest request, Long workTypeId){
         log.debug(" ==== ==== ==== [ 근무 타입 수정 서비스 실행 ] ==== ==== ====");
-        WorkType workType = workTypeJpaRepository.findWithUserById(request.getWorkTypeId())
+        WorkType workType = workTypeJpaRepository.findWithUserById(workTypeId)
                 .orElseThrow(() -> new WorkTypeException(NO_EXIST_WORKTYPE));
-        if (workType.getUser().getId() != loginUser.getId()) throw new WorkTypeException(ACCESS_DENIED);
+        if (!workType.getUser().equals(loginUser)) throw new WorkTypeException(ACCESS_DENIED);
         return workTypeJpaRepository.save(workType
                     .edit(request.getTitle(), request.getColor(), request.getWorkTypeImgUrl(), request.getStartTime(), request.getWorkTime()))
                 .toResponse();
