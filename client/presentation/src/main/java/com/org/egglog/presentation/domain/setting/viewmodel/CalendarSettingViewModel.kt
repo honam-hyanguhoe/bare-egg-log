@@ -1,6 +1,7 @@
 package com.org.egglog.presentation.domain.setting.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.org.egglog.domain.auth.model.UserDetail
 import com.org.egglog.domain.setting.usecase.GetCalendarGroupMapStoreUseCase
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
@@ -64,8 +65,9 @@ class CalendarSettingViewModel @Inject constructor(
                 isBasic = isBasic
             )
         }
+
         setCalendarGroupMapStoreUseCase(map)
-        reduce { state.copy(calendarGroupList = updateList ?: emptyList()) }
+        reduce { state.copy(calendarGroupList = updateList ?: emptyList(), user = user) }
     }
 
     fun onClickSync() = intent {
@@ -125,7 +127,8 @@ data class CalendarSettingState(
     val deleteEnabled: Boolean = true,
     val calendarGroupList: List<CalendarGroup> = emptyList(),
     val url: String = "",
-    val alias: String = ""
+    val alias: String = "",
+    val user: UserDetail? = null
 )
 
 sealed interface CalendarSettingSideEffect {

@@ -11,6 +11,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface SettingService {
@@ -45,4 +46,25 @@ interface SettingService {
     suspend fun getWorkTypeList(
         @Header("Authorization") accessToken: String
     ): CommonResponse<List<WorkTypeResponse>?>
+
+    @POST("worktypes/create")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun postWorkType(
+        @Header("Authorization") accessToken: String,
+        @Body requestBody: RequestBody
+    ): CommonResponse<WorkTypeResponse?>
+
+    @DELETE("worktypes/{workTypeId}")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun deleteWorkType(
+        @Header("Authorization") accessToken: String,
+        @Path("workTypeId") workTypeId: Long
+    ): CommonResponse<Unit?>
+
+    @PUT("worktypes/edit")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun putWorkType(
+        @Header("Authorization") accessToken: String,
+        @Body requestBody: RequestBody
+    ): CommonResponse<WorkTypeResponse?>
 }
