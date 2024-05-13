@@ -12,12 +12,17 @@ data class GroupInfoResponse(
     val admin: AdminDto?,
     val groupImage: Int,
     val groupName: String,
-    val groupMembers: List<String>?
+    val groupMembers: List<GroupMemberDto>?
 )
 
 fun GroupInfoResponse.toDomainModel(): GroupInfo {
     return GroupInfo(
-        id, isAdmin, admin?.toDomainModel(), groupImage, groupName, groupMembers
+        id,
+        isAdmin,
+        admin?.toDomainModel(),
+        groupImage,
+        groupName,
+        groupMembers?.mapNotNull { it.toDomainModel() }
     )
 }
 

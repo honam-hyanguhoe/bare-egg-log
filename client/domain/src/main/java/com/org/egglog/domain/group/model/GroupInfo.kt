@@ -9,5 +9,5 @@ data class GroupInfo(
     val admin: Admin?,
     val groupImage: Int,
     val groupName: String,
-    val groupMembers : List<String>?
+    val groupMembers : List<GroupMember>?
 )

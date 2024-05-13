@@ -1,18 +1,29 @@
 package com.org.egglog.presentation.domain.group.viewmodel
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.res.integerResource
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
+import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
 import com.org.egglog.domain.group.model.Admin
 import com.org.egglog.domain.group.model.Group
 import com.org.egglog.domain.group.model.GroupInfo
 import com.org.egglog.domain.group.model.Member
 import com.org.egglog.domain.group.usecase.GetGroupDutyUseCase
 import com.org.egglog.domain.group.usecase.GetGroupInfoUseCase
+import com.org.egglog.domain.group.usecase.GetInvitationCodeUseCase
+import com.org.egglog.domain.group.usecase.GetMembersWorkUseCase
+import com.org.egglog.domain.main.model.WeeklyWork
+import com.org.egglog.domain.main.usecase.GetWeeklyWorkUseCase
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyDataSource
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,8 +40,12 @@ import javax.inject.Inject
 @HiltViewModel
 class GroupDetailViewModel @Inject constructor(
     private val getTokenUseCase: GetTokenUseCase,
+    private val getUserStoreUseCase: GetUserStoreUseCase,
     private val groupInfoUseCase: GetGroupInfoUseCase,
     private val groupDutyUseCase: GetGroupDutyUseCase,
+    private val getInvitationCodeUseCase: GetInvitationCodeUseCase,
+    private val getWeeklyWorkUseCase: GetWeeklyWorkUseCase,
+    private val getMembersWorkUseCase: GetMembersWorkUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel(), ContainerHost<GroupDetailState, Nothing> {
     override val container: Container<GroupDetailState, Nothing> =
@@ -45,9 +60,140 @@ class GroupDetailViewModel @Inject constructor(
         ?: throw IllegalStateException("GroupId must be provided")
     private val _selected = mutableStateOf("Day")
     val selected: MutableState<String> = _selected
+    val dataSource = WeeklyDataSource()
+
+    init {
+        Log.d("groupDetail", "groupId $groupId")
+        loadInit()
+    }
+
+    private fun loadInit() = intent {
+        Log.d("groupDetail", "$groupId")
+        getGroupInfo(groupId = groupId)
+        getGroupDuty()
+        getMyWork()
+    }
 
     fun setSelected(newValue: String) = intent {
         reduce { state.copy(dutyType = newValue) }
+        updateData()
+    }
+
+    fun toggleMemberSelection(member: Member) {
+        intent {
+            val currentMembers = state.selectedMembers
+            val newMembers = when {
+                currentMembers.contains(member) -> {
+                    currentMembers - member
+                }
+
+                currentMembers.size < 3 -> {
+                    currentMembers + member
+                }
+
+                else -> {
+                    currentMembers
+                }
+            }
+            reduce {
+                state.copy(selectedMembers = newMembers)
+            }
+        }
+        getGroupWork()
+    }
+
+    private fun formatWork(
+        weeklyWork: WeeklyWork?,
+        userName: String
+    ): Map<String, Map<String, String>> {
+        val workMap: Map<String, String> = weeklyWork?.workList?.associate {
+            it.workDate to it.workType.workTag
+        }!!
+
+        // 한 달 근무 안채워져 있으면 None으로 채우는 로직 추가
+
+        return mapOf(userName to workMap)
+    }
+
+    fun getMyWork() = intent {
+        val tokens = getTokenUseCase()
+        val user = getUserStoreUseCase()
+
+        val tempStartDate =
+            dataSource.getStartOfMonth(LocalDate.now().year, LocalDate.now().monthValue)
+        val tempEnddate = dataSource.getEndOfMonth(LocalDate.now().year, LocalDate.now().monthValue)
+
+        Log.d("myWork", "$tempEnddate  $tempStartDate")
+        val result = getWeeklyWorkUseCase(
+            accessToken = "Bearer ${tokens.first}",
+            calendarGroupId = user?.workGroupId ?: 0,
+            startDate = tempStartDate.toString(),
+            endDate = tempEnddate.toString(),
+        ).getOrNull()
+
+        Log.d("myWork", "result $result")
+
+        val userName = getUserStoreUseCase()!!.userName
+        val scheduleWork = formatWork(result, userName)
+        Log.d("myWork", "scheduleWork $scheduleWork")
+
+        reduce {
+            state.copy(myWorkList = scheduleWork)
+        }
+    }
+
+
+    // 같은 그룹 유저의 근무 일정 조회
+    fun getGroupWork() = intent {
+        val tokens = getTokenUseCase()
+
+        val tempStartDate =
+            dataSource.getStartOfMonth(LocalDate.now().year, LocalDate.now().monthValue)
+        val tempEnddate = dataSource.getEndOfMonth(LocalDate.now().year, LocalDate.now().monthValue)
+
+        val result = getMembersWorkUseCase(
+            accessToken = "Bearer ${tokens.first}",
+            userGroupId = groupId,
+            targetUserId = state.selectedMembers[0].userId,
+            startDate = tempStartDate.toString(),
+            endDate = tempEnddate.toString(),
+        ).getOrNull()
+
+        Log.d("getGroupWork", "result $result")
+    }
+
+
+    private fun getGroupDuty() = intent {
+        val tokens = getTokenUseCase()
+
+        Log.d(
+            "groupDetail",
+            "${tokens.first} ${state.groupInfo.id} ${state.currentWeekDays.selectedDate.date.toString()}"
+        )
+//        val result = groupDutyUseCase(
+//            accessToken = "Bearer ${tokens.first}",
+//            groupId = groupId,
+//            date = state.currentWeekDays.selectedDate.date.toString()
+//        ).getOrNull()
+        Log.d(
+            "groupDetail", "getGroupDuty ${
+                groupDutyUseCase(
+                    accessToken = "Bearer ${tokens.first}",
+                    groupId = groupId,
+                    date = state.currentWeekDays.selectedDate.date.toString()
+                )
+            }"
+        )
+
+//        reduce {
+//            state.copy(
+//                day = result?.copy()?.day ?: emptyList(),
+//                eve = result?.copy()?.eve ?: emptyList(),
+//                night = result?.copy()?.night ?: emptyList(),
+//                off = result?.copy()?.off ?: emptyList(),
+//                etc = result?.copy()?.etc ?: emptyList(),
+//            )
+//        }
         updateData()
     }
 
@@ -66,72 +212,40 @@ class GroupDetailViewModel @Inject constructor(
                 selectedDuty = tempDuty
             )
         }
+        Log.d("invite", "selectedDuty ${state.selectedDuty}")
     }
 
-    init {
-        Log.d("groupDetail", "groupId $groupId")
-        loadInit()
-    }
-
-    private fun loadInit() = intent {
-        getGroupInfo(groupId = groupId)
-        getGroupDuty()
-    }
-
-    private fun getGroupDuty() = intent {
-        val tokens = getTokenUseCase()
-
-        Log.d(
-            "groupDetail",
-            "${tokens.first} ${state.groupInfo.id} ${state.currentWeekDays.selectedDate.date.toString()}"
-        )
-        val result = groupDutyUseCase(
-            accessToken = "Bearer ${tokens.first}",
-            groupId = groupId,
-            date = state.currentWeekDays.selectedDate.date.toString()
-        ).getOrNull()
-        Log.d("groupDetail", "getGroupDuty $result")
-
-        reduce {
-            state.copy(
-                day = result?.day ?: emptyList(),
-                eve = result?.eve ?: emptyList(),
-                night = result?.night ?: emptyList(),
-                off = result?.off ?: emptyList(),
-                etc = result?.etc ?: emptyList(),
-            )
-        }
-    }
 
     private fun getGroupInfo(groupId: Long) = intent {
-
         val tokens = getTokenUseCase()
-
         val result = groupInfoUseCase(
             accessToken = "Bearer ${tokens.first}",
             groupId = groupId
-        ).getOrNull()
-        Log.d("groupDetail", "getGroupInfo ${result}")
+        ).getOrThrow()
+        Log.d(
+            "groupDetail", "getGroupInfo ${
+                groupInfoUseCase(
+                    accessToken = "Bearer ${tokens.first}",
+                    groupId = groupId
+                )
+            }"
+        )
 
         reduce {
             state.copy(
-                groupInfo = result!!
+                groupInfo = result
             )
         }
     }
 
-    val dataSource = WeeklyDataSource()
+
     fun onPrevClick(localDate: LocalDate) = intent {
         val finalStartDate = dataSource.getStartOfWeek(localDate)
-        Log.d("groupDetail", "finalStartDate ${localDate} --- ${finalStartDate}")
-
         val calendarUiModel: WeeklyUiModel =
             dataSource.getData(
                 startDate = finalStartDate.minusDays(2),
                 lastSelectedDate = finalStartDate
             )
-        Log.d("groupDetail", "${calendarUiModel}")
-
         reduce {
             state.copy(
                 currentWeekDays = calendarUiModel,
@@ -139,17 +253,11 @@ class GroupDetailViewModel @Inject constructor(
                 endDate = finalStartDate
             )
         }
-
-        Log.d("groupDetail", "${state.currentWeekDays}")
-        Log.d("groupDetail", " ${state.startDate} ---- ${state.endDate}")
-
         getGroupDuty()
-        updateData()
     }
 
 
     fun onDateClick(date: WeeklyUiModel.Date) = intent {
-        Log.d("groupDetail", "onDateClick!")
         reduce {
             state.copy(
                 currentWeekDays = state.currentWeekDays.copy(
@@ -163,23 +271,16 @@ class GroupDetailViewModel @Inject constructor(
                 )
             )
         }
-        Log.d("groupDetail", "선택한 근무 ${state.currentWeekDays.selectedDate}")
-
         getGroupDuty()
-        updateData()
     }
 
     fun onNextClick(localDate: LocalDate) = intent {
         val finalStartDate = dataSource.getEndOfWeek(localDate)
-        Log.d("groupDetail", "next click")
-        Log.d("groupDetail", "${finalStartDate}")
-
         val calendarUiModel: WeeklyUiModel =
             dataSource.getData(
                 startDate = finalStartDate,
                 lastSelectedDate = finalStartDate.plusDays(1)
             )
-        Log.d("groupDetail", "${calendarUiModel}")
 
         reduce {
             state.copy(
@@ -189,19 +290,33 @@ class GroupDetailViewModel @Inject constructor(
             )
         }
 
-        Log.d("groupDetail", "${calendarUiModel}")
-        Log.d("groupDetail", "${state.startDate} ---- ${state.endDate}")
         getGroupDuty()
-        updateData()
     }
 
 
-    fun copyInvitationLink() = intent {
+    private fun getInvitationCode() = intent {
+        val tokens = getTokenUseCase()
+        val result = getInvitationCodeUseCase(
+            accessToken = "Bearer ${tokens.first}",
+            groupId = groupId
+        ).getOrNull()
+
+
         reduce {
             state.copy(
-
+                invitationCode = result ?: ""
             )
         }
+    }
+
+    fun copyInvitationLink(context: Context) = intent {
+        Log.d("invite", "invite 시작")
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        getInvitationCode()
+
+        // 수정 예정
+        val clip = ClipData.newPlainText("label", state.invitationCode)
+        clipboard.setPrimaryClip(clip)
     }
 }
 
@@ -240,6 +355,11 @@ data class GroupDetailState(
     val selectedDuty: List<Member> = emptyList(),
 
     // invitation
-    val invitationCode : String = ""
+    val invitationCode: String = "",
+
+    // 선택한 멤버 근무 조회
+    val selectedMembers: List<Member> = emptyList(),
+    val myWorkList: Map<String, Map<String, String>> = emptyMap(),
+    val groupWorkList: Map<String, Map<String, String>> = emptyMap()
 )
 

@@ -1,13 +1,11 @@
 package com.org.egglog.presentation.domain.group.screen
 
+import android.content.Context
 import android.util.Log
-import android.widget.Space
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,21 +14,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -40,18 +32,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.org.egglog.client.data.UserInfo
 import com.org.egglog.client.ui.molecules.radioButtons.WorkRadioButton
 import com.org.egglog.domain.group.model.Member
 import com.org.egglog.presentation.R
 import com.org.egglog.presentation.component.atoms.buttons.GroupProfileButton
-import com.org.egglog.presentation.component.atoms.buttons.ProfileButton
 import com.org.egglog.presentation.component.atoms.buttons.ThinButton
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.presentation.component.molecules.headers.BasicHeader
 import com.org.egglog.presentation.component.organisms.calendars.GroupCalenar
 import com.org.egglog.presentation.component.organisms.calendars.WeeklyCalendar
-import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyDataSource
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyUiModel
 import com.org.egglog.presentation.domain.group.viewmodel.GroupDetailViewModel
 import com.org.egglog.presentation.theme.*
@@ -60,6 +49,7 @@ import com.org.egglog.presentation.utils.widthPercent
 import org.orbitmvi.orbit.compose.collectAsState
 import java.time.LocalDate
 import java.util.Calendar
+import kotlin.reflect.KFunction1
 
 @Composable
 fun GroupDetailScreen(
@@ -70,11 +60,12 @@ fun GroupDetailScreen(
     val groupDetailState = groupDetailViewModel.collectAsState().value
     val context = LocalContext.current
     val selected = groupDetailViewModel.selected
+
+
     LaunchedEffect(selected.value) {
         groupDetailViewModel.setSelected(selected.value)
         Log.d("groupDetail", "radio ${selected.value}")
     }
-
 
     GroupDetailScreen(
         groupName = groupDetailState.groupInfo.groupName,
@@ -87,7 +78,12 @@ fun GroupDetailScreen(
         startDate = groupDetailState.startDate,
         onDateClick = groupDetailViewModel::onDateClick,
         selected = selected,
-        selectedDuty = groupDetailState.selectedDuty
+        selectedDuty = groupDetailState.selectedDuty,
+        // 초대링크
+        copyInvitationLink = groupDetailViewModel::copyInvitationLink,
+        toggleMemberSelection = groupDetailViewModel::toggleMemberSelection,
+        selectedMembers = groupDetailState.selectedMembers,
+        myWorkList = groupDetailState.myWorkList
     )
 }
 
@@ -103,13 +99,15 @@ private fun GroupDetailScreen(
     onNextClick: (LocalDate) -> Unit,
     onDateClick: (WeeklyUiModel.Date) -> Unit,
     selected: MutableState<String>,
-    selectedDuty: List<Member>
+    selectedDuty: List<Member>,
+    copyInvitationLink: (Context) -> Unit,
+    toggleMemberSelection: KFunction1<Member, Unit>,
+    selectedMembers: List<Member>,
+    myWorkList : Map<String, Map<String, String>>
 ) {
-//    val dataSource = WeeklyDataSource()
-//    val calendarUiModel by remember { mutableStateOf(dataSource.getData(lastSelectedDate = dataSource.today)) }
     val tempLabels: List<String> = listOf("Night", "Day", "휴가", "보건", "Off", "Eve", "Eve")
-//    val scrollState = rememberScrollState()
     val options = listOf("그룹 설정", "그룹원 설정", "그룹 나가기")
+    val context = LocalContext.current
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
@@ -123,6 +121,7 @@ private fun GroupDetailScreen(
                 hasMore = true,
                 hasInvitationButton = true,
                 onClickBack = onClickBack,
+                onClickLink = { copyInvitationLink(context) },
                 options = options
             )
         }
@@ -148,21 +147,21 @@ private fun GroupDetailScreen(
             Spacer(modifier = Modifier.height(5.dp))
             MembersCard(
                 selected = selected,
-                selectedDuty = selectedDuty
+                selectedDuty = selectedDuty,
+                selectedMembers = selectedMembers,
+                toggleMemberSelection = toggleMemberSelection
             )
         }
         item {
             Spacer(modifier = Modifier.height(30.dp))
-            MemberCalendar()
+            MemberCalendar(myWorkList = myWorkList)
         }
     }
 }
 
 @Composable
 private fun GroupInfoCard(
-    groupName: String,
-    memberCount: Int,
-    adminName: String
+    groupName: String, memberCount: Int, adminName: String
 ) {
     val context = LocalContext.current
     Column(
@@ -180,8 +179,7 @@ private fun GroupInfoCard(
             }
             .padding(8.dp, 15.dp, 8.dp, 0.dp),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+        horizontalAlignment = Alignment.CenterHorizontally) {
 
         Column(
             modifier = Modifier
@@ -235,7 +233,6 @@ fun DutyCard(
     Column(
         modifier = Modifier
             .width(340.widthPercent(context).dp)
-//            .border(1.dp, NaturalBlack)
             .background(color = NaturalWhite, shape = RoundedCornerShape(20.dp))
             .padding(8.dp, 15.dp, 8.dp, 25.dp)
     ) {
@@ -260,18 +257,17 @@ fun DutyCard(
 @Composable
 private fun MembersCard(
     selected: MutableState<String>,
-    selectedDuty: List<Member>
+    selectedDuty: List<Member>,
+    toggleMemberSelection: KFunction1<Member, Unit>,
+    selectedMembers: List<Member>
 ) {
     val context = LocalContext.current
     val radioList = arrayListOf("Day", "Eve", "Night", "Off", "Etc")
-
     Column(
         modifier = Modifier
             .width(340.widthPercent(context).dp)
             .padding(8.dp, 15.dp, 8.dp, 0.dp),
-//            .border(1.dp, NaturalBlack),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.Start
+        verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start
     ) {
         Text(
             text = "함께 일할 동료는 누구일까요?",
@@ -294,13 +290,14 @@ private fun MembersCard(
 
         WorkRadioButton(radioList = radioList, selected = selected)
         if (selectedDuty.isEmpty()) {
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .height(108.heightPercent(context).dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(108.heightPercent(context).dp)
+            )
         } else {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(15.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -312,9 +309,11 @@ private fun MembersCard(
                     ) {
                         rowItems.forEach { member ->
                             GroupProfileButton(
-                                onClick = { /* 클릭 이벤트 처리 */ },
+                                onClick = {
+                                    toggleMemberSelection(member)
+                                },
                                 userInfo = member,
-                                isSelected = false,
+                                isSelected = selectedMembers.contains(member),
                                 isMine = false,
                             )
                         }
@@ -330,31 +329,19 @@ private fun MembersCard(
                     }
                 }
             }
-
         }
-
-
     }
 }
 
 @Composable
-private fun MemberCalendar() {
+private fun MemberCalendar(
+    myWorkList : Map<String, Map<String, String>>
+) {
     val currentYear = remember { mutableStateOf(Calendar.getInstance().get(Calendar.YEAR)) }
     val currentMonth = remember { mutableStateOf(Calendar.getInstance().get(Calendar.MONTH) + 1) }
 
     // 내 근무 일정
-    val myWorkList = mapOf(
-        "김다희" to mapOf(
-            "2024-05-01" to "DAY",
-            "2024-05-02" to "EVE",
-            "2024-05-03" to "OFF",
-            "2024-05-04" to "NONE",
-            "2024-05-05" to "DAY",
-            "2024-05-06" to "DAY",
-            "2024-05-07" to "OFF",
-            "2024-05-08" to "EVE"
-        )
-    )
+    Log.d("myWork", "ggg $myWorkList")
 
     // 선택한 그룹원 일정
     val groupWorkList = mapOf(
@@ -367,7 +354,6 @@ private fun MemberCalendar() {
             "2024-05-06" to "DAY",
             "2024-05-07" to "OFF",
             "2024-05-08" to "EVE"
-
         ), "김아현" to mapOf(
             "2024-05-01" to "DAY",
             "2024-05-02" to "EVE",
@@ -381,7 +367,7 @@ private fun MemberCalendar() {
     )
     // 나 + 그룹원 일정 합쳐서 인수로 전달s
     val workList = myWorkList + groupWorkList
-
+    Log.d("myWork", "groupWorkList $groupWorkList")
     Column(
         modifier = Modifier
             .width(340.widthPercent(LocalContext.current).dp)
@@ -389,15 +375,11 @@ private fun MemberCalendar() {
 //            .border(1.dp, NaturalBlack)
     ) {
         Text(
-            text = "2024. 04",
-            style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
+            text = "2024. 04", style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
         )
         Spacer(modifier = Modifier.height(10.dp))
         GroupCalenar(currentYear = currentYear, currentMonth = currentMonth, workList)
-
     }
-
-
 }
 
 @Preview

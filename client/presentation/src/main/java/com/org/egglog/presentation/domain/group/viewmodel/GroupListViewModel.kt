@@ -122,7 +122,7 @@ class GroupListViewModel @Inject constructor(
         val result = getGroupListUseCase(
             accessToken = "Bearer ${tokens.first}"
         ).getOrNull()
-        Log.d("groupList", result.toString())
+        Log.d("groupList", "ddd ${result.toString()}")
 
         reduce {
             val lastGroup = result?.lastOrNull()

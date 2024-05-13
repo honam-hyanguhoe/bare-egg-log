@@ -16,6 +16,14 @@ class WeeklyDataSource {
             return LocalDate.now()
         }
 
+    fun getStartOfMonth(year: Int, month: Int): LocalDate {
+        return LocalDate.of(year, month, 1)
+    }
+
+    fun getEndOfMonth(year: Int, month: Int): LocalDate {
+        return LocalDate.of(year, month, 1).with(TemporalAdjusters.lastDayOfMonth())
+    }
+
     fun getStartOfWeek(date: LocalDate): LocalDate {
         return date.with(TemporalAdjusters.previous(DayOfWeek.SUNDAY))
     }

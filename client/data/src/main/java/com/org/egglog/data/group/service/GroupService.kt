@@ -3,6 +3,8 @@ package com.org.egglog.data.group.service
 import com.org.egglog.data.group.model.GroupDutyResponse
 import com.org.egglog.data.group.model.GroupInfoResponse
 import com.org.egglog.data.group.model.GroupResponse
+import com.org.egglog.data.group.model.MembersWorkResponse
+import com.org.egglog.data.main.model.WeeklyWorkReponse
 import com.org.egglog.data.main.model.stats.RemainDutyResponse
 import com.org.egglog.data.retrofit.CommonResponse
 import okhttp3.RequestBody
@@ -41,7 +43,7 @@ interface GroupService {
     suspend fun getGroupDuty(
         @Header("Authorization") accessToken: String,
         @Path("groupId") groupId: Long,
-        @Query("date") date : String
+        @Query("date") date: String
     ): CommonResponse<GroupDutyResponse?>
 
 
@@ -59,5 +61,17 @@ interface GroupService {
         @Header("Authorization") accessToken: String,
         @Body requestBody: RequestBody
     ): CommonResponse<String?>
+
+
+    // group Work
+    @GET("work/find/user")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun getMembersWork(
+        @Header("Authorization") accessToken: String,
+        @Query("userGroupId") userGroupId: Long,
+        @Query("targetUserId") targetUserId: Long,
+        @Query("startDate") startDate: String,
+        @Query("endDate") endDate: String
+    ): CommonResponse<MembersWorkResponse?>
 }
 

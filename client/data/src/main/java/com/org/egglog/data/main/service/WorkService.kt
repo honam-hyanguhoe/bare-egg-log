@@ -9,8 +9,6 @@ import retrofit2.http.Headers
 import retrofit2.http.Query
 
 interface WorkService {
-
-
     @GET("work/find")
     @Headers("Content-Type:application/json; charset=UTF8")
     suspend fun getWeeklyWork(
