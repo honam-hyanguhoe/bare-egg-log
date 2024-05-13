@@ -166,34 +166,21 @@ class GroupDetailViewModel @Inject constructor(
     private fun getGroupDuty() = intent {
         val tokens = getTokenUseCase()
 
-        Log.d(
-            "groupDetail",
-            "${tokens.first} ${state.groupInfo.id} ${state.currentWeekDays.selectedDate.date.toString()}"
-        )
-//        val result = groupDutyUseCase(
-//            accessToken = "Bearer ${tokens.first}",
-//            groupId = groupId,
-//            date = state.currentWeekDays.selectedDate.date.toString()
-//        ).getOrNull()
-        Log.d(
-            "groupDetail", "getGroupDuty ${
-                groupDutyUseCase(
-                    accessToken = "Bearer ${tokens.first}",
-                    groupId = groupId,
-                    date = state.currentWeekDays.selectedDate.date.toString()
-                )
-            }"
-        )
+        val result = groupDutyUseCase(
+            accessToken = "Bearer ${tokens.first}",
+            groupId = groupId,
+            date = state.currentWeekDays.selectedDate.date.toString()
+        ).getOrNull()
 
-//        reduce {
-//            state.copy(
-//                day = result?.copy()?.day ?: emptyList(),
-//                eve = result?.copy()?.eve ?: emptyList(),
-//                night = result?.copy()?.night ?: emptyList(),
-//                off = result?.copy()?.off ?: emptyList(),
-//                etc = result?.copy()?.etc ?: emptyList(),
-//            )
-//        }
+        reduce {
+            state.copy(
+                day = result?.copy()?.day ?: emptyList(),
+                eve = result?.copy()?.eve ?: emptyList(),
+                night = result?.copy()?.night ?: emptyList(),
+                off = result?.copy()?.off ?: emptyList(),
+                etc = result?.copy()?.etc ?: emptyList(),
+            )
+        }
         updateData()
     }
 
@@ -307,6 +294,8 @@ class GroupDetailViewModel @Inject constructor(
                 invitationCode = result ?: ""
             )
         }
+
+        Log.d("invitationCode" , "${state.invitationCode}")
     }
 
     fun copyInvitationLink(context: Context) = intent {

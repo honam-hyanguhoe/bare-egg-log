@@ -130,7 +130,6 @@ private fun GroupDetailScreen(
                 groupName = groupName,
                 memberCount = memberCount,
                 adminName = adminName,
-
                 )
         }
         item {
@@ -154,7 +153,7 @@ private fun GroupDetailScreen(
         }
         item {
             Spacer(modifier = Modifier.height(30.dp))
-            MemberCalendar(myWorkList = myWorkList)
+            MemberCalendar(workList = myWorkList)
         }
     }
 }
@@ -335,39 +334,41 @@ private fun MembersCard(
 
 @Composable
 private fun MemberCalendar(
-    myWorkList : Map<String, Map<String, String>>
+    workList : Map<String, Map<String, String>>
 ) {
     val currentYear = remember { mutableStateOf(Calendar.getInstance().get(Calendar.YEAR)) }
     val currentMonth = remember { mutableStateOf(Calendar.getInstance().get(Calendar.MONTH) + 1) }
 
     // 내 근무 일정
-    Log.d("myWork", "ggg $myWorkList")
+    Log.d("myWork", "ggg $workList")
 
-    // 선택한 그룹원 일정
-    val groupWorkList = mapOf(
-        "김형민" to mapOf(
-            "2024-05-01" to "DAY",
-            "2024-05-02" to "EVE",
-            "2024-05-03" to "OFF",
-            "2024-05-04" to "NONE",
-            "2024-05-05" to "DAY",
-            "2024-05-06" to "DAY",
-            "2024-05-07" to "OFF",
-            "2024-05-08" to "EVE"
-        ), "김아현" to mapOf(
-            "2024-05-01" to "DAY",
-            "2024-05-02" to "EVE",
-            "2024-05-03" to "OFF",
-            "2024-05-04" to "NONE",
-            "2024-05-05" to "DAY",
-            "2024-05-06" to "DAY",
-            "2024-05-07" to "OFF",
-            "2024-05-08" to "EVE"
-        )
-    )
-    // 나 + 그룹원 일정 합쳐서 인수로 전달s
-    val workList = myWorkList + groupWorkList
-    Log.d("myWork", "groupWorkList $groupWorkList")
+//    // 선택한 그룹원 일정
+//    val groupWorkList = mapOf(
+//        "김형민" to mapOf(
+//            "2024-05-01" to "DAY",
+//            "2024-05-02" to "EVE",
+//            "2024-05-03" to "OFF",
+//            "2024-05-04" to "NONE",
+//            "2024-05-05" to "DAY",
+//            "2024-05-06" to "DAY",
+//            "2024-05-07" to "OFF",
+//            "2024-05-08" to "EVE"
+//        ), "김아현" to mapOf(
+//            "2024-05-01" to "DAY",
+//            "2024-05-02" to "EVE",
+//            "2024-05-03" to "OFF",
+//            "2024-05-04" to "NONE",
+//            "2024-05-05" to "DAY",
+//            "2024-05-06" to "DAY",
+//            "2024-05-07" to "OFF",
+//            "2024-05-08" to "EVE"
+//        )
+//    )
+//    // 나 + 그룹원 일정 합쳐서 인수로 전달s
+//    val workList = myWorkList + groupWorkList
+//    Log.d("myWork", "groupWorkList $groupWorkList")
+
+
     Column(
         modifier = Modifier
             .width(340.widthPercent(LocalContext.current).dp)
