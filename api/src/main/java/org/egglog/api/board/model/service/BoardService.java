@@ -86,67 +86,6 @@ public class BoardService {
      * @param user
      * @return
      */
-//    public List<BoardListOutputSpec> getBoardList(BoardListForm boardListForm, User user) {
-//        List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
-//        int size = 10;
-//        try {
-//            List<Board> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getOffset(), size);
-//
-//            for (Board board : boardList) {
-//                Long commentCnt = commentRepository.getCommentCount(board.getId());
-//                Long likeCnt = boardRepository.getLikeCount(board.getId());
-//                long viewCount = redisViewCountUtil.getViewCount(String.valueOf(board.getId())); //하루 동안의 조회수
-//                Long hitCnt = viewCount + board.getViewCount();
-//
-//                //사용자의 병원 인증 정보
-//                Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(user, user.getSelectedHospital());
-//
-//                boolean isUserLiked = false;  //좋아요 누른 여부
-//                boolean isCommented = false;    //댓글 유무 여부
-//
-//                if (commentCnt != null) {
-//                    isCommented = true;
-//                }
-//                //사용자가 이미 좋아요를 눌렀는지
-//                if (!isNotLiked(user.getId(), board.getId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
-//                    isUserLiked = true;
-//                }
-//
-//                BoardListOutputSpec boardListOutputSpec = BoardListOutputSpec.builder()
-//                        .boardId(board.getId())
-//                        .boardTitle(board.getTitle())
-//                        .boardContent(board.getContent())
-//                        .boardCreatedAt(board.getCreatedAt())
-//                        .tempNickname(board.getTempNickname())
-//                        .viewCount(hitCnt)
-//                        .commentCount(commentCnt)
-//                        .likeCount(likeCnt)
-//                        .isLiked(isUserLiked)  //좋아요 여부
-//                        .isCommented(isCommented)   //댓글 유무
-//                        .userId(board.getUser().getId())    //작성자
-//                        .hospitalName(user.getSelectedHospital().getHospitalName()) //병원명
-//                        .build();
-//
-//                //병원 인증배지가 없다면
-//                if (hospitalAuth.isEmpty()) {
-//                    boardListOutputSpec.setIsHospitalAuth(false);
-//                }
-//                //있다면
-//                hospitalAuth.ifPresent(auth -> boardListOutputSpec.setIsHospitalAuth(auth.getAuth()));
-//
-//                boardListOutputSpecList.add(boardListOutputSpec);
-//            }
-//
-//        } catch (DataAccessException e) {
-//            throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            throw new BoardException(BoardErrorCode.UNKNOWN_ERROR);
-//        }
-//
-//        return boardListOutputSpecList;
-//    }
-
     public List<BoardListOutputSpec> getBoardList(BoardListForm boardListForm, User user) {
         List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
         int size = 10;

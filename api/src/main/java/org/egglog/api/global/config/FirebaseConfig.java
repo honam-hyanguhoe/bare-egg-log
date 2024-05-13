@@ -7,10 +7,13 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.cloud.StorageClient;
+import com.google.firebase.messaging.FirebaseMessaging;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.global.util.FirebaseProperties;
+import org.egglog.api.notification.exception.NotificationErrorCode;
+import org.egglog.api.notification.exception.NotificationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,7 +44,7 @@ public class FirebaseConfig {
                     .setStorageBucket(bucketName)
                     .build();
         } catch (IOException e) {
-            throw new RuntimeException("FCM 서버 세팅 중 에러가 발생했습니다: " + e);
+            throw new NotificationException(NotificationErrorCode.NOTIFICATION_SERVER_ERROR);
         }
         if(FirebaseApp.getApps().isEmpty()){
             FirebaseApp.initializeApp(options);
@@ -57,6 +60,11 @@ public class FirebaseConfig {
     @Bean
     public Bucket bucket() throws IOException {
         return StorageClient.getInstance().bucket();
+    }
+
+    @Bean
+    public FirebaseMessaging firebaseMessaging() {
+        return FirebaseMessaging.getInstance();
     }
 
 }
