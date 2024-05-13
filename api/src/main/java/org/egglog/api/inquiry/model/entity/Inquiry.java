@@ -33,6 +33,9 @@ public class Inquiry {
     @Column(name = "content", length = 2000, nullable = false)
     private String content;
 
+    @Column(name = "email", length = 100, nullable = false)
+    private String email;
+
     @Column(name = "group_admin", nullable = false)
     @Enumerated(EnumType.STRING)
     private InquiryType inquiryType;

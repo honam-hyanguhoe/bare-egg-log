@@ -29,6 +29,7 @@ public class InquiryService {
                 .createdAt(LocalDateTime.now())
                 .title(registForm.getTitle())
                 .content(registForm.getContent())
+                .email(registForm.getEmail()!=null? registForm.getEmail() : user.getEmail())
                 .inquiryType(InquiryType.DEFAULT)
                 .isNoted(false)
                 .build();
