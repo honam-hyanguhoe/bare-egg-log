@@ -3,6 +3,7 @@ package org.egglog.api.work.model.dto.response;
 import lombok.*;
 import org.egglog.api.calendargroup.model.dto.response.CalendarGroupResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,9 +22,16 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
 public class WorkListResponse {
 
     private List<WorkResponse> workList;
     private CalendarGroupResponse calendarGroup;
+
+    public WorkListResponse() {
+        this.workList = new ArrayList<>();
+    }
+
+    public void addWork(WorkResponse work) {
+        this.workList.add(work);
+    }
 }
