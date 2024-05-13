@@ -17,6 +17,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,30 +28,34 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.org.egglog.domain.setting.model.WorkType
 import com.org.egglog.presentation.R
-import com.org.egglog.client.data.ScheduleInfo
+import com.org.egglog.presentation.data.ScheduleInfo
 import com.org.egglog.presentation.utils.widthPercent
 import com.org.egglog.presentation.utils.MoreHoriz
 import com.org.egglog.presentation.component.atoms.cards.BackgroundCard
 import com.org.egglog.presentation.component.atoms.icons.Icon
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
+import com.org.egglog.presentation.component.atoms.menus.ScrollableMenus
 import com.org.egglog.presentation.theme.*
 
 
 @Composable
-fun SmallScheduleCard(work: String, startTime: String, endTime: String, onClickMore: () -> Unit) {
+fun SmallScheduleCard(workType: WorkType, isMore: Boolean = false, groupOptions: List<String> = emptyList(), onSelected: (String, WorkType) -> Unit = { _, _ -> }) {
     val context = LocalContext.current
 
-    val cardContent: ScheduleInfo = when(work) {
-        "day" -> ScheduleInfo(DayCard, "Day 근무", R.drawable.day)
-        "eve" -> ScheduleInfo(EveCard, "Eve 근무", R.drawable.eve)
-        "night" -> ScheduleInfo(NightCard, "Night 근무", R.drawable.night)
-        "off" -> ScheduleInfo(Primary400, "Off", R.drawable.off)
+    val cardContent: ScheduleInfo = when(workType.workTag) {
+        "DAY" -> ScheduleInfo(DayCard, "Day 근무", R.drawable.day)
+        "EVE" -> ScheduleInfo(EveCard, "Eve 근무", R.drawable.eve)
+        "NIGHT" -> ScheduleInfo(NightCard, "Night 근무", R.drawable.night)
+        "OFF" -> ScheduleInfo(Primary400, "Off", R.drawable.off)
         "교육" -> ScheduleInfo(Orange300, "교육", R.drawable.education)
         "휴가" -> ScheduleInfo(Error300, "휴가", R.drawable.vacation)
         "보건" -> ScheduleInfo(Pink300, "보건", R.drawable.health)
-        else -> ScheduleInfo(Gray100, "", R.drawable.dark)
+        else -> ScheduleInfo(if(workType.color.isEmpty()) Gray200 else Color(android.graphics.Color.parseColor(workType.color)), workType.title, R.drawable.dark)
     }
+
+    val selectedMenuItem by remember { mutableStateOf<String?>(null) }
 
     BackgroundCard(margin = 4.widthPercent(context).dp, padding = 12.widthPercent(context).dp, color = cardContent.color, borderRadius = 10.widthPercent(context).dp) {
         Column() {
@@ -57,16 +65,22 @@ fun SmallScheduleCard(work: String, startTime: String, endTime: String, onClickM
                     verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(Modifier
+                    Box(
+                        Modifier
                             .size(10.widthPercent(context).dp)
                             .background(Color.Transparent, CircleShape)
                             .border(3.dp, Primary600, CircleShape)) {}
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "${startTime} - ${endTime}", style = Typography.displayLarge)
+                    Text(text = "${workType.startTime.substring(0, 5)} - ${workType.workTime.substring(0, 5)}", style = Typography.displayLarge)
                 }
-                IconButton(onClick = { onClickMore() }, Modifier.size(20.dp)) {
-                    Icon(imageVector = MoreHoriz, modifier = Modifier.fillMaxSize())
-                }
+                if(isMore) ScrollableMenus(
+                    iconShape = MoreHoriz,
+                    boxSize = 20,
+                    iconSize = 20,
+                    options = groupOptions,
+                    selectedOption = selectedMenuItem,
+                    onSelect = { onSelected(it, workType)}
+                )
             }
             Spacer(modifier = Modifier.height(2.dp))
             Row(Modifier
@@ -74,7 +88,7 @@ fun SmallScheduleCard(work: String, startTime: String, endTime: String, onClickM
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "${cardContent.title}", style = Typography.bodyLarge.copy(fontSize = 18.sp))
+                Text(text = cardContent.title, style = Typography.bodyLarge.copy(fontSize = 18.sp))
                 LocalImageLoader(imageUrl = cardContent.imageName, Modifier.size(36.dp))
             }
         }
@@ -88,8 +102,15 @@ fun CardPreview() {
         fun onClickMore(planId: Any? = null) {
             println(planId)
         }
-        SmallScheduleCard("day", "14:00", "20:00") {
-            onClickMore()
-        }
+        SmallScheduleCard(
+            WorkType(
+                workTypeId = 0L,
+                title = "",
+                color = "",
+                workTypeImgUrl = "",
+                workTag = "",
+                startTime = "",
+                workTime = ""
+            ), groupOptions = emptyList(), isMore = false)
     }
 }

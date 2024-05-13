@@ -36,7 +36,7 @@ import kotlin.math.roundToInt
 
 @OptIn(ExperimentalWearMaterialApi::class)
 @Composable
-fun CalendarSettingSwiper(onDelete: () -> Unit, deleteEnabled: Boolean, children: @Composable () -> Unit) {
+fun CalendarSettingSwiper(onDelete: () -> Unit, deleteEnabled: Boolean, enabled: Boolean = true, children: @Composable () -> Unit) {
     val swipeAbleState = rememberSwipeableState(initialValue = 0)
     val coroutineScope = rememberCoroutineScope()
     val squareSize = 54.widthPercent(LocalContext.current).dp
@@ -52,7 +52,8 @@ fun CalendarSettingSwiper(onDelete: () -> Unit, deleteEnabled: Boolean, children
                 orientation = Orientation.Horizontal,
                 anchors = anchors,
                 thresholds = { _, _ -> FractionalThreshold(0.5f) },
-                velocityThreshold = 1000.dp
+                velocityThreshold = 1000.dp,
+                enabled = enabled
             ),
         contentAlignment = Alignment.Center
     ) {
