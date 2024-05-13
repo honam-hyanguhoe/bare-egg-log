@@ -34,7 +34,9 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.material3.Text
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import com.org.egglog.domain.myCalendar.model.WorkType
 import com.org.egglog.presentation.R
 import com.org.egglog.presentation.component.atoms.buttons.BigButton
 import com.org.egglog.presentation.component.atoms.buttons.CustomIconButton
@@ -45,6 +47,7 @@ import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.presentation.component.atoms.inputs.SingleInput
 import com.org.egglog.presentation.component.atoms.labels.Labels
 import com.org.egglog.presentation.component.atoms.toggle.Toggle
+import com.org.egglog.presentation.component.atoms.wheelPicker.DateTimePicker
 import com.org.egglog.presentation.component.atoms.wheelPicker.TimePicker
 import com.org.egglog.presentation.component.molecules.bottomNavigator.BottomNavigator
 import com.org.egglog.presentation.component.molecules.cards.BigScheduleCard
@@ -155,7 +158,9 @@ fun MyCalendarScreen(
         selectedDate = state.selectedDate,
         onPrevMonthClick = viewModel::onPrevMonthClick,
         onNextMonthClick = viewModel::onNextMonthClick,
-        onDateClicked = viewModel::onDateClicked
+        onDateClicked = viewModel::onDateClicked,
+        workTypeList = state.workTypeList,
+        onSubmitPersonalSchedule = viewModel::onSubmitPersonalSchedule
     )
 
 }
@@ -169,8 +174,8 @@ fun MyCalendarScreen(
     scheduleContent: String,
     onChangeScheduleTitle: (String) -> Unit,
     onChangeScheduleContent: (String) -> Unit,
-    onChangeStartTime: (LocalTime) -> Unit,
-    onChangeEndTime: (LocalTime) -> Unit,
+    onChangeStartTime: (LocalDateTime) -> Unit,
+    onChangeEndTime: (LocalDateTime) -> Unit,
     onClickCalendarSetting: () -> Unit,
     currentYear: Int,
     currentMonth: Int,
@@ -178,7 +183,8 @@ fun MyCalendarScreen(
     onPrevMonthClick: () -> Unit,
     onNextMonthClick: () -> Unit,
     onDateClicked: (Int) -> Unit,
-
+    workTypeList: List<WorkType>,
+    onSubmitPersonalSchedule: () -> Unit
     ) {
 
     val context = LocalContext.current
@@ -242,7 +248,7 @@ fun MyCalendarScreen(
             height = 380.heightPercent(context).dp,
             showBottomSheet = isWorkBottomSheet.value,
             onDismiss = { isWorkBottomSheet.value = false }) {
-            WorkScheduleForm()
+            WorkScheduleForm(workTypeList = workTypeList, isWorkBottomSheet = isWorkBottomSheet)
         }
     }
 
@@ -257,7 +263,9 @@ fun MyCalendarScreen(
                 onChangeScheduleTitle = onChangeScheduleTitle,
                 onChangeScheduleContent = onChangeScheduleContent,
                 onChangeStartTime = onChangeStartTime,
-                onChangeEndTime = onChangeEndTime
+                onChangeEndTime = onChangeEndTime,
+                isPersonalBottomSheet = isPersonalBottomSheet,
+                onSubmitPersonalSchedule = onSubmitPersonalSchedule
             )
         }
     }
@@ -327,8 +335,10 @@ fun PersonalScheduleForm(
     scheduleContent: String = "",
     onChangeScheduleTitle: (String) -> Unit,
     onChangeScheduleContent: (String) -> Unit,
-    onChangeStartTime: (LocalTime) -> Unit,
-    onChangeEndTime: (LocalTime) -> Unit
+    onChangeStartTime: (LocalDateTime) -> Unit,
+    onChangeEndTime: (LocalDateTime) -> Unit,
+    isPersonalBottomSheet: MutableState<Boolean>,
+    onSubmitPersonalSchedule: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -364,12 +374,12 @@ fun PersonalScheduleForm(
 
         // 시작 시간
         Text(text = "시작 시간", style = Typography.displayLarge)
-        TimePicker { time -> onChangeStartTime(time) }
+        DateTimePicker { time -> onChangeStartTime(time) }
         Spacer(modifier = Modifier.height(24.heightPercent(LocalContext.current).dp))
 
         // 종료 시간
         Text(text = "종료 시간", style = Typography.displayLarge)
-        TimePicker { time -> onChangeEndTime(time) }
+        DateTimePicker { time -> onChangeEndTime(time) }
         Spacer(modifier = Modifier.height(24.heightPercent(LocalContext.current).dp))
 
         BigButton(
@@ -379,21 +389,25 @@ fun PersonalScheduleForm(
                 disabledContainerColor = Gray300,
                 disabledContentColor = NaturalWhite
             ), onClick = {
-                /** TODO: 버튼 클릭시 선택된 날짜에 일정 등록 **/
+                onSubmitPersonalSchedule()
+                isPersonalBottomSheet.value = false
             },
             enabled = (scheduleTitle != "" && scheduleContent != "") // title과 content 값이 없으면 disabled
         ) {
             Text(
                 style = Typography.bodyLarge,
                 color = NaturalWhite,
-                text = "추가하기"
+                text = "추가 하기"
             )
         }
     }
 }
 
 @Composable
-fun WorkScheduleForm() {
+fun WorkScheduleForm(
+    workTypeList: List<WorkType>,
+    isWorkBottomSheet: MutableState<Boolean>
+) {
     val context = LocalContext.current
 
     Column(
@@ -441,11 +455,7 @@ fun WorkScheduleForm() {
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // 근무 타입 리스트
-            val typeList: List<String> =
-                listOf("DAY", "EVE", "NIGHT", "OFF", "교육", "보건", "휴가", "None")
-
-            val groupedTypeList: List<List<String>> = typeList.chunked(4)
+            val groupedTypeList = workTypeList.chunked(4)
 
             groupedTypeList.forEach { rowList ->
                 Row(
@@ -455,7 +465,9 @@ fun WorkScheduleForm() {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     rowList.forEach { type ->
-                        Labels(text = type, size = "big", onClick = {})
+                        Labels(text = type.title, size = "big", onClick = {
+                            println(type.workTypeId)
+                        })
                     }
                 }
             }
@@ -473,7 +485,7 @@ fun WorkScheduleForm() {
                     containerColor = Gray300,
                     disabledContainerColor = Gray300,
                     disabledContentColor = NaturalWhite
-                ), onClick = { /*TODO*/ }) {
+                ), onClick = { isWorkBottomSheet.value = false}) {
                 Text(text = "취소", style = Typography.bodyLarge)
             }
 
@@ -484,7 +496,10 @@ fun WorkScheduleForm() {
                     containerColor = Warning300,
                     disabledContainerColor = Gray300,
                     disabledContentColor = NaturalWhite
-                ), onClick = { /*TODO*/ }) {
+                ), onClick = {
+                    // TODO : 일정 추가 요청 보내기
+                    isWorkBottomSheet.value = false
+                }) {
                 Text(text = "완료", style = Typography.bodyLarge)
             }
         }
