@@ -3,6 +3,7 @@ package org.egglog.api.group.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.egglog.api.group.model.dto.request.GroupDutyData;
 import org.egglog.api.group.model.dto.request.GroupForm;
 import org.egglog.api.group.model.dto.request.GroupUpdateForm;
 import org.egglog.api.group.model.dto.request.InvitationAcceptForm;
@@ -40,13 +41,14 @@ public class GroupController {
     //TODO kafka 적용해 이벤트 큐에 파싱 요청 송신하는 형태로 작성할 것
 
     /**
-     * ???
+     * 그룹 근무 엑셀 파일(json 변환 데이터) 업로드
      * @param user 로그인한 유저(JWT 토큰)
+     * @param groupDutyData 근무 엑셀 파일 데이터
      * @return
      * @author 김다희
      */
     @PostMapping("/duty")
-    public ResponseEntity<MessageUtils> generateGroupDuty(@AuthenticationPrincipal User user){
+    public ResponseEntity<MessageUtils> generateGroupDuty(@AuthenticationPrincipal User user, @RequestBody GroupDutyData groupDutyData){
         Long userId=1L;
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }
@@ -210,10 +212,10 @@ public class GroupController {
 
 
     /**
-     * ????
+     * 그룹 근무 형태별 근무자 목록
      * @param user 로그인한 유저(JWT 토큰)
-     * @param groupId ???
-     * @param date ???
+     * @param groupId 조회를 희망하는 그룹 아이디
+     * @param date 조회를 희망하는 날짜
      * @return
      * @author 김다희
      */
