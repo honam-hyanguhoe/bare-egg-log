@@ -282,7 +282,7 @@ public class CalendarService {
                 .build();
     }
 
-    public Map<LocalDate, CalendarListResponse> getEventByDate(CalendarListResponse calendarListResponse) {
+    public List<CalendarListResponse> getEventByDate(CalendarListResponse calendarListResponse) {
         Map<LocalDate, CalendarListResponse> dailySchedules = new HashMap<>();
 
         List<EventListOutputSpec> eventList = calendarListResponse.getEventList();
@@ -318,7 +318,11 @@ public class CalendarService {
                 schedule.setCalendarGroupId(calendarGroup.getCalendarGroupId());
             }
         }
-        return dailySchedules;
+        List<CalendarListResponse> result = new ArrayList<>();
+        for (CalendarListResponse value : dailySchedules.values()) {
+            result.add(value);
+        }
+        return result;
     }
 
     public void updateIcs(Long userId) {
