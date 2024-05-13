@@ -32,7 +32,7 @@ public class TokenService {
     }
 
     public void RemoveToken(Long id){
-        Token token = refreshTokenRepository.findById(id).orElseThrow(() -> new JwtException(JwtErrorCode.NOT_EXISTS_TOKEN));
+        Token token = refreshTokenRepository.findById(id).orElseThrow(() -> new JwtException(JwtErrorCode.INVALID_REFRESH_TOKEN));
         refreshTokenRepository.delete(token);
     }
 
@@ -46,14 +46,14 @@ public class TokenService {
             String role = jwtUtils.getUserRoleByRefreshToken(refreshTokenRequest);
             log.debug("role={}",role);
             //해당 리프레쉬 토큰으로 발행된 토큰 쌍을 가져온다.(엑세스 토큰이 리프레쉬 될때, 항상 토큰 쌍이 재발행 된다)
-            Token token = refreshTokenRepository.findById(id).orElseThrow(() -> new JwtException(JwtErrorCode.NOT_EXISTS_TOKEN));
+            Token token = refreshTokenRepository.findById(id).orElseThrow(() -> new JwtException(JwtErrorCode.INVALID_REFRESH_TOKEN));
 
             //해당 토큰이 블랙리스트에 존재한다면
             if (unsafeTokenRepository.findById(token.getAccessToken()).isPresent()){
                 log.debug("해당 refresh 토큰이 블랙리스트에 있습니다.");
                 // 같은 ID에 대한 토큰이 두명 이상 가지고 있을 수 있다. -> 토큰 탈취 가능성 있다.
                 refreshTokenRepository.delete(token); //토큰 지우고
-                User user = userJpaRepository.findById(id).orElseThrow(() -> new UserException(UserErrorCode.DELETED_USER));
+                User user = userJpaRepository.findById(id).orElseThrow(() -> new JwtException(JwtErrorCode.INVALID_REFRESH_TOKEN));
                 userJpaRepository.save(user.doLogout()); //로그아웃 처리후
                 throw new JwtException(JwtErrorCode.INVALID_REFRESH_TOKEN); //로그인 재요청
             }
@@ -68,7 +68,7 @@ public class TokenService {
                 log.debug("토큰 탈취 의혹 발생 해당 토큰을 폐기합니다. 재 로그인 해주세요.");
                 RemoveToken(id);//현재 토큰의 유저 ID 토큰은 모두 지운다.
                 unsafeTokenRepository.save(token.toUnSafeToken());
-                User user = userJpaRepository.findById(id).orElseThrow(() -> new UserException(UserErrorCode.DELETED_USER));
+                User user = userJpaRepository.findById(id).orElseThrow(() -> new JwtException(JwtErrorCode.INVALID_REFRESH_TOKEN));
                 userJpaRepository.save(user.doLogout()); //로그아웃 처리후
                 throw new JwtException(JwtErrorCode.INVALID_REFRESH_TOKEN);//로그인 재 요청
             }
