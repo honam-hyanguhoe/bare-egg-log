@@ -37,7 +37,7 @@ class WorkSettingViewModel @Inject constructor(
             this.exceptionHandler = CoroutineExceptionHandler { _, throwable ->
                 intent {
                     postSideEffect(WorkSettingSideEffect.Toast(message = throwable.message.orEmpty()))
-                    reduce { state.copy(deleteEnabled = true, addEnabled = true) }
+                    reduce { state.copy(deleteEnabled = true, addEnabled = true, modifyEnabled = true) }
                 }
             }
         }

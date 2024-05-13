@@ -21,6 +21,7 @@ import com.org.egglog.presentation.utils.widthPercent
 @Composable
 fun MultiInput(
     text: String,
+    modifier: Modifier = Modifier,
     placeholder: String,
     height : Int = 300,
     onValueChange: (String) -> Unit,
@@ -29,9 +30,7 @@ fun MultiInput(
 ) {
     val context = LocalContext.current
     OutlinedTextField(
-        modifier = Modifier
-            .width(320.widthPercent(context).dp)
-            .height(height.heightPercent(context).dp),
+        modifier = modifier.height(height.heightPercent(context).dp),
         shape = RoundedCornerShape(8.widthPercent(context).dp),
         colors = TextFieldDefaults.colors(
             unfocusedPlaceholderColor = Gray300,
