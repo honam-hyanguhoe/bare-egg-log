@@ -3,6 +3,8 @@ package org.egglog.api.calendar.model.dto.response;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
+import org.egglog.api.calendargroup.model.dto.response.CalendarGroupResponse;
+import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.event.model.dto.response.EventListOutputSpec;
 import org.egglog.api.work.model.dto.response.WorkListResponse;
 import org.egglog.api.work.model.dto.response.WorkResponse;
@@ -56,6 +58,11 @@ public class CalendarListResponse {
         if (this.workList == null) {
             this.workList = new WorkListResponse();  // 만약 workList가 null이라면 초기화
         }
-        this.workList.addWork(work);  // WorkListResponse 클래스의 addWork 메서드 호출
+        this.workList.addWork(work);
+    }
+
+    public void addCalendarGroup(CalendarGroupResponse calendarGroupResponse) {
+        this.workList.setCalendarGroup(calendarGroupResponse);
+
     }
 }

@@ -314,6 +314,7 @@ public class CalendarService {
                     schedule = new CalendarListResponse(date);
                     dailySchedules.put(date, schedule);
                 }
+                schedule.addCalendarGroup(calendarGroup);
                 schedule.addWorkToWorkList(work);
                 schedule.setCalendarGroupId(calendarGroup.getCalendarGroupId());
             }
