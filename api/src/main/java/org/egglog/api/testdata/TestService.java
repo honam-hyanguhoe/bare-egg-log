@@ -132,7 +132,6 @@ public class TestService {
             userService.joinUser(user, JoinUserRequest.builder()
                     .userName(user.getName())
                     .empNo("TEST-"+cnt)
-                    .fcmToken(UUID.randomUUID().toString())
                     .hospitalId(hospitalId).build());
             log.debug("user = {}", user);
             log.debug("=====end user Join=====");
