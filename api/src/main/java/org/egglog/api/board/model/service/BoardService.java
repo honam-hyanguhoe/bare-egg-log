@@ -691,10 +691,8 @@ public class BoardService {
                 .build();
 
         //사용자의 그룹리스트
-        Optional<List<GroupPreviewDto>> groupByUserId = groupRepository.findGroupByUserId(user.getId());
-        if (groupByUserId.isPresent()) {
-            boardTypeListOutputSpec.setGroupList(groupByUserId.get());
-        }
+        List<GroupPreviewDto> groupByUserId = groupRepository.findGroupByUserId(user.getId());
+        boardTypeListOutputSpec.setGroupList(groupByUserId);
         return boardTypeListOutputSpec;
     }
 }

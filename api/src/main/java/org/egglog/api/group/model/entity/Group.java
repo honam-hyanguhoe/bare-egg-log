@@ -26,8 +26,9 @@ public class Group {
     @Column(name = "group_password",nullable = false)
     private String password;
 
-    @Column(name = "group_admin", nullable = false)
-    private String admin;
+    @JoinColumn(name = "group_admin_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private GroupMember admin;
 
     public GroupSimpleDto toSimpleDto(){
         GroupSimpleDto simpleDto = new GroupSimpleDto();
