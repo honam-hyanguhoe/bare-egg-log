@@ -49,8 +49,8 @@ public class WorkTypeService {
         log.debug(" ==== ==== ==== [ 근무 타입 삭제 서비스 실행 ] ==== ==== ==== ");
         WorkType workType = workTypeJpaRepository.findWithUserById(workTypeId)
                 .orElseThrow(() -> new WorkTypeException(NO_EXIST_WORKTYPE));
-        if (workType.getWorkTag().equals(WorkTag.ETC.name())) throw new WorkTypeException(ACCESS_DENIED);
-        if (workType.getUser().getId()!=loginUser.getId()) throw new WorkTypeException(ACCESS_DENIED);
+        if (!workType.getWorkTag().equals(WorkTag.ETC)) throw new WorkTypeException(ACCESS_DENIED);
+        if (!workType.getUser().equals(loginUser)) throw new WorkTypeException(ACCESS_DENIED);
         workTypeJpaRepository.delete(workType);
     }
 
