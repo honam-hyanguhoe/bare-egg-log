@@ -33,6 +33,7 @@ import com.org.egglog.presentation.component.atoms.buttons.HalfBigButton
 import com.org.egglog.presentation.component.atoms.inputs.SingleInput
 import com.org.egglog.presentation.component.atoms.wheelPicker.TimePicker
 import com.org.egglog.presentation.theme.*
+import com.org.egglog.presentation.utils.addFocusCleaner
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
 import java.time.LocalTime
@@ -56,6 +57,7 @@ fun WorkModifySheet(
             .fillMaxSize()
             .padding(horizontal = 12.widthPercent(context).dp)
             .padding(bottom = 62.dp)
+            .addFocusCleaner(focusManager)
     ) {
         if(selectedWorkType?.workTag == "ETC") {
             Text(text = "제목", style = Typography.bodyLarge)

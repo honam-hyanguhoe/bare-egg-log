@@ -69,4 +69,11 @@ interface SettingService {
         @Path("workTypeId") workTypeId: Long,
         @Body requestBody: RequestBody
     ): CommonResponse<WorkTypeResponse?>
+
+    @POST("inquiries")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun postAsk(
+        @Header("Authorization") accessToken: String,
+        @Body requestBody: RequestBody
+    ): CommonResponse<Unit?>
 }
