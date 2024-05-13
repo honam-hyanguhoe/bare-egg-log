@@ -85,9 +85,10 @@ public class WorkTypeController {
     }
 
     /**
-     * 수정 (덮어 쓰기)
+     * 수정
      * @param loginUser 로그인 한 유저(jwt 토큰)
-     * @param request 근무타입ID, 이름, 색상, 근무 이미지, 태그 속성, 시작시각, 근무시간
+     * @param request 이름, 색상, 근무 이미지, 태그 속성, 시작시각, 근무시간
+     * @param workTypeId 수정할 근무 유형 아이디
      * @return 수정된 근무타입ID, 이름, 색상, 근무 이미지, 태그 속성, 시작시각, 근무시간
      */
     @PatchMapping("/edit/{workTypeId}")
