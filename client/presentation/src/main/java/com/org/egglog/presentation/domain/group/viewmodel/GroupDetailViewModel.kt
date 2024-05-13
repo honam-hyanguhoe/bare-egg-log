@@ -22,14 +22,23 @@ import com.org.egglog.domain.group.usecase.GetGroupDutyUseCase
 import com.org.egglog.domain.group.usecase.GetGroupInfoUseCase
 import com.org.egglog.domain.group.usecase.GetInvitationCodeUseCase
 import com.org.egglog.domain.group.usecase.GetMembersWorkUseCase
+import com.org.egglog.domain.group.usecase.UpdateGroupInfoUseCase
 import com.org.egglog.domain.main.model.WeeklyWork
+import com.org.egglog.domain.main.model.Work
 import com.org.egglog.domain.main.usecase.GetWeeklyWorkUseCase
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyDataSource
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyUiModel
+import com.org.egglog.presentation.domain.auth.viewmodel.PlusLoginSideEffect
+import com.org.egglog.presentation.domain.community.viewmodel.PostDetailSideEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
+import org.orbitmvi.orbit.annotation.OrbitExperimental
+import org.orbitmvi.orbit.syntax.simple.blockingIntent
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
@@ -46,14 +55,13 @@ class GroupDetailViewModel @Inject constructor(
     private val getInvitationCodeUseCase: GetInvitationCodeUseCase,
     private val getWeeklyWorkUseCase: GetWeeklyWorkUseCase,
     private val getMembersWorkUseCase: GetMembersWorkUseCase,
+    private val updateGroupInfoUseCase: UpdateGroupInfoUseCase,
     savedStateHandle: SavedStateHandle
-) : ViewModel(), ContainerHost<GroupDetailState, Nothing> {
-    override val container: Container<GroupDetailState, Nothing> =
+) : ViewModel(), ContainerHost<GroupDetailState, GroupDetailSideEffect> {
+    override val container: Container<GroupDetailState, GroupDetailSideEffect> =
         container(initialState = GroupDetailState(), buildSettings = {
             this.exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-                intent {
-
-                }
+                intent {postSideEffect(GroupDetailSideEffect.Toast(throwable.message.orEmpty()))}
             }
         })
     val groupId = savedStateHandle.get<Long>("groupId")
@@ -61,6 +69,8 @@ class GroupDetailViewModel @Inject constructor(
     private val _selected = mutableStateOf("Day")
     val selected: MutableState<String> = _selected
     val dataSource = WeeklyDataSource()
+    private val _showBottomSheet = MutableStateFlow(false)
+    val showBottomSheet: StateFlow<Boolean> = _showBottomSheet.asStateFlow()
 
     init {
         Log.d("groupDetail", "groupId $groupId")
@@ -72,6 +82,17 @@ class GroupDetailViewModel @Inject constructor(
         getGroupInfo(groupId = groupId)
         getGroupDuty()
         getMyWork()
+        reduce {
+            state.copy(
+                selectedMembers =  emptyList(),
+                groupWorkList = emptyMap(),
+            )
+        }
+    }
+
+
+    fun setShowBottomSheet(show: Boolean) {
+        _showBottomSheet.value = show
     }
 
     fun setSelected(newValue: String) = intent {
@@ -79,27 +100,34 @@ class GroupDetailViewModel @Inject constructor(
         updateData()
     }
 
+
+    // 멤버 선택 근무 일정 조회
     fun toggleMemberSelection(member: Member) {
         intent {
             val currentMembers = state.selectedMembers
-            val newMembers = when {
-                currentMembers.contains(member) -> {
-                    currentMembers - member
-                }
+            val currentGroupWorkList = state.groupWorkList
 
-                currentMembers.size < 3 -> {
-                    currentMembers + member
-                }
+            val newMembers : List<Member>
+            val newGroupWorkList : Map<String, Map<String, String>>
 
-                else -> {
-                    currentMembers
-                }
+            if(currentMembers.contains(member)){
+                newMembers = currentMembers - member
+                newGroupWorkList = currentGroupWorkList - member.userName.toString()
+            }else if(currentMembers.size < 3){
+                newMembers = currentMembers + member
+                newGroupWorkList = currentGroupWorkList + getGroupWork(member.userId, member.userName)
+            }else{
+                newMembers = currentMembers
+                newGroupWorkList = currentGroupWorkList
             }
+
             reduce {
-                state.copy(selectedMembers = newMembers)
+                state.copy(selectedMembers = newMembers, groupWorkList = newGroupWorkList)
             }
+
+            Log.d("getGroupList", "selectedMembers ${state.selectedMembers}")
+            Log.d("getGroupList", "groupWorkList ${state.groupWorkList}")
         }
-        getGroupWork()
     }
 
     private fun formatWork(
@@ -111,11 +139,20 @@ class GroupDetailViewModel @Inject constructor(
         }!!
 
         // 한 달 근무 안채워져 있으면 None으로 채우는 로직 추가
+        return mapOf(userName to workMap)
+    }
+
+    private fun formatGroupMembersWork(
+        groupMemberWork : List<Work>,
+        userName: String
+    ) : Map<String, Map<String, String>> {
+        val workMap: Map<String, String> =
+            groupMemberWork.associate { it.workDate to it.workType.workTag }
 
         return mapOf(userName to workMap)
     }
 
-    fun getMyWork() = intent {
+    private fun getMyWork() = intent {
         val tokens = getTokenUseCase()
         val user = getUserStoreUseCase()
 
@@ -143,8 +180,8 @@ class GroupDetailViewModel @Inject constructor(
     }
 
 
-    // 같은 그룹 유저의 근무 일정 조회
-    fun getGroupWork() = intent {
+    // 선택한 유저의 근무일정 조회
+    suspend fun getGroupWork(userId : Long, userName: String)  : Map<String, Map<String, String>>{
         val tokens = getTokenUseCase()
 
         val tempStartDate =
@@ -154,14 +191,93 @@ class GroupDetailViewModel @Inject constructor(
         val result = getMembersWorkUseCase(
             accessToken = "Bearer ${tokens.first}",
             userGroupId = groupId,
-            targetUserId = state.selectedMembers[0].userId,
+            targetUserId = userId,
             startDate = tempStartDate.toString(),
             endDate = tempEnddate.toString(),
         ).getOrNull()
 
-        Log.d("getGroupWork", "result $result")
+        val scheduleWork = formatGroupMembersWork(result!!, userName)
+        Log.d("getGroupWork", "result $scheduleWork")
+
+        return scheduleWork
     }
 
+
+    // 그룹 정보 조회
+    private fun getGroupInfo(groupId: Long) = intent {
+        val tokens = getTokenUseCase()
+        val result = groupInfoUseCase(
+            accessToken = "Bearer ${tokens.first}",
+            groupId = groupId
+        ).getOrThrow()
+
+        reduce {
+            state.copy(
+                groupInfo = result,
+                tempGroupName = result.groupName
+            )
+        }
+    }
+
+    // 주간 달력 터치 & 함께 일하는 동료 조회
+    fun onPrevClick(localDate: LocalDate) = intent {
+        val finalStartDate = dataSource.getStartOfWeek(localDate)
+        val calendarUiModel: WeeklyUiModel =
+            dataSource.getData(
+                startDate = finalStartDate.minusDays(2),
+                lastSelectedDate = finalStartDate
+            )
+        reduce {
+            state.copy(
+                currentWeekDays = calendarUiModel,
+                startDate = calendarUiModel.startDate.date,
+                endDate = finalStartDate,
+                selectedMembers = emptyList(),
+                groupWorkList =  emptyMap()
+            )
+        }
+        getGroupDuty()
+    }
+
+
+    fun onDateClick(date: WeeklyUiModel.Date) = intent {
+        reduce {
+            state.copy(
+                currentWeekDays = state.currentWeekDays.copy(
+                    selectedDate = date,
+                    visibleDates = state.currentWeekDays.visibleDates.map {
+                        it.copy(
+                            isSelected = it.date.isEqual(date.date)
+                        )
+                    }
+                ),
+                selectedMembers = emptyList(),
+                groupWorkList =  emptyMap()
+            )
+        }
+        getGroupDuty()
+    }
+
+    fun onNextClick(localDate: LocalDate) = intent {
+        val finalStartDate = dataSource.getEndOfWeek(localDate)
+        val calendarUiModel: WeeklyUiModel =
+            dataSource.getData(
+                startDate = finalStartDate,
+                lastSelectedDate = finalStartDate.plusDays(1)
+            )
+
+        reduce {
+            state.copy(
+                currentWeekDays = calendarUiModel,
+                startDate = calendarUiModel.startDate.date,
+                endDate = finalStartDate.plusDays(7),
+                selectedMembers = emptyList(),
+                groupWorkList =  emptyMap()
+            )
+        }
+
+        getGroupDuty()
+    }
 
     private fun getGroupDuty() = intent {
         val tokens = getTokenUseCase()
@@ -183,7 +299,6 @@ class GroupDetailViewModel @Inject constructor(
         }
         updateData()
     }
-
     fun updateData() = intent {
         val tempDuty: List<Member> = when (state.dutyType) {
             "Day" -> state.day
@@ -203,84 +318,7 @@ class GroupDetailViewModel @Inject constructor(
     }
 
 
-    private fun getGroupInfo(groupId: Long) = intent {
-        val tokens = getTokenUseCase()
-        val result = groupInfoUseCase(
-            accessToken = "Bearer ${tokens.first}",
-            groupId = groupId
-        ).getOrThrow()
-        Log.d(
-            "groupDetail", "getGroupInfo ${
-                groupInfoUseCase(
-                    accessToken = "Bearer ${tokens.first}",
-                    groupId = groupId
-                )
-            }"
-        )
-
-        reduce {
-            state.copy(
-                groupInfo = result
-            )
-        }
-    }
-
-
-    fun onPrevClick(localDate: LocalDate) = intent {
-        val finalStartDate = dataSource.getStartOfWeek(localDate)
-        val calendarUiModel: WeeklyUiModel =
-            dataSource.getData(
-                startDate = finalStartDate.minusDays(2),
-                lastSelectedDate = finalStartDate
-            )
-        reduce {
-            state.copy(
-                currentWeekDays = calendarUiModel,
-                startDate = calendarUiModel.startDate.date,
-                endDate = finalStartDate
-            )
-        }
-        getGroupDuty()
-    }
-
-
-    fun onDateClick(date: WeeklyUiModel.Date) = intent {
-        reduce {
-            state.copy(
-                currentWeekDays = state.currentWeekDays.copy(
-                    selectedDate = date,
-                    visibleDates = state.currentWeekDays.visibleDates.map {
-                        it.copy(
-                            isSelected = it.date.isEqual(date.date)
-                        )
-                    }
-
-                )
-            )
-        }
-        getGroupDuty()
-    }
-
-    fun onNextClick(localDate: LocalDate) = intent {
-        val finalStartDate = dataSource.getEndOfWeek(localDate)
-        val calendarUiModel: WeeklyUiModel =
-            dataSource.getData(
-                startDate = finalStartDate,
-                lastSelectedDate = finalStartDate.plusDays(1)
-            )
-
-        reduce {
-            state.copy(
-                currentWeekDays = calendarUiModel,
-                startDate = calendarUiModel.startDate.date,
-                endDate = finalStartDate.plusDays(7)
-            )
-        }
-
-        getGroupDuty()
-    }
-
-
+    // 초대 링크 생성 및 복사
     private fun getInvitationCode() = intent {
         val tokens = getTokenUseCase()
         val result = getInvitationCodeUseCase(
@@ -295,7 +333,7 @@ class GroupDetailViewModel @Inject constructor(
             )
         }
 
-        Log.d("invitationCode" , "${state.invitationCode}")
+        Log.d("invitationCode", "${state.invitationCode}")
     }
 
     fun copyInvitationLink(context: Context) = intent {
@@ -307,6 +345,68 @@ class GroupDetailViewModel @Inject constructor(
         val clip = ClipData.newPlainText("label", state.invitationCode)
         clipboard.setPrimaryClip(clip)
     }
+
+
+    // 그룹 수정
+    fun updateGroupInfo() = intent {
+        val tokens = getTokenUseCase()
+
+        val newPassword = if (state.tempGroupPassword.length == 6) {
+            state.tempGroupPassword
+        } else {
+            ""
+        }   // 요청사항. 쿼리가 어떻게 돌아가는지 모르겠지만 빈 문자열로 주면 password는 안바꿈
+        val result = updateGroupInfoUseCase(
+            accessToken = "Bearer ${tokens.first}",
+            groupId = groupId,
+            newName = state.tempGroupName,
+            newPassword = newPassword
+        )
+        Log.d("updateGroupInfo" , "update $result")
+        Log.d("updateGroupInfo", "update groupInfo ${state.tempGroupName}  ${newPassword}")
+
+        if(result.isSuccess){
+            reduce {
+                state.copy(
+                    groupInfo = state.groupInfo.copy(
+                        groupName = state.tempGroupName
+                    ),
+                    tempGroupPassword = ""
+                )
+            }
+            postSideEffect(GroupDetailSideEffect.Toast("수정 완료되었습니다."))
+        }else{
+            postSideEffect(GroupDetailSideEffect.Toast("그룹 정보 수정이 실패하였습니다."))
+        }
+    }
+
+    fun onClickCancel() = intent {
+        reduce {
+            state.copy(
+                tempGroupName = state.groupInfo.groupName,
+                tempGroupPassword = ""
+            )
+        }
+    }
+
+    @OptIn(OrbitExperimental::class)
+    fun onChangeGroupName(value: String) = blockingIntent {
+        reduce {
+            state.copy(
+                tempGroupName = value
+            )
+        }
+    }
+
+
+    @OptIn(OrbitExperimental::class)
+    fun onChangeGroupPassword(value: String) = blockingIntent {
+        reduce {
+            state.copy(
+                tempGroupPassword = value
+            )
+        }
+    }
 }
 
 
@@ -316,7 +416,7 @@ data class GroupDetailState(
         id = 0,
         isAdmin = false,
         groupImage = 1,
-        groupName = "",
+        groupName = "임시",
         admin = Admin(
             userId = null,
             groupId = 12,
@@ -326,6 +426,9 @@ data class GroupDetailState(
         ),
         groupMembers = emptyList()
     ),
+
+    val tempGroupName : String = "",
+    val tempGroupPassword : String = "",
 
     // 주간 달력 클릭
     val currentWeekDays: WeeklyUiModel = WeeklyDataSource().getData(
@@ -352,3 +455,6 @@ data class GroupDetailState(
     val groupWorkList: Map<String, Map<String, String>> = emptyMap()
 )
 
+sealed interface GroupDetailSideEffect {
+    class Toast(val message: String) : GroupDetailSideEffect
+}

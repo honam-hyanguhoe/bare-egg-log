@@ -3,8 +3,10 @@ package com.org.egglog.data.group.usecase
 import android.util.Log
 import com.org.egglog.data.group.model.toDomainModel
 import com.org.egglog.data.group.service.GroupService
+import com.org.egglog.data.main.model.toDomainModel
 import com.org.egglog.domain.group.model.GroupMembersWork
 import com.org.egglog.domain.group.usecase.GetMembersWorkUseCase
+import com.org.egglog.domain.main.model.Work
 import javax.inject.Inject
 
 class GetMembersWorkUseCaseImpl @Inject constructor(
@@ -16,7 +18,7 @@ class GetMembersWorkUseCaseImpl @Inject constructor(
         targetUserId: Long,
         startDate: String,
         endDate: String
-    ): Result<GroupMembersWork?> = kotlin.runCatching {
+    ): Result<List<Work>?> = kotlin.runCatching {
 
         Log.d("getGroupWork","$userGroupId-$targetUserId-$startDate-$endDate")
         val response =
@@ -29,6 +31,6 @@ class GetMembersWorkUseCaseImpl @Inject constructor(
             )
 
         Log.d("getGroupWork", "response ${response.dataHeader.resultCode}")
-        response.dataBody?.toDomainModel()
+        response.dataBody?.map { it.toDomainModel() }
     }
 }

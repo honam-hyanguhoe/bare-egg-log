@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Admin(
-    val userId: String?,
+    val userId: Long?,
     val groupId: Long,
     val userName: String,
     val profileImgUrl: String,

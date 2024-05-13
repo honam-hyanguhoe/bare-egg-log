@@ -3,15 +3,15 @@ package com.org.egglog.data.group.service
 import com.org.egglog.data.group.model.GroupDutyResponse
 import com.org.egglog.data.group.model.GroupInfoResponse
 import com.org.egglog.data.group.model.GroupResponse
-import com.org.egglog.data.group.model.MembersWorkResponse
-import com.org.egglog.data.main.model.WeeklyWorkReponse
-import com.org.egglog.data.main.model.stats.RemainDutyResponse
+import com.org.egglog.data.group.model.UpdateGroupInfoResponse
+import com.org.egglog.data.main.model.WorkDTO
 import com.org.egglog.data.retrofit.CommonResponse
 import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -72,6 +72,16 @@ interface GroupService {
         @Query("targetUserId") targetUserId: Long,
         @Query("startDate") startDate: String,
         @Query("endDate") endDate: String
-    ): CommonResponse<MembersWorkResponse?>
+    ): CommonResponse<List<WorkDTO>?>
+
+    // settings
+    @PATCH("groups/{group_id}")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun updateGroupInfo(
+        @Header("Authorization") accessToken: String,
+        @Path("group_id") groupId: Long,
+        @Body requestBody: RequestBody
+    ): CommonResponse<UpdateGroupInfoResponse>
+
 }
 

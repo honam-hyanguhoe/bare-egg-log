@@ -14,9 +14,8 @@ class GetGroupInfoUseCaseImpl @Inject constructor(
     private val groupService: GroupService
 ) : GetGroupInfoUseCase {
     override suspend fun invoke(accessToken: String, groupId: Long): Result<GroupInfo> = kotlin.runCatching{
-        Log.d("groupDetail", "response $groupId")
         val response = groupService.getGroupInfo(accessToken, groupId)
-        Log.d("groupDetail", "response $response")
+        Log.d("groupDetail", "response ${response.dataBody}")
         response.dataBody!!.toDomainModel()
     }
 }

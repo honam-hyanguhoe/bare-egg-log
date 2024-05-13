@@ -17,6 +17,6 @@ data class GroupMemberDto(
 
 fun GroupMemberDto.toDomainModel() : GroupMember {
     return GroupMember(
-       userId!!, groupId, userName, profileImgUrl, isAdmin
+        userId, groupId, userName, profileImgUrl, isAdmin
     )
 }

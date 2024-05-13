@@ -2,6 +2,7 @@ package com.org.egglog.presentation.domain.group.screen
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,23 +13,31 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -36,17 +45,23 @@ import com.org.egglog.client.ui.molecules.radioButtons.WorkRadioButton
 import com.org.egglog.domain.group.model.Member
 import com.org.egglog.presentation.R
 import com.org.egglog.presentation.component.atoms.buttons.GroupProfileButton
+import com.org.egglog.presentation.component.atoms.buttons.HalfBigButton
 import com.org.egglog.presentation.component.atoms.buttons.ThinButton
+import com.org.egglog.presentation.component.atoms.dialogs.BottomSheet
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
+import com.org.egglog.presentation.component.atoms.inputs.PassInput
+import com.org.egglog.presentation.component.atoms.inputs.SingleInput
 import com.org.egglog.presentation.component.molecules.headers.BasicHeader
 import com.org.egglog.presentation.component.organisms.calendars.GroupCalenar
 import com.org.egglog.presentation.component.organisms.calendars.WeeklyCalendar
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyUiModel
+import com.org.egglog.presentation.domain.group.viewmodel.GroupDetailSideEffect
 import com.org.egglog.presentation.domain.group.viewmodel.GroupDetailViewModel
 import com.org.egglog.presentation.theme.*
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
 import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 import java.time.LocalDate
 import java.util.Calendar
 import kotlin.reflect.KFunction1
@@ -60,7 +75,18 @@ fun GroupDetailScreen(
     val groupDetailState = groupDetailViewModel.collectAsState().value
     val context = LocalContext.current
     val selected = groupDetailViewModel.selected
+    val showBottomSheet by groupDetailViewModel.showBottomSheet.collectAsState()
 
+    groupDetailViewModel.collectSideEffect {
+        sideEffect ->
+        when(sideEffect){
+            is GroupDetailSideEffect.Toast -> Toast.makeText(
+                context,
+                sideEffect.message,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
 
     LaunchedEffect(selected.value) {
         groupDetailViewModel.setSelected(selected.value)
@@ -82,8 +108,21 @@ fun GroupDetailScreen(
         // 초대링크
         copyInvitationLink = groupDetailViewModel::copyInvitationLink,
         toggleMemberSelection = groupDetailViewModel::toggleMemberSelection,
+
         selectedMembers = groupDetailState.selectedMembers,
-        myWorkList = groupDetailState.myWorkList
+        myWorkList = groupDetailState.myWorkList,
+        groupWorkList = groupDetailState.groupWorkList,
+
+        showBottomSheet = showBottomSheet,
+        setShowBottomSheet = groupDetailViewModel::setShowBottomSheet,
+
+        // settings
+        tempGroupName = groupDetailState.tempGroupName,
+        tempGroupPassword = groupDetailState.tempGroupPassword,
+        onGroupNameChange = groupDetailViewModel::onChangeGroupName,
+        onGroupPasswordChange = groupDetailViewModel::onChangeGroupPassword,
+        updateGroup = groupDetailViewModel::updateGroupInfo,
+        onClickCancel = groupDetailViewModel::onClickCancel,
     )
 }
 
@@ -103,15 +142,29 @@ private fun GroupDetailScreen(
     copyInvitationLink: (Context) -> Unit,
     toggleMemberSelection: KFunction1<Member, Unit>,
     selectedMembers: List<Member>,
-    myWorkList : Map<String, Map<String, String>>
+    myWorkList: Map<String, Map<String, String>>,
+    groupWorkList: Map<String, Map<String, String>>,
+    showBottomSheet: Boolean,
+    setShowBottomSheet: (Boolean) -> Unit,
+
+    // 그룹 설정
+    tempGroupName: String ,
+    tempGroupPassword: String ,
+    onGroupNameChange: (String) -> Unit ,
+    onGroupPasswordChange: (String) -> Unit ,
+    updateGroup : () -> Unit,
+    onClickCancel : () -> Unit,
 ) {
     val tempLabels: List<String> = listOf("Night", "Day", "휴가", "보건", "Off", "Eve", "Eve")
     val options = listOf("그룹 설정", "그룹원 설정", "그룹 나가기")
+    var selectedOption by remember { mutableStateOf<String?>(null) }
+
     val context = LocalContext.current
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = NaturalWhite),
+            .background(color = NaturalWhite)
+            .systemBarsPadding(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -122,7 +175,14 @@ private fun GroupDetailScreen(
                 hasInvitationButton = true,
                 onClickBack = onClickBack,
                 onClickLink = { copyInvitationLink(context) },
-                options = options
+                options = options,
+                onSelect = {
+                    selectedOption = it
+                    Log.d("menus", "it $it")
+                    if (it == "그룹 설정") {
+                        setShowBottomSheet(true)
+                    }
+                }
             )
         }
         item {
@@ -130,7 +190,7 @@ private fun GroupDetailScreen(
                 groupName = groupName,
                 memberCount = memberCount,
                 adminName = adminName,
-                )
+            )
         }
         item {
             Spacer(modifier = Modifier.height(5.dp))
@@ -153,10 +213,117 @@ private fun GroupDetailScreen(
         }
         item {
             Spacer(modifier = Modifier.height(30.dp))
-            MemberCalendar(workList = myWorkList)
+            MemberCalendar(myWorkList = myWorkList, groupWorkList = groupWorkList)
+        }
+    }
+
+    if (showBottomSheet) {
+        BottomSheet(
+            height = 300.dp,
+            showBottomSheet = showBottomSheet,
+            onDismiss = { setShowBottomSheet(false) },
+        ) {
+            GroupBottomSheetContent(
+                tempGroupName = tempGroupName,
+                tempGroupPassword = tempGroupPassword,
+                onGroupNameChange = onGroupNameChange,
+                onGroupPasswordChange = onGroupPasswordChange,
+                updateGroup = updateGroup,
+                setShowBottomSheet = setShowBottomSheet,
+                onClickCancel = onClickCancel,
+            )
         }
     }
 }
+
+@Composable
+fun GroupBottomSheetContent(
+    tempGroupName: String,
+    tempGroupPassword: String,
+    onGroupNameChange: (String) -> Unit,
+    onGroupPasswordChange: (String) -> Unit,
+    updateGroup: () -> Unit,
+    setShowBottomSheet: (Boolean) -> Unit,
+    onClickCancel: () -> Unit
+) {
+    val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
+    ) {
+        Column(
+            modifier = Modifier.width(320.widthPercent(context).dp),
+            horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "그룹 이름을 입력해주세요", style = Typography.headlineSmall.copy(
+                    fontWeight = FontWeight.Bold, textAlign = TextAlign.Start
+                )
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            SingleInput(
+                text = tempGroupName,
+                onValueChange = onGroupNameChange,
+                focusManager = focusManager,
+                placeholder = "그룹이름을 입력하세요",
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done
+                ),
+            )
+            Spacer(modifier = Modifier.height(15.dp))
+            Text(
+                text = "비밀번호를 입력해주세요", style = Typography.headlineSmall.copy(
+                    fontWeight = FontWeight.Bold, textAlign = TextAlign.Start
+                )
+            )
+            Spacer(modifier = Modifier.height(5.dp))
+            PassInput(pin = tempGroupPassword, onValueChange = onGroupPasswordChange)
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        Row(
+            modifier = Modifier.width(320.widthPercent(context).dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            HalfBigButton(
+                modifier = Modifier.width(150.widthPercent(context).dp), onClick = {
+                    setShowBottomSheet(false)
+                    onClickCancel()
+                }, colors = ButtonColors(
+                    contentColor = Gray25,
+                    containerColor = Gray300,
+                    disabledContentColor = Gray25,
+                    disabledContainerColor = Gray300
+                )
+            ) {
+                Text(
+                    style = Typography.headlineSmall.copy(fontWeight = FontWeight.Bold), text = "취소"
+                )
+            }
+
+            HalfBigButton(
+                modifier = Modifier.width(150.widthPercent(context).dp), onClick = {
+                    updateGroup()
+                    setShowBottomSheet(false)
+                }, colors = ButtonColors(
+                    contentColor = NaturalWhite,
+                    containerColor = Warning300,
+                    disabledContentColor = Gray25,
+                    disabledContainerColor = Gray300
+                )
+            ) {
+                Text(
+                    style = Typography.headlineSmall.copy(fontWeight = FontWeight.Bold), text = "수정"
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+    }
+}
+
 
 @Composable
 private fun GroupInfoCard(
@@ -334,46 +501,18 @@ private fun MembersCard(
 
 @Composable
 private fun MemberCalendar(
-    workList : Map<String, Map<String, String>>
+    myWorkList: Map<String, Map<String, String>>,
+    groupWorkList: Map<String, Map<String, String>>
 ) {
     val currentYear = remember { mutableStateOf(Calendar.getInstance().get(Calendar.YEAR)) }
     val currentMonth = remember { mutableStateOf(Calendar.getInstance().get(Calendar.MONTH) + 1) }
 
-    // 내 근무 일정
-    Log.d("myWork", "ggg $workList")
-
-//    // 선택한 그룹원 일정
-//    val groupWorkList = mapOf(
-//        "김형민" to mapOf(
-//            "2024-05-01" to "DAY",
-//            "2024-05-02" to "EVE",
-//            "2024-05-03" to "OFF",
-//            "2024-05-04" to "NONE",
-//            "2024-05-05" to "DAY",
-//            "2024-05-06" to "DAY",
-//            "2024-05-07" to "OFF",
-//            "2024-05-08" to "EVE"
-//        ), "김아현" to mapOf(
-//            "2024-05-01" to "DAY",
-//            "2024-05-02" to "EVE",
-//            "2024-05-03" to "OFF",
-//            "2024-05-04" to "NONE",
-//            "2024-05-05" to "DAY",
-//            "2024-05-06" to "DAY",
-//            "2024-05-07" to "OFF",
-//            "2024-05-08" to "EVE"
-//        )
-//    )
-//    // 나 + 그룹원 일정 합쳐서 인수로 전달s
-//    val workList = myWorkList + groupWorkList
-//    Log.d("myWork", "groupWorkList $groupWorkList")
-
+    val workList = myWorkList + groupWorkList
 
     Column(
         modifier = Modifier
             .width(340.widthPercent(LocalContext.current).dp)
             .padding(8.dp, 15.dp, 8.dp, 0.dp)
-//            .border(1.dp, NaturalBlack)
     ) {
         Text(
             text = "2024. 04", style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)

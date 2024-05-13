@@ -3,6 +3,7 @@ package com.org.egglog.data.main.model
 import androidx.room.PrimaryKey
 import com.org.egglog.domain.main.model.WeeklyWork
 import com.org.egglog.domain.main.model.Work
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable

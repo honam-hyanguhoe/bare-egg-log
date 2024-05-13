@@ -2,6 +2,7 @@ package com.org.egglog.domain.group.usecase
 
 import com.org.egglog.domain.group.model.GroupMembersWork
 import com.org.egglog.domain.main.model.WeeklyWork
+import com.org.egglog.domain.main.model.Work
 import com.org.egglog.domain.main.model.WorkStats
 
 interface GetMembersWorkUseCase {
@@ -11,7 +12,7 @@ interface GetMembersWorkUseCase {
         targetUserId : Long,
         startDate : String,
         endDate : String
-    ) : Result<GroupMembersWork?>
+    ) : Result<List<Work>?>
 }
 
 //{

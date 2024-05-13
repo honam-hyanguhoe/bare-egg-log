@@ -168,11 +168,17 @@ fun GroupDayList(
                                 Spacer(modifier = Modifier.height(10.dp))
 
                                 // 해당 날짜에 근무 내용이 있는 사용자 리스트 가져오기
-                                val usersWithWork =
-                                    workList.filterValues { it.containsKey(dateString) }
-                                // 각 사용자별로 근무 내용 표시
-                                usersWithWork.forEach { (user, workMap) ->
-                                    Labels(text = "${workMap[dateString]}")
+//                                val usersWithWork =
+//                                    workList.filterValues { it.containsKey(dateString) }
+//                                // 각 사용자별로 근무 내용 표시
+//                                usersWithWork.forEach { (user, workMap) ->
+//                                    Labels(text = "${workMap[dateString]}")
+//                                    Spacer(Modifier.height(8.dp))
+//                                }
+
+                                workList.keys.forEach { user ->
+                                    val work = workList[user]?.get(dateString)
+                                    Labels(text = work ?: "None")
                                     Spacer(Modifier.height(8.dp))
                                 }
 

@@ -7,9 +7,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GroupInfoResponse(
-    val id: Long,  // groupId
+    val id: Long,
     val isAdmin: Boolean,
-    val admin: AdminDto?,
+    val admin: AdminDto,
     val groupImage: Int,
     val groupName: String,
     val groupMembers: List<GroupMemberDto>?
@@ -19,10 +19,10 @@ fun GroupInfoResponse.toDomainModel(): GroupInfo {
     return GroupInfo(
         id,
         isAdmin,
-        admin?.toDomainModel(),
+        admin.toDomainModel(),
         groupImage,
         groupName,
-        groupMembers?.mapNotNull { it.toDomainModel() }
+        groupMembers?.map { it.toDomainModel() }
     )
 }
 

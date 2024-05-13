@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AdminDto(
-    val userId: String?,
+    val userId: Long?,
     val groupId: Long,
     val userName: String,
     val profileImgUrl: String,
