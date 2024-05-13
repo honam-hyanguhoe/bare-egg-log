@@ -1,6 +1,8 @@
 package org.egglog.api.board.model.service;
 
 
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import jakarta.persistence.PersistenceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,8 @@ import org.egglog.api.global.util.RedisViewCountUtil;
 import org.egglog.api.hospital.exception.HospitalErrorCode;
 import org.egglog.api.hospital.exception.HospitalException;
 import org.egglog.api.hospital.model.entity.Hospital;
+import org.egglog.api.notification.model.entity.FCMTopic;
+import org.egglog.api.notification.model.service.FCMService;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
@@ -77,6 +81,8 @@ public class BoardService {
     private final RedisViewCountUtil redisViewCountUtil;    //조회수
 
     private final StringRedisTemplate redisTemplate;    //급상승 게시물
+
+    private final FCMService fcmService;
 
     /**
      * 게시판 조회
@@ -279,7 +285,20 @@ public class BoardService {
         }
 
         try {
-            boardRepository.save(board);  //저장
+            Board saveBoard = boardRepository.save(board);//저장
+            if (saveBoard.getBoardType().equals(BoardType.GROUP)){
+                //그룹 게시판에 글이 등록되었다면 푸시알림 발송
+                FCMTopic topic = FCMTopic.builder()
+                        .topic(FCMTopic.TopicEnum.group)
+                        .topicId(boardForm.getGroupId())
+                        .build();
+                Notification notification = Notification.builder()
+                        .setTitle(boardForm.getBoardTitle())
+                        .setBody(boardForm.getBoardContent())
+                        .setImage(boardForm.getPictureOne() != null ? boardForm.getPictureOne() : null)
+                        .build();
+                fcmService.sendNotificationToTopic(topic, notification);
+            }
 
         } catch (PersistenceException e) {
             throw new BoardException(BoardErrorCode.TRANSACTION_ERROR);
