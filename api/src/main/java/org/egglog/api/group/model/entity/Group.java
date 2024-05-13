@@ -10,10 +10,12 @@ import org.egglog.api.group.model.dto.response.GroupSimpleDto;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "`Groups`")
 public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     @Column(name = "group_id")
     private Long id;
 

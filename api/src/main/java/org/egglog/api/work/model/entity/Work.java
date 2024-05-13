@@ -9,6 +9,7 @@ import org.egglog.api.worktype.model.entity.WorkType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 
 /**
@@ -30,10 +31,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Table(indexes = {@Index(name = "idx_user_id", columnList = "user_id"),@Index(name = "idx_work_uuid", columnList = "work_uuid")})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Work {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "work_id")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "work_date")
@@ -61,4 +64,5 @@ public class Work {
                 .workType(this.workType.toResponse())
                 .build();
     }
+
 }
