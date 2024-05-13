@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDate;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -82,7 +83,7 @@ public class CalendarController {
      * @return
      */
     @GetMapping("/month")
-    public ResponseEntity<MessageUtils<Map<LocalDate, CalendarListResponse>>> getCalendarByMonth(@ModelAttribute @Valid CalendarMonthRequest calendarMonthRequest, @AuthenticationPrincipal User user) {
+    public ResponseEntity<MessageUtils<List<CalendarListResponse>>> getCalendarByMonth(@ModelAttribute @Valid CalendarMonthRequest calendarMonthRequest, @AuthenticationPrincipal User user) {
         CalendarListResponse calendarListByMonth = calendarService.getCalendarListByMonth(calendarMonthRequest, user);
         return ResponseEntity.ok().body(MessageUtils.success(calendarService.getEventByDate(calendarListByMonth)));
     }
