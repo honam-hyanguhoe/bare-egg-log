@@ -18,7 +18,7 @@ import com.org.egglog.presentation.utils.widthPercent
 import java.time.LocalDate
 
 @Composable
-internal fun DefaultWheelDatePicker(
+internal fun DefaultWheelCustomPicker(
     modifier: Modifier = Modifier,
     startDate: LocalDate = LocalDate.now(),
     minDate: LocalDate = LocalDate.MIN,
@@ -32,8 +32,6 @@ internal fun DefaultWheelDatePicker(
     onSnappedDate : (snappedDate: SnappedDate) -> Int? = { _ -> null }
 ) {
     var snappedDate by remember { mutableStateOf(startDate) }
-
-    var dayOfMonths = calculateDayOfMonths(snappedDate.month.value, snappedDate.year)
 
     val months = (1..12).map {
         Month(
@@ -89,8 +87,6 @@ internal fun DefaultWheelDatePicker(
                                 snappedDate = newDate
                             }
 
-                            dayOfMonths = calculateDayOfMonths(snappedDate.month.value, snappedDate.year)
-
                             val newIndex =  years.find { it.value == snappedDate.year }?.index
 
                             newIndex?.let {
@@ -134,8 +130,6 @@ internal fun DefaultWheelDatePicker(
                             snappedDate = newDate
                         }
 
-                        dayOfMonths = calculateDayOfMonths(snappedDate.month.value, snappedDate.year)
-
                         val newIndex =  months.find { it.value == snappedDate.monthValue }?.index
 
                         newIndex?.let {
@@ -152,114 +146,6 @@ internal fun DefaultWheelDatePicker(
                     return@WheelTextPicker months.find { it.value == snappedDate.monthValue }?.index
                 }
             )
-            //Day of Month
-            WheelTextPicker(
-                size = DpSize(
-                    width = 42.widthPercent(LocalContext.current).dp,
-                    height = size.height
-                ),
-                texts = dayOfMonths.map { it.text + "일" },
-                rowCount = rowCount,
-                style = textStyle,
-                color = textColor,
-                selectorProperties = WheelPickerDefaults.selectorProperties(
-                    enabled = false
-                ),
-                startIndex = dayOfMonths.find { it.value== startDate.dayOfMonth }?.index ?: 0,
-                onScrollFinished = { snappedIndex ->
-
-                    val newDayOfMonth = dayOfMonths.find { it.index == snappedIndex }?.value
-
-                    newDayOfMonth?.let {
-                        val newDate = snappedDate.withDayOfMonth(newDayOfMonth)
-
-                        if(!newDate.isBefore(minDate) && !newDate.isAfter(maxDate)) {
-                            snappedDate = newDate
-                        }
-
-                        val newIndex =  dayOfMonths.find { it.value == snappedDate.dayOfMonth }?.index
-
-                        newIndex?.let {
-                            onSnappedDate(
-                                SnappedDate.DayOfMonth(
-                                    localDate = snappedDate,
-                                    index = newIndex
-                                )
-                            )?.let { return@WheelTextPicker it }
-                        }
-                    }
-
-                    return@WheelTextPicker dayOfMonths.find { it.value == snappedDate.dayOfMonth }?.index
-                }
-            )
         }
-    }
-}
-
-internal data class DayOfMonth(
-    val text: String,
-    val value: Int,
-    val index: Int
-)
-
-data class Month(
-    val text: String,
-    val value: Int,
-    val index: Int
-)
-
-data class Year(
-    val text: String,
-    val value: Int,
-    val index: Int
-)
-
-internal fun calculateDayOfMonths(month: Int, year: Int): List<DayOfMonth> {
-
-    val isLeapYear = LocalDate.of(year, month, 1).isLeapYear
-
-    val month31day = (1..31).map {
-        DayOfMonth(
-            text = it.toString(),
-            value = it,
-            index = it - 1
-        )
-    }
-    val month30day = (1..30).map {
-        DayOfMonth(
-            text = it.toString(),
-            value = it,
-            index = it - 1
-        )
-    }
-    val month29day = (1..29).map {
-        DayOfMonth(
-            text = it.toString(),
-            value = it,
-            index = it - 1
-        )
-    }
-    val month28day = (1..28).map {
-        DayOfMonth(
-            text = it.toString(),
-            value = it,
-            index = it - 1
-        )
-    }
-
-    return when(month){
-        1 -> { month31day }
-        2 -> { if(isLeapYear) month29day else month28day }
-        3 -> { month31day }
-        4 -> { month30day }
-        5 -> { month31day }
-        6 -> { month30day }
-        7 -> { month31day }
-        8 -> { month31day }
-        9 -> { month30day }
-        10 -> { month31day }
-        11 -> { month30day }
-        12 -> { month31day }
-        else -> { emptyList() }
     }
 }
