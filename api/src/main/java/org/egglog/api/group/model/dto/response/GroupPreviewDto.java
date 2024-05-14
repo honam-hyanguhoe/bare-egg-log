@@ -13,4 +13,5 @@ public class GroupPreviewDto {
     private Integer groupImage;
     private String groupName;
     private String admin;
+    private Integer memberCount;
 }

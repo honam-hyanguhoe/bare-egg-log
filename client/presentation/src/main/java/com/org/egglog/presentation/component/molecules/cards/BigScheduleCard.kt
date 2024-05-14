@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.org.egglog.client.data.ScheduleInfo
+import com.org.egglog.presentation.data.ScheduleInfo
 import com.org.egglog.presentation.utils.MoreHoriz
 import com.org.egglog.presentation.utils.widthPercent
 import com.org.egglog.presentation.component.atoms.cards.BackgroundCard

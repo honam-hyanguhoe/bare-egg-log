@@ -7,6 +7,7 @@ import org.egglog.api.group.model.dto.response.GroupDutySummary;
 import org.egglog.api.group.model.entity.GroupMember;
 import org.egglog.api.group.repository.jpa.GroupMemberRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,7 +31,7 @@ public class GroupMemberService {
 
     public GroupMember getGroupMember(Long groupId, Long userId) {
         GroupMember member = groupMemberRepository
-                .findGroupMemberByGroupIdAndUserId(groupId,userId)
+                .findGroupMemberByGroupIdAndUserId(groupId, userId)
                 .orElseThrow(()->new GroupMemberException(GroupMemberErrorCode.NOT_FOUND));
         return member;
     }

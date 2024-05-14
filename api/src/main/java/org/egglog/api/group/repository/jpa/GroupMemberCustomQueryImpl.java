@@ -52,6 +52,8 @@ public class GroupMemberCustomQueryImpl implements GroupMemberCustomQuery{
     public Optional<GroupMember> findGroupMemberByGroupIdAndUserId(Long groupId, Long userId){
         return Optional.ofNullable(jpaQueryFactory
                 .selectFrom(groupMember)
+                .leftJoin(groupMember.user).fetchJoin()
+                .leftJoin(groupMember.group).fetchJoin()
                 .where(groupMember.group.id.eq(groupId).and(groupMember.user.id.eq(userId)))
                 .fetchOne()
         );

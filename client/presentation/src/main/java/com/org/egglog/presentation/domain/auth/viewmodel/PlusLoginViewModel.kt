@@ -11,6 +11,7 @@ import com.org.egglog.domain.auth.model.UserHospital
 import com.org.egglog.domain.auth.usecase.DeleteTokenUseCase
 import com.org.egglog.domain.auth.usecase.DeleteUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.GetAllHospitalUseCase
+import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.UpdateUserJoinUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,6 +36,7 @@ class PlusLoginViewModel @Inject constructor(
     private val deleteUserStoreUseCase: DeleteUserStoreUseCase,
     private val deleteTokenUseCase: DeleteTokenUseCase,
     private val setUserStoreUseCase: SetUserStoreUseCase,
+    private val getTokenUseCase: GetTokenUseCase,
     private val updateUserJoinUseCase: UpdateUserJoinUseCase,
     private val getAllHospitalUseCase: GetAllHospitalUseCase
 ): ViewModel(), ContainerHost<PlusLoginState, PlusLoginSideEffect>{
@@ -44,6 +46,9 @@ class PlusLoginViewModel @Inject constructor(
             this.exceptionHandler = CoroutineExceptionHandler { _, throwable ->
                 intent {
                     postSideEffect(PlusLoginSideEffect.Toast(message = throwable.message.orEmpty()))
+                    reduce {
+                        state.copy(joinEnabled = true)
+                    }
                 }
             }
         }
@@ -84,18 +89,25 @@ class PlusLoginViewModel @Inject constructor(
     }
 
     fun onClickJoin() = intent {
+        reduce {
+            state.copy(joinEnabled = false)
+        }
         val fcmToken = try {
             Firebase.messaging.token.await()
         } catch (e: Exception) {
             Log.e("FCM Token", "Error fetching FCM token: ${e.message}", e)
             null
         }
-        val result = updateUserJoinUseCase(AddUserParam(userName = state.name, empNo = state.empNo, hospitalId = state.hospital!!.hospitalId, fcmToken = fcmToken)).getOrThrow()
+        val tokens = getTokenUseCase()
+        val result = updateUserJoinUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}", addUserParam = AddUserParam(userName = state.name, empNo = state.empNo, hospitalId = state.hospital!!.hospitalId, fcmToken = fcmToken)).getOrThrow()
         if(result != null) {
             setUserStoreUseCase(result)
             postSideEffect(PlusLoginSideEffect.NavigateToMainActivity)
         } else {
             postSideEffect(PlusLoginSideEffect.Toast("회원가입에 실패했습니다."))
+        }
+        reduce {
+            state.copy(joinEnabled = true)
         }
     }
 
@@ -121,6 +133,7 @@ class PlusLoginViewModel @Inject constructor(
 @Immutable
 data class PlusLoginState(
     val name: String = "",
+    val joinEnabled: Boolean = true,
     val hospital: UserHospital? = null,
     val search: String = "",
     val empNo: String = "",

@@ -1,8 +1,11 @@
 package org.egglog.api.calendargroup.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.egglog.api.calendargroup.model.dto.params.CalendarGroupListRequest;
 import org.egglog.api.calendargroup.model.dto.request.CreateCalGroupRequest;
+import org.egglog.api.calendargroup.model.dto.response.CalendarGroupEventListResponse;
+import org.egglog.api.calendargroup.model.dto.response.CalendarGroupResponse;
 import org.egglog.api.calendargroup.model.service.CalendarGroupService;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.utility.utils.MessageUtils;
@@ -10,6 +13,9 @@ import org.egglog.utility.utils.SuccessType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 /**
  * ```
  * ===================[Info]=========================
@@ -23,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
  * |2024-04-20|김도휘|최초 생성|
  * |2024-04-20|김도휘|캘린더 그룹으로 개인 일정 조회 추가|
  * |2024-05-07|김형민|리스트조회, 생성, 삭제 추가|
+ * |2024-05-08|김형민|1차 리펙토링|
  */
 @RestController
 @RequiredArgsConstructor
@@ -39,9 +46,9 @@ public class CalendarGroupController {
      * @author 김형민
      */
     @PostMapping("/create")
-    public ResponseEntity<MessageUtils> registerCalendarGroup(
+    public ResponseEntity<MessageUtils<CalendarGroupResponse>> registerCalendarGroup(
             @AuthenticationPrincipal User loginUser,
-            @RequestBody CreateCalGroupRequest request
+            @RequestBody @Valid CreateCalGroupRequest request
         ) {
         return ResponseEntity.ok()
                 .body(MessageUtils.success(calendarGroupService.registerCalendarGroup(request, loginUser)));
@@ -71,7 +78,7 @@ public class CalendarGroupController {
      * @author 김형민
      */
     @GetMapping("/find/list")
-    public ResponseEntity<MessageUtils> findList(
+    public ResponseEntity<MessageUtils<List<CalendarGroupResponse>>> findList(
             @AuthenticationPrincipal User loginUser
     ){
         return ResponseEntity.ok()
@@ -86,7 +93,7 @@ public class CalendarGroupController {
      * @author 김도휘
      */
     @GetMapping("/events")
-    public ResponseEntity<?> getEventListByCalendarGroupIds(
+    public ResponseEntity<MessageUtils<List<CalendarGroupEventListResponse>>> getEventListByCalendarGroupIds(
             @ModelAttribute CalendarGroupListRequest request,
             @AuthenticationPrincipal User user
     ) {

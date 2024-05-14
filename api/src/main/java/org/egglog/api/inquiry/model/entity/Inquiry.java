@@ -17,10 +17,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
 @Table(name = "`Inquiries`")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Inquiry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "inquiry_id")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,6 +34,9 @@ public class Inquiry {
 
     @Column(name = "content", length = 2000, nullable = false)
     private String content;
+
+    @Column(name = "email", length = 100, nullable = false)
+    private String email;
 
     @Column(name = "group_admin", nullable = false)
     @Enumerated(EnumType.STRING)

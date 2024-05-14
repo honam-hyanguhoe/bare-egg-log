@@ -2,8 +2,22 @@ package org.egglog.api.testdata;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.egglog.api.security.model.dto.request.LoginRequest;
-import org.egglog.api.security.model.service.AuthService;
+import org.egglog.api.group.exception.GroupErrorCode;
+import org.egglog.api.group.exception.GroupException;
+import org.egglog.api.group.model.dto.request.GroupForm;
+import org.egglog.api.group.model.dto.request.InvitationAcceptForm;
+import org.egglog.api.group.model.entity.Group;
+import org.egglog.api.group.model.entity.GroupMember;
+import org.egglog.api.group.model.entity.InvitationCode;
+import org.egglog.api.group.model.service.GroupMemberService;
+import org.egglog.api.group.model.service.GroupService;
+import org.egglog.api.group.repository.jpa.GroupRepository;
+import org.egglog.api.group.repository.redis.GroupInvitationRepository;
+import org.egglog.api.security.model.dto.response.TokenResponse;
+import org.egglog.api.security.model.service.TokenService;
+import org.egglog.api.testdata.dto.request.TestLoginRequest;
+import org.egglog.api.user.exception.UserErrorCode;
+import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.dto.request.JoinUserRequest;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.model.entity.enums.AuthProvider;
@@ -17,12 +31,12 @@ import org.egglog.api.work.model.service.WorkService;
 import org.egglog.api.worktype.model.dto.response.WorkTypeResponse;
 import org.egglog.api.worktype.model.service.WorkTypeService;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * ```
@@ -44,6 +58,69 @@ public class TestService {
     private final UserJpaRepository userJpaRepository;
     private final WorkService workService;
     private final WorkTypeService workTypeService;
+    private final TokenService tokenService;
+    private final GroupRepository groupRepository;
+    private final GroupMemberService groupMemberService;
+    private final GroupInvitationRepository groupInvitationRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public void testDeleteUser(User user){
+
+    }
+
+
+
+    @Transactional
+    public void giveGroupUsers(InvitationAcceptForm request){
+        List<User> mockUsers = userJpaRepository.findListByEggLogWithHospital();
+        // 목록의 수가 10개 초과인 경우에만 셔플 후 상위 10개 선택
+        if (mockUsers.size() > 10) {
+            Collections.shuffle(mockUsers);  // 목록 셔플
+            mockUsers = mockUsers.subList(0, 10);  // 상위 10개 요소 추출
+        }
+        for (User mockUser : mockUsers) {
+            //존재하지 않는 코드는 exception 처리
+            InvitationCode invitationCode = groupInvitationRepository
+                    .findInvitationCodeByCode(request.getInvitationCode())
+                    .orElseThrow(() -> new GroupException(GroupErrorCode.NOT_FOUND_INVITATION));
+            //password 검증
+            //만약 password가 동일하다면 초대 수락
+            if(passwordEncoder.matches(request.getPassword(), invitationCode.getPassword())){
+                Group group = groupRepository
+                        .findById(invitationCode.getGroupId())
+                        .orElseThrow(() -> new GroupException(GroupErrorCode.NOT_FOUND));
+                //이미 그룹원이라면 추가하지 않는다.
+                if(groupMemberService.isGroupMember(group.getId(), mockUser.getId())) continue;
+                GroupMember newMember = GroupMember.builder()
+                        .group(group)
+                        .user(mockUser)
+                        .isAdmin(false)
+                        .build();
+                groupMemberService.createGroupMember(newMember);
+            }else{
+                throw new GroupException(GroupErrorCode.NOT_MATCH_INVITATION);
+            }
+        }
+    }
+
+
+    public TokenResponse testLogin(TestLoginRequest request, AuthProvider provider){
+        log.debug(" ==== ==== ==== [test login 서비스 실행] ==== ==== ====");
+        //회원 가입 일 경우
+        Optional<User> optionalUser = userJpaRepository.findByEmailWithHospital(request.getEmail());
+        if (optionalUser.isPresent()){
+            //로그인인 경우
+            User user = optionalUser.get();
+            if (user.getUserStatus()!= UserStatus.ACTIVE) throw new UserException(UserErrorCode.DELETED_USER);
+            userJpaRepository.save(user.doLogin());
+            return tokenService.generatedToken(user.getId(), user.getUserRole().name());
+        }
+        else {
+            //회원가입일 경우
+            User saveUser = userJpaRepository.save(request.toEntity(provider));
+            return tokenService.generatedToken(saveUser.getId(), saveUser.getUserRole().name());
+        }
+    }
     public List<User> createUserMockData(){
         List<User> users = userJpaRepository.saveAll(makeUsers());
         Long hospitalId = 1L;
@@ -55,7 +132,6 @@ public class TestService {
             userService.joinUser(user, JoinUserRequest.builder()
                     .userName(user.getName())
                     .empNo("TEST-"+cnt)
-                    .fcmToken(UUID.randomUUID().toString())
                     .hospitalId(hospitalId).build());
             log.debug("user = {}", user);
             log.debug("=====end user Join=====");

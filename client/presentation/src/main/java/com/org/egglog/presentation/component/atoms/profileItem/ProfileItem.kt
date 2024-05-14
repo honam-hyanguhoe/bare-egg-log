@@ -1,5 +1,6 @@
 package com.org.egglog.presentation.component.atoms.profileItem
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,11 +37,12 @@ fun ProfileItem(profile: Profile, type: String, createdAt: String ?= null)  {
     }
 
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier
+        Box(
+            Modifier
                 .size(40.widthPercent(LocalContext.current).dp)
                 .background(
-                        if (itemType.equals("post")) Gray200 else Color.Transparent,
-                        shape = CircleShape
+                    if (itemType.equals("post")) Gray200 else Color.Transparent,
+                    shape = CircleShape
                 ),
                 contentAlignment = Alignment.Center) {
             LocalImageLoader(imageUrl = R.drawable.dark, Modifier.size(20.widthPercent(LocalContext.current).dp))
@@ -53,11 +56,19 @@ fun ProfileItem(profile: Profile, type: String, createdAt: String ?= null)  {
                         color = NaturalBlack,
                         style = if (itemType == "post") Typography.displayLarge else Typography.bodyLarge
                 )
+                if(profile.userId == profile.commentUserId) {
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(text = "(나)", color = BlueGray400, style = Typography.displayLarge.copy(fontWeight = FontWeight.SemiBold))
+                }
                 if(itemType.equals("post")) {
                     if (profile.isAuth != null && profile.isAuth) {
                         Spacer(modifier = Modifier.width(10.dp))
-                        Box(Modifier
-                                .background(Warning300, RoundedCornerShape(20.widthPercent(LocalContext.current).dp))
+                        Box(
+                            Modifier
+                                .background(
+                                    Warning300,
+                                    RoundedCornerShape(20.widthPercent(LocalContext.current).dp)
+                                )
                                 .padding(horizontal = 8.widthPercent(LocalContext.current).dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 LocalImageLoader(imageUrl = R.drawable.small_fry, Modifier.size(12.widthPercent(LocalContext.current).dp))
@@ -90,7 +101,7 @@ fun ProfileItem(profile: Profile, type: String, createdAt: String ?= null)  {
 fun Preview() {
     ClientTheme {
         Column {
-            val profile = Profile(1,"익명의 구운란1", "전남대병원", true)
+            val profile = Profile(1,"익명의 구운란1", "전남대병원", true, 1)
             ProfileItem(profile = profile, type = "post")
 
             val profile2 = Profile(1,"익명의 구운란1", "전남대병원", false)

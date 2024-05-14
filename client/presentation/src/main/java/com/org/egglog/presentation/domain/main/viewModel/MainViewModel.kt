@@ -6,8 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
 import com.org.egglog.domain.main.usecase.GetWeeklyWorkUseCase
-import com.org.egglog.presentation.domain.community.posteditor.viewmodel.PostSideEffect
-import com.org.egglog.presentation.domain.community.posteditor.viewmodel.PostState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableSharedFlow

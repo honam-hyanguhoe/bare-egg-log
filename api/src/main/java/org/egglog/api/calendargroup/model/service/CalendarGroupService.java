@@ -19,6 +19,7 @@ import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.user.repository.jpa.UserJpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -55,9 +56,13 @@ public class CalendarGroupService {
      * @param loginUser
      * @author 김형민
      */
+    @Transactional
     public void deleteCalendarGroup(Long calendarGroupId, User loginUser) {
         log.debug(" ==== ==== ==== [ 캘린더 그룹 삭제 서비스 실행 ] ==== ==== ====");
-        if (loginUser.getWorkGroupId()==calendarGroupId) throw new CalendarGroupException(CalendarGroupErrorCode.NOT_CONTROL_WORKGROUP);
+        log.debug(" ==== ==== ==== [ calendarGroupId = {} loginUser.getWorkGroupId() = {} ] ==== ==== ==== ",calendarGroupId, loginUser.getWorkGroupId());
+        log.debug(" ==== ==== ==== [ loginUser.getWorkGroupId() == calendarGroupId = {}  ==== ==== ==== ", loginUser.getWorkGroupId() == calendarGroupId);
+        log.debug(" ==== ==== ==== [ loginUser.getWorkGroupId().equal(calendarGroupId) = {}  ==== ==== ==== ", loginUser.getWorkGroupId().equals(calendarGroupId));
+        if (loginUser.getWorkGroupId().equals(calendarGroupId)) throw new CalendarGroupException(CalendarGroupErrorCode.NOT_CONTROL_WORKGROUP);
         CalendarGroup calendarGroup = calendarGroupRepository.findCalendarGroupWithUserById(calendarGroupId)
                 .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
         if (calendarGroup.getUser().equals(loginUser)) throw new UserException(UserErrorCode.ACCESS_DENIED);

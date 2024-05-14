@@ -31,11 +31,12 @@ import java.util.Calendar
 
 @Composable
 fun MonthlyCalendar(
-        currentYear: MutableState<Int>,
-        currentMonth: MutableState<Int>,
+        currentYear: Int,
+        currentMonth: Int,
         onDateClicked: (Int) -> Unit,
-        onPrevMonthClick: () -> Int,
-        onNextMonthClick: () -> Int
+        onPrevMonthClick: () -> Unit,
+        onNextMonthClick: () -> Unit,
+        selectedDate: Int
 ) {
 
 
@@ -44,16 +45,16 @@ fun MonthlyCalendar(
     ) {
         CalendarHeader(currentYear, currentMonth, onPrevMonthClick, onNextMonthClick)
         Spacer(modifier = Modifier.height(16.dp))
-        DayList(currentYear, currentMonth, onDateClicked = onDateClicked) // 콜백 전달
+        DayList(currentYear, currentMonth, onDateClicked = onDateClicked, selectedDate) // 콜백 전달
     }
 }
 
 @Composable
 fun CalendarHeader(
-        year: MutableState<Int>,
-        month: MutableState<Int>,
-        onPrevMonthClick: () -> Int,
-        onNextMonthClick: () -> Int
+        year: Int,
+        month: Int,
+        onPrevMonthClick: () -> Unit,
+        onNextMonthClick: () -> Unit
 ) {
     val nameList = listOf("일", "월", "화", "수", "목", "금", "토")
 
@@ -66,7 +67,7 @@ fun CalendarHeader(
             IconButton(onClick = { onPrevMonthClick() }) {
                 Icon(imageVector = ArrowLeft, modifier = Modifier.size(20.dp))
             }
-            Text(text = "${year.value}년 ${month.value}월")
+            Text(text = "${year}년 ${month}월")
             IconButton(onClick = { onNextMonthClick() }) {
                 Icon(imageVector = ArrowRight, modifier = Modifier.size(20.dp))
             }
@@ -92,17 +93,17 @@ fun CalendarHeader(
 
 @Composable
 fun DayList(
-        currentYear: MutableState<Int>,
-        currentMonth: MutableState<Int>,
-        onDateClicked: (Int) -> Unit
+        currentYear: Int,
+        currentMonth: Int,
+        onDateClicked: (Int) -> Unit,
+        selectedDate: Int
 ) {
     val time = remember { mutableStateOf(Calendar.getInstance()) }
     val date = time.value
-    val selectedDate = remember { mutableStateOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH)) }
 
     // 시간 세팅
-    date.set(Calendar.YEAR, currentYear.value)
-    date.set(Calendar.MONTH, currentMonth.value - 1)
+    date.set(Calendar.YEAR, currentYear)
+    date.set(Calendar.MONTH, currentMonth - 1)
     date.set(Calendar.DAY_OF_MONTH, 1)
 
     // 이번달 정보
@@ -120,7 +121,7 @@ fun DayList(
             Row {
                 repeat(7) { day ->
                     val resultDay = week * 7 + day - thisMonthFirstDay + 1
-                    val isSelected = selectedDate.value == resultDay
+                    val isSelected = selectedDate == resultDay
                     val dayOfWeek = (day + 1) % 7
 
                     if (resultDay in 1..thisMonthDayMax) {
@@ -130,7 +131,6 @@ fun DayList(
                                         .weight(1f)
                                         .height(70.dp)
                                         .clickable {
-                                            selectedDate.value = resultDay
                                             onDateClicked(resultDay)
                                         }
                                         .background(
@@ -154,8 +154,8 @@ fun DayList(
                                         }
                                 )
                                 Spacer(modifier = Modifier.height(5.dp))
-                                Labels(text = "Night")
-                                Text(text = "··")
+//                                Labels(text = "EVE")
+//                                Text(text = "··")
                             }
                         }
                     } else {
@@ -185,8 +185,8 @@ fun DayList(
                                         style = Typography.displayMedium
                                 )
                                 Spacer(modifier = Modifier.height(5.dp))
-                                Labels(text = "Night")
-                                Text(text = "·")
+//                                Labels(text = "NIGHT")
+//                                Text(text = "·")
                             }
                         }
                     }

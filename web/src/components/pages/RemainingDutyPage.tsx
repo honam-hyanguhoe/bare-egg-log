@@ -2,66 +2,54 @@ import React, { useRef, useEffect, useState, useMemo } from "react";
 import styled from "styled-components";
 import RemainingDutyGraph from "../atoms/RemainingDutyGraph";
 
+declare global {
+  interface Window {
+    receiveDataFromApp: (data: string) => void;
+  }
+}
+
 interface TreeNode {
   name: string;
   remain?: number;
   value?: number;
-  children?: TreeNode[];
   colname?: string;
   color?: string;
+  children?: TreeNode[];
 }
 
-const remainingDuty = [
-  { name: "Day", value: 0, color: "#18C5B5" },
-  { name: "Eve", value: 0, color: "#F4D567" },
-  { name: "Night", value: 0, color: "#485E88" },
-  { name: "Off", value: 0, color: "#9B8AFB" },
-  { name: "Vacation", value: 0, color: "#FDA29B" },
-  { name: "Edu", value: 0, color: "#98A2B3" },
-];
+// TreeNode 데이터에 대한 초기 상태 설정
+const initialData: TreeNode = {
+  name: "duty",
+  colname: "duty-column",
+  color: "white",
+  remain: 0,
+  children: [
+    { name: "Day", value: 3, color: "#18C5B5" },
+    { name: "Eve", value: 2, color: "#F4D567" },
+    { name: "Night", value: 1, color: "#485E88" },
+    { name: "Off", value: 4, color: "#9B8AFB" },
+  ],
+};
 
 const RemainingDutyPage = () => {
-  const initialData: TreeNode = {
-    name: "duty",
-    children: remainingDuty,
-    colname: "duty-column",
-    color: "white",
-    remain: 0,
-  };
+  const [duty, setDuty] = useState<TreeNode>(initialData);
 
-  const [data, setData] = useState<TreeNode>(initialData);
+  window.receiveDataFromApp = (data: string) => {
+    delete (window as any).receiveDataFromApp;
+    console.log("remain Data received: " + data);
 
-  // useEffect(() => {
-  //   const updateData = () => {
-  //     const newData: TreeNode = {
-  //       name: "duty",
-  //       children: [
-  //         { name: "Day", value: getRandomValues(), color: "#18C5B5" },
-  //         { name: "Eve", value: getRandomValues(), color: "#F4D567" },
-  //         { name: "Night", value: getRandomValues(), color: "#485E88" },
-  //         { name: "Off", value: getRandomValues(), color: "#9B8AFB" },
-  //         { name: "휴가", value: getRandomValues(), color: "#FDA29B" },
-  //         { name: "Edu", value: getRandomValues(), color: "#98A2B3" },
-  //       ],
-  //       colname: "duty-column",
-  //       color: "white",
-  //       remain: 0,
-  //     };
-  //     setData(newData);
-  //   };
+    setDuty((prevData) => ({
+      ...prevData,
+      children: JSON.parse(data),
+    }));
 
-  //   // const interval = setInterval(updateData, 2000);
-
-  //   // return () => clearInterval(interval);
-  // }, []);
-  const getRandomValues = () => {
-    return Math.floor(Math.random() * 8);
+    return `remainData in web ${JSON.stringify(data)}`;
   };
 
   return (
     <GraphContainer>
-      {/* <GraphTitle>제 근무는 언제 끝나죠?</GraphTitle> */}
-      <RemainingDutyGraph data={data} />
+      {/* <GraphTitle id="title">{JSON.stringify(duty)}</GraphTitle> */}
+      <RemainingDutyGraph data={duty} />
     </GraphContainer>
   );
 };
@@ -69,6 +57,7 @@ const RemainingDutyPage = () => {
 export default RemainingDutyPage;
 
 const GraphContainer = styled.div`
+  max-height: 100vh;
   min-height: 100vh;
   background-color: #f2f4f7;
 `;
@@ -79,3 +68,41 @@ const GraphTitle = styled.p`
   color: #333;
   margin-bottom: 20px;
 `;
+
+// useEffect(() => {
+//   const data = `[{
+//       "name": "DAY",
+//       "value": 1,
+//       "color": "#18C5B5"
+//     }, {
+//       "name": "OFF",
+//       "value": 3,
+//       "color": "#9B8AFB"
+//     }]`;
+//   const tempData: TreeNode[] = JSON.parse(data);
+//   updateData(tempData);
+// }, []);
+
+// useEffect(() => {
+//   const handleDataReceive = (data: string) => {
+//     console.log("Data received: " + data);
+
+//     try {
+//       const newChildren = JSON.parse(data);
+//       setDuty((prevData) => ({
+//         ...prevData,
+//         children: newChildren,
+//       }));
+//     } catch (error) {
+//       console.error("Failed to parse incoming data", error);
+//     }
+//   };
+
+//   window.receiveDataFromApp = handleDataReceive;
+
+//   return () => {
+
+//       delete window.receiveDataFromApp;
+
+//   };
+// }, []);

@@ -44,6 +44,7 @@ import org.egglog.api.worktype.model.entity.WorkType;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 //import java.util.TimeZone;
 import java.time.format.DateTimeFormatter;
@@ -206,6 +207,60 @@ public class CalendarService {
         }
         return blobPath;
     }
+
+
+    /**
+     * 캘린더 startDate - endDate 조회
+     * 개인 일정 + 근무 일정
+     * @param calendarMonthRequest
+     * @param user
+     * @return
+     */
+    public List<CalendarListResponse> getCalendarList(CalendarMonthRequest calendarMonthRequest, User user) {
+        Map<LocalDate, CalendarListResponse> dailySchedules = new HashMap<>();
+
+        CalendarListResponse calendarListResponse = getCalendarListByMonth(calendarMonthRequest, user);
+        List<EventListOutputSpec> eventList = calendarListResponse.getEventList();
+        WorkListResponse workListResponse = calendarListResponse.getWorkList();
+
+        if (!eventList.isEmpty()) {
+            for (EventListOutputSpec event : eventList) {
+                LocalDate eventStart = event.getStartDate().toLocalDate();
+                LocalDate eventEnd = event.getEndDate().toLocalDate();
+
+                eventStart.datesUntil(eventEnd.plusDays(1)).forEach(date -> {
+                    CalendarListResponse schedule = dailySchedules.get(date);
+                    if (schedule == null) {
+                        schedule = new CalendarListResponse(date);
+                        dailySchedules.put(date, schedule);
+                    }
+                    schedule.addEvent(event);
+                });
+            }
+        }
+        if (workListResponse != null) {
+            List<WorkResponse> workList = workListResponse.getWorkList();
+            CalendarGroupResponse calendarGroup = workListResponse.getCalendarGroup();
+
+            for (WorkResponse work : workList) {
+                LocalDate date = work.getWorkDate();    //근무하는 날짜
+                CalendarListResponse schedule = dailySchedules.get(date);
+                if (schedule == null) {
+                    schedule = new CalendarListResponse(date);
+                    dailySchedules.put(date, schedule);
+                }
+                schedule.addCalendarGroup(calendarGroup);
+                schedule.addWorkToWorkList(work);
+                schedule.setCalendarGroupId(calendarGroup.getCalendarGroupId());
+            }
+        }
+        List<CalendarListResponse> result = new ArrayList<>();
+        for (CalendarListResponse value : dailySchedules.values()) {
+            result.add(value);
+        }
+        return result;
+    }
+
     /**
      * 한달 조회
      * 개인 일정 + 근무
@@ -213,7 +268,7 @@ public class CalendarService {
      * @param calendarMonthRequest
      * @return
      */
-    public CalendarListResponse getCalendarListByMonth(CalendarMonthRequest calendarMonthRequest, User user) {
+    private CalendarListResponse getCalendarListByMonth(CalendarMonthRequest calendarMonthRequest, User user) {
         LocalDateTime startDate = calendarMonthRequest.getStartDate();
         LocalDateTime endDate = calendarMonthRequest.getEndDate();
         Long calendarGroupId = calendarMonthRequest.getCalendarGroupId();

@@ -22,12 +22,14 @@ fun Dialog(
     onConfirmation: () -> Unit,
     dialogTitle: String,
     dialogText: String,
+    enabled: Boolean = true
 ) {
     AlertDialog(
         modifier = Modifier.fillMaxWidth(),
         onDismissRequest = { onDismissRequest() },
         confirmButton = {
             BasicButton(
+                enabled = enabled,
                 onClick = { onConfirmation() },
                 modifier = Modifier.fillMaxWidth(0.485f),
                 colors = ButtonColors(contentColor = NaturalWhite, containerColor = Warning300, disabledContentColor = NaturalWhite, disabledContainerColor = Gray300),

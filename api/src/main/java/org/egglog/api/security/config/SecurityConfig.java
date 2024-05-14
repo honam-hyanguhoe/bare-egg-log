@@ -29,7 +29,7 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig{
-    private static final String[] ALLOWED_URIS = {"/v1/hospital/list", "/v1/auth/login/**", "/v1/auth/refresh", "/test/**", "/swagger-ui/**", "/login/oauth2/code/**", "/oauth2/**", "/v3/api-docs/**", "/actuator/prometheus", "/actuator/metrics"};
+    private static final String[] ALLOWED_URIS = {"/v1/hospital/list", "/v1/auth/login/**", "/v1/auth/refresh", "/test/**", "/swagger-ui/**", "/login/oauth2/code/**", "/oauth2/**", "/v3/api-docs/**", "/actuator/prometheus", "/actuator/metrics", "/v1/logger/**"};
     private final JwtFilter jwtFilter;
     private final CustomOAuth2Service customOAuth2Service;
     private final OAuthSuccessHandler oAuth2SuccessHandler;
@@ -54,25 +54,25 @@ public class SecurityConfig{
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)// JwtFilter 추가
                 .addFilterBefore(exceptionHandlerFilter, JwtFilter.class) // ExceptionHandlerFilter 추가
-                .addFilterAfter(joinExceptionFilter, JwtFilter.class)
-                .oauth2Login(customizer ->
-                        customizer
+                .addFilterAfter(joinExceptionFilter, JwtFilter.class);
+//                .oauth2Login(customizer ->
+//                        customizer
 //                                .authorizationEndpoint(authorization -> authorization
 //                                        .baseUri("/oauth2/authorization")
 //                                        .authorizationRequestRepository(this.authorizationRequestRepository())
 //                                )
-                                .redirectionEndpoint(redirection -> redirection
-                                        .baseUri("/*/oauth2/code/*")
-                                )
-                                .userInfoEndpoint(userInfoEndpoint ->
-                                        userInfoEndpoint.userService(customOAuth2Service))
-                                .successHandler(oAuth2SuccessHandler)
-                                .failureHandler(authFailureHandler)
-                )
-                .exceptionHandling(exceptionHandling ->
-                        exceptionHandling
-                                .authenticationEntryPoint(authFailureHandler)
-                );
+//                                .redirectionEndpoint(redirection -> redirection
+//                                        .baseUri("/*/oauth2/code/*")
+//                                )
+//                                .userInfoEndpoint(userInfoEndpoint ->
+//                                        userInfoEndpoint.userService(customOAuth2Service))
+//                                .successHandler(oAuth2SuccessHandler)
+//                                .failureHandler(authFailureHandler)
+//                );
+//                .exceptionHandling(exceptionHandling ->
+//                        exceptionHandling
+//                                .authenticationEntryPoint(authFailureHandler)
+//                );
 
 
         return http.build();

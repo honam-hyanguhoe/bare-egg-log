@@ -1,6 +1,7 @@
 package org.egglog.api.hospital.model.dto.request;
 
 import jakarta.persistence.Column;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 /**
@@ -20,6 +21,8 @@ import lombok.*;
 @Setter
 @Builder
 public class CreateHospitalAuthRequest {
+    @NotBlank(message = "간호사 인증 파일은 필수입니다.")
     private String nurseCertificationImgUrl;
+    @NotBlank(message = "병원 재직 인증 파일은 필수입니다.")
     private String hospitalCertificationImgUrl;
 }

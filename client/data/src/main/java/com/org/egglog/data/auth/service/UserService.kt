@@ -18,8 +18,8 @@ interface UserService {
     @POST("auth/login/{provider}")
     @Headers("Content-Type:application/json; charset=UTF8")
     suspend fun login(
-        @Path("provider") type: String,
-        @Body requestBody: RequestBody
+        @Header("accessToken") authToken: String,
+        @Path("provider") provider: String
     ): CommonResponse<TokenResponse?>
 
     @GET("user/find")
@@ -31,6 +31,7 @@ interface UserService {
     @PATCH("user/join")
     @Headers("Content-Type:application/json; charset=UTF8")
     suspend fun join(
+        @Header("Authorization") accessToken: String,
         @Body requestBody: RequestBody
     ): CommonResponse<UserResponse?>
 

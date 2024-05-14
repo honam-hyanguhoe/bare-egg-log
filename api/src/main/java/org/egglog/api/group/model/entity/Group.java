@@ -10,10 +10,12 @@ import org.egglog.api.group.model.dto.response.GroupSimpleDto;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "`Groups`")
 public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     @Column(name = "group_id")
     private Long id;
 
@@ -26,13 +28,20 @@ public class Group {
     @Column(name = "group_password",nullable = false)
     private String password;
 
-    @Column(name = "group_admin", nullable = false)
-    private String admin;
+    @JoinColumn(name = "group_admin_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private GroupMember admin;
 
     public GroupSimpleDto toSimpleDto(){
         GroupSimpleDto simpleDto = new GroupSimpleDto();
         simpleDto.setGroupId(this.id);
         simpleDto.setGroupName(this.groupName);
         return simpleDto;
+    }
+
+    public Group update(String groupName, String password){
+        this.groupName = groupName==null||groupName.isEmpty() ? this.groupName : groupName;
+        this.password = password==null||password.isEmpty() ? this.password : password;
+        return this;
     }
 }

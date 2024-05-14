@@ -202,13 +202,13 @@ internal data class DayOfMonth(
     val index: Int
 )
 
-private data class Month(
+data class Month(
     val text: String,
     val value: Int,
     val index: Int
 )
 
-private data class Year(
+data class Year(
     val text: String,
     val value: Int,
     val index: Int

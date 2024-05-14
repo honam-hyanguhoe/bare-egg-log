@@ -1,14 +1,19 @@
 package org.egglog.api.hospital.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.hospital.model.dto.request.CreateHospitalAuthRequest;
+import org.egglog.api.hospital.model.dto.response.HospitalAuthListResponse;
+import org.egglog.api.hospital.model.dto.response.HospitalAuthResponse;
 import org.egglog.api.hospital.model.service.HospitalAuthService;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.utility.utils.MessageUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 /**
@@ -41,9 +46,9 @@ public class HospitalAuthController {
      * @return
      */
     @PostMapping("/create")
-    public ResponseEntity<MessageUtils> createAuth(
+    public ResponseEntity<MessageUtils<HospitalAuthResponse>> createAuth(
             @AuthenticationPrincipal User loginUser,
-            @RequestBody CreateHospitalAuthRequest request
+            @RequestBody @Valid CreateHospitalAuthRequest request
             ){
         return ResponseEntity.ok().body(
                 MessageUtils.success(hospitalAuthService.createHospitalAuth(loginUser, request)));
@@ -57,7 +62,7 @@ public class HospitalAuthController {
      * @return
      */
     @GetMapping("/list/{authType}")
-    public ResponseEntity<MessageUtils> findAuthList(
+    public ResponseEntity<MessageUtils<List<HospitalAuthListResponse>>> findAuthList(
             @AuthenticationPrincipal User adminUser,
             @PathVariable Boolean authType
 
@@ -73,7 +78,7 @@ public class HospitalAuthController {
      * @return
      */
     @PatchMapping("/cert/{authHospitalId}")
-    public ResponseEntity<MessageUtils> cert(
+    public ResponseEntity<MessageUtils<HospitalAuthResponse>> cert(
             @AuthenticationPrincipal User adminUser,
             @PathVariable Long authHospitalId
     ){

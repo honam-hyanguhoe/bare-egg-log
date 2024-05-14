@@ -29,11 +29,14 @@ public class EditAndDeleteWorkRequest {
     @Positive(message = "정확한 ID 값을 입력 해주세요.")
     private Long workId;
 
+    @NotNull(message = "workDate 는 필수 입니다.")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate workDate;
 
     @NotNull(message = "workTypeId 는 필수 입니다.")
     @Positive(message = "정확한 ID 값을 입력 해주세요.")
     private Long workTypeId;
+
+    @NotNull(message = "null일 수 없습니다. 지울 값이면 T, 지우지 않을값이면 F를 넣어주세요.")
     private Boolean isDeleted;
 }

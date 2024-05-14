@@ -1,17 +1,21 @@
 package com.org.egglog.presentation.component.molecules.headers
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.org.egglog.presentation.R
@@ -22,6 +26,7 @@ import com.org.egglog.presentation.utils.Search
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.presentation.component.atoms.menus.ScrollableMenus
 import com.org.egglog.presentation.theme.*
+import com.org.egglog.presentation.utils.heightPercent
 
 @Composable
 fun NoticeHeader(
@@ -33,16 +38,20 @@ fun NoticeHeader(
     onClickNotification : () -> Unit = {},
     onClickMenus : () -> Unit = {},
     options: List<String> = listOf(""),
-    selectedOption: String?,
-    onSelect: (String) -> Unit = {}
+    selectedOption: String? = null,
+    onSelect: (String) -> Unit = {},
+    horizontalPadding : Int = 0,
+    verticalPadding : Int = 0
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(NaturalWhite),
-//            .border(1.dp, Success500)
+            .padding(horizontal = horizontalPadding.dp, vertical = verticalPadding.dp)
+            .background(NaturalWhite)
     ) {
-        Column {
+        Column (
+            modifier = Modifier.fillMaxWidth()
+        ){
             NoticeHeaderContents(
                 title = title,
                 hasSearch = hasSearch,
@@ -95,13 +104,12 @@ fun NoticeHeaderContents(
             } else {
                 Text(
                     text = title,
-                    style = Typography.bodyLarge,
+                    style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
                     color = NaturalBlack,
                     textAlign = TextAlign.Center,
                 )
 
                 if (hasMenu) {
-
                     ScrollableMenus(
                         iconShape = ArrowDown,
                         horizontalOffset = -80.dp,
@@ -118,14 +126,14 @@ fun NoticeHeaderContents(
         ) {
             if (hasSearch) {
                 CustomIconButton(
-                    size = 25.dp,
+                    size = 35.dp,
                     imageVector = Search,
                     color = NaturalBlack,
                     onClick = onClickSearch
                 )
             }
             CustomIconButton(
-                size = 25.dp,
+                size = 35.dp,
                 imageVector = Notification,
                 color = NaturalBlack,
                 onClick = onClickNotification

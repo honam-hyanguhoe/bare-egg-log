@@ -39,8 +39,7 @@ class SettingViewModel @Inject constructor(
     private val getTokenUseCase: GetTokenUseCase,
     private val postLogoutUseCase: PostLogoutUseCase,
     private val deleteTokenUseCase: DeleteTokenUseCase,
-    private val deleteUserStoreUseCase: DeleteUserStoreUseCase,
-    private val getUserStoreUseCase: GetUserStoreUseCase
+    private val deleteUserStoreUseCase: DeleteUserStoreUseCase
 ): ViewModel(), ContainerHost<SettingState, SettingSideEffect>{
     override val container: Container<SettingState, SettingSideEffect> = container(
         initialState = SettingState(),
@@ -48,28 +47,49 @@ class SettingViewModel @Inject constructor(
             this.exceptionHandler = CoroutineExceptionHandler { _, throwable ->
                 intent {
                     postSideEffect(SettingSideEffect.Toast(message = throwable.message.orEmpty()))
+                    reduce {
+                        state.copy(logoutEnabled = true)
+                    }
                 }
             }
         }
     )
 
     fun onClickLogout() = intent {
+        reduce {
+            state.copy(logoutEnabled = false)
+        }
         val tokens = getTokenUseCase()
-        postLogoutUseCase(tokens.first ?: "")
+        postLogoutUseCase("Bearer ${tokens.first.orEmpty()}")
         deleteTokenUseCase()
         deleteUserStoreUseCase()
         postSideEffect(SettingSideEffect.NavigateToLoginActivity)
+        reduce {
+            state.copy(logoutEnabled = true)
+        }
+    }
+
+    fun onSelectedIdx(selectedIdx: Int) = intent {
+        when(selectedIdx) {
+            0 -> postSideEffect(SettingSideEffect.Toast("출시 준비 중입니다."))
+            1 -> postSideEffect(SettingSideEffect.NavigateToGroupActivity)
+            2 -> postSideEffect(SettingSideEffect.NavigateToMainActivity)
+            3 -> postSideEffect(SettingSideEffect.Toast("출시 준비 중입니다."))
+        }
     }
 }
 
 
 @Immutable
 data class SettingState(
-    val user: UserDetail? = null,
+    val logoutEnabled: Boolean = true,
+    val selectedIdx: Int = 4
 )
 
 sealed interface SettingSideEffect {
     class Toast(val message: String): SettingSideEffect
     data object NavigateToMainActivity: SettingSideEffect
+    data object NavigateToCommunityActivity: SettingSideEffect
+    data object NavigateToGroupActivity: SettingSideEffect
     data object NavigateToLoginActivity: SettingSideEffect
 }
