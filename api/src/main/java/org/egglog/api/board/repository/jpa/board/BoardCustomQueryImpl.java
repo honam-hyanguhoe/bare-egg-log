@@ -168,7 +168,7 @@ public class BoardCustomQueryImpl implements BoardCustomQuery {
 
     public Optional<Board> findWithUserById(Long boardId) {
         return Optional.ofNullable(jpaQueryFactory
-                .select(board)
+                .selectFrom(board)
                 .leftJoin(board.user).fetchJoin()
                 .where(board.id.eq(boardId))
                 .fetchOne());
