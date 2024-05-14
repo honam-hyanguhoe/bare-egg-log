@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.egglog.api.group.exception.GroupMemberErrorCode;
 import org.egglog.api.group.exception.GroupMemberException;
 import org.egglog.api.group.model.dto.response.GroupDutySummary;
+import org.egglog.api.group.model.dto.response.GroupMemberDto;
 import org.egglog.api.group.model.entity.GroupMember;
 import org.egglog.api.group.repository.jpa.GroupMemberRepository;
 import org.springframework.stereotype.Service;
@@ -16,17 +17,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GroupMemberService {
     private final GroupMemberRepository groupMemberRepository;
-    public GroupMember getAdminMember(Long groupId) {
-        GroupMember boss = groupMemberRepository
+    public GroupMemberDto getAdminMember(Long groupId) {
+        return groupMemberRepository
                 .findGroupBossMemberByGroupId(groupId)
                 .orElseThrow(()->new GroupMemberException(GroupMemberErrorCode.NOT_FOUND));
-        return boss;
     }
 
-    public List<GroupMember> getGroupMeberList(Long groupId) {
-        List<GroupMember> groupMemberList = groupMemberRepository
-                .findGroupMemberByGroupId(groupId);
-        return groupMemberList;
+    public List<GroupMemberDto> getGroupMemberList(Long groupId) {
+        return groupMemberRepository.findGroupMemberByGroupId(groupId);
     }
 
     public GroupMember getGroupMember(Long groupId, Long userId) {

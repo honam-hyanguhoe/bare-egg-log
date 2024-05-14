@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -130,8 +131,8 @@ public class GroupService {
      */
     @Transactional
     public void deleteGroupMember(Long groupId, Long memberId, User user) {
-        GroupMember boss = groupMemberService.getAdminMember(groupId);
-        if(boss.getUser().equals(user)) {
+        GroupMemberDto boss = groupMemberService.getAdminMember(groupId);
+        if(Objects.equals(boss.getUserId(), user.getId())) {
             //그룹에 해당 멤버가 존재하는지 검증하고 삭제
             GroupMember member = groupMemberService.getGroupMember(groupId, memberId);
             groupMemberService.deleteGroupMember(member);
@@ -172,22 +173,18 @@ public class GroupService {
      */
     public GroupDto retrieveGroup(Long groupId, User user) {
         Group group = groupRepository.findById(groupId).orElseThrow(() -> new GroupException(GroupErrorCode.NOT_FOUND));
-        GroupMember boss = groupMemberService.getAdminMember(groupId);
+        GroupMemberDto boss = groupMemberService.getAdminMember(groupId);
         Boolean isBoss = false;
-        if(boss.getUser().getId() == user.getId()){
+        if(Objects.equals(boss.getUserId(), user.getId())){
             isBoss = true;
         }
-        List<GroupMemberDto> memberList = groupMemberService
-                .getGroupMeberList(groupId)
-                .stream()
-                .map(GroupMember::toDto)
-                .collect(Collectors.toList());
+        List<GroupMemberDto> memberList = groupMemberService.getGroupMemberList(groupId);
 
         return GroupDto.builder()
                 .id(groupId)
                 .groupImage(group.getGroupImage())
                 .groupName(group.getGroupName())
-                .admin(boss.toDto())
+                .admin(boss)
                 .isAdmin(isBoss)
                 .groupMembers(memberList)
                 .build();

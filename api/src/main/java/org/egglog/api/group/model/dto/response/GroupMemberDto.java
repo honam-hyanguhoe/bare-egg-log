@@ -18,4 +18,5 @@ public class GroupMemberDto {
     private String userName;
     private String profileImgUrl;
     private Boolean isAdmin;
+    private String hospitalName;
 }

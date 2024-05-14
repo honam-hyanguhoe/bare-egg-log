@@ -1,7 +1,8 @@
 package org.egglog.api.group.repository.jpa;
 
+import com.querydsl.core.Tuple;
 import org.egglog.api.group.model.dto.response.GroupDutySummary;
-import org.egglog.api.group.model.dto.response.GroupPreviewDto;
+import org.egglog.api.group.model.dto.response.GroupMemberDto;
 import org.egglog.api.group.model.entity.GroupMember;
 
 import java.time.LocalDate;
@@ -10,9 +11,9 @@ import java.util.Optional;
 
 
 public interface GroupMemberCustomQuery {
-    List<GroupMember> findGroupMemberByGroupId(Long groupId);
+    List<GroupMemberDto> findGroupMemberByGroupId(Long groupId);
 
-    Optional<GroupMember> findGroupBossMemberByGroupId(Long groupId);
+    Optional<GroupMemberDto> findGroupBossMemberByGroupId(Long groupId);
 
     Optional<GroupMember> findGroupMemberByGroupIdAndUserId(Long groupId, Long userId);
 
