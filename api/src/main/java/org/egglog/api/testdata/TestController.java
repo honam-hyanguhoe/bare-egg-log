@@ -77,4 +77,10 @@ public class TestController {
         testService.giveGroupUsers(request);
         return ResponseEntity.ok().body(MessageUtils.success((SuccessType.CREATE)));
     }
+
+    @PostMapping("/create/notification")
+    public ResponseEntity<MessageUtils> createNotification(){
+        testService.createNotification();
+        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
+    }
 }
