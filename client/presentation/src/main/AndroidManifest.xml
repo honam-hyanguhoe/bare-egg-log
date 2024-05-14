@@ -30,6 +30,9 @@
                 <data
                     android:host="oauth"
                     android:scheme="@string/kakao_redirection_scheme" />
+                <data
+                    android:scheme="egglog"
+                    android:host="honam.com" />
             </intent-filter>
         </activity>
 
