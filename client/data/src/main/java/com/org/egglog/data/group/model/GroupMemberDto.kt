@@ -11,12 +11,12 @@ data class GroupMemberDto(
     val groupId : Long,
     val userName : String,
     val profileImgUrl : String,
-    val isAdmin : Boolean
-
+    val isAdmin : Boolean,
+    val hospitalName : String
 )
 
 fun GroupMemberDto.toDomainModel() : GroupMember {
     return GroupMember(
-        userId, groupId, userName, profileImgUrl, isAdmin
+        userId, groupId, userName, profileImgUrl, isAdmin, hospitalName
     )
 }

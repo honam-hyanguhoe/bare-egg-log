@@ -8,5 +8,6 @@ data class GroupMember(
     val groupId : Long,
     val userName : String,
     val profileImgUrl : String,
-    val isAdmin : Boolean
+    val isAdmin : Boolean,
+    val hospitalName : String
 )

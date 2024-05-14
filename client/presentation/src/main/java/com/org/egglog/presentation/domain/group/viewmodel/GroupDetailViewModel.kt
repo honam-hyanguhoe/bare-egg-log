@@ -18,6 +18,7 @@ import com.org.egglog.domain.group.model.Admin
 import com.org.egglog.domain.group.model.Group
 import com.org.egglog.domain.group.model.GroupInfo
 import com.org.egglog.domain.group.model.Member
+import com.org.egglog.domain.group.usecase.DeleteMemberUseCase
 import com.org.egglog.domain.group.usecase.GetGroupDutyUseCase
 import com.org.egglog.domain.group.usecase.GetGroupInfoUseCase
 import com.org.egglog.domain.group.usecase.GetInvitationCodeUseCase
@@ -56,6 +57,7 @@ class GroupDetailViewModel @Inject constructor(
     private val getWeeklyWorkUseCase: GetWeeklyWorkUseCase,
     private val getMembersWorkUseCase: GetMembersWorkUseCase,
     private val updateGroupInfoUseCase: UpdateGroupInfoUseCase,
+    private val deleteMemberUseCase: DeleteMemberUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel(), ContainerHost<GroupDetailState, GroupDetailSideEffect> {
     override val container: Container<GroupDetailState, GroupDetailSideEffect> =
@@ -81,6 +83,7 @@ class GroupDetailViewModel @Inject constructor(
 //        getGroupDuty()
 //        getMyWork()
 //        initSelectedMembers()
+        Log.d("weekCal", "init ${state.startDate} ${state.currentWeekDays}")
     }
 
     fun initSelectedMembers() = intent {
@@ -171,6 +174,7 @@ class GroupDetailViewModel @Inject constructor(
         reduce {
             state.copy(myWorkList = scheduleWork)
         }
+        Log.d("weekCal", "${state.myWorkList}")
     }
 
 
@@ -203,6 +207,7 @@ class GroupDetailViewModel @Inject constructor(
             groupId = groupId
         ).getOrThrow()
 
+        Log.d("groupInfo", "result $result")
         reduce {
             state.copy(
                 groupInfo = result,
@@ -212,13 +217,15 @@ class GroupDetailViewModel @Inject constructor(
     }
 
     // 주간 달력 터치 & 함께 일하는 동료 조회
-    fun onPrevClick(localDate: LocalDate) = intent {
-        val finalStartDate = dataSource.getStartOfWeek(localDate)
-        val calendarUiModel: WeeklyUiModel =
-            dataSource.getData(
-                startDate = finalStartDate.minusDays(2),
-                lastSelectedDate = finalStartDate
-            )
+    fun onPrevClick(clickedDate: LocalDate) = intent {
+        val finalStartDate = dataSource.getStartOfWeek(clickedDate)
+//        val calendarUiModel: WeeklyUiModel =
+//            dataSource.getData(
+//                startDate = finalStartDate.minusDays(2),
+//                lastSelectedDate = finalStartDate
+//            )
+        val calendarUiModel = dataSource.getData(startDate = finalStartDate, lastSelectedDate = finalStartDate)
+
         reduce {
             state.copy(
                 currentWeekDays = calendarUiModel,
@@ -228,9 +235,25 @@ class GroupDetailViewModel @Inject constructor(
                 groupWorkList = emptyMap()
             )
         }
+        Log.d("weekCal", "${state.startDate} ${state.endDate}")
         getGroupDuty()
+
+        val userName = getUserStoreUseCase()!!.userName
+
+//        Log.d("weekCal", "myWork ${state.myWorkList} ${clickedDate.toString()}")
+//        val todayWork = state.myWorkList[userName]?.get(clickedDate.toString()) ?: "NONE"
+//        Log.d("weekCal", "works $todayWork  ${state.myWorkList[userName]?.get("2024-05-05")}")
+//
+//        if(todayWork == "NONE"){
+//            setSelected("Day")
+//        }else{
+//            setSelected(capitalizeFirstLetter(todayWork))
+//        }
     }
 
+    fun capitalizeFirstLetter(input: String): String {
+        return input.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+    }
 
     fun onDateClick(date: WeeklyUiModel.Date) = intent {
         reduce {
@@ -247,22 +270,25 @@ class GroupDetailViewModel @Inject constructor(
                 groupWorkList = emptyMap()
             )
         }
+        Log.d("weekCal", "${state.currentWeekDays}")
         getGroupDuty()
     }
 
     fun onNextClick(localDate: LocalDate) = intent {
-        val finalStartDate = dataSource.getEndOfWeek(localDate)
-        val calendarUiModel: WeeklyUiModel =
-            dataSource.getData(
-                startDate = finalStartDate,
-                lastSelectedDate = finalStartDate.plusDays(1)
-            )
+        val finalStartDate = dataSource.getEndOfWeek(localDate).plusDays(2)
+//        val calendarUiModel: WeeklyUiModel =
+//            dataSource.getData(
+//                startDate = finalStartDate,
+//                lastSelectedDate = finalStartDate.plusDays(1)
+//            )
+        val   calendarUiModel = dataSource.getData(startDate = finalStartDate, lastSelectedDate = finalStartDate.minusDays(1))
+//        Log.d("weekCal", "cum $calendarUiModel")
 
         reduce {
             state.copy(
                 currentWeekDays = calendarUiModel,
                 startDate = calendarUiModel.startDate.date,
-                endDate = finalStartDate.plusDays(7),
+                endDate = finalStartDate.plusDays(5),
                 selectedMembers = emptyList(),
                 groupWorkList = emptyMap()
             )
@@ -288,6 +314,7 @@ class GroupDetailViewModel @Inject constructor(
                 etc = result?.copy()?.etc ?: emptyList(),
             )
         }
+        Log.d("weekCal", "result $result")
         updateData()
     }
 
@@ -396,6 +423,34 @@ class GroupDetailViewModel @Inject constructor(
             )
         }
     }
+
+    // 그룹원 관리
+    fun onDelete(userId : Long) = intent {
+        val tokens = getTokenUseCase()
+        val result = deleteMemberUseCase(
+            accessToken = "Bearer ${tokens.first}",
+            groupId = groupId,
+            memberId = userId
+        )
+        if(result.isSuccess){
+            reduce {
+                state.copy(
+                    groupInfo = state.groupInfo.copy(
+                        groupMembers = state.groupInfo.groupMembers?.filter { it.userId != userId }
+                    )
+                )
+            }
+            Log.d("memberManageScreen", "groupMembers ${state.groupInfo.groupMembers}")
+            postSideEffect(GroupDetailSideEffect.Toast("멤버를 삭제하였습니다."))
+        }else{
+            postSideEffect(GroupDetailSideEffect.Toast("멤버 삭제에 실패하였습니다."))
+        }
+    }
+
+
+    fun onChangeLeader(userId : Long) = intent {
+
+    }
 }
 
 
@@ -411,7 +466,7 @@ data class GroupDetailState(
             groupId = 12,
             userName = "도",
             profileImgUrl = "https://ssl.pstatic.net/static/pwe/address/img_profile.png",
-            isAdmin = true
+            isAdmin = true,
         ),
         groupMembers = emptyList()
     ),
@@ -421,9 +476,10 @@ data class GroupDetailState(
 
     // 주간 달력 클릭
     val currentWeekDays: WeeklyUiModel = WeeklyDataSource().getData(
-        LocalDate.now().minusDays(1),
+        LocalDate.now(),
         LocalDate.now()
     ),
+
     val startDate: LocalDate = LocalDate.now(),
     val endDate: LocalDate = LocalDate.now(),
 

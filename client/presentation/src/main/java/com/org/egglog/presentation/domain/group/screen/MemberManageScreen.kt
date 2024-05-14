@@ -1,6 +1,7 @@
 package com.org.egglog.presentation.domain.group.screen
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +28,7 @@ import com.org.egglog.presentation.component.molecules.headers.BasicHeader
 import com.org.egglog.presentation.component.molecules.headers.SearchHeader
 import com.org.egglog.presentation.component.molecules.swiper.Swiper
 import com.org.egglog.presentation.domain.group.navigation.GroupRoute
+import com.org.egglog.presentation.domain.group.viewmodel.GroupDetailSideEffect
 import com.org.egglog.presentation.domain.group.viewmodel.GroupDetailViewModel
 import com.org.egglog.presentation.domain.group.viewmodel.MemberManageViewModel
 import com.org.egglog.presentation.theme.Indigo500
@@ -34,6 +36,7 @@ import com.org.egglog.presentation.theme.NaturalBlack
 import com.org.egglog.presentation.theme.NaturalWhite
 import com.org.egglog.presentation.utils.widthPercent
 import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
 fun MemberManageScreen(
@@ -41,12 +44,23 @@ fun MemberManageScreen(
     groupId: Long,
     onNavigateToGroupDetailScreen: (groupId: Long) -> Unit,
 ) {
+    val context = LocalContext.current
     val groupDetailState = groupDetailViewModel.collectAsState().value
+    groupDetailViewModel.collectSideEffect {
+            sideEffect ->
+        when(sideEffect){
+            is GroupDetailSideEffect.Toast -> Toast.makeText(
+                context,
+                sideEffect.message,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
 
     onNavigateToGroupDetailScreen
     MemberManageScreen(
         groupId = groupId,
-        onDelete = {},
+        onDelete = groupDetailViewModel::onDelete,
         onChangeLeader = {},
         onClickBack = { groupId: Long -> onNavigateToGroupDetailScreen(groupId) },
         members = groupDetailState.groupInfo.groupMembers ?: emptyList<GroupMember>()
@@ -56,7 +70,7 @@ fun MemberManageScreen(
 @Composable
 private fun MemberManageScreen(
     groupId: Long,
-    onDelete: () -> Unit,
+    onDelete: (Long) -> Unit,
     onChangeLeader: () -> Unit,
     onClickBack: (groupId: Long) -> Unit,
     members: List<GroupMember> = emptyList()
@@ -87,14 +101,10 @@ private fun MemberManageScreen(
                     .fillMaxWidth()
             ) {
                 items(
-                    listOf(
-                        Profile(1, "김싸피", "전남대학교병원"),
-                        Profile(1, "김싸피", "전남대학교병원"),
-                        Profile(1, "김싸피", "전남대학교병원")
-                    )
-                ) { profile ->
-                    Swiper(onDelete = onDelete, onChangeLeader = onChangeLeader) {
-                        ProfileItem(profile = profile, type = "basic")
+                  members
+                ) { member ->
+                    Swiper(onDelete = { onDelete(member.userId!!)}, onChangeLeader = onChangeLeader) {
+                        ProfileItem(profile = Profile(userId= member.userId!!, name = member.userName, hospital = member.hospitalName), type = "basic")
                     }
                 }
             }
@@ -107,10 +117,10 @@ private fun MemberManageScreen(
 @Preview
 @Composable
 private fun MemberManagePreviewScreen() {
-    MemberManageScreen(
-        groupId = 0,
-        onDelete = {},
-        onClickBack = {},
-        onChangeLeader = {},
-    )
+//    MemberManageScreen(
+//        groupId = 0,
+//        onDelete = {},
+//        onClickBack = {},
+//        onChangeLeader = {},
+//    )
 }

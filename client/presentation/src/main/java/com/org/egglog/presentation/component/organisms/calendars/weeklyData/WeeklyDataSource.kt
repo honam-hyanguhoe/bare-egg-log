@@ -31,16 +31,20 @@ class WeeklyDataSource {
     fun getEndOfWeek(date : LocalDate) : LocalDate {
         return date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY))
     }
-    // 시작 날짜(startDate)와 마지막으로 선택된 날짜(lastSelectedDate)를 인자로 받아, 그 주간의 날짜들과 UI 모델을 생성
-    // firstDayOfWeek는 startDate에서 일주일 전의 일요일을 계산하며, endDayOfWeek는 이 날짜로부터 일주일 후의 날짜
+
     fun getData(startDate: LocalDate = today, lastSelectedDate: LocalDate): WeeklyUiModel {
-        val firstDayOfWeek = startDate.with(DayOfWeek.SUNDAY)
+        val firstDayOfWeek :LocalDate
+        if(startDate.dayOfWeek.toString() == "SUNDAY"){
+            firstDayOfWeek = startDate
+        }else{
+            firstDayOfWeek = startDate.minusWeeks(1).with(DayOfWeek.SUNDAY)
+        }
         val endDayOfWeek = firstDayOfWeek.plusDays(7)
         val visibleDates = getDatesBetween(firstDayOfWeek, endDayOfWeek)
 
-        Log.d("groupDetail", "GetData $firstDayOfWeek  $endDayOfWeek  $visibleDates")
         return toUiModel(visibleDates, lastSelectedDate)
     }
+
 
     // 주어진 시작 날짜와 종료 날짜 사이의 모든 날짜를 리스트로 생성
     private fun getDatesBetween(startDate: LocalDate, endDate: LocalDate): List<LocalDate> {

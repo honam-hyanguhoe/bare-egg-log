@@ -1,5 +1,6 @@
 package com.org.egglog.data.group.service
 
+import androidx.room.Delete
 import com.org.egglog.data.group.model.GroupDutyResponse
 import com.org.egglog.data.group.model.GroupInfoResponse
 import com.org.egglog.data.group.model.GroupResponse
@@ -8,6 +9,7 @@ import com.org.egglog.data.main.model.WorkDTO
 import com.org.egglog.data.retrofit.CommonResponse
 import okhttp3.RequestBody
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
@@ -82,6 +84,15 @@ interface GroupService {
         @Path("group_id") groupId: Long,
         @Body requestBody: RequestBody
     ): CommonResponse<UpdateGroupInfoResponse>
+
+    @DELETE("groups/{group_id}/{member_id}")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun deleteMember(
+        @Header("Authorization") accessToken: String,
+        @Path("group_id") groupId: Long,
+        @Path("member_id") memberId: Long,
+    ): CommonResponse<String>
+
 
 }
 

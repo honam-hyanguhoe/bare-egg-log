@@ -33,7 +33,7 @@ fun Dialog(
                 onClick = { onConfirmation() },
                 modifier = Modifier.fillMaxWidth(0.485f),
                 colors = ButtonColors(contentColor = NaturalWhite, containerColor = Warning300, disabledContentColor = NaturalWhite, disabledContainerColor = Gray300),
-                shape = RoundedCornerShape(24.widthPercent(LocalContext.current).dp)
+                shape = RoundedCornerShape(12.widthPercent(LocalContext.current).dp)
             ) {
                 Text(text = "확인")
             }
@@ -43,7 +43,7 @@ fun Dialog(
                 onClick = { onDismissRequest() },
                 modifier = Modifier.fillMaxWidth(0.485f),
                 colors = ButtonColors(contentColor = NaturalWhite, containerColor = Gray300, disabledContentColor = NaturalWhite, disabledContainerColor = Gray300),
-                shape = RoundedCornerShape(24.widthPercent(LocalContext.current).dp)
+                shape = RoundedCornerShape(12.widthPercent(LocalContext.current).dp)
             ) {
                 Text(text = "취소")
             }

@@ -48,6 +48,7 @@ import com.org.egglog.presentation.component.atoms.buttons.GroupProfileButton
 import com.org.egglog.presentation.component.atoms.buttons.HalfBigButton
 import com.org.egglog.presentation.component.atoms.buttons.ThinButton
 import com.org.egglog.presentation.component.atoms.dialogs.BottomSheet
+import com.org.egglog.presentation.component.atoms.dialogs.Dialog
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.presentation.component.atoms.inputs.PassInput
 import com.org.egglog.presentation.component.atoms.inputs.SingleInput
@@ -200,7 +201,11 @@ private fun GroupDetailScreen(
                         }
                     }else if(it == "그룹원 설정"){
                         Log.d("screen", "그룹원 설정 페이지 이동")
-                        onClickManageMember(groupId)
+                        if(isAdmin){
+                            onClickManageMember(groupId)
+                        }else{
+                            Toast.makeText(context,"접근 권한이 없습니다.", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             )
@@ -236,7 +241,7 @@ private fun GroupDetailScreen(
             MemberCalendar(myWorkList = myWorkList, groupWorkList = groupWorkList)
         }
     }
-
+    
     if (showBottomSheet) {
         BottomSheet(
             height = 300.dp,
