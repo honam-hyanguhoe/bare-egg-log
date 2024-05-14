@@ -93,7 +93,9 @@ import java.util.Calendar
 @Composable
 fun MyCalendarScreen(
     viewModel: MyCalendarViewModel = hiltViewModel(),
-    onNavigateToExcelScreen: () -> Unit
+    onNavigateToExcelScreen: () -> Unit,
+    onNavigateToCalendarSettingScreen: () -> Unit,
+    onNavigateToWorkSettingScreen: () -> Unit
 ) {
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
@@ -148,7 +150,7 @@ fun MyCalendarScreen(
             ).show()
 
             MyCalendarSideEffect.NavigateToCalendarSettingScreen -> {
-                Toast.makeText(context, "캘린더 설정 페이지로 이동할게요", Toast.LENGTH_SHORT).show()
+                onNavigateToCalendarSettingScreen()
             }
         }
     }
@@ -175,7 +177,8 @@ fun MyCalendarScreen(
         onWorkLabelClick = viewModel::onWorkLabelClick,
         tempWorkList = state.tempWorkList,
         onCancelWorkSchedule = viewModel::onCancelWorkSchedule,
-        onSubmitWorkSchedule = viewModel::onSubmitWorkSchedule
+        onSubmitWorkSchedule = viewModel::onSubmitWorkSchedule,
+        onNavigateToWorkSettingScreen = onNavigateToWorkSettingScreen
     )
 
 }
@@ -203,8 +206,9 @@ fun MyCalendarScreen(
     onWorkLabelClick: (WorkType) -> Unit,
     tempWorkList: List<Pair<Int, String>>,
     onCancelWorkSchedule: () -> Unit,
-    onSubmitWorkSchedule: () -> Unit
-    ) {
+    onSubmitWorkSchedule: () -> Unit,
+    onNavigateToWorkSettingScreen: () -> Unit
+) {
 
     val context = LocalContext.current
 
@@ -264,7 +268,16 @@ fun MyCalendarScreen(
     )
 
     if (isWorkBottomSheet.value) {
-        InteractiveBottomSheet(380.heightPercent(context).dp, 10.dp, workTypeList, isWorkBottomSheet, onWorkLabelClick, onCancelWorkSchedule, onSubmitWorkSchedule)
+        InteractiveBottomSheet(
+            380.heightPercent(context).dp,
+            10.dp,
+            workTypeList,
+            isWorkBottomSheet,
+            onWorkLabelClick,
+            onCancelWorkSchedule,
+            onSubmitWorkSchedule,
+            onNavigateToWorkSettingScreen=onNavigateToWorkSettingScreen
+        )
     }
 
     if (isPersonalBottomSheet.value) {
@@ -302,7 +315,11 @@ fun ScheduleListHeader(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = "${currentMonth}월 ${selectedDate}일", color = NaturalBlack, style = Typography.bodyLarge)
+            Text(
+                text = "${currentMonth}월 ${selectedDate}일",
+                color = NaturalBlack,
+                style = Typography.bodyLarge
+            )
             Spacer(modifier = Modifier.width(10.dp))
 //            Toggle(checked = true, onCheckedChange = {})
         }
@@ -430,7 +447,8 @@ fun InteractiveBottomSheet(
     isWorkBottomSheet: MutableState<Boolean>,
     onWorkLabelClick: (WorkType) -> Unit,
     onCancelWorkSchedule: () -> Unit,
-    onSubmitWorkSchedule: () -> Unit
+    onSubmitWorkSchedule: () -> Unit,
+    onNavigateToWorkSettingScreen: ()->Unit,
 ) {
     val scope = rememberCoroutineScope()
 
@@ -446,7 +464,14 @@ fun InteractiveBottomSheet(
 
     BottomSheetScaffold(
         sheetContent = {
-            WorkScheduleForm(workTypeList = workTypeList, isWorkBottomSheet = isWorkBottomSheet, onWorkLabelClick = onWorkLabelClick, onCancelWorkSchedule = onCancelWorkSchedule, onSubmitWorkSchedule = onSubmitWorkSchedule)
+            WorkScheduleForm(
+                workTypeList = workTypeList,
+                isWorkBottomSheet = isWorkBottomSheet,
+                onWorkLabelClick = onWorkLabelClick,
+                onCancelWorkSchedule = onCancelWorkSchedule,
+                onSubmitWorkSchedule = onSubmitWorkSchedule,
+                onNavigateToWorkSettingScreen = onNavigateToWorkSettingScreen
+            )
         },
         modifier = Modifier
             .fillMaxWidth()
@@ -469,7 +494,8 @@ fun WorkScheduleForm(
     isWorkBottomSheet: MutableState<Boolean>,
     onWorkLabelClick: (WorkType) -> Unit,
     onCancelWorkSchedule: () -> Unit,
-    onSubmitWorkSchedule: () -> Unit
+    onSubmitWorkSchedule: () -> Unit,
+    onNavigateToWorkSettingScreen: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -498,7 +524,7 @@ fun WorkScheduleForm(
 
                 Row(
                     Modifier.clickable {
-                        Toast.makeText(context, "근무 설정 페이지 이동", Toast.LENGTH_SHORT).show()
+                        onNavigateToWorkSettingScreen()
                     },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
