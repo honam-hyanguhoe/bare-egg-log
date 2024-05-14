@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface GroupMemberCustomQuery {
     List<GroupMemberDto> findGroupMemberByGroupId(Long groupId);
 
-    Optional<GroupMemberDto> findGroupBossMemberByGroupId(Long groupId);
+    GroupMemberDto findGroupBossMemberByGroupId(Long groupId);
 
     Optional<GroupMember> findGroupMemberByGroupIdAndUserId(Long groupId, Long userId);
 

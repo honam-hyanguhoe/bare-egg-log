@@ -173,11 +173,15 @@ public class GroupService {
      */
     public GroupDto retrieveGroup(Long groupId, User user) {
         Group group = groupRepository.findById(groupId).orElseThrow(() -> new GroupException(GroupErrorCode.NOT_FOUND));
+        log.debug("getAdmin");
         GroupMemberDto boss = groupMemberService.getAdminMember(groupId);
         Boolean isBoss = false;
+
         if(Objects.equals(boss.getUserId(), user.getId())){
             isBoss = true;
         }
+
+        log.debug("getMembers");
         List<GroupMemberDto> memberList = groupMemberService.getGroupMemberList(groupId);
 
         return GroupDto.builder()

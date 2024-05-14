@@ -19,8 +19,7 @@ public class GroupMemberService {
     private final GroupMemberRepository groupMemberRepository;
     public GroupMemberDto getAdminMember(Long groupId) {
         return groupMemberRepository
-                .findGroupBossMemberByGroupId(groupId)
-                .orElseThrow(()->new GroupMemberException(GroupMemberErrorCode.NOT_FOUND));
+                .findGroupBossMemberByGroupId(groupId);
     }
 
     public List<GroupMemberDto> getGroupMemberList(Long groupId) {

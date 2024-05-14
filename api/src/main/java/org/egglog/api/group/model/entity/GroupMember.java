@@ -37,6 +37,7 @@ public class GroupMember {
                 .userName(user.getName())
                 .profileImgUrl(user.getProfileImgUrl())
                 .isAdmin(this.isAdmin)
+                .hospitalName(this.user.getSelectedHospital().getHospitalName())
                 .build();
     }
 }

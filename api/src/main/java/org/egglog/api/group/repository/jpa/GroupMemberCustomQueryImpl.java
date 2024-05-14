@@ -4,6 +4,8 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.egglog.api.group.exception.GroupMemberErrorCode;
+import org.egglog.api.group.exception.GroupMemberException;
 import org.egglog.api.group.model.dto.response.GroupDutySummary;
 import org.egglog.api.group.model.dto.response.GroupMemberDto;
 import org.egglog.api.group.model.dto.response.GroupMemberSimpleDto;
@@ -21,6 +23,7 @@ import static org.egglog.api.worktype.model.entity.QWorkType.workType;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Repository
@@ -30,19 +33,18 @@ public class GroupMemberCustomQueryImpl implements GroupMemberCustomQuery{
 
     @Override
     public List<GroupMemberDto> findGroupMemberByGroupId(Long groupId) {
-        return jpaQueryFactory
-                .select(Projections.fields(GroupMemberDto.class,
-                        groupMember.user.id.as("userId"),
-                        groupMember.group.id.as("groupId"),
-                        groupMember.user.name.as("userName"),
-                        groupMember.user.profileImgUrl.as("profileImgUrl"),
-                        groupMember.isAdmin,
-                        hospital.hospitalName.as("hospitalName")))
-                .join(groupMember.user,user)
-                    .on(groupMember.user.id.eq(user.id).and(groupMember.isAdmin.eq(false)))
-                .join(groupMember.user.selectedHospital,hospital)
-                    .on(groupMember.user.selectedHospital.id.eq(hospital.id))
+        List<GroupMember> results = jpaQueryFactory
+                .select(groupMember)
+                .from(groupMember)
+                .join(groupMember.user, user).fetchJoin()
+                .join(groupMember.user.selectedHospital, hospital).fetchJoin()
+                .where(groupMember.group.id.eq(groupId)
+                        .and(groupMember.isAdmin.eq(false))) // 그룹 ID로 필터링 추가
                 .fetch();
+
+        return results.stream()
+                .map(GroupMember::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -54,20 +56,16 @@ public class GroupMemberCustomQueryImpl implements GroupMemberCustomQuery{
     }
 
     @Override
-    public Optional<GroupMemberDto> findGroupBossMemberByGroupId(Long groupId) {
-        return Optional.ofNullable(jpaQueryFactory
-                .select(Projections.fields(GroupMemberDto.class,
-                        groupMember.user.id.as("userId"),
-                        groupMember.group.id.as("groupId"),
-                        groupMember.user.name.as("userName"),
-                        groupMember.user.profileImgUrl.as("profileImgUrl"),
-                        groupMember.isAdmin,
-                        hospital.hospitalName.as("hospitalName")))
-                .join(groupMember.user,user)
-                .on(groupMember.user.id.eq(user.id).and(groupMember.isAdmin.eq(true)))
-                .join(groupMember.user.selectedHospital,hospital)
-                .on(groupMember.user.selectedHospital.id.eq(hospital.id))
-                .fetchOne());
+    public GroupMemberDto findGroupBossMemberByGroupId(Long groupId) {
+        GroupMember boss = Optional.ofNullable(jpaQueryFactory
+                .select(groupMember)
+                .from(groupMember)
+                .join(groupMember.user, user).fetchJoin()
+                .join(groupMember.user.selectedHospital, hospital).fetchJoin()
+                .where(groupMember.group.id.eq(groupId)
+                        .and(groupMember.isAdmin.eq(true))) // 그룹 ID로 필터링 추가
+                .fetchOne()).orElseThrow(() -> new GroupMemberException(GroupMemberErrorCode.NOT_FOUND));
+        return boss.toDto();
     }
     @Override
     public Optional<GroupMember> findGroupMemberByGroupIdAndUserId(Long groupId, Long userId){
