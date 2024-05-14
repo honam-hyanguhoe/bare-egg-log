@@ -119,7 +119,7 @@ public class BoardCustomQueryImpl implements BoardCustomQuery {
     }
 
     @Override
-    public List<BoardListOutputSpec> findBoardList(String keyword, Long groupId, Long hospitalId, Long offset, int size, User loginUser) {
+    public List<BoardListOutputSpec> findBoardList(String keyword, Long groupId, Long hospitalId, Long offset, int size, Long loginUserId) {
         BooleanExpression whereClause = board.isNotNull()
                 .and(groupId != null ? board.group.id.eq(groupId) : board.group.id.isNull())
                 .and(hospitalId != null ? board.hospital.id.eq(hospitalId) : board.hospital.id.isNull())
@@ -142,7 +142,7 @@ public class BoardCustomQueryImpl implements BoardCustomQuery {
                         JPAExpressions.select(boardLike)
                                 .from(boardLike)
                                 .where(
-                                        boardLike.user.eq(loginUser),
+                                        boardLike.user.id.eq(loginUserId),
                                         boardLike.board.eq(board)
                                 )
                 )

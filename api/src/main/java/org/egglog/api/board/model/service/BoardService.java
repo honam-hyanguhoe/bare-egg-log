@@ -97,7 +97,7 @@ public class BoardService {
         int size = 10;
         try {
             log.info("boardList 쿼리 실행");
-            List<BoardListOutputSpec> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getOffset(), size, user);
+            List<BoardListOutputSpec> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getOffset(), size, user.getId());
             for (BoardListOutputSpec board : boardList) {
                 log.info("boardId: {}", board.getBoardId());
 
