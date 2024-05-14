@@ -34,6 +34,7 @@ public class GroupMember {
     public GroupMemberDto toDto(){
         return GroupMemberDto.builder()
                 .groupId(group.getId())
+                .userId(user.getId())
                 .userName(user.getName())
                 .profileImgUrl(user.getProfileImgUrl())
                 .isAdmin(this.isAdmin)
