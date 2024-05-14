@@ -92,6 +92,62 @@ public class BoardService {
      * @param user
      * @return
      */
+//    public List<BoardListOutputSpec> getBoardList(BoardListForm boardListForm, User user) {
+//        List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
+//        int size = 10;
+//        try {
+//            List<BoardListOutputSpec> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getOffset(), size);
+//            log.info("boardList 쿼리 실행");
+//            for (BoardListOutputSpec board : boardList) {
+//                log.info("boardId: {}", board.getBoardId());
+//                User writer = userJpaRepository.findById(board.getUserId()).orElseThrow(
+//                        () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
+//                );
+//                long viewCount = redisViewCountUtil.getViewCount(String.valueOf(board.getBoardId())); //하루 동안의 조회수
+//                log.info("redis view count: {}", viewCount);
+//                long hitCnt = viewCount + board.getViewCount();
+//                log.info("redis + db 조회수 합산: {}", hitCnt);
+//                log.info("db 조회수: {}", board.getViewCount());
+//
+//                //사용자의 병원 인증 정보
+//                Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(writer, writer.getSelectedHospital());
+//                boolean isUserLiked = false;  //좋아요 누른 여부
+//                boolean isCommented = false;    //댓글 유무 여부
+//
+//                if (board.getCommentCount() != 0) {
+//                    isCommented = true;
+//                }
+//
+//                //로그인한 사용자가 이미 좋아요를 눌렀는지
+//                if (!isNotLiked(user.getId(), board.getBoardId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
+//                    isUserLiked = true;
+//                }
+//
+//                board.setViewCount(hitCnt);
+//                board.setIsLiked(isUserLiked);
+//                board.setIsCommented(isCommented);
+//                board.setHospitalName(writer.getSelectedHospital().getHospitalName());
+//
+//                //병원 인증배지가 없다면
+//                if (hospitalAuth.isEmpty()) {
+//                    board.setIsHospitalAuth(false);
+//                }
+//                //있다면
+//                hospitalAuth.ifPresent(auth -> board.setIsHospitalAuth(auth.getAuth()));
+//
+//                boardListOutputSpecList.add(board);
+//            }
+//
+//        } catch (DataAccessException e) {
+//            throw new BoardException(BoardErrorCode.DATABASE_CONNECTION_FAILED);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            throw new BoardException(BoardErrorCode.UNKNOWN_ERROR);
+//        }
+//
+//        return boardListOutputSpecList;
+//    }
+
     public List<BoardListOutputSpec> getBoardList(BoardListForm boardListForm, User user) {
         List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
         int size = 10;
@@ -100,9 +156,7 @@ public class BoardService {
             log.info("boardList 쿼리 실행");
             for (BoardListOutputSpec board : boardList) {
                 log.info("boardId: {}", board.getBoardId());
-                User writer = userJpaRepository.findById(board.getUserId()).orElseThrow(
-                        () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-                );
+
                 long viewCount = redisViewCountUtil.getViewCount(String.valueOf(board.getBoardId())); //하루 동안의 조회수
                 log.info("redis view count: {}", viewCount);
                 long hitCnt = viewCount + board.getViewCount();
@@ -110,7 +164,7 @@ public class BoardService {
                 log.info("db 조회수: {}", board.getViewCount());
 
                 //사용자의 병원 인증 정보
-                Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(writer, writer.getSelectedHospital());
+//                Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(writer, writer.getSelectedHospital());
                 boolean isUserLiked = false;  //좋아요 누른 여부
                 boolean isCommented = false;    //댓글 유무 여부
 
@@ -126,14 +180,6 @@ public class BoardService {
                 board.setViewCount(hitCnt);
                 board.setIsLiked(isUserLiked);
                 board.setIsCommented(isCommented);
-                board.setHospitalName(writer.getSelectedHospital().getHospitalName());
-
-                //병원 인증배지가 없다면
-                if (hospitalAuth.isEmpty()) {
-                    board.setIsHospitalAuth(false);
-                }
-                //있다면
-                hospitalAuth.ifPresent(auth -> board.setIsHospitalAuth(auth.getAuth()));
 
                 boardListOutputSpecList.add(board);
             }
@@ -147,6 +193,7 @@ public class BoardService {
 
         return boardListOutputSpecList;
     }
+
 
     /**
      * 급상승 게시물 조회
