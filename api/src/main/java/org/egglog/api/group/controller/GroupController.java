@@ -171,6 +171,7 @@ public class GroupController {
             @PathVariable("member_id") Long memberId,
             @AuthenticationPrincipal User user
     ){
+        groupService.updateGroupMember(groupId,memberId,user);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.NO_CONTENT));
     }
 
