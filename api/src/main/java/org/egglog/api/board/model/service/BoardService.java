@@ -29,6 +29,7 @@ import org.egglog.api.hospital.model.entity.Hospital;
 import org.egglog.api.notification.model.entity.FCMTopic;
 import org.egglog.api.notification.model.entity.enums.TopicEnum;
 import org.egglog.api.notification.model.service.FCMService;
+import org.egglog.api.notification.model.service.NotificationService;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
@@ -83,7 +84,7 @@ public class BoardService {
 
     private final StringRedisTemplate redisTemplate;    //급상승 게시물
 
-    private final FCMService fcmService;
+    private final NotificationService notificationService;
 
     /**
      * 게시판 조회
@@ -277,19 +278,7 @@ public class BoardService {
 
         try {
             Board saveBoard = boardRepository.save(board);//저장
-            if (saveBoard.getBoardType().equals(BoardType.GROUP) && group != null) {
-                //그룹 게시판에 글이 등록되었다면 푸시알림 발송
-                FCMTopic topic = FCMTopic.builder()
-                        .topic(TopicEnum.GROUP)
-                        .topicId(boardForm.getGroupId())
-                        .build();
-                Notification notification = Notification.builder()
-                        .setTitle("[EGGLOG] " + group.getGroupName() + " 커뮤니티에 새 글이 올라왔습니다.")
-                        .setBody(boardForm.getBoardTitle())
-                        .setImage(boardForm.getPictureOne() != null ? boardForm.getPictureOne() : null)
-                        .build();
-                fcmService.sendNotificationToTopic(topic, notification);
-            }
+            notificationService.registerBoardNotification(boardForm, saveBoard, group);
 
         } catch (PersistenceException e) {
             throw new BoardException(BoardErrorCode.TRANSACTION_ERROR);
@@ -300,6 +289,8 @@ public class BoardService {
             throw new BoardException(BoardErrorCode.UNKNOWN_ERROR);
         }
     }
+
+
 
 
     /**
