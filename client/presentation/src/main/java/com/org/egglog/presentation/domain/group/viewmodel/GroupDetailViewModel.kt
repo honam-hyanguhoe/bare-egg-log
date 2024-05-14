@@ -17,7 +17,9 @@ import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
 import com.org.egglog.domain.group.model.Admin
 import com.org.egglog.domain.group.model.Group
 import com.org.egglog.domain.group.model.GroupInfo
+import com.org.egglog.domain.group.model.GroupMember
 import com.org.egglog.domain.group.model.Member
+import com.org.egglog.domain.group.usecase.ChangeLeaderUseCase
 import com.org.egglog.domain.group.usecase.DeleteMemberUseCase
 import com.org.egglog.domain.group.usecase.GetGroupDutyUseCase
 import com.org.egglog.domain.group.usecase.GetGroupInfoUseCase
@@ -58,6 +60,7 @@ class GroupDetailViewModel @Inject constructor(
     private val getMembersWorkUseCase: GetMembersWorkUseCase,
     private val updateGroupInfoUseCase: UpdateGroupInfoUseCase,
     private val deleteMemberUseCase: DeleteMemberUseCase,
+    private val changeLeaderUseCase: ChangeLeaderUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel(), ContainerHost<GroupDetailState, GroupDetailSideEffect> {
     override val container: Container<GroupDetailState, GroupDetailSideEffect> =
@@ -448,8 +451,36 @@ class GroupDetailViewModel @Inject constructor(
     }
 
 
-    fun onChangeLeader(userId : Long) = intent {
+    fun onChangeLeader(member : GroupMember) = intent {
+        val tokens = getTokenUseCase()
+        val result = changeLeaderUseCase(
+            accessToken = "Bearer ${tokens.first}",
+            groupId = groupId,
+            memberId = member.userId!!
+        )
 
+        Log.d("memberManageScreen", "result $result")
+
+        if(result.isSuccess){
+            reduce {
+                state.copy(
+                    groupInfo = state.groupInfo.copy(
+                        isAdmin = false,
+                        admin = Admin(
+                            userId = member.userId,
+                            groupId = groupId,
+                            userName = member.userName,
+                            profileImgUrl = member.profileImgUrl,
+                            isAdmin = true
+                        )
+                    )
+                )
+            }
+            Log.d("memberManageScreen", "groupMembers ${state.groupInfo}")
+            postSideEffect(GroupDetailSideEffect.Toast("모임장이 변경되었습니다."))
+        }else{
+            postSideEffect(GroupDetailSideEffect.Toast("모임장 위임에 실패하였습니다."))
+        }
     }
 }
 

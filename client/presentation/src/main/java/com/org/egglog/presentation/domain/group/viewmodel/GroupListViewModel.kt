@@ -50,7 +50,7 @@ class GroupListViewModel @Inject constructor(
         })
 
     init {
-        getGroupList()
+//        getGroupList()
         // state 값의 groupImage 번호 설정
     }
 
@@ -115,7 +115,7 @@ class GroupListViewModel @Inject constructor(
     }
 
 
-    private fun getGroupList() = intent {
+    fun getGroupList() = intent {
         val tokens = getTokenUseCase()
 
         Log.d("groupList", "${tokens.first}")

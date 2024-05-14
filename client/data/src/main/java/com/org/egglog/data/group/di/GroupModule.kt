@@ -1,6 +1,7 @@
 package com.org.egglog.data.group.di
 
 import com.org.egglog.data.community.usecase.GetHotPostListUseCaseImpl
+import com.org.egglog.data.group.usecase.ChangeLeaderUseCaseImpl
 import com.org.egglog.data.group.usecase.CreateGroupUseCaseImpl
 import com.org.egglog.data.group.usecase.DeleteMemberUseCaseImpl
 import com.org.egglog.data.group.usecase.GetGroupDutyUseCaseImpl
@@ -11,6 +12,7 @@ import com.org.egglog.data.group.usecase.GetMembersWorkUseCaseImpl
 import com.org.egglog.data.group.usecase.InviteMemberUseCaseImpl
 import com.org.egglog.data.group.usecase.UpdateGroupInfoUseCaseImpl
 import com.org.egglog.domain.community.usecase.GetHotPostListUseCase
+import com.org.egglog.domain.group.usecase.ChangeLeaderUseCase
 import com.org.egglog.domain.group.usecase.CreateGroupUseCase
 import com.org.egglog.domain.group.usecase.DeleteMemberUseCase
 import com.org.egglog.domain.group.usecase.GetGroupDutyUseCase
@@ -54,4 +56,7 @@ abstract class GroupModule {
 
     @Binds
     abstract fun deleteMemberUseCaseImpl(uc : DeleteMemberUseCaseImpl) : DeleteMemberUseCase
+
+    @Binds
+    abstract fun changeLeaderUseCaseImpl(uc : ChangeLeaderUseCaseImpl) : ChangeLeaderUseCase
 }

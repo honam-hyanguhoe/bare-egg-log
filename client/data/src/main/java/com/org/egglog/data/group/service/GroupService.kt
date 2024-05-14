@@ -94,5 +94,14 @@ interface GroupService {
     ): CommonResponse<String>
 
 
+    @PATCH("groups/{group_id}/{member_id}")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun changeLeader(
+        @Header("Authorization") accessToken: String,
+        @Path("group_id") groupId: Long,
+        @Path("member_id") memberId: Long,
+    ): CommonResponse<String>
+
+
 }
 

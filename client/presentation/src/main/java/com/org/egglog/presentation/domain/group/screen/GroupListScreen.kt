@@ -63,7 +63,11 @@ fun GroupListScreen(
     val groupListState = groupListViewModel.collectAsState().value
     val context = LocalContext.current
     val showBottomSheet by groupListViewModel.showBottomSheet.collectAsState()
-    
+
+    LaunchedEffect(Unit) {
+        Log.d("groupList", "왔니")
+        groupListViewModel.getGroupList()
+    }
 
     groupListViewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {

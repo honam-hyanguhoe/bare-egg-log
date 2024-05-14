@@ -61,7 +61,7 @@ fun MemberManageScreen(
     MemberManageScreen(
         groupId = groupId,
         onDelete = groupDetailViewModel::onDelete,
-        onChangeLeader = {},
+        onChangeLeader = groupDetailViewModel::onChangeLeader,
         onClickBack = { groupId: Long -> onNavigateToGroupDetailScreen(groupId) },
         members = groupDetailState.groupInfo.groupMembers ?: emptyList<GroupMember>()
     )
@@ -71,7 +71,7 @@ fun MemberManageScreen(
 private fun MemberManageScreen(
     groupId: Long,
     onDelete: (Long) -> Unit,
-    onChangeLeader: () -> Unit,
+    onChangeLeader: (GroupMember) -> Unit,
     onClickBack: (groupId: Long) -> Unit,
     members: List<GroupMember> = emptyList()
 ) {
@@ -103,7 +103,7 @@ private fun MemberManageScreen(
                 items(
                   members
                 ) { member ->
-                    Swiper(onDelete = { onDelete(member.userId!!)}, onChangeLeader = onChangeLeader) {
+                    Swiper(onDelete = { onDelete(member.userId!!)}, onChangeLeader = {onChangeLeader(member)}) {
                         ProfileItem(profile = Profile(userId= member.userId!!, name = member.userName, hospital = member.hospitalName), type = "basic")
                     }
                 }
