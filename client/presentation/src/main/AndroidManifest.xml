@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.org.egglog.presentation">
-
     <application>
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
@@ -49,13 +49,16 @@
         <activity android:name=".domain.myCalendar.activity.MyCalendarActivity" />
 
         <service
-            android:name=".utils.FcmReceiveService"
+            android:name=".receiver.FcmReceiveService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
         </service>
+        <receiver android:name=".receiver.AlarmBroadcastReceiver"
+            android:exported="true"
+            tools:ignore="ExportedReceiver" />
     </application>
 
 </manifest>

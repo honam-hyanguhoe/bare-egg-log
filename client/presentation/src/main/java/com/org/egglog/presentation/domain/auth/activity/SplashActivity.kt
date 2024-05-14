@@ -1,8 +1,11 @@
 package com.org.egglog.presentation.domain.auth.activity
 
 import android.Manifest
+import android.app.AlarmManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.icu.util.Calendar
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -30,6 +33,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.org.egglog.presentation.R
 import com.org.egglog.presentation.domain.main.activity.MainActivity
+import com.org.egglog.presentation.receiver.*
 import kotlinx.coroutines.tasks.await
 
 @AndroidEntryPoint
@@ -39,6 +43,7 @@ class SplashActivity : AppCompatActivity() {
     @Inject lateinit var getUserUseCase: GetUserUseCase
     @Inject lateinit var setUserStoreUseCase: SetUserStoreUseCase
     @Inject lateinit var updateUserFcmTokenUseCase: UpdateUserFcmTokenUseCase
+    private lateinit var alarmManager: AlarmManager
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,8 +61,10 @@ class SplashActivity : AppCompatActivity() {
         // 권한 요청 예시
         askForPermissions(listOf(
             Manifest.permission.POST_NOTIFICATIONS,
-            Manifest.permission.INTERNET
+            Manifest.permission.SCHEDULE_EXACT_ALARM
         ))
+        alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        setAlarm()
     }
 
     private fun askForPermissions(permissionList: List<String>) {
@@ -85,6 +92,27 @@ class SplashActivity : AppCompatActivity() {
             }
         }
 
+    private fun setAlarm() {
+        val hour = 17
+        val minute = 46
+        val second = 0
+
+        val receiverIntent = Intent(this, AlarmBroadcastReceiver::class.java).apply {
+            putExtra(AlarmConst.REQUEST_CODE, AlarmConst.requestAlarmClock)
+            putExtra(AlarmConst.INTERVAL_HOUR, hour)
+            putExtra(AlarmConst.INTERVAL_MINUTE, minute)
+            putExtra(AlarmConst.INTERVAL_SECOND, second)
+        }
+        val pendingIntent = AlarmConst.getPendingIntent(this, AlarmConst.PENDING_REPEAT_CLOCK, receiverIntent)
+        val calendar = Calendar.getInstance().apply {
+            timeInMillis = System.currentTimeMillis()
+            add(Calendar.HOUR_OF_DAY, hour)
+            add(Calendar.MINUTE, minute)
+            add(Calendar.SECOND, second)
+        }
+        val alarmClock = AlarmManager.AlarmClockInfo(calendar.timeInMillis, pendingIntent)
+        alarmManager.setAlarmClock(alarmClock, pendingIntent)
+    }
 
     private fun startLifecycleScopeWork() {
         lifecycleScope.launch {
