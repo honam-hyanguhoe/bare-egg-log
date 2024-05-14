@@ -1,0 +1,32 @@
+package com.org.egglog.presentation.component.atoms.wheelPicker
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
+import com.org.egglog.presentation.component.atoms.wheelPicker.basic.WheelCustomPicker
+import com.org.egglog.presentation.theme.*
+import com.org.egglog.presentation.utils.heightPercent
+import com.org.egglog.presentation.utils.widthPercent
+import com.org.egglog.presentation.component.atoms.wheelPicker.core.WheelPickerDefaults
+import java.time.LocalDate
+
+@Composable
+fun CustomDatePicker(onDateTimeSelected: (LocalDate) -> Unit) {
+    val context = LocalContext.current
+    WheelCustomPicker(
+        selectorProperties = WheelPickerDefaults.selectorProperties(
+            enabled = true,
+            shape = RoundedCornerShape(10.widthPercent(context).dp),
+            color = Gray200,
+            border = BorderStroke(1.widthPercent(context).dp, Gray200)
+        ),
+        size = DpSize(320.widthPercent(context).dp, 120.heightPercent(context).dp),
+        textStyle = Typography.headlineSmall.copy(fontWeight = FontWeight.Medium)
+    ) {
+            snappedDateTime -> onDateTimeSelected(snappedDateTime)
+    }
+}
