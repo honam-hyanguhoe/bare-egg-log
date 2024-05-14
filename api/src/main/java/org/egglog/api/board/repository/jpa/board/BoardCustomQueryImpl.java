@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.board.model.dto.response.BoardListOutputSpec;
 import org.egglog.api.board.model.entity.Board;
 import org.egglog.api.board.model.entity.BoardLike;
-import org.egglog.api.user.model.entity.User;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -119,7 +118,7 @@ public class BoardCustomQueryImpl implements BoardCustomQuery {
     }
 
     @Override
-    public List<BoardListOutputSpec> findBoardList(String keyword, Long groupId, Long hospitalId, Long offset, int size, Long loginUserId) {
+    public List<BoardListOutputSpec> findBoardList(String keyword, Long groupId, Long hospitalId, Long offset, int size) {
         BooleanExpression whereClause = board.isNotNull()
                 .and(groupId != null ? board.group.id.eq(groupId) : board.group.id.isNull())
                 .and(hospitalId != null ? board.hospital.id.eq(hospitalId) : board.hospital.id.isNull())
@@ -138,12 +137,6 @@ public class BoardCustomQueryImpl implements BoardCustomQuery {
                                 .where(
                                         hospitalAuth.user.eq(board.user),
                                         hospitalAuth.hospital.eq(board.user.selectedHospital)
-                                ),
-                        JPAExpressions.select(boardLike)
-                                .from(boardLike)
-                                .where(
-                                        boardLike.user.id.eq(loginUserId),
-                                        boardLike.board.eq(board)
                                 )
                 )
                 .from(board)
@@ -161,8 +154,7 @@ public class BoardCustomQueryImpl implements BoardCustomQuery {
                 tuple.get(comment.countDistinct().longValue()),
                 tuple.get(boardLike.countDistinct().longValue()),
                 tuple.get(3, String.class),
-                tuple.get(4, Boolean.class) != null ? tuple.get(4, Boolean.class) : false,
-                tuple.get(5, BoardLike.class) != null ? true : false
+                tuple.get(4, Boolean.class) != null ? tuple.get(4, Boolean.class) : false
         )).collect(Collectors.toList());
 
     }

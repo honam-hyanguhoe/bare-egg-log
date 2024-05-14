@@ -97,7 +97,7 @@ public class BoardService {
         int size = 10;
         try {
             log.info("boardList 쿼리 실행");
-            List<BoardListOutputSpec> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getOffset(), size, user.getId());
+            List<BoardListOutputSpec> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getOffset(), size);
             for (BoardListOutputSpec board : boardList) {
                 log.info("boardId: {}", board.getBoardId());
 
@@ -115,9 +115,9 @@ public class BoardService {
                 }
 
                 //로그인한 사용자가 이미 좋아요를 눌렀는지
-//                if (!isNotLiked(user.getId(), board.getBoardId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
-//                    isUserLiked = true;
-//                }
+                if (!isNotLiked(user.getId(), board.getBoardId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
+                    isUserLiked = true;
+                }
 
                 board.setViewCount(hitCnt);
                 board.setIsLiked(isUserLiked);
