@@ -97,7 +97,7 @@ public class BoardService {
         int size = 10;
         try {
             log.info("boardList 쿼리 실행");
-            List<BoardListOutputSpec> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getOffset(), size);
+            List<BoardListOutputSpec> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getOffset(), size, user);
             for (BoardListOutputSpec board : boardList) {
                 log.info("boardId: {}", board.getBoardId());
 
@@ -115,9 +115,9 @@ public class BoardService {
                 }
 
                 //로그인한 사용자가 이미 좋아요를 눌렀는지
-                if (!isNotLiked(user.getId(), board.getBoardId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
-                    isUserLiked = true;
-                }
+//                if (!isNotLiked(user.getId(), board.getBoardId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
+//                    isUserLiked = true;
+//                }
 
                 board.setViewCount(hitCnt);
                 board.setIsLiked(isUserLiked);
@@ -275,14 +275,14 @@ public class BoardService {
 
         try {
             Board saveBoard = boardRepository.save(board);//저장
-            if (saveBoard.getBoardType().equals(BoardType.GROUP) && group!=null){
+            if (saveBoard.getBoardType().equals(BoardType.GROUP) && group != null) {
                 //그룹 게시판에 글이 등록되었다면 푸시알림 발송
                 FCMTopic topic = FCMTopic.builder()
                         .topic(FCMTopic.TopicEnum.group)
                         .topicId(boardForm.getGroupId())
                         .build();
                 Notification notification = Notification.builder()
-                        .setTitle("[EGGLOG] "+group.getGroupName()+" 커뮤니티에 새 글이 올라왔습니다.")
+                        .setTitle("[EGGLOG] " + group.getGroupName() + " 커뮤니티에 새 글이 올라왔습니다.")
                         .setBody(boardForm.getBoardTitle())
                         .setImage(boardForm.getPictureOne() != null ? boardForm.getPictureOne() : null)
                         .build();
@@ -523,8 +523,7 @@ public class BoardService {
             //병원 인증배지가 없다면
             if (hospitalAuth.isEmpty()) {
                 boardOutputSpec.setIsHospitalAuth(false);
-            }
-            else {
+            } else {
                 boardOutputSpec.setIsHospitalAuth(hospitalAuth.get().getAuth());
             }
 
