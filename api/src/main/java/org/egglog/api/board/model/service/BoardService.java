@@ -97,7 +97,8 @@ public class BoardService {
         int size = 10;
         try {
             log.info("boardList 쿼리 실행");
-            List<BoardListOutputSpec> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getOffset(), size);
+            List<BoardListOutputSpec> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getOffset(), size, user.getId());
+
             for (BoardListOutputSpec board : boardList) {
                 log.info("boardId: {}", board.getBoardId());
 
@@ -107,7 +108,7 @@ public class BoardService {
                 log.info("redis + db 조회수 합산: {}", hitCnt);
                 log.info("db 조회수: {}", board.getViewCount());
 
-                boolean isUserLiked = false;  //좋아요 누른 여부
+//                boolean isUserLiked = false;  //좋아요 누른 여부
                 boolean isCommented = false;    //댓글 유무 여부
 
                 if (board.getCommentCount() != 0) {
@@ -115,12 +116,12 @@ public class BoardService {
                 }
 
                 //로그인한 사용자가 이미 좋아요를 눌렀는지
-                if (!isNotLiked(user.getId(), board.getBoardId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
-                    isUserLiked = true;
-                }
+//                if (!isNotLiked(user.getId(), board.getBoardId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
+//                    isUserLiked = true;
+//                }
 
                 board.setViewCount(hitCnt);
-                board.setIsLiked(isUserLiked);
+                board.setIsLiked(board.getIsLiked());
                 board.setIsCommented(isCommented);
 
                 boardListOutputSpecList.add(board);
