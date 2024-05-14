@@ -24,16 +24,6 @@ public class GroupCustomQueryImpl implements GroupCustomQuery{
     private final JPAQueryFactory jpaQueryFactory;
     @Override
     public List<GroupPreviewDto> findGroupByUserId(Long userId){
-//        JOIN
-//    `Groups` gr ON gm.groups_id = gr.group_id
-//        WHERE
-//        gr.group_id IN (
-//                SELECT DISTINCT groups_id
-//        FROM GroupMember
-//        WHERE user_id = 4
-//    )
-//        GROUP BY
-//        gr.group_image, gr.group_name, gr.group_id;
         List<Tuple> results = jpaQueryFactory
                 .select(group.groupImage, group.groupName, group.id, group.admin, Expressions.as(groupMember.count(),"memberCount"))
                 .from(groupMember)

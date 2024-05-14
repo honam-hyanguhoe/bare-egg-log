@@ -223,6 +223,7 @@ public class GroupService {
             invitationCode.setPassword(group.getPassword());
             groupRepository.save(updateGroup);
             groupInvitationRepository.save(invitationCode);
+
         }catch (Exception e){
             throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
         }
@@ -236,7 +237,7 @@ public class GroupService {
      * @param user
      */
     @Transactional
-    public BossChangeDto updateGroupMember(Long groupId, Long memberId, User user) {
+    public void updateGroupMember(Long groupId, Long memberId, User user) {
         GroupMember boss = groupMemberService.getGroupMember(groupId, user.getId());
         //사용자가 그룹장이 아니라면 권한 에러 403
         if(!boss.getIsAdmin()){
@@ -255,12 +256,8 @@ public class GroupService {
         groupMemberService.createGroupMember(newBoss);
         groupMemberService.createGroupMember(boss);
 
-        //응답 DTO 생성
-        BossChangeDto changes = new BossChangeDto();
-        changes.setCurrentAdmin(newBoss.toDto());
-        changes.setOldAdmin(boss.toDto());
-
-        return changes;
+        Group group = groupRepository.findById(groupId).orElseThrow(()->new GroupException(GroupErrorCode.TRANSACTION_ERROR));
+        group.setAdmin(newBoss);
     }
 
     /**
