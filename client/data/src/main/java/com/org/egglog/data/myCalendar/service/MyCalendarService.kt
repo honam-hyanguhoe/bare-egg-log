@@ -1,5 +1,6 @@
 package com.org.egglog.data.myCalendar.service
 
+import com.org.egglog.data.myCalendar.model.WorkListResponse
 import com.org.egglog.data.myCalendar.model.WorkTypeResponse
 import com.org.egglog.data.retrofit.CommonResponse
 import okhttp3.RequestBody
@@ -23,4 +24,11 @@ interface MyCalendarService {
         @Header("Authorization") accessToken: String,
         @Body requestBody: RequestBody
     ): CommonResponse<String>
+
+    @POST("work/create")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun createWorkSchedule(
+        @Header("Authorization") accessToken: String,
+        @Body requestBody: RequestBody
+    ): CommonResponse<List<WorkListResponse>>
 }

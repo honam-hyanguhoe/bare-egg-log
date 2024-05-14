@@ -41,6 +41,7 @@ import com.org.egglog.presentation.domain.main.activity.MainActivity
 import com.org.egglog.presentation.domain.main.viewModel.StaticSideEffect
 import com.org.egglog.presentation.domain.main.viewModel.StaticsViewModel
 import com.org.egglog.presentation.domain.main.viewModel.WorkViewModel
+import com.org.egglog.presentation.domain.myCalendar.activity.MyCalendarActivity
 import com.org.egglog.presentation.domain.setting.activity.SettingActivity
 import com.org.egglog.presentation.domain.setting.viewmodel.SettingSideEffect
 import com.org.egglog.presentation.theme.Gray100
@@ -102,6 +103,15 @@ fun MainScreen(
                     }
                 )
             }
+
+            StaticSideEffect.NavigateToMyCalendarActivity ->
+                context.startActivity(
+                    Intent(
+                        context, MyCalendarActivity::class.java
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                )
         }
     }
 

@@ -15,7 +15,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -31,38 +30,47 @@ import java.util.Calendar
 
 @Composable
 fun MonthlyCalendar(
-        currentYear: Int,
-        currentMonth: Int,
-        onDateClicked: (Int) -> Unit,
-        onPrevMonthClick: () -> Unit,
-        onNextMonthClick: () -> Unit,
-        selectedDate: Int
+    currentYear: Int,
+    currentMonth: Int,
+    onDateClicked: (Int) -> Unit,
+    onPrevMonthClick: () -> Unit,
+    onNextMonthClick: () -> Unit,
+    selectedDate: Int,
+    tempWorkList: List<Pair<Int, String>>
 ) {
 
 
-    Column(Modifier
+    Column(
+        Modifier
             .fillMaxWidth()
     ) {
         CalendarHeader(currentYear, currentMonth, onPrevMonthClick, onNextMonthClick)
         Spacer(modifier = Modifier.height(16.dp))
-        DayList(currentYear, currentMonth, onDateClicked = onDateClicked, selectedDate) // 콜백 전달
+        DayList(
+            currentYear,
+            currentMonth,
+            onDateClicked = onDateClicked,
+            selectedDate,
+            tempWorkList = tempWorkList
+        ) // 콜백 전달
     }
 }
 
 @Composable
 fun CalendarHeader(
-        year: Int,
-        month: Int,
-        onPrevMonthClick: () -> Unit,
-        onNextMonthClick: () -> Unit
+    year: Int,
+    month: Int,
+    onPrevMonthClick: () -> Unit,
+    onNextMonthClick: () -> Unit
 ) {
     val nameList = listOf("일", "월", "화", "수", "목", "금", "토")
 
     Column {
-        Row(Modifier
+        Row(
+            Modifier
                 .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = { onPrevMonthClick() }) {
                 Icon(imageVector = ArrowLeft, modifier = Modifier.size(20.dp))
@@ -75,28 +83,31 @@ fun CalendarHeader(
         Spacer(modifier = Modifier.height(16.dp))
         Row() {
             nameList.forEach {
-                Box(modifier = Modifier
+                Box(
+                    modifier = Modifier
                         .weight(1f),
-                        contentAlignment = Alignment.Center) {
+                    contentAlignment = Alignment.Center
+                ) {
                     Text(
-                            text = it,
-                            style = Typography.displayMedium,
-                            color = if(it.equals("일")) Error600 else if(it.equals("토")) Blue700 else NaturalBlack
+                        text = it,
+                        style = Typography.displayMedium,
+                        color = if (it.equals("일")) Error600 else if (it.equals("토")) Blue700 else NaturalBlack
                     )
                 }
             }
 
         }
     }
-    
+
 }
 
 @Composable
 fun DayList(
-        currentYear: Int,
-        currentMonth: Int,
-        onDateClicked: (Int) -> Unit,
-        selectedDate: Int
+    currentYear: Int,
+    currentMonth: Int,
+    onDateClicked: (Int) -> Unit,
+    selectedDate: Int,
+    tempWorkList: List<Pair<Int, String>>
 ) {
     val time = remember { mutableStateOf(Calendar.getInstance()) }
     val date = time.value
@@ -123,66 +134,69 @@ fun DayList(
                     val resultDay = week * 7 + day - thisMonthFirstDay + 1
                     val isSelected = selectedDate == resultDay
                     val dayOfWeek = (day + 1) % 7
+                    val workInfo = tempWorkList.find { it.first == resultDay }
+
 
                     if (resultDay in 1..thisMonthDayMax) {
                         // 달력 날짜 범위 내
                         Box(
-                                modifier = Modifier
-                                        .weight(1f)
-                                        .height(70.dp)
-                                        .clickable {
-                                            onDateClicked(resultDay)
-                                        }
-                                        .background(
-                                                if (isSelected) Gray200 else Color.Transparent,
-                                                RoundedCornerShape(10.dp)
-                                        )
-                                        .padding(4.dp),
-                                contentAlignment = Alignment.TopCenter
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(70.dp)
+                                .clickable {
+                                    onDateClicked(resultDay)
+                                }
+                                .background(
+                                    if (isSelected) Gray200 else Color.Transparent,
+                                    RoundedCornerShape(10.dp)
+                                )
+                                .padding(4.dp),
+                            contentAlignment = Alignment.TopCenter
                         ) {
                             Column(
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                        text = resultDay.toString(),
-                                        style = Typography.displayMedium,
-                                        color = when (dayOfWeek) {
-                                            Calendar.SUNDAY -> Error600
-                                            0 -> Blue700
-                                            else -> NaturalBlack
-                                        }
+                                    text = resultDay.toString(),
+                                    style = Typography.displayMedium,
+                                    color = when (dayOfWeek) {
+                                        Calendar.SUNDAY -> Error600
+                                        0 -> Blue700
+                                        else -> NaturalBlack
+                                    }
                                 )
                                 Spacer(modifier = Modifier.height(5.dp))
-//                                Labels(text = "EVE")
+
+                                Labels(text = workInfo?.second ?: "None")
 //                                Text(text = "··")
                             }
                         }
                     } else {
                         // 달력 날짜 범위 밖
                         Box(
-                                modifier = Modifier
-                                        .weight(1f)
-                                        .height(70.dp)
-                                        .background(
-                                                if (isSelected) Gray200 else Color.Transparent,
-                                                RoundedCornerShape(10.dp)
-                                        )
-                                        .padding(4.dp),
-                                contentAlignment = Alignment.TopCenter
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(70.dp)
+                                .background(
+                                    if (isSelected) Gray200 else Color.Transparent,
+                                    RoundedCornerShape(10.dp)
+                                )
+                                .padding(4.dp),
+                            contentAlignment = Alignment.TopCenter
                         ) {
                             Column(
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                        text = if (resultDay < 1) "${resultDay + lastMonthDayMax}" else "${resultDay - thisMonthDayMax}",
-                                        color = when (dayOfWeek) {
-                                            Calendar.SUNDAY -> Error200
-                                            0 -> BlueGray400
-                                            else -> Gray400
-                                        },
-                                        style = Typography.displayMedium
+                                    text = if (resultDay < 1) "${resultDay + lastMonthDayMax}" else "${resultDay - thisMonthDayMax}",
+                                    color = when (dayOfWeek) {
+                                        Calendar.SUNDAY -> Error200
+                                        0 -> BlueGray400
+                                        else -> Gray400
+                                    },
+                                    style = Typography.displayMedium
                                 )
                                 Spacer(modifier = Modifier.height(5.dp))
 //                                Labels(text = "NIGHT")
