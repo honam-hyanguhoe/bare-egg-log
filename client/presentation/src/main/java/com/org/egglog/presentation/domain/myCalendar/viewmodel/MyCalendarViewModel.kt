@@ -6,12 +6,12 @@ import com.org.egglog.domain.auth.model.UserDetail
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
 import com.org.egglog.domain.myCalendar.model.AddWorkData
+import com.org.egglog.domain.myCalendar.model.EditWorkData
 import com.org.egglog.domain.myCalendar.model.WorkType
 import com.org.egglog.domain.myCalendar.usecase.CreatePersonalScheduleUseCase
 import com.org.egglog.domain.myCalendar.usecase.CreateWorkScheduleUseCase
+import com.org.egglog.domain.myCalendar.usecase.EditWorkScheduleUseCase
 import com.org.egglog.domain.myCalendar.usecase.GetWorkTypeListUseCase
-import com.org.egglog.presentation.data.AddWorkInfo
-import com.org.egglog.presentation.data.EditWorkInfo
 import com.org.egglog.presentation.data.WorkScheduleInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -34,7 +34,8 @@ class MyCalendarViewModel @Inject constructor(
     private val getWorkTypeListUseCase: GetWorkTypeListUseCase,
     private val createPersonalScheduleUseCase: CreatePersonalScheduleUseCase,
     private val getUserStoreUseCase: GetUserStoreUseCase,
-    private val createWorkScheduleUseCase: CreateWorkScheduleUseCase
+    private val createWorkScheduleUseCase: CreateWorkScheduleUseCase,
+    private val editWorkScheduleUseCase: EditWorkScheduleUseCase
 ) : ViewModel(), ContainerHost<MyCalenderState, MyCalendarSideEffect> {
 
     private var accessToken: String? = null
@@ -261,7 +262,7 @@ class MyCalendarViewModel @Inject constructor(
                     reduce {
                         state.copy(
                             editWorkList = state.editWorkList.plus(
-                                EditWorkInfo(
+                                EditWorkData(
                                     targetWorkId,
                                     workDate,
                                     workType.workTypeId,
@@ -287,7 +288,7 @@ class MyCalendarViewModel @Inject constructor(
                     reduce {
                         state.copy(
                             editWorkList = state.editWorkList.plus(
-                                EditWorkInfo(
+                                EditWorkData(
                                     targetWorkId,
                                     workDate,
                                     workType.workTypeId,
@@ -359,11 +360,15 @@ class MyCalendarViewModel @Inject constructor(
         Log.e("MyCalendarViewModel", "editList : ${state.editWorkList}")
         Log.e("MyCalendarViewModel", "createList: ${state.createWorkList}")
 
-        if (state.createWorkList.isEmpty() && state.editWorkList.isNotEmpty()) {
-            // TODO 근무 수정 요청 보내고 새로운 근무 일정 불러오기
-
-
-        } else if (state.createWorkList.isNotEmpty() && state.editWorkList.isEmpty()) {
+        if (state.editWorkList.isNotEmpty()) {
+            // TODO 근무 수정 요청 보내고 새로운 근무 일정 불러오기 (근무 조회 기능 구현 후 주석 풀 예정)
+//            val response = editWorkScheduleUseCase("Bearer $accessToken", userInfo!!.workGroupId!!, state.editWorkList)
+//            if(response.isSuccess) {
+//                postSideEffect(MyCalendarSideEffect.Toast("등록되었습니다!"))
+//            } else {
+//                postSideEffect(MyCalendarSideEffect.Toast("등록에 실패하였습니다. 다시 시도해주세요."))
+//            }
+        } else if (state.createWorkList.isNotEmpty()) {
             // TODO 근무 생성 요청 보내고 새로운 근무 일정 불러오기
             val response = createWorkScheduleUseCase("Bearer $accessToken", userInfo!!.workGroupId!!, state.createWorkList)
             if(response.isSuccess) {
@@ -371,16 +376,6 @@ class MyCalendarViewModel @Inject constructor(
             } else {
                 postSideEffect(MyCalendarSideEffect.Toast("등록에 실패하였습니다. 다시 시도해주세요."))
             }
-        } else if (state.createWorkList.isNotEmpty() && state.editWorkList.isNotEmpty()) {
-            // TODO 근무 생성, 수정 요청 보내고 새로운 근무 일정 불러오기
-            val response = createWorkScheduleUseCase("Bearer $accessToken", userInfo!!.workGroupId!!, state.createWorkList)
-
-//            if(response.isSuccess) {
-//                postSideEffect(MyCalendarSideEffect.Toast("등록되었습니다!"))
-//            } else {
-//                postSideEffect(MyCalendarSideEffect.Toast("등록에 실패하였습니다. 다시 시도해주세요."))
-//            }
-
         }
 
         // 불러온 근무 일정을 monthlyWorkList 에 대입해주기
@@ -417,7 +412,7 @@ data class MyCalenderState(
     val workTypeList: List<WorkType> = listOf(),
     val monthlyWorkList: List<WorkScheduleInfo> = listOf(), // 서버로부터 조회한 월간 근무 일정
     val createWorkList: List<AddWorkData> = listOf(),
-    val editWorkList: List<EditWorkInfo> = listOf(),
+    val editWorkList: List<EditWorkData> = listOf(),
     val tempWorkList: List<Pair<Int, String>> = listOf() // 근무 입력시 달력에 표시할 내용 (workDate, workTitle)
 )
 
