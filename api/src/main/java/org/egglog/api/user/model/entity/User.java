@@ -103,7 +103,7 @@ public class User implements UserDetails {
     public User delete(){
         this.name = "탈퇴회원";
         this.email = UUID.randomUUID().toString();
-        this.selectedHospital = null;
+        this.empNo = null;
         this.userStatus = UserStatus.DELETED;
         this.deletedAt = LocalDateTime.now();
         return this;

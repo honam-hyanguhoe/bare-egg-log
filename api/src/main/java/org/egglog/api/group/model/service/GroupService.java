@@ -210,18 +210,11 @@ public class GroupService {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new GroupException(GroupErrorCode.NOT_FOUND));
         try {
-            if(groupUpdateForm.getNewName()!=null){
-                group.setGroupName(groupUpdateForm.getNewName());
-            }
-            if(groupUpdateForm.getNewPassword()!=null){
-                group.setPassword(passwordEncoder.encode(groupUpdateForm.getNewPassword()));
-                InvitationCode invitationCode = groupInvitationRepository.findInvitationCodeByGroupId(groupId).orElse(null);
-                if(invitationCode!=null){
-                    invitationCode.setPassword(group.getPassword());
-                    groupInvitationRepository.save(invitationCode);
-                }
-            }
-            groupRepository.save(group);
+            Group updateGroup = group.update(groupUpdateForm.getNewName(), passwordEncoder.encode(groupUpdateForm.getNewPassword()));
+            InvitationCode invitationCode = groupInvitationRepository.findInvitationCodeByGroupId(groupId).orElse(null);
+            invitationCode.setPassword(group.getPassword());
+            groupRepository.save(updateGroup);
+            groupInvitationRepository.save(invitationCode);
         }catch (Exception e){
             throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
         }

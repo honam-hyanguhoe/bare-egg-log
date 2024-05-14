@@ -38,4 +38,10 @@ public class Group {
         simpleDto.setGroupName(this.groupName);
         return simpleDto;
     }
+
+    public Group update(String groupName, String password){
+        this.groupName = groupName==null||groupName.isEmpty() ? this.groupName : groupName;
+        this.password = password==null||password.isEmpty() ? this.password : password;
+        return this;
+    }
 }
