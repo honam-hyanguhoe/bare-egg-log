@@ -37,8 +37,8 @@ public class FCMService {
     //토픽 구독
     public void subscribeToTopic(String token, FCMTopic fcmTopic) {
         try {
-            log.debug("[FCM 서비스 실행] \n {} 토큰이 \n {} 토픽을 구독", token, fcmTopic.setTopic());
-            firebaseMessaging.subscribeToTopic(Arrays.asList(token), fcmTopic.setTopic());
+            log.debug("[FCM 서비스 실행] \n {} 토큰이 \n {} 토픽을 구독", token, fcmTopic.getTopic());
+            firebaseMessaging.subscribeToTopic(Arrays.asList(token), fcmTopic.getTopic());
         } catch (FirebaseMessagingException e) {
             log.error("[FCM 구독 에러 발생] : {}", e.getMessage(), e);
             throw new NotificationException(NotificationErrorCode.NOTIFICATION_SERVER_ERROR);
@@ -48,8 +48,8 @@ public class FCMService {
     //토픽 구독 삭제
     public void unsubscribeFromTopic(String token, FCMTopic fcmTopic) {
         try {
-            log.debug("[FCM 서비스 실행] \n {} 토큰이 \n {} 토픽을 구독 해제", token, fcmTopic.setTopic());
-            firebaseMessaging.unsubscribeFromTopic(Arrays.asList(token), fcmTopic.setTopic());
+            log.debug("[FCM 서비스 실행] \n {} 토큰이 \n {} 토픽을 구독 해제", token, fcmTopic.getTopic());
+            firebaseMessaging.unsubscribeFromTopic(Arrays.asList(token), fcmTopic.getTopic());
         } catch (FirebaseMessagingException e) {
             log.error("[FCM 구독 해제 에러 발생] : {}", e.getMessage(), e);
             throw new NotificationException(NotificationErrorCode.NOTIFICATION_SERVER_ERROR);
@@ -61,10 +61,10 @@ public class FCMService {
         //todo : 딥링크 연결시 여기서 설정 또한 작성자는 알림 대상 제외 설정도 필요함 condition에서 설정
         Message message = Message.builder()
                 .setNotification(notification)
-                .setTopic(fcmTopic.setTopic())
+                .setTopic(fcmTopic.getTopic())
                 .build();
         try {
-            log.debug("[FCM 서비스 실행] \n  {} 토픽 구독자 알림 발송", fcmTopic.setTopic());
+            log.debug("[FCM 서비스 실행] \n  {} 토픽 구독자 알림 발송", fcmTopic.getTopic());
             String response = firebaseMessaging.send(message);
             log.debug("[FCM 서비스 실행] \n  {} 토픽 구독자 알림 발송 성공", response);
         } catch (FirebaseMessagingException e) {
