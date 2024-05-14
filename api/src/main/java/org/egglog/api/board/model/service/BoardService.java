@@ -97,21 +97,17 @@ public class BoardService {
         List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
         int size = 10;
         try {
-            List<BoardListOutputSpec> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getOffset(), size);
             log.info("boardList 쿼리 실행");
+            List<BoardListOutputSpec> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getOffset(), size);
             for (BoardListOutputSpec board : boardList) {
                 log.info("boardId: {}", board.getBoardId());
-                User writer = userJpaRepository.findById(board.getUserId()).orElseThrow(
-                        () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-                );
+
                 long viewCount = redisViewCountUtil.getViewCount(String.valueOf(board.getBoardId())); //하루 동안의 조회수
                 log.info("redis view count: {}", viewCount);
                 long hitCnt = viewCount + board.getViewCount();
                 log.info("redis + db 조회수 합산: {}", hitCnt);
                 log.info("db 조회수: {}", board.getViewCount());
 
-                //사용자의 병원 인증 정보
-                Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(writer, writer.getSelectedHospital());
                 boolean isUserLiked = false;  //좋아요 누른 여부
                 boolean isCommented = false;    //댓글 유무 여부
 
@@ -127,14 +123,6 @@ public class BoardService {
                 board.setViewCount(hitCnt);
                 board.setIsLiked(isUserLiked);
                 board.setIsCommented(isCommented);
-                board.setHospitalName(writer.getSelectedHospital().getHospitalName());
-
-                //병원 인증배지가 없다면
-                if (hospitalAuth.isEmpty()) {
-                    board.setIsHospitalAuth(false);
-                }
-                //있다면
-                hospitalAuth.ifPresent(auth -> board.setIsHospitalAuth(auth.getAuth()));
 
                 boardListOutputSpecList.add(board);
             }
@@ -148,6 +136,7 @@ public class BoardService {
 
         return boardListOutputSpecList;
     }
+
 
     /**
      * 급상승 게시물 조회
@@ -287,14 +276,14 @@ public class BoardService {
 
         try {
             Board saveBoard = boardRepository.save(board);//저장
-            if (saveBoard.getBoardType().equals(BoardType.GROUP) && group!=null){
+            if (saveBoard.getBoardType().equals(BoardType.GROUP) && group != null) {
                 //그룹 게시판에 글이 등록되었다면 푸시알림 발송
                 FCMTopic topic = FCMTopic.builder()
                         .topic(TopicEnum.GROUP)
                         .topicId(boardForm.getGroupId())
                         .build();
                 Notification notification = Notification.builder()
-                        .setTitle("[EGGLOG] "+group.getGroupName()+" 커뮤니티에 새 글이 올라왔습니다.")
+                        .setTitle("[EGGLOG] " + group.getGroupName() + " 커뮤니티에 새 글이 올라왔습니다.")
                         .setBody(boardForm.getBoardTitle())
                         .setImage(boardForm.getPictureOne() != null ? boardForm.getPictureOne() : null)
                         .build();
@@ -535,8 +524,7 @@ public class BoardService {
             //병원 인증배지가 없다면
             if (hospitalAuth.isEmpty()) {
                 boardOutputSpec.setIsHospitalAuth(false);
-            }
-            else {
+            } else {
                 boardOutputSpec.setIsHospitalAuth(hospitalAuth.get().getAuth());
             }
 
