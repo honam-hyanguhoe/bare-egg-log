@@ -59,4 +59,5 @@ public class NotificationController {
     ){
         return ResponseEntity.ok().body(MessageUtils.success(notificationService.updateNotification(requests, loginUser)));
     }
+
 }

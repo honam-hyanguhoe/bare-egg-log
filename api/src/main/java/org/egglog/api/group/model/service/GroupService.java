@@ -17,6 +17,7 @@ import org.egglog.api.group.repository.jpa.GroupRepository;
 import org.egglog.api.notification.model.entity.FCMTopic;
 import org.egglog.api.notification.model.entity.enums.TopicEnum;
 import org.egglog.api.notification.model.service.FCMService;
+import org.egglog.api.notification.model.service.NotificationService;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.utility.utils.RandomStringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +38,7 @@ public class GroupService {
     private final GroupInvitationRepository groupInvitationRepository;
 
     private final FCMService fcmService;
-
+    private final NotificationService notificationService;
     /**
      * 초대수락 메서드
      * 존재하는 코드인지 확인해서 password 검증 후 그룹에 사용자 등록
@@ -72,27 +72,13 @@ public class GroupService {
                     .isAdmin(false)
                     .build();
             groupMemberService.createGroupMember(newMember);
-
-            //1. 그룹에 새 멤버가 추가되었다면 해당 그룹 토픽으로 FCM 알림 발송
-            FCMTopic topic = FCMTopic.builder()
-                    .topic(TopicEnum.GROUP)
-                    .topicId(group.getId())
-                    .build();
-            Notification notification = Notification.builder()
-                    .setTitle("[EGGLOG]")
-                    .setBody(group.getGroupName()+"의 그룹에 새 멤버가 추가 되었습니다. 축하해주세요!")
-                    .build();
-            fcmService.sendNotificationToTopic(topic, notification);
-
-            //2. 그룹에 가입되었다면 해당 그룹 토픽 구독
-            String loginUserDeviceToken = user.getDeviceToken();
-            if (loginUserDeviceToken!=null){
-                fcmService.subscribeToTopic(loginUserDeviceToken, topic);
-            }
+            notificationService.groupMemberAcceptNotification(user, group);
         }else{
             throw new GroupException(GroupErrorCode.NOT_MATCH_INVITATION);
         }
     }
+
+
 
     /**
      * 초대코드를 요청 받을때
@@ -138,23 +124,11 @@ public class GroupService {
             GroupMember member = groupMemberService.getGroupMember(groupId, memberId);
             groupMemberService.deleteGroupMember(member);
 
-            //해당 멤버가 삭제되었다면 해당 유저의 토픽 구독 취소
-            String userDeviceToken = member.getUser().getDeviceToken();
-            FCMTopic topic = FCMTopic.builder()
-                    .topic(TopicEnum.GROUP)
-                    .topicId(groupId)
-                    .build();
-            if (userDeviceToken!=null){
-                fcmService.unsubscribeFromTopic(userDeviceToken, topic);//구독 취소
-                //해당 유저에 알림 발송
-                Notification notification = Notification.builder()
-                        .setTitle("[EGGLOG]")
-                        .setBody(member.getGroup().getGroupName()+" 에서 퇴장 당했습니다.")
-                        .build();
-                fcmService.sendPersonalNotification(userDeviceToken, notification);
-            }
+            notificationService.deleteGroupMemberNotification(groupId, member);
         }
     }
+
+
 
     /**
      * 본인이 속한 그룹리스트 반환

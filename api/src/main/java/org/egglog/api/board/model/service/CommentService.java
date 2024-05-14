@@ -1,6 +1,6 @@
 package org.egglog.api.board.model.service;
 
-import com.google.firebase.messaging.Notification;
+
 import jakarta.persistence.PersistenceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,12 +15,8 @@ import org.egglog.api.board.model.entity.Board;
 import org.egglog.api.board.model.entity.Comment;
 import org.egglog.api.board.repository.jpa.board.BoardRepository;
 import org.egglog.api.board.repository.jpa.comment.CommentRepository;
-import org.egglog.api.notification.model.entity.FCMTopic;
-import org.egglog.api.notification.model.service.FCMService;
-import org.egglog.api.user.exception.UserErrorCode;
-import org.egglog.api.user.exception.UserException;
+import org.egglog.api.notification.model.service.NotificationService;
 import org.egglog.api.user.model.entity.User;
-import org.egglog.api.user.repository.jpa.UserJpaRepository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,13 +30,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CommentService {
 
-    private final UserJpaRepository userJpaRepository;
-
     private final BoardRepository boardRepository;
 
     private final CommentRepository commentRepository;
 
-    private final FCMService fcmService;
+    private final NotificationService notificationService;
 
     /**
      * 댓글 조회 메서드<br/>
@@ -139,32 +133,7 @@ public class CommentService {
 
         try {
             Comment saveComment = commentRepository.save(comment);
-
-            //1. 해당 글에 댓글이 등록되었다면 글 작성자에게 푸시알림 발송
-            String deviceToken = board.getUser().getDeviceToken();
-            if (deviceToken!=null){
-                Notification notification = Notification.builder()
-                        .setTitle("[EGGLOG] 커뮤니티 글에 새 댓글이 달렸습니다.")
-                        .setBody(saveComment.getContent())
-                        .build();
-                fcmService.sendPersonalNotification(deviceToken, notification);
-            }
-
-
-            // 2. 대 댓글이라면 부모 ID 작성자에게도 알림을 보낸다.
-            Long parentId = comment.getParentId();
-            if (!parentId.equals(0L)&&!parentId.equals(board.getUser().getId())){//대 댓글이면서 부모 댓글의 아이디가 글 작성자가 아닐때만 발송한다.
-                Comment cocoment = commentRepository.findWithUserById(parentId).orElseThrow(
-                        () -> new CommentException(CommentErrorCode.NO_EXIST_COMMENT));
-                String cocomentDeviceToken = cocoment.getUser().getDeviceToken();
-                if (cocomentDeviceToken!=null){
-                    Notification notification = Notification.builder()
-                            .setTitle("[EGGLOG] 내 댓글에 새 대댓글이 달렸습니다.")
-                            .setBody(saveComment.getContent())
-                            .build();
-                    fcmService.sendPersonalNotification(cocomentDeviceToken, notification);
-                }
-            }
+            notificationService.registerCommentNotification(board, saveComment, comment);
         } catch (DataAccessException e) {
             throw new CommentException(CommentErrorCode.DATABASE_CONNECTION_FAILED);
         } catch (Exception e) {
@@ -172,6 +141,8 @@ public class CommentService {
             throw new CommentException(CommentErrorCode.UNKNOWN_ERROR);
         }
     }
+
+
 
 
     /**
