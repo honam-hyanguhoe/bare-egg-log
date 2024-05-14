@@ -15,6 +15,7 @@ import org.egglog.api.group.model.entity.InvitationCode;
 import org.egglog.api.group.repository.redis.GroupInvitationRepository;
 import org.egglog.api.group.repository.jpa.GroupRepository;
 import org.egglog.api.notification.model.entity.FCMTopic;
+import org.egglog.api.notification.model.entity.enums.TopicEnum;
 import org.egglog.api.notification.model.service.FCMService;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.utility.utils.RandomStringUtils;
@@ -74,7 +75,7 @@ public class GroupService {
 
             //1. 그룹에 새 멤버가 추가되었다면 해당 그룹 토픽으로 FCM 알림 발송
             FCMTopic topic = FCMTopic.builder()
-                    .topic(FCMTopic.TopicEnum.group)
+                    .topic(TopicEnum.GROUP)
                     .topicId(group.getId())
                     .build();
             Notification notification = Notification.builder()
@@ -140,7 +141,7 @@ public class GroupService {
             //해당 멤버가 삭제되었다면 해당 유저의 토픽 구독 취소
             String userDeviceToken = member.getUser().getDeviceToken();
             FCMTopic topic = FCMTopic.builder()
-                    .topic(FCMTopic.TopicEnum.group)
+                    .topic(TopicEnum.GROUP)
                     .topicId(groupId)
                     .build();
             if (userDeviceToken!=null){
@@ -285,7 +286,7 @@ public class GroupService {
                 //해당 멤버가 삭제되었다면 해당 유저의 토픽 구독 취소
                 String loginUserDeviceToken = user.getDeviceToken();
                 FCMTopic topic = FCMTopic.builder()
-                        .topic(FCMTopic.TopicEnum.group)
+                        .topic(TopicEnum.GROUP)
                         .topicId(groupId)
                         .build();
                 if (loginUserDeviceToken!=null){

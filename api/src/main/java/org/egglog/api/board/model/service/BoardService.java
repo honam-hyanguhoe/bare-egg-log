@@ -27,6 +27,7 @@ import org.egglog.api.hospital.exception.HospitalErrorCode;
 import org.egglog.api.hospital.exception.HospitalException;
 import org.egglog.api.hospital.model.entity.Hospital;
 import org.egglog.api.notification.model.entity.FCMTopic;
+import org.egglog.api.notification.model.entity.enums.TopicEnum;
 import org.egglog.api.notification.model.service.FCMService;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
@@ -278,7 +279,7 @@ public class BoardService {
             if (saveBoard.getBoardType().equals(BoardType.GROUP) && group != null) {
                 //그룹 게시판에 글이 등록되었다면 푸시알림 발송
                 FCMTopic topic = FCMTopic.builder()
-                        .topic(FCMTopic.TopicEnum.group)
+                        .topic(TopicEnum.GROUP)
                         .topicId(boardForm.getGroupId())
                         .build();
                 Notification notification = Notification.builder()
