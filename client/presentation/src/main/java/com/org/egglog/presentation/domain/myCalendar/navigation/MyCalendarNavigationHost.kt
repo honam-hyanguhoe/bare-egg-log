@@ -7,6 +7,10 @@ import androidx.navigation.compose.rememberNavController
 import com.org.egglog.presentation.domain.community.navigation.CommunityRoute
 import com.org.egglog.presentation.domain.myCalendar.screen.ExcelListScreen
 import com.org.egglog.presentation.domain.myCalendar.screen.MyCalendarScreen
+import com.org.egglog.presentation.domain.setting.navigation.SettingRoute
+import com.org.egglog.presentation.domain.setting.screen.CalendarAddScreen
+import com.org.egglog.presentation.domain.setting.screen.CalendarSettingScreen
+import com.org.egglog.presentation.domain.setting.screen.WorkSettingScreen
 
 @Composable
 fun MyCalendarNavigationHost() {
@@ -21,6 +25,16 @@ fun MyCalendarNavigationHost() {
                 onNavigateToExcelScreen = {
                     navController.navigate(
                         MyCalendarRoute.ExcelListScreen.name
+                    )
+                },
+                onNavigateToCalendarSettingScreen = {
+                    navController.navigate(
+                        SettingRoute.CalendarSettingScreen.name
+                    )
+                },
+                onNavigateToWorkSettingScreen = {
+                    navController.navigate(
+                        SettingRoute.WorkSettingScreen.name
                     )
                 }
             )
@@ -39,6 +53,20 @@ fun MyCalendarNavigationHost() {
                     )
                 }
             )
+        }
+
+        composable(route = SettingRoute.CalendarSettingScreen.name) {
+            CalendarSettingScreen(
+                onNavigationToCalendarAddScreen = { navController.navigate(route = SettingRoute.CalendarAddScreen.name) }
+            )
+        }
+
+        composable(route = SettingRoute.CalendarAddScreen.name) {
+            CalendarAddScreen()
+        }
+
+        composable(route = SettingRoute.WorkSettingScreen.name) {
+            WorkSettingScreen()
         }
     }
 }

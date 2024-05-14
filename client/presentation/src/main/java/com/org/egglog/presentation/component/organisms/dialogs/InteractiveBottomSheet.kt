@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.org.egglog.presentation.theme.*
@@ -55,24 +56,6 @@ fun InteractiveBottomSheet(
         contentColor = NaturalBlack,
         sheetSwipeEnabled = false,
     ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Column() {
-                Button(
-                    onClick = {
-                        scope.launch { iBottomSheetState.bottomSheetState.partialExpand() }
-                    }
-                ) {
-                    Text("열어줘")
-                }
-                Button(
-                    onClick = {
-                        scope.launch { iBottomSheetState.bottomSheetState.hide() }
-                    }
-                ) {
-                    Text("닫을래")
-                }
-            }
-        }
     }
 }
 
@@ -87,4 +70,13 @@ fun SheetContent() {
     ) {
         Text(text = "test")
     }
+}
+
+@Preview
+@Composable
+private fun InteractiveBottomSheetPrev() {
+    ClientTheme {
+        InteractiveBottomSheet(height = 100.dp, padding = 10.dp)
+    }
+
 }
