@@ -36,14 +36,14 @@ public class BoardListOutputSpec {
     private Boolean isLiked;        // 좋아요 여부
 
     private Boolean isCommented;    //댓글 유무 여부
-    
+
     private Boolean isHospitalAuth;     // 인증 여부
 
     private String hospitalName;    // 사용자 병원명
 
     private Long userId;            // 유저 id
 
-    public BoardListOutputSpec(Board board, long commentCount, long likeCount, String hospitalName, Boolean isHospitalAuth) {
+    public BoardListOutputSpec(Board board, long commentCount, long likeCount, String hospitalName, Boolean isHospitalAuth, Boolean isLiked) {
 
         this.boardId = board.getId();
         this.boardTitle = board.getTitle();
@@ -57,6 +57,7 @@ public class BoardListOutputSpec {
         this.userId = board.getUser().getId();
         this.hospitalName = hospitalName;
         this.isHospitalAuth = isHospitalAuth;
+        this.isLiked = isLiked;
     }
 
 }

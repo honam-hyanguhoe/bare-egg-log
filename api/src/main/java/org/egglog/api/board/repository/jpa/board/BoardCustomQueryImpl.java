@@ -117,8 +117,50 @@ public class BoardCustomQueryImpl implements BoardCustomQuery {
 
     }
 
+//    @Override
+//    public List<BoardListOutputSpec> findBoardList(String keyword, Long groupId, Long hospitalId, Long offset, int size) {
+//        BooleanExpression whereClause = board.isNotNull()
+//                .and(groupId != null ? board.group.id.eq(groupId) : board.group.id.isNull())
+//                .and(hospitalId != null ? board.hospital.id.eq(hospitalId) : board.hospital.id.isNull())
+//                .and(keyword != null && !keyword.isEmpty() ? searchKeyword(keyword) : null);
+//
+//        List<Tuple> results = jpaQueryFactory
+//                .select(
+//                        board,
+//                        comment.countDistinct(),
+//                        boardLike.countDistinct(),
+//                        JPAExpressions.select(board.user.selectedHospital.hospitalName)
+//                                .from(hospital)
+//                                .where(hospital.id.eq(board.user.selectedHospital.id)),
+//                        JPAExpressions.select(hospitalAuth.auth)
+//                                .from(hospitalAuth)
+//                                .where(
+//                                        hospitalAuth.user.eq(board.user),
+//                                        hospitalAuth.hospital.eq(board.user.selectedHospital)
+//                                )
+//                )
+//                .from(board)
+//                .leftJoin(comment).on(comment.board.eq(board))
+//                .leftJoin(boardLike).on(boardLike.board.eq(board))
+//                .where(whereClause)
+//                .groupBy(board.id)
+//                .orderBy(board.id.desc())
+//                .offset(offset)
+//                .limit(size)
+//                .fetch();
+//
+//        return results.stream().map(tuple -> new BoardListOutputSpec(
+//                tuple.get(board),
+//                tuple.get(comment.countDistinct().longValue()),
+//                tuple.get(boardLike.countDistinct().longValue()),
+//                tuple.get(3, String.class),
+//                tuple.get(4, Boolean.class) != null ? tuple.get(4, Boolean.class) : false
+//        )).collect(Collectors.toList());
+//
+//    }
+
     @Override
-    public List<BoardListOutputSpec> findBoardList(String keyword, Long groupId, Long hospitalId, Long offset, int size) {
+    public List<BoardListOutputSpec> findBoardList(String keyword, Long groupId, Long hospitalId, Long offset, int size, Long loginUserId) {
         BooleanExpression whereClause = board.isNotNull()
                 .and(groupId != null ? board.group.id.eq(groupId) : board.group.id.isNull())
                 .and(hospitalId != null ? board.hospital.id.eq(hospitalId) : board.hospital.id.isNull())
@@ -137,6 +179,11 @@ public class BoardCustomQueryImpl implements BoardCustomQuery {
                                 .where(
                                         hospitalAuth.user.eq(board.user),
                                         hospitalAuth.hospital.eq(board.user.selectedHospital)
+                                ),
+                        JPAExpressions.selectFrom(boardLike)
+                                .where(
+                                        boardLike.user.id.eq(loginUserId),
+                                                boardLike.board.eq(board)
                                 )
                 )
                 .from(board)
@@ -154,7 +201,8 @@ public class BoardCustomQueryImpl implements BoardCustomQuery {
                 tuple.get(comment.countDistinct().longValue()),
                 tuple.get(boardLike.countDistinct().longValue()),
                 tuple.get(3, String.class),
-                tuple.get(4, Boolean.class) != null ? tuple.get(4, Boolean.class) : false
+                tuple.get(4, Boolean.class) != null ? tuple.get(4, Boolean.class) : false,
+                tuple.get(5, BoardLike.class) != null ? true : false
         )).collect(Collectors.toList());
 
     }
