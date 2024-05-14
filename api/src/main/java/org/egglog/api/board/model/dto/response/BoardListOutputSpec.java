@@ -43,7 +43,7 @@ public class BoardListOutputSpec {
 
     private Long userId;            // 유저 id
 
-    public BoardListOutputSpec(Board board, long commentCount, long likeCount) {
+    public BoardListOutputSpec(Board board, long commentCount, long likeCount, String hospitalName, Boolean isHospitalAuth) {
         this.boardId = board.getId();
         this.boardTitle = board.getTitle();
         this.boardContent = board.getContent();
@@ -54,6 +54,8 @@ public class BoardListOutputSpec {
         this.likeCount = likeCount;
         this.pictureOne = board.getPictureOne();
         this.userId = board.getUser().getId();
+        this.hospitalName = hospitalName;
+        this.isHospitalAuth = isHospitalAuth;
     }
 
 }
