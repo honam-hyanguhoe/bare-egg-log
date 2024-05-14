@@ -70,7 +70,8 @@ import kotlin.reflect.KFunction1
 fun GroupDetailScreen(
     groupDetailViewModel: GroupDetailViewModel = hiltViewModel(),
     onNavigateToGroupListScreen: () -> Unit,
-    groupId: Long?
+    onNavigateToMemberManageScreen: (groupId: Long) -> Unit,
+    groupId: Long
 ) {
     val groupDetailState = groupDetailViewModel.collectAsState().value
     val context = LocalContext.current
@@ -88,12 +89,20 @@ fun GroupDetailScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        Log.d("groupDetailScreen", "가져올게")
+        groupDetailViewModel.getGroupDuty()
+        groupDetailViewModel.getMyWork()
+        groupDetailViewModel.initSelectedMembers()
+    }
+
     LaunchedEffect(selected.value) {
         groupDetailViewModel.setSelected(selected.value)
         Log.d("groupDetail", "radio ${selected.value}")
     }
 
     GroupDetailScreen(
+        groupId = groupId,
         groupName = groupDetailState.groupInfo.groupName,
         isAdmin = groupDetailState.groupInfo.isAdmin,
         memberCount = (groupDetailState.groupInfo.groupMembers?.size?.plus(1)) ?: 1,
@@ -116,7 +125,6 @@ fun GroupDetailScreen(
 
         showBottomSheet = showBottomSheet,
         setShowBottomSheet = groupDetailViewModel::setShowBottomSheet,
-
         // settings
         tempGroupName = groupDetailState.tempGroupName,
         tempGroupPassword = groupDetailState.tempGroupPassword,
@@ -124,11 +132,13 @@ fun GroupDetailScreen(
         onGroupPasswordChange = groupDetailViewModel::onChangeGroupPassword,
         updateGroup = groupDetailViewModel::updateGroupInfo,
         onClickCancel = groupDetailViewModel::onClickCancel,
+        onClickManageMember = { groupId: Long -> onNavigateToMemberManageScreen(groupId) }
     )
 }
 
 @Composable
 private fun GroupDetailScreen(
+    groupId: Long,
     groupName: String,
     isAdmin : Boolean = false,
     memberCount: Int,
@@ -156,6 +166,7 @@ private fun GroupDetailScreen(
     onGroupPasswordChange: (String) -> Unit ,
     updateGroup : () -> Unit,
     onClickCancel : () -> Unit,
+    onClickManageMember:(groupId: Long) -> Unit,
 ) {
     val tempLabels: List<String> = listOf("Night", "Day", "휴가", "보건", "Off", "Eve", "Eve")
     val options = listOf("그룹 설정", "그룹원 설정", "그룹 나가기")
@@ -183,11 +194,13 @@ private fun GroupDetailScreen(
                     Log.d("menus", "it $it")
                     if (it == "그룹 설정") {
                         if(isAdmin){
-//                            Toast.makeText(context,"그룹장입니다", Toast.LENGTH_SHORT).show()
                             setShowBottomSheet(true)
                         }else{
                             Toast.makeText(context,"접근 권한이 없습니다.", Toast.LENGTH_SHORT).show()
                         }
+                    }else if(it == "그룹원 설정"){
+                        Log.d("screen", "그룹원 설정 페이지 이동")
+                        onClickManageMember(groupId)
                     }
                 }
             )
