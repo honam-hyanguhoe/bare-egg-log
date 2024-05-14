@@ -211,7 +211,13 @@ public class GroupService {
                 .orElseThrow(() -> new GroupException(GroupErrorCode.NOT_FOUND));
         try {
             Group updateGroup = group.update(groupUpdateForm.getNewName(), passwordEncoder.encode(groupUpdateForm.getNewPassword()));
-            InvitationCode invitationCode = groupInvitationRepository.findInvitationCodeByGroupId(groupId).orElse(null);
+            InvitationCode invitationCode = groupInvitationRepository.findInvitationCodeByGroupId(groupId)
+                    .orElse(InvitationCode
+                            .builder()
+                            .groupId(groupId)
+                            .code(RandomStringUtils.generateRandomMixChar(10))
+                            .build());
+
             invitationCode.setPassword(group.getPassword());
             groupRepository.save(updateGroup);
             groupInvitationRepository.save(invitationCode);
