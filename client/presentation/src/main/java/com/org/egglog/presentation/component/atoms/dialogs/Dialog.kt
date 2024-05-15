@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.org.egglog.presentation.component.atoms.buttons.BasicButton
@@ -48,7 +49,7 @@ fun Dialog(
                 Text(text = "취소")
             }
         },
-        title = { Text(text = dialogTitle) },
+        title = { Text(text = dialogTitle, style = Typography.headlineLarge.copy(fontWeight = FontWeight.Bold)) },
         text = {
             Column {
                 Text(text = dialogText)

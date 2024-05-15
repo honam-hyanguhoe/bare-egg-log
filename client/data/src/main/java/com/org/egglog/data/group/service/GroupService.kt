@@ -102,6 +102,12 @@ interface GroupService {
         @Path("member_id") memberId: Long,
     ): CommonResponse<String>
 
+    @DELETE("groups/exit/{group_id}")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun exitGroup(
+        @Header("Authorization") accessToken: String,
+        @Path("group_id") groupId: Long,
+    ): CommonResponse<String>
 
 }
 

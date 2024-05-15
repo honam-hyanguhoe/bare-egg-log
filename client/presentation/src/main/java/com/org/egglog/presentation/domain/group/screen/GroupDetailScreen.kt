@@ -56,6 +56,7 @@ import com.org.egglog.presentation.component.molecules.headers.BasicHeader
 import com.org.egglog.presentation.component.organisms.calendars.GroupCalenar
 import com.org.egglog.presentation.component.organisms.calendars.WeeklyCalendar
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyUiModel
+import com.org.egglog.presentation.component.organisms.dialogs.WebViewDialog
 import com.org.egglog.presentation.domain.group.viewmodel.GroupDetailSideEffect
 import com.org.egglog.presentation.domain.group.viewmodel.GroupDetailViewModel
 import com.org.egglog.presentation.theme.*
@@ -133,7 +134,8 @@ fun GroupDetailScreen(
         onGroupPasswordChange = groupDetailViewModel::onChangeGroupPassword,
         updateGroup = groupDetailViewModel::updateGroupInfo,
         onClickCancel = groupDetailViewModel::onClickCancel,
-        onClickManageMember = { groupId: Long -> onNavigateToMemberManageScreen(groupId) }
+        onClickManageMember = { groupId: Long -> onNavigateToMemberManageScreen(groupId) },
+        exitGroup = groupDetailViewModel::exitGroup
     )
 }
 
@@ -168,11 +170,13 @@ private fun GroupDetailScreen(
     updateGroup : () -> Unit,
     onClickCancel : () -> Unit,
     onClickManageMember:(groupId: Long) -> Unit,
+    exitGroup : () -> Unit
 ) {
     val tempLabels: List<String> = listOf("Night", "Day", "휴가", "보건", "Off", "Eve", "Eve")
     val options = listOf("그룹 설정", "그룹원 설정", "그룹 나가기")
     var selectedOption by remember { mutableStateOf<String?>(null) }
-
+    val openDialogExit = remember { mutableStateOf(false) }
+    val openDialogBoss = remember { mutableStateOf(false) }
     val context = LocalContext.current
     LazyColumn(
         modifier = Modifier
@@ -205,6 +209,16 @@ private fun GroupDetailScreen(
                             onClickManageMember(groupId)
                         }else{
                             Toast.makeText(context,"접근 권한이 없습니다.", Toast.LENGTH_SHORT).show()
+                        }
+                    }else if(it == "그룹 나가기"){
+                        if(isAdmin){
+                            if(memberCount == 1){
+                                openDialogExit.value = true
+                            }else{
+                                openDialogBoss.value = true
+                            }
+                        }else{
+                            openDialogExit.value = true
                         }
                     }
                 }
@@ -241,7 +255,26 @@ private fun GroupDetailScreen(
             MemberCalendar(myWorkList = myWorkList, groupWorkList = groupWorkList)
         }
     }
-    
+
+    when {
+        openDialogExit.value -> {
+            Dialog(
+                onDismissRequest = { openDialogExit.value = false },
+                onConfirmation = exitGroup,
+                dialogTitle = "그룹을 나가시겠습니까?",
+                dialogText = "그룹을 나가면 해당 그룹의 모든 활동 및 업데이트를 더 이상 받을 수 없습니다."
+            )
+        }
+        openDialogBoss.value -> {
+            Dialog(
+                onDismissRequest = { openDialogBoss.value = false },
+                onConfirmation = { openDialogBoss.value = false },
+                dialogTitle = "그룹장은 탈퇴할 수 없습니다.",
+                dialogText = "새 그룹장을 선택 후 다시 시도해주세요."
+            )
+        }
+    }
+
     if (showBottomSheet) {
         BottomSheet(
             height = 300.dp,

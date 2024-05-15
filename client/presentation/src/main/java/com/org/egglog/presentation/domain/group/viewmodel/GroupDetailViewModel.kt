@@ -21,6 +21,7 @@ import com.org.egglog.domain.group.model.GroupMember
 import com.org.egglog.domain.group.model.Member
 import com.org.egglog.domain.group.usecase.ChangeLeaderUseCase
 import com.org.egglog.domain.group.usecase.DeleteMemberUseCase
+import com.org.egglog.domain.group.usecase.ExitGroupUseCase
 import com.org.egglog.domain.group.usecase.GetGroupDutyUseCase
 import com.org.egglog.domain.group.usecase.GetGroupInfoUseCase
 import com.org.egglog.domain.group.usecase.GetInvitationCodeUseCase
@@ -61,6 +62,7 @@ class GroupDetailViewModel @Inject constructor(
     private val updateGroupInfoUseCase: UpdateGroupInfoUseCase,
     private val deleteMemberUseCase: DeleteMemberUseCase,
     private val changeLeaderUseCase: ChangeLeaderUseCase,
+    private val exitGroupUseCase: ExitGroupUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel(), ContainerHost<GroupDetailState, GroupDetailSideEffect> {
     override val container: Container<GroupDetailState, GroupDetailSideEffect> =
@@ -75,6 +77,7 @@ class GroupDetailViewModel @Inject constructor(
     val selected: MutableState<String> = _selected
     val dataSource = WeeklyDataSource()
     private val _showBottomSheet = MutableStateFlow(false)
+    private val _showDialog = MutableStateFlow(false)
     val showBottomSheet: StateFlow<Boolean> = _showBottomSheet.asStateFlow()
 
     init {
@@ -480,6 +483,20 @@ class GroupDetailViewModel @Inject constructor(
             postSideEffect(GroupDetailSideEffect.Toast("모임장이 변경되었습니다."))
         }else{
             postSideEffect(GroupDetailSideEffect.Toast("모임장 위임에 실패하였습니다."))
+        }
+    }
+
+    fun exitGroup() = intent {
+        val tokens = getTokenUseCase()
+        val result = exitGroupUseCase(
+            accessToken = "Bearer ${tokens.first}",
+            groupId = groupId
+        )
+
+        if(result.isSuccess){
+            postSideEffect(GroupDetailSideEffect.Toast("그룹을 탈퇴하였습니다."))
+        }else{
+            postSideEffect(GroupDetailSideEffect.Toast("다시 시도해주세요"))
         }
     }
 }
