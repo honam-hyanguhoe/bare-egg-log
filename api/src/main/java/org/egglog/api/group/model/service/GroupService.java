@@ -232,6 +232,7 @@ public class GroupService {
 
         Group group = groupRepository.findById(groupId).orElseThrow(()->new GroupException(GroupErrorCode.TRANSACTION_ERROR));
         group.setAdmin(newBoss);
+        groupRepository.save(group);
     }
 
     /**
