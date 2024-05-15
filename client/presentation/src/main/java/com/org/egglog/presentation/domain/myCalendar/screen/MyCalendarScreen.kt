@@ -355,7 +355,10 @@ fun ScheduleList(
 ) {
     Column() {
         if(currentWorkData != null) {
-            SmallScheduleCard(work = currentWorkData.title, startTime = currentWorkData.startTime.substring(0,5), endTime = currentWorkData.workTime.substring(0,5), onClickMore = {})
+            val hour1 = currentWorkData.startTime.substring(0,2).toInt()
+            val hour2 = currentWorkData.workTime.substring(0,2).toInt()
+            val endTime = String.format("%02d:00", hour1 + hour2)
+            SmallScheduleCard(work = currentWorkData.title, startTime = currentWorkData.startTime.substring(0,5), endTime = endTime, onClickMore = {})
         }
 
 //        SmallScheduleCard(work = "day", startTime = "12:00", endTime = "13:00", onClickMore = {})
