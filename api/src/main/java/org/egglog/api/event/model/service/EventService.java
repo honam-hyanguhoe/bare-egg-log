@@ -141,6 +141,7 @@ public class EventService {
                         .eventContent(event.getEventContent())
                         .startDate(event.getStartDate())
                         .endDate(event.getEndDate())
+                        .calendarGroupId(calendarGroupId)
                         .build();
 
                 eventListOutputSpecList.add(eventListOutputSpec);
