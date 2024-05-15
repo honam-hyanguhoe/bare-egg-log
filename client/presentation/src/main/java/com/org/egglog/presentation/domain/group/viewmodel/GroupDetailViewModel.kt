@@ -77,18 +77,18 @@ class GroupDetailViewModel @Inject constructor(
     val selected: MutableState<String> = _selected
     val dataSource = WeeklyDataSource()
     private val _showBottomSheet = MutableStateFlow(false)
-    private val _showDialog = MutableStateFlow(false)
     val showBottomSheet: StateFlow<Boolean> = _showBottomSheet.asStateFlow()
 
+    private val _showUploadBottomSheet = MutableStateFlow(false)
+    val showUploadBottomSheet : StateFlow<Boolean> = _showUploadBottomSheet.asStateFlow()
+    private val _showSecondUploadBottomSheet = MutableStateFlow(false)
+    val showSecondUploadBottomSheet : StateFlow<Boolean> = _showSecondUploadBottomSheet.asStateFlow()
     init {
         loadInit()
     }
 
     private fun loadInit() = intent {
         getGroupInfo(groupId = groupId)
-//        getGroupDuty()
-//        getMyWork()
-//        initSelectedMembers()
         Log.d("weekCal", "init ${state.startDate} ${state.currentWeekDays}")
     }
 
@@ -110,6 +110,15 @@ class GroupDetailViewModel @Inject constructor(
         reduce { state.copy(dutyType = newValue) }
         updateData()
     }
+
+    fun onClickUpload(show : Boolean){
+        _showUploadBottomSheet.value = show
+    }
+
+    fun onClickNextUpload(show : Boolean){
+        _showSecondUploadBottomSheet.value = show
+    }
+
 
 
     // 멤버 선택 근무 일정 조회
@@ -425,6 +434,9 @@ class GroupDetailViewModel @Inject constructor(
             )
         }
     }
+
+
+
 
     // 그룹원 관리
     fun onDelete(userId : Long) = intent {

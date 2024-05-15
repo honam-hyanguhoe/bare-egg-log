@@ -1,14 +1,20 @@
 package com.org.egglog.presentation.domain.group.screen
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -44,6 +50,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.android.datatransport.runtime.scheduling.jobscheduling.Uploader
 import com.org.egglog.client.ui.molecules.radioButtons.WorkRadioButton
 import com.org.egglog.domain.group.model.Member
 import com.org.egglog.presentation.R
@@ -55,11 +62,14 @@ import com.org.egglog.presentation.component.atoms.dialogs.Dialog
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.presentation.component.atoms.inputs.PassInput
 import com.org.egglog.presentation.component.atoms.inputs.SingleInput
+import com.org.egglog.presentation.component.atoms.wheelPicker.CustomDatePicker
 import com.org.egglog.presentation.component.molecules.headers.BasicHeader
 import com.org.egglog.presentation.component.organisms.calendars.GroupCalenar
 import com.org.egglog.presentation.component.organisms.calendars.WeeklyCalendar
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyUiModel
 import com.org.egglog.presentation.component.organisms.dialogs.WebViewDialog
+import com.org.egglog.presentation.domain.group.viewmodel.FileUploadSideEffect
+import com.org.egglog.presentation.domain.group.viewmodel.FileUploadViewModel
 import com.org.egglog.presentation.domain.group.viewmodel.GroupDetailSideEffect
 import com.org.egglog.presentation.domain.group.viewmodel.GroupDetailViewModel
 import com.org.egglog.presentation.theme.*
@@ -74,19 +84,43 @@ import kotlin.reflect.KFunction1
 @Composable
 fun GroupDetailScreen(
     groupDetailViewModel: GroupDetailViewModel = hiltViewModel(),
+    fileUploadViewModel: FileUploadViewModel = hiltViewModel(),
     onNavigateToGroupListScreen: () -> Unit,
     onNavigateToMemberManageScreen: (groupId: Long) -> Unit,
     groupId: Long
 ) {
     val groupDetailState = groupDetailViewModel.collectAsState().value
+    val fileUploadState = fileUploadViewModel.collectAsState().value
     val context = LocalContext.current
     val selected = groupDetailViewModel.selected
     val showBottomSheet by groupDetailViewModel.showBottomSheet.collectAsState()
+    val showUploadBottomSheet by groupDetailViewModel.showUploadBottomSheet.collectAsState()
+    val showSecondUploadBottomSheet by groupDetailViewModel.showSecondUploadBottomSheet.collectAsState()
+    val selectedDate = fileUploadViewModel.selectedDate
 
-    groupDetailViewModel.collectSideEffect {
-        sideEffect ->
-        when(sideEffect){
+    val getFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri: Uri? ->
+            uri?.let {
+                fileUploadViewModel.uploadFile(context, uri)
+            }
+        }
+    )
+
+    groupDetailViewModel.collectSideEffect { sideEffect ->
+        when (sideEffect) {
             is GroupDetailSideEffect.Toast -> Toast.makeText(
+                context,
+                sideEffect.message,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+
+    fileUploadViewModel.collectSideEffect { sideEffect ->
+        when (sideEffect) {
+            is FileUploadSideEffect.Toast -> Toast.makeText(
                 context,
                 sideEffect.message,
                 Toast.LENGTH_SHORT
@@ -130,15 +164,29 @@ fun GroupDetailScreen(
 
         showBottomSheet = showBottomSheet,
         setShowBottomSheet = groupDetailViewModel::setShowBottomSheet,
+
+        showUploadBottomSheet = showUploadBottomSheet,
+        setShowUploadBottomSheet = groupDetailViewModel::onClickUpload,
+
+        showSecondUploadBottomSheet = showSecondUploadBottomSheet,
+        setShowSecondUploadBottomSheet = groupDetailViewModel::onClickNextUpload,
         // settings
         tempGroupName = groupDetailState.tempGroupName,
         tempGroupPassword = groupDetailState.tempGroupPassword,
+
+        setSelectedDate = fileUploadViewModel::setSelectedDate,
+        customDutyList = fileUploadState.customDutyList,
+        onChangeFileDay = fileUploadViewModel::onChangeFileDay,
+        onChangeFileEVE = fileUploadViewModel::onChangeFileEVE,
+        onChangeFileNIGHT = fileUploadViewModel::onChangeFileNIGHT,
+        onChangeFileOFF = fileUploadViewModel::onChangeFileOFF,
         onGroupNameChange = groupDetailViewModel::onChangeGroupName,
         onGroupPasswordChange = groupDetailViewModel::onChangeGroupPassword,
         updateGroup = groupDetailViewModel::updateGroupInfo,
         onClickCancel = groupDetailViewModel::onClickCancel,
         onClickManageMember = { groupId: Long -> onNavigateToMemberManageScreen(groupId) },
-        exitGroup = groupDetailViewModel::exitGroup
+        exitGroup = groupDetailViewModel::exitGroup,
+        onClickFileUploader = { getFileLauncher.launch("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")}
     )
 }
 
@@ -146,7 +194,7 @@ fun GroupDetailScreen(
 private fun GroupDetailScreen(
     groupId: Long,
     groupName: String,
-    isAdmin : Boolean = false,
+    isAdmin: Boolean = false,
     memberCount: Int,
     adminName: String,
     onClickBack: () -> Unit,
@@ -156,6 +204,7 @@ private fun GroupDetailScreen(
     onNextClick: (LocalDate) -> Unit,
     onDateClick: (WeeklyUiModel.Date) -> Unit,
     selected: MutableState<String>,
+    setSelectedDate : (LocalDate?) -> Unit,
     selectedDuty: List<Member>,
     copyInvitationLink: (Context) -> Unit,
     toggleMemberSelection: KFunction1<Member, Unit>,
@@ -164,23 +213,36 @@ private fun GroupDetailScreen(
     groupWorkList: Map<String, Map<String, String>>,
     showBottomSheet: Boolean,
     setShowBottomSheet: (Boolean) -> Unit,
+    showUploadBottomSheet: Boolean,
+    setShowUploadBottomSheet: (Boolean) -> Unit,
+    showSecondUploadBottomSheet: Boolean,
+    setShowSecondUploadBottomSheet: (Boolean) -> Unit,
 
     // 그룹 설정
-    tempGroupName: String ,
-    tempGroupPassword: String ,
-    onGroupNameChange: (String) -> Unit ,
-    onGroupPasswordChange: (String) -> Unit ,
-    updateGroup : () -> Unit,
-    onClickCancel : () -> Unit,
-    onClickManageMember:(groupId: Long) -> Unit,
-    exitGroup : () -> Unit
+    tempGroupName: String,
+    tempGroupPassword: String,
+    customDutyList : Map<String, String>,
+    onChangeFileDay: (String) -> Unit,
+    onChangeFileEVE: (String) -> Unit,
+    onChangeFileNIGHT: (String) -> Unit,
+    onChangeFileOFF: (String) -> Unit,
+    onGroupNameChange: (String) -> Unit,
+    onGroupPasswordChange: (String) -> Unit,
+    updateGroup: () -> Unit,
+    onClickCancel: () -> Unit,
+    onClickManageMember: (groupId: Long) -> Unit,
+    exitGroup: () -> Unit,
+    onClickFileUploader: () -> Unit
 ) {
     val tempLabels: List<String> = listOf("Night", "Day", "휴가", "보건", "Off", "Eve", "Eve")
     val options = listOf("그룹 설정", "그룹원 설정", "그룹 나가기")
     var selectedOption by remember { mutableStateOf<String?>(null) }
     val openDialogExit = remember { mutableStateOf(false) }
     val openDialogBoss = remember { mutableStateOf(false) }
+    var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
     val focusRequester = remember { FocusRequester() }
+
+
     val context = LocalContext.current
     LazyColumn(
         modifier = Modifier
@@ -199,32 +261,33 @@ private fun GroupDetailScreen(
                 onClickBack = onClickBack,
                 onClickLink = {
                     focusRequester.requestFocus()
-                    copyInvitationLink(context) },
+                    copyInvitationLink(context)
+                },
                 options = options,
                 onSelect = {
                     selectedOption = it
                     Log.d("menus", "it $it")
                     if (it == "그룹 설정") {
-                        if(isAdmin){
+                        if (isAdmin) {
                             setShowBottomSheet(true)
-                        }else{
-                            Toast.makeText(context,"접근 권한이 없습니다.", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "접근 권한이 없습니다.", Toast.LENGTH_SHORT).show()
                         }
-                    }else if(it == "그룹원 설정"){
+                    } else if (it == "그룹원 설정") {
                         Log.d("screen", "그룹원 설정 페이지 이동")
-                        if(isAdmin){
+                        if (isAdmin) {
                             onClickManageMember(groupId)
-                        }else{
-                            Toast.makeText(context,"접근 권한이 없습니다.", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "접근 권한이 없습니다.", Toast.LENGTH_SHORT).show()
                         }
-                    }else if(it == "그룹 나가기"){
-                        if(isAdmin){
-                            if(memberCount == 1){
+                    } else if (it == "그룹 나가기") {
+                        if (isAdmin) {
+                            if (memberCount == 1) {
                                 openDialogExit.value = true
-                            }else{
+                            } else {
                                 openDialogBoss.value = true
                             }
-                        }else{
+                        } else {
                             openDialogExit.value = true
                         }
                     }
@@ -236,6 +299,7 @@ private fun GroupDetailScreen(
                 groupName = groupName,
                 memberCount = memberCount,
                 adminName = adminName,
+                setShowUploadBottomSheet = setShowUploadBottomSheet
             )
         }
         item {
@@ -276,6 +340,7 @@ private fun GroupDetailScreen(
                 dialogText = "그룹을 나가면 해당 그룹의 모든 활동 및 업데이트를 더 이상 받을 수 없습니다."
             )
         }
+
         openDialogBoss.value -> {
             Dialog(
                 onDismissRequest = { openDialogBoss.value = false },
@@ -303,13 +368,273 @@ private fun GroupDetailScreen(
             )
         }
     }
+
+    // 근무표 등록 바텀시트
+    if (showUploadBottomSheet) {
+        BottomSheet(
+            height = 300.dp,
+            showBottomSheet = showBottomSheet,
+            onDismiss = { setShowUploadBottomSheet(false) },
+        ) {
+            SelectDateBottomSheetContent(
+                onDateTimeSelected = { date ->
+                    selectedDate = date
+                    setSelectedDate(date)
+//                    Log.d("upload", "selected ${selectedDate}")
+                },
+                onClickCancel = { setShowUploadBottomSheet(false) },
+                onClickNext = {
+                    setShowUploadBottomSheet(false)
+                    setShowSecondUploadBottomSheet(true)
+                }
+            )
+        }
+    }
+
+    if (showSecondUploadBottomSheet) {
+        BottomSheet(
+            height = 450.dp,
+            showBottomSheet = showBottomSheet,
+            onDismiss = { setShowSecondUploadBottomSheet(false) },
+        ) {
+            UploadFileBottomSheetContent(
+                customDutyList = customDutyList,
+                onChangeFileDay = onChangeFileDay,
+                onChangeFileEVE = onChangeFileEVE,
+                onChangeFileNIGHT = onChangeFileNIGHT,
+                onChangeFileOFF = onChangeFileOFF,
+                onClickCancel = { setShowSecondUploadBottomSheet(false) },
+                onClickUploadFile = {
+                    onClickFileUploader()
+                    setShowSecondUploadBottomSheet(false)
+                }
+            )
+        }
+    }
+
+}
+
+@Composable
+fun UploadFileBottomSheetContent(
+    customDutyList : Map<String, String>,
+    onChangeFileDay: (String) -> Unit,
+    onChangeFileEVE: (String) -> Unit,
+    onChangeFileNIGHT: (String) -> Unit,
+    onChangeFileOFF: (String) -> Unit,
+    onClickUploadFile: () -> Unit,
+    onClickCancel: () -> Unit
+) {
+    val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding(),
+        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top
+    ) {
+        Column(
+            modifier = Modifier
+                .width(320.widthPercent(context).dp)
+                .fillMaxHeight(),
+            horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Text(
+                    text = "근무를 지정할 표기를 작성해주세요", style = Typography.headlineSmall.copy(
+                        fontWeight = FontWeight.Bold, textAlign = TextAlign.Start
+                    )
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "DAY", style = Typography.bodyLarge, textAlign = TextAlign.Start)
+                    SingleInput(
+                        text = customDutyList["DAY"] ?: "",
+                        onValueChange = onChangeFileDay,
+                        focusManager = focusManager,
+                        placeholder = "DAY",
+                        modifier = Modifier.width(200.widthPercent(context).dp),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Next
+                        ),
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "EVE", style = Typography.bodyLarge, textAlign = TextAlign.Start)
+                    SingleInput(
+                        text = customDutyList["EVE"] ?: "",
+                        onValueChange = onChangeFileEVE,
+                        focusManager = focusManager,
+                        placeholder = "EVE",
+                        modifier = Modifier.width(200.widthPercent(context).dp),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Next
+                        ),
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "NIGHT", style = Typography.bodyLarge, textAlign = TextAlign.Start)
+                    SingleInput(
+                        text = customDutyList["NIGHT"] ?: "",
+                        onValueChange = onChangeFileNIGHT,
+                        focusManager = focusManager,
+                        placeholder = "NIGHT",
+                        modifier = Modifier.width(200.widthPercent(context).dp),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Next
+                        ),
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "OFF", style = Typography.bodyLarge, textAlign = TextAlign.Start)
+                    SingleInput(
+                        text = customDutyList["OFF"] ?: "",
+                        onValueChange = onChangeFileOFF,
+                        focusManager = focusManager,
+                        placeholder = "OFF",
+                        modifier = Modifier.width(200.widthPercent(context).dp),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done
+                        ),
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.width(320.widthPercent(context).dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                HalfBigButton(
+                    modifier = Modifier.width(150.widthPercent(context).dp), onClick = {
+                        onClickCancel()
+                    }, colors = ButtonColors(
+                        contentColor = Gray25,
+                        containerColor = Gray300,
+                        disabledContentColor = Gray25,
+                        disabledContainerColor = Gray300
+                    )
+                ) {
+                    Text(
+                        style = Typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                        text = "취소"
+                    )
+                }
+                HalfBigButton(
+                    modifier = Modifier.width(150.widthPercent(context).dp), onClick = {
+                        onClickUploadFile()
+                    }, colors = ButtonColors(
+                        contentColor = NaturalWhite,
+                        containerColor = Warning300,
+                        disabledContentColor = Gray25,
+                        disabledContainerColor = Gray300
+                    )
+                ) {
+                    Text(
+                        style = Typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                        text = "근무표 업로드"
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Composable
 fun SelectDateBottomSheetContent(
-    
-){
+    onDateTimeSelected: (LocalDate) -> Unit,
+    onClickNext: () -> Unit,
+    onClickCancel: () -> Unit
+) {
+    val context = LocalContext.current
 
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding(),
+        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top
+    ) {
+        Column(
+            modifier = Modifier
+                .width(320.widthPercent(context).dp)
+                .fillMaxHeight(),
+            horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "업로드할 근무 날짜를 선택하세요", style = Typography.headlineSmall.copy(
+                    fontWeight = FontWeight.Bold, textAlign = TextAlign.Start
+                )
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            CustomDatePicker { date ->
+                onDateTimeSelected(date)
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+            Row(
+                modifier = Modifier.width(320.widthPercent(context).dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                HalfBigButton(
+                    modifier = Modifier.width(150.widthPercent(context).dp), onClick = {
+                        onClickCancel()
+                    }, colors = ButtonColors(
+                        contentColor = Gray25,
+                        containerColor = Gray300,
+                        disabledContentColor = Gray25,
+                        disabledContainerColor = Gray300
+                    )
+                ) {
+                    Text(
+                        style = Typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                        text = "취소"
+                    )
+                }
+
+                HalfBigButton(
+                    modifier = Modifier.width(150.widthPercent(context).dp), onClick = {
+                        onClickNext()
+                    }, colors = ButtonColors(
+                        contentColor = NaturalWhite,
+                        containerColor = Warning300,
+                        disabledContentColor = Gray25,
+                        disabledContainerColor = Gray300
+                    )
+                ) {
+                    Text(
+                        style = Typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                        text = "다음"
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+        }
+    }
 }
 
 @Composable
@@ -403,7 +728,10 @@ fun GroupBottomSheetContent(
 
 @Composable
 private fun GroupInfoCard(
-    groupName: String, memberCount: Int, adminName: String
+    groupName: String,
+    memberCount: Int,
+    adminName: String,
+    setShowUploadBottomSheet: (Boolean) -> Unit
 ) {
     val context = LocalContext.current
     Column(
@@ -441,7 +769,7 @@ private fun GroupInfoCard(
 
             Spacer(modifier = Modifier.height(20.dp))
             ThinButton(
-                onClick = { Log.d("clicked: ", "clicked!!!!") }, colors = ButtonColors(
+                onClick = { setShowUploadBottomSheet(true) }, colors = ButtonColors(
                     contentColor = Warning25,
                     containerColor = Warning300,
                     disabledContentColor = Gray25,

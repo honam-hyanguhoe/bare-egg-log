@@ -48,6 +48,7 @@ android {
     }
 }
 
+val poiVersion = "5.2.3"
 dependencies {
     implementation(libs.appcompat)
     implementation(libs.core.ktx)
@@ -124,6 +125,9 @@ dependencies {
 
     // ui controller
     implementation(libs.accompanist.insets)
+
+    implementation("org.apache.poi:poi:$poiVersion")
+    implementation("org.apache.poi:poi-ooxml:$poiVersion")
 
     implementation(project(":domain"))
 }

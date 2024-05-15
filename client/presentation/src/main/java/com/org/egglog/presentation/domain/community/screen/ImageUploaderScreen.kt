@@ -71,7 +71,6 @@ private fun ImageUploader(
         )
 
         Spacer(modifier = Modifier.width(10.dp))
-
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {

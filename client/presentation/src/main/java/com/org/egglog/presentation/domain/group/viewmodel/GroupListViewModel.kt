@@ -49,10 +49,11 @@ class GroupListViewModel @Inject constructor(
             }
         })
 
-    init {
-//        getGroupList()
-        // state 값의 groupImage 번호 설정
-    }
+//    init {
+//
+////        getGroupList()
+//        // state 값의 groupImage 번호 설정
+//    }
 
     private val _showBottomSheet = MutableStateFlow(false)
     val showBottomSheet: StateFlow<Boolean> = _showBottomSheet.asStateFlow()
