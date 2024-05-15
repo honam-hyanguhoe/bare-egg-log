@@ -1,5 +1,7 @@
 package com.org.egglog.presentation.component.organisms.workSetting
 
+import android.app.AlarmManager
+import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -10,11 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.org.egglog.presentation.component.molecules.cards.AlarmSettingCard
+import com.org.egglog.presentation.receiver.AlarmConst
 import com.org.egglog.presentation.utils.widthPercent
+import java.time.LocalTime
 
 @Composable
-fun AlarmManager() {
+fun AlarmManager(alarmManager: AlarmManager) {
     val context = LocalContext.current
+    AlarmConst.setAlarm(context = context, alarmManager = alarmManager, repeatCount = 0, time = LocalTime.of(23, 45), minutesToAdd = 2L)
     Column(
         Modifier
             .padding(horizontal = 8.widthPercent(context).dp)
@@ -27,78 +32,8 @@ fun AlarmManager() {
             duration = 1,
             interval = 5,
             checked = false,
-            setToggle = { -> },
-            onClickCard = { -> },
-            color = null
-        )
-        AlarmSettingCard(
-            work = "",
-            time = "1",
-            duration = 1,
-            interval = 5,
-            checked = false,
-            setToggle = { -> },
-            onClickCard = { -> },
-            color = null
-        )
-        AlarmSettingCard(
-            work = "",
-            time = "1",
-            duration = 1,
-            interval = 5,
-            checked = false,
-            setToggle = { -> },
-            onClickCard = { -> },
-            color = null
-        )
-        AlarmSettingCard(
-            work = "",
-            time = "1",
-            duration = 1,
-            interval = 5,
-            checked = false,
-            setToggle = { -> },
-            onClickCard = { -> },
-            color = null
-        )
-        AlarmSettingCard(
-            work = "",
-            time = "1",
-            duration = 1,
-            interval = 5,
-            checked = false,
-            setToggle = { -> },
-            onClickCard = { -> },
-            color = null
-        )
-        AlarmSettingCard(
-            work = "",
-            time = "1",
-            duration = 1,
-            interval = 5,
-            checked = false,
-            setToggle = { -> },
-            onClickCard = { -> },
-            color = null
-        )
-        AlarmSettingCard(
-            work = "",
-            time = "1",
-            duration = 1,
-            interval = 5,
-            checked = false,
-            setToggle = { -> },
-            onClickCard = { -> },
-            color = null
-        )
-        AlarmSettingCard(
-            work = "",
-            time = "1",
-            duration = 1,
-            interval = 5,
-            checked = false,
-            setToggle = { -> },
-            onClickCard = { -> },
+            setToggle = { },
+            onClickCard = { },
             color = null
         )
     }
