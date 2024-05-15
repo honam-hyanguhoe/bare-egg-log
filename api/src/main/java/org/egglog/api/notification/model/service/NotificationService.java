@@ -162,9 +162,33 @@ public class NotificationService {
     }
 
     @Transactional
+    public void createGroupNotification(User loginUser, Group group){
+        FCMTopic topic = FCMTopic.builder()
+                .topic(TopicEnum.GROUP)
+                .topicId(group.getId())
+                .build();
+        String loginUserDeviceToken = loginUser.getDeviceToken();
+        if (loginUserDeviceToken!=null){
+            fcmService.subscribeToTopic(loginUserDeviceToken, topic);
+        }
+    }
+    @Transactional
+    public void exitGroupNotification(User user, Long groupId){
+        String userDeviceToken = user.getDeviceToken();
+        FCMTopic topic = FCMTopic.builder()
+                .topic(TopicEnum.GROUP)
+                .topicId(groupId)
+                .build();
+        if (userDeviceToken!=null) {
+            fcmService.unsubscribeFromTopic(userDeviceToken, topic);//구독 취소
+        }
+    }
+
+    @Transactional
     public void deleteGroupMemberNotification(Long groupId, GroupMember member) {
         //해당 멤버가 삭제되었다면 해당 유저의 토픽 구독 취소
         String userDeviceToken = member.getUser().getDeviceToken();
+        //알림을 거부했는지 확인
         UserNotification memberUserNotification = notificationRepository
                 .findByTypeAndUser(TopicEnum.BOARD, member.getUser()).orElseThrow(() -> new NotificationException(NotificationErrorCode.NOTIFICATION_SERVER_ERROR));
 
@@ -172,8 +196,8 @@ public class NotificationService {
                 .topic(TopicEnum.GROUP)
                 .topicId(groupId)
                 .build();
+        fcmService.unsubscribeFromTopic(userDeviceToken, topic);//구독 취소
         if (userDeviceToken!=null && memberUserNotification.getStatus()){
-            fcmService.unsubscribeFromTopic(userDeviceToken, topic);//구독 취소
             //해당 유저에 알림 발송
             Notification notification = Notification.builder()
                     .setTitle("[EGGLOG]")
@@ -199,6 +223,22 @@ public class NotificationService {
             fcmService.sendNotificationToTopic(topic, notification);
         }
     }
+
+    @Transactional
+    public void hotBoardNotification(Board board){
+        //1. 해당 글이 실시간 급상승 게시판에 등록되면 글 작성자에게 푸시알림 발송
+        UserNotification userNotification = notificationRepository
+                .findByTypeAndUser(TopicEnum.BOARD, board.getUser()).orElseThrow(() -> new NotificationException(NotificationErrorCode.NOTIFICATION_SERVER_ERROR));
+        String deviceToken = board.getUser().getDeviceToken();
+        if (deviceToken!=null&&userNotification.getStatus()){
+            Notification notification = Notification.builder()
+                    .setTitle("[EGGLOG]")
+                    .setBody(board.getUser().getName()+"님 의"+board.getTitle()+" 글이 실시간 급상승 게시판에 등록되었습니다. ")
+                    .build();
+            fcmService.sendPersonalNotification(deviceToken, notification);
+        }
+    }
+
 
     @Transactional
     public void registerCommentNotification(Board board, Comment saveComment, Comment comment) {
