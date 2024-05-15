@@ -229,10 +229,6 @@ public class GroupService {
         //변경 정보 DB 반영
         groupMemberService.createGroupMember(newBoss);
         groupMemberService.createGroupMember(boss);
-
-        Group group = groupRepository.findById(groupId).orElseThrow(()->new GroupException(GroupErrorCode.TRANSACTION_ERROR));
-        group.setAdmin(newBoss);
-        groupRepository.save(group);
     }
 
     /**
@@ -293,8 +289,6 @@ public class GroupService {
                 .group(newGroup)
                 .user(user)
                 .build();
-
-        newGroup.setAdmin(newGroupMember);
 
         try {
             groupRepository.save(newGroup);
