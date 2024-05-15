@@ -47,9 +47,12 @@ public class GroupController {
      * @return
      * @author 김다희
      */
-    @PostMapping("/duty")
-    public ResponseEntity<MessageUtils> generateGroupDuty(@AuthenticationPrincipal User user, @RequestBody GroupDutyData groupDutyData){
-        Long userId=1L;
+    @PostMapping("/duty/{groupId}")
+    public ResponseEntity<MessageUtils> generateGroupDuty(
+            @AuthenticationPrincipal User user,
+            @PathVariable("groupId") Long groupId,
+            @RequestBody @Valid GroupDutyData groupDutyData){
+        groupService.addDuty(user,groupId,groupDutyData);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }
 
@@ -226,4 +229,5 @@ public class GroupController {
     ){
         return ResponseEntity.ok().body(MessageUtils.success(groupService.getGroupDuty(groupId,user,date)));
     }
+
 }

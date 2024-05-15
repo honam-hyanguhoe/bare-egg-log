@@ -1,10 +1,13 @@
 package org.egglog.api.group.model.service;
 
-import com.google.firebase.messaging.Notification;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.Query;
+import com.google.firebase.cloud.FirestoreClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.group.exception.GroupErrorCode;
 import org.egglog.api.group.exception.GroupException;
+import org.egglog.api.group.model.dto.request.GroupDutyData;
 import org.egglog.api.group.model.dto.request.GroupForm;
 import org.egglog.api.group.model.dto.request.GroupUpdateForm;
 import org.egglog.api.group.model.dto.request.InvitationAcceptForm;
@@ -298,10 +301,39 @@ public class GroupService {
         }
     }
 
+    /**
+     * 그룹내 듀티별 해당자 요약
+     * @param groupId
+     * @param user
+     * @param date
+     * @return
+     */
     public GroupDutySummary getGroupDuty(Long groupId, User user, String date) {
         if(!groupMemberService.isGroupMember(groupId,user.getId())){
             throw new GroupException(GroupErrorCode.GROUP_ROLE_NOT_MATCH);
         }
         return groupMemberService.getGroupDutySummary(groupId, date);
+    }
+
+    /**
+     * 파싱된 엑셀 데이터 firestore에 저장
+     * @param user
+     * @param groupId
+     * @param groupDutyData
+     */
+    public void addDuty(User user, Long groupId, GroupDutyData groupDutyData) {
+//        Query query = FIRE_STORE.collection(
+//                COLLECTION_NAME).whereEqualTo("email", user.getEmail());
+//        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+//
+//        DocumentReference document = null;
+//        if (isNotExistEmail(querySnapshot)) {
+//            document = FIRE_STORE.collection(COLLECTION_NAME).document();
+//            user.setId(document.getId());
+//            document.set(user);
+//            log.info("새로운 문서가 추가되었습니다. document ID: {}", document.getId());
+//        } else {
+//            throw new RuntimeException("이미 가입된 이메일입니다.");
+//        }
     }
 }
