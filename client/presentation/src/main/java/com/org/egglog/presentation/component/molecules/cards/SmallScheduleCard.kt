@@ -39,10 +39,10 @@ fun SmallScheduleCard(work: String, startTime: String, endTime: String, onClickM
     val context = LocalContext.current
 
     val cardContent: ScheduleInfo = when(work) {
-        "day" -> ScheduleInfo(DayCard, "Day 근무", R.drawable.day)
-        "eve" -> ScheduleInfo(EveCard, "Eve 근무", R.drawable.eve)
-        "night" -> ScheduleInfo(NightCard, "Night 근무", R.drawable.night)
-        "off" -> ScheduleInfo(Primary400, "Off", R.drawable.off)
+        "DAY" -> ScheduleInfo(DayCard, "Day 근무", R.drawable.day)
+        "EVE" -> ScheduleInfo(EveCard, "Eve 근무", R.drawable.eve)
+        "NIGHT" -> ScheduleInfo(NightCard, "Night 근무", R.drawable.night)
+        "OFF" -> ScheduleInfo(Primary400, "Off", R.drawable.off)
         "교육" -> ScheduleInfo(Orange300, "교육", R.drawable.education)
         "휴가" -> ScheduleInfo(Error300, "휴가", R.drawable.vacation)
         "보건" -> ScheduleInfo(Pink300, "보건", R.drawable.health)

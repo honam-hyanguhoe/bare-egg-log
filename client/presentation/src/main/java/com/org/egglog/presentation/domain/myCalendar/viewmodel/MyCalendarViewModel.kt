@@ -102,7 +102,6 @@ class MyCalendarViewModel @Inject constructor(
         val endDate = "${state.currentYear}-${month}-${lastDayOfMonth}"
 
         val monthlyWorkList = getWorkListUseCase("Bearer $accessToken", startDate, endDate).getOrThrow()
-        Log.e("MyCalendarViewModel", "한 달 근무 일정은 ${monthlyWorkList.workList}")
 
         reduce {
             state.copy(
@@ -212,14 +211,28 @@ class MyCalendarViewModel @Inject constructor(
         }
     }
 
+    private fun updateCurrentWorkData() = intent {
+        val date =
+            if (state.selectedDate < 10) "0${state.selectedDate}" else "${state.selectedDate}"
+
+        val currentWorkData = state.monthlyWorkList.find {it.workDate.substring(8,10) == date}?.workType
+
+        reduce {
+            state.copy (
+                currentWorkData = currentWorkData
+            )
+        }
+    }
+
     fun onDateClicked(clickedDate: Int) = intent {
         // TODO 해당 날짜 일정 리스트 불러오기
-
         reduce {
             state.copy(
                 selectedDate = clickedDate
             )
         }
+
+        updateCurrentWorkData()
     }
 
     fun onWorkLabelClick(workType: WorkType) = intent {
@@ -405,8 +418,6 @@ class MyCalendarViewModel @Inject constructor(
     }
 
     fun onSubmitWorkSchedule() = intent {
-        Log.e("MyCalendarViewModel", "editList : ${state.editWorkList}")
-        Log.e("MyCalendarViewModel", "createList: ${state.createWorkList}")
 
         if (state.editWorkList.isNotEmpty()) {
             // TODO 근무 수정 요청 보내고 새로운 근무 일정 불러오기 (근무 조회 기능 구현 후 주석 풀 예정)
@@ -427,6 +438,7 @@ class MyCalendarViewModel @Inject constructor(
         }
 
         getWorkList()
+        updateCurrentWorkData()
 
         // 불러온 근무 일정을 monthlyWorkList 에 대입해주기
         reduce {
@@ -463,7 +475,8 @@ data class MyCalenderState(
     val monthlyWorkList: List<WorkListData> = listOf(), // 서버로부터 조회한 월간 근무 일정
     val createWorkList: List<AddWorkData> = listOf(),
     val editWorkList: List<EditWorkData> = listOf(),
-    val tempWorkList: List<Pair<Int, String>> = listOf() // 근무 입력시 달력에 표시할 내용 (workDate, workTitle)
+    val tempWorkList: List<Pair<Int, String>> = listOf(), // 근무 입력시 달력에 표시할 내용 (workDate, workTitle)
+    val currentWorkData: WorkType ?= null
 )
 
 sealed interface MyCalendarSideEffect {

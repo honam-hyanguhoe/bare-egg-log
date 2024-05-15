@@ -175,6 +175,7 @@ fun MyCalendarScreen(
         onDateClicked = viewModel::onDateClicked,
         workTypeList = state.workTypeList,
         monthlyWorkList = state.monthlyWorkList,
+        currentWorkData = state.currentWorkData,
         onSubmitPersonalSchedule = viewModel::onSubmitPersonalSchedule,
         onWorkLabelClick = viewModel::onWorkLabelClick,
         tempWorkList = state.tempWorkList,
@@ -205,6 +206,7 @@ fun MyCalendarScreen(
     onDateClicked: (Int) -> Unit,
     workTypeList: List<WorkType>,
     monthlyWorkList: List<WorkListData>,
+    currentWorkData: WorkType ?= null,
     onSubmitPersonalSchedule: () -> Unit,
     onWorkLabelClick: (WorkType) -> Unit,
     tempWorkList: List<Pair<Int, String>>,
@@ -253,7 +255,7 @@ fun MyCalendarScreen(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                ScheduleList()
+                ScheduleList(currentWorkData)
 
             }
 
@@ -348,15 +350,13 @@ fun ScheduleListHeader(
 
 // 일정 카드 리스트
 @Composable
-fun ScheduleList() {
+fun ScheduleList(
+    currentWorkData: WorkType ?= null
+) {
     Column() {
-        BigScheduleCard(
-            work = "basic",
-            startTime = "10:00",
-            endTime = "12:00",
-            title = "점심 약속",
-            content = "봉선동 성내 식당",
-            onClickMore = {})
+        if(currentWorkData != null) {
+            SmallScheduleCard(work = currentWorkData.title, startTime = currentWorkData.startTime.substring(0,5), endTime = currentWorkData.workTime.substring(0,5), onClickMore = {})
+        }
 
 //        SmallScheduleCard(work = "day", startTime = "12:00", endTime = "13:00", onClickMore = {})
 //
