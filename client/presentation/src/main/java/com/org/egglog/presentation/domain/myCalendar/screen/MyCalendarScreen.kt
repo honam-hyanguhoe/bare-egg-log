@@ -64,6 +64,7 @@ import com.org.egglog.presentation.component.atoms.wheelPicker.TimePicker
 import com.org.egglog.presentation.component.molecules.bottomNavigator.BottomNavigator
 import com.org.egglog.presentation.component.molecules.cards.BigScheduleCard
 import com.org.egglog.presentation.component.molecules.cards.SmallScheduleCard
+import com.org.egglog.presentation.component.molecules.cards.SmallScheduleCard2
 import com.org.egglog.presentation.component.organisms.calendars.MonthlyCalendar
 import com.org.egglog.presentation.component.organisms.dialogs.SheetContent
 import com.org.egglog.presentation.domain.community.activity.CommunityActivity
@@ -366,7 +367,7 @@ fun ScheduleList(
             val hour1 = currentWorkData.startTime.substring(0,2).toInt()
             val hour2 = currentWorkData.workTime.substring(0,2).toInt()
             val endTime = String.format("%02d:00", hour1 + hour2)
-            SmallScheduleCard(work = currentWorkData.title, startTime = currentWorkData.startTime.substring(0,5), endTime = endTime, onClickMore = {})
+            SmallScheduleCard2(workType = currentWorkData.copy(workTime = endTime))
         }
 
         currentPersonalData?.forEach {personalData ->
