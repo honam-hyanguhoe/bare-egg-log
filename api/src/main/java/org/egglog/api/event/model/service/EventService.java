@@ -110,8 +110,8 @@ public class EventService {
     }
 
     public List<EventListOutputSpec> getEventListByPeriod(EventPeriodRequest eventPeriodRequest, User user) {
-        LocalDateTime start = eventPeriodRequest.getStartDate();
-        LocalDateTime end = eventPeriodRequest.getEndDate();
+        LocalDate start = eventPeriodRequest.getStartDate();
+        LocalDate end = eventPeriodRequest.getEndDate();
         Long userId = eventPeriodRequest.getUserId();
         Long calendarGroupId = eventPeriodRequest.getCalendarGroupId();
 
@@ -188,7 +188,7 @@ public class EventService {
      * @param userId
      * @return
      */
-    public List<EventListOutputSpec> getEventListByMonth(Long calendarGroupId, LocalDateTime startDate, LocalDateTime endDate, Long userId) {
+    public List<EventListOutputSpec> getEventListByMonth(Long calendarGroupId, LocalDate startDate, LocalDate endDate, Long userId) {
         List<EventListOutputSpec> eventListOutputSpecList = new ArrayList<>();
         Optional<List<Event>> byMonthAndUserId = eventRepository.findEventsByMonthAndUserId(startDate, endDate, userId, calendarGroupId);
 
@@ -208,49 +208,6 @@ public class EventService {
         }
         return eventListOutputSpecList;
     }
-//    /**
-//     * 해당 달의 개인 일정 조회
-//     *
-//     * @param date
-//     * @param userId
-//     */
-//    public List<EventListOutputSpec> getEventListByMonth(LocalDateTime date, Long userId) {
-//        User user = userJpaRepository.findById(userId).orElseThrow(
-//                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-//        );
-//        List<EventListOutputSpec> eventListOutputSpecList = null;
-//
-//        YearMonth targetMonth = YearMonth.of(date.getYear(), date.getMonth());  //해당 년도, 월
-//
-//        LocalDate firstDayOfTargetMonth = targetMonth.atDay(1);
-//        LocalDate lastDayOfTargetMonth = targetMonth.atEndOfMonth();
-//
-//        // 해당 달의 첫째 날의 이전 주의 일요일
-//        LocalDateTime startOfCalendar = LocalDateTime.of(firstDayOfTargetMonth.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)), LocalTime.MIN);
-//
-//        // 해당 달의 마지막 날의 다음 주의 토요일
-//        LocalDateTime endOfCalendar = LocalDateTime.of(lastDayOfTargetMonth.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY)), LocalTime.MAX);
-//
-//        Optional<List<Event>> result = eventRepository.findByMonthAndUserId(startOfCalendar, endOfCalendar, userId);
-//
-//        if (result.isPresent()) {
-//            eventListOutputSpecList = new ArrayList<>();
-//
-//            for (Event event : result.get()) {
-//                EventListOutputSpec eventListOutputSpec = EventListOutputSpec.builder()
-//                        .eventId(event.getId())
-//                        .eventTitle(event.getEventTitle())
-//                        .eventContent(event.getEventContent())
-//                        .startDate(event.getStartDate())
-//                        .endDate(event.getEndDate())
-//                        .calendarGroupId(event.getCalendarGroup().getId())
-//                        .build();
-//
-//                eventListOutputSpecList.add(eventListOutputSpec);
-//            }
-//        }
-//        return eventListOutputSpecList;
-//    }
 
     public List<EventListOutputSpec> getEventListByDate(LocalDateTime targetDate, Long userId) {
         User user = userJpaRepository.findById(userId).orElseThrow(
