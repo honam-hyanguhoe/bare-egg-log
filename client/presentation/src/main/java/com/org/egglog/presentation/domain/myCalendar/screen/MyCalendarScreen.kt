@@ -45,6 +45,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.Dp
+import com.org.egglog.domain.myCalendar.model.EventListData
+import com.org.egglog.domain.myCalendar.model.PersonalScheduleData
 import com.org.egglog.domain.myCalendar.model.WorkListData
 import com.org.egglog.domain.myCalendar.model.WorkType
 import com.org.egglog.presentation.R
@@ -176,6 +178,8 @@ fun MyCalendarScreen(
         workTypeList = state.workTypeList,
         monthlyWorkList = state.monthlyWorkList,
         currentWorkData = state.currentWorkData,
+        monthlyPersonalList = state.monthlyPersonalList,
+        currentPersonalData = state.currentPersonalData,
         onSubmitPersonalSchedule = viewModel::onSubmitPersonalSchedule,
         onWorkLabelClick = viewModel::onWorkLabelClick,
         tempWorkList = state.tempWorkList,
@@ -207,6 +211,8 @@ fun MyCalendarScreen(
     workTypeList: List<WorkType>,
     monthlyWorkList: List<WorkListData>,
     currentWorkData: WorkType ?= null,
+    monthlyPersonalList: List<PersonalScheduleData>,
+    currentPersonalData: List<EventListData> ?= listOf(),
     onSubmitPersonalSchedule: () -> Unit,
     onWorkLabelClick: (WorkType) -> Unit,
     tempWorkList: List<Pair<Int, String>>,
@@ -246,7 +252,8 @@ fun MyCalendarScreen(
                     onNextMonthClick = onNextMonthClick,
                     selectedDate = selectedDate,
                     tempWorkList = tempWorkList,
-                    monthlyWorkList = monthlyWorkList
+                    monthlyWorkList = monthlyWorkList,
+                    monthlyPersonalList = monthlyPersonalList
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -255,7 +262,7 @@ fun MyCalendarScreen(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                ScheduleList(currentWorkData)
+                ScheduleList(currentWorkData, currentPersonalData)
 
             }
 
@@ -351,7 +358,8 @@ fun ScheduleListHeader(
 // 일정 카드 리스트
 @Composable
 fun ScheduleList(
-    currentWorkData: WorkType ?= null
+    currentWorkData: WorkType ?= null,
+    currentPersonalData: List<EventListData> ?= listOf()
 ) {
     Column() {
         if(currentWorkData != null) {
@@ -361,11 +369,9 @@ fun ScheduleList(
             SmallScheduleCard(work = currentWorkData.title, startTime = currentWorkData.startTime.substring(0,5), endTime = endTime, onClickMore = {})
         }
 
-//        SmallScheduleCard(work = "day", startTime = "12:00", endTime = "13:00", onClickMore = {})
-//
-//        SmallScheduleCard(work = "night", startTime = "12:00", endTime = "13:00", onClickMore = {})
-//
-//        SmallScheduleCard(work = "eve", startTime = "12:00", endTime = "13:00", onClickMore = {})
+        currentPersonalData?.forEach {personalData ->
+            BigScheduleCard(work = "BASIC", startTime = personalData.startDate.substring(11,16), endTime = personalData.endDate.substring(11,16), content = personalData.eventContent, title = personalData.eventTitle, onClickMore = {})
+        }
     }
 }
 

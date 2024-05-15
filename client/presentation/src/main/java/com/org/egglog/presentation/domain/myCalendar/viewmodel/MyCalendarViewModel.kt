@@ -7,12 +7,15 @@ import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
 import com.org.egglog.domain.myCalendar.model.AddWorkData
 import com.org.egglog.domain.myCalendar.model.EditWorkData
+import com.org.egglog.domain.myCalendar.model.EventListData
+import com.org.egglog.domain.myCalendar.model.PersonalScheduleData
 import com.org.egglog.domain.myCalendar.model.WorkListData
 import com.org.egglog.domain.myCalendar.model.WorkScheduleData
 import com.org.egglog.domain.myCalendar.model.WorkType
 import com.org.egglog.domain.myCalendar.usecase.CreatePersonalScheduleUseCase
 import com.org.egglog.domain.myCalendar.usecase.CreateWorkScheduleUseCase
 import com.org.egglog.domain.myCalendar.usecase.EditWorkScheduleUseCase
+import com.org.egglog.domain.myCalendar.usecase.GetPersonalScheduleUseCase
 import com.org.egglog.domain.myCalendar.usecase.GetWorkListUseCase
 import com.org.egglog.domain.myCalendar.usecase.GetWorkTypeListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,7 +41,8 @@ class MyCalendarViewModel @Inject constructor(
     private val getUserStoreUseCase: GetUserStoreUseCase,
     private val createWorkScheduleUseCase: CreateWorkScheduleUseCase,
     private val editWorkScheduleUseCase: EditWorkScheduleUseCase,
-    private val getWorkListUseCase: GetWorkListUseCase
+    private val getWorkListUseCase: GetWorkListUseCase,
+    private val getPersonalScheduleUseCase: GetPersonalScheduleUseCase
 ) : ViewModel(), ContainerHost<MyCalenderState, MyCalendarSideEffect> {
 
     private var accessToken: String? = null
@@ -70,6 +74,7 @@ class MyCalendarViewModel @Inject constructor(
 
         // TODO 이번달 1일~마지막일 근무, 개인 일정 리스트 불러오기
         getWorkList()
+        getPersonalList()
 
         reduce {
             state.copy(
@@ -108,6 +113,29 @@ class MyCalendarViewModel @Inject constructor(
                 monthlyWorkList = monthlyWorkList.workList
             )
         }
+
+        updateCurrentWorkData()
+    }
+
+    private fun getPersonalList() = intent{
+        val calendar = Calendar.getInstance()
+
+        calendar.set(Calendar.YEAR, state.currentYear)
+        calendar.set(Calendar.MONTH, state.currentMonth - 1)
+        val lastDayOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+
+        val month =
+            if (state.currentMonth < 10) "0${state.currentMonth}" else "${state.currentMonth}"
+
+        val startDate = "${state.currentYear}-${month}-01"
+        val endDate = "${state.currentYear}-${month}-${lastDayOfMonth}"
+
+        val monthlyPersonalList = getPersonalScheduleUseCase("Bearer $accessToken", startDate, endDate, userInfo!!.id, userInfo!!.workGroupId!!).getOrThrow()
+        reduce {
+            state.copy(monthlyPersonalList = monthlyPersonalList)
+        }
+
+        updateCurrentEventData()
     }
 
     fun onSelectedIdx(selectedIdx: Int) = intent {
@@ -160,6 +188,8 @@ class MyCalendarViewModel @Inject constructor(
         } else {
             postSideEffect(MyCalendarSideEffect.Toast("등록에 실패했습니다\n다시 시도해주세요"))
         }
+
+        getPersonalList()
 
         reduce {
             state.copy(
@@ -236,6 +266,19 @@ class MyCalendarViewModel @Inject constructor(
         }
     }
 
+    private fun updateCurrentEventData() = intent {
+        val date =
+            if (state.selectedDate < 10) "0${state.selectedDate}" else "${state.selectedDate}"
+
+        val currentPersonalData = state.monthlyPersonalList.find { it.date.substring(8,10) == date }?.eventList
+
+        reduce {
+            state.copy(
+                currentPersonalData = currentPersonalData
+            )
+        }
+    }
+
     fun onDateClicked(clickedDate: Int) = intent {
         // TODO 해당 날짜 일정 리스트 불러오기
         reduce {
@@ -245,6 +288,7 @@ class MyCalendarViewModel @Inject constructor(
         }
 
         updateCurrentWorkData()
+        updateCurrentEventData()
     }
 
     fun onWorkLabelClick(workType: WorkType) = intent {
@@ -450,12 +494,9 @@ class MyCalendarViewModel @Inject constructor(
         }
 
         getWorkList()
-        updateCurrentWorkData()
 
-        // 불러온 근무 일정을 monthlyWorkList 에 대입해주기
         reduce {
             state.copy(
-//                monthlyWorkList = listOf(),
                 createWorkList = listOf(),
                 editWorkList = listOf(),
                 tempWorkList = listOf()
@@ -489,7 +530,8 @@ data class MyCalenderState(
     val editWorkList: List<EditWorkData> = listOf(),
     val tempWorkList: List<Pair<Int, String>> = listOf(), // 근무 입력시 달력에 표시할 내용 (workDate, workTitle)
     val currentWorkData: WorkType ?= null,
-    val monthlyPersonalList: List<String> = listOf(),
+    val monthlyPersonalList: List<PersonalScheduleData> = listOf(),
+    val currentPersonalData: List<EventListData> ?= listOf()
 )
 
 sealed interface MyCalendarSideEffect {

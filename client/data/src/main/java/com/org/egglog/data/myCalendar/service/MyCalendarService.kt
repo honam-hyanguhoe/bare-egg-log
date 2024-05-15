@@ -1,5 +1,6 @@
 package com.org.egglog.data.myCalendar.service
 
+import com.org.egglog.data.myCalendar.model.PersonalScheduleResponse
 import com.org.egglog.data.myCalendar.model.WorkListResponse
 import com.org.egglog.data.myCalendar.model.WorkScheduleResponse
 import com.org.egglog.data.myCalendar.model.WorkTypeResponse
@@ -50,4 +51,13 @@ interface MyCalendarService {
         @Query("endDate") endDate: String
     ): CommonResponse<WorkScheduleResponse>
 
+    @GET("events/month")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun getPersonalList(
+        @Header("Authorization") accessToken: String,
+        @Query("startDate") startDate: String,
+        @Query("endDate") endDate: String,
+        @Query("userId") userId: Long,
+        @Query("calendarGroupId") calendarGroupId: Long
+    ): CommonResponse<List<PersonalScheduleResponse>>
 }
