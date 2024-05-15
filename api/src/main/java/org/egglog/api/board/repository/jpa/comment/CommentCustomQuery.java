@@ -11,4 +11,6 @@ public interface CommentCustomQuery {
     Optional<List<Comment>> getCommentListByBoardId(Long boardId);
 
     Optional<List<Comment>> getRecommentListByCommentId(Long commentId);
+
+    Optional<Comment> findWithUserById(Long commentId);
 }

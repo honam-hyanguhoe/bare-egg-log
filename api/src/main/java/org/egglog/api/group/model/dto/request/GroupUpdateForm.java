@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class GroupUpdateForm {
-    private String newName = null;
-    private String newPassword =null;
+    private String newName;
+    private String newPassword;
 }

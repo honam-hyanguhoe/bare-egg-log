@@ -34,6 +34,8 @@ fun ScrollableMenus(
     horizontalOffset : Dp = -6.dp,
     verticalOffset : Dp = 0.dp,
     options: List<String>,
+    boxSize: Int = 30,
+    iconSize: Int = 25,
     selectedOption: String?,
     onSelect: (String) -> Unit ) {
     var expanded by remember { mutableStateOf(false) }
@@ -43,12 +45,12 @@ fun ScrollableMenus(
 
     Box(
         modifier = Modifier
-            .size(30.widthPercent(context).dp),
+            .size(boxSize.widthPercent(context).dp),
 //            .border(1.dp, Warning400),
         contentAlignment = Alignment.CenterEnd
     ) {
         IconButton(onClick = { expanded = true }) {
-            Icon(iconShape, modifier = Modifier.size(25.dp), color = NaturalBlack)
+            Icon(iconShape, modifier = Modifier.size(iconSize.dp), color = NaturalBlack)
         }
         DropdownMenu(
             expanded = expanded,

@@ -6,6 +6,7 @@ import org.egglog.api.user.model.entity.User;
 import org.egglog.api.worktype.model.dto.response.WorkTypeResponse;
 
 import java.time.LocalTime;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -13,11 +14,13 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class WorkType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "work_type_id")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "work_type_title")
@@ -56,12 +59,11 @@ public class WorkType {
 
 
     public WorkType edit(String title, String color, String workTypeImgUrl, LocalTime startTime, LocalTime workTime){
-        this.title = title;
-        this.workTag = WorkTag.ETC;
-        this.color = color;
-        this.workTypeImgUrl = workTypeImgUrl;
-        this.startTime = startTime;
-        this.workTime = workTime;
+        this.title = title!=null ? title : this.title;
+        this.color = color!=null ? color : this.color;
+        this.workTypeImgUrl = workTypeImgUrl!=null ? workTypeImgUrl : this.workTypeImgUrl;
+        this.startTime = startTime!=null ? startTime : this.startTime;
+        this.workTime = workTime!=null ? workTime : this.workTime;
         return this;
     }
 }

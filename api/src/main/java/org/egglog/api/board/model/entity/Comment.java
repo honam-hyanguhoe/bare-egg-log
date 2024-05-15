@@ -13,11 +13,13 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @SuperBuilder(toBuilder = true)
 public class Comment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     @Column(name = "comment_id")
     private Long id;
 
@@ -25,7 +27,7 @@ public class Comment extends BaseEntity {
     private String content;  //내용
 
     @Column(name = "parent_id")
-    private Long parentId;  //부모 댓글
+    private Long parentId;  //부모 댓글 (대댓글까지만 허용 -> depth = 1)
 
     private String tempNickname;    //익명 닉네임
 

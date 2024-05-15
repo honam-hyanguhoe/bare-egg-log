@@ -39,10 +39,6 @@ public class CalendarMonthRequest {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)//필수
     private LocalDateTime endDate;
 
-    @NotNull(message = "userId는 필수 값 입니다.")
-    @Positive(message = "정확한 ID 값을 입력 해주세요.")
-    private Long userId;//필수
-
     @NotNull(message = "calendarGroupId는 필수 값 입니다.")
     @Positive(message = "정확한 ID 값을 입력 해주세요.")
     private Long calendarGroupId;//필수

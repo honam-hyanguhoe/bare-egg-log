@@ -17,7 +17,12 @@ import org.springframework.web.bind.annotation.*;
 import org.egglog.utility.utils.MessageUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import java.time.LocalDate;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
+
 /**
  * ```
  * ===================[Info]=========================
@@ -30,6 +35,7 @@ import java.util.Calendar;
  * |:---:|:---:|:---:|
  * |2024-04-24|김다희|최초 생성|
  * |2024-05-10|김형민|동기화 api 추가|
+ * |2024-05-13|김도휘|캘린더 한달 조회 api
  */
 @RestController
 @RequiredArgsConstructor
@@ -73,12 +79,22 @@ public class CalendarController {
     }
 
     /**
-     * ???
+     * 생성
+     * @param loginUser 로그인한 유저(JWT 토큰)
+     * @param request 이름, 색상, 근무 이미지, 시작시각, 근무시간
+     * @return 근무타입ID, 이름, 색상, 근무 이미지, 태그 속성, 시작시각, 근무시간
+     * @author 김형민
+     */
+
+    /**
+     * 캘린더 startDate - endDate 개인 일정 & 근무 일정 조회
+     * @param calendarMonthRequest 시작날짜, 종료날짜, 캘린더 그룹 ID
+     * @param user
      * @return
      */
-    @GetMapping("/month")
-    public ResponseEntity<MessageUtils<CalendarListResponse>> getCalendarByMonth(@ModelAttribute @Valid CalendarMonthRequest calendarMonthRequest, @AuthenticationPrincipal User user) {
-        return ResponseEntity.ok().body(MessageUtils.success(calendarService.getCalendarListByMonth(calendarMonthRequest, user)));
-    }
+//    @GetMapping("/month")
+//    public ResponseEntity<MessageUtils<List<CalendarListResponse>>> getCalendarByMonth(@ModelAttribute @Valid CalendarMonthRequest calendarMonthRequest, @AuthenticationPrincipal User user) {
+//        return ResponseEntity.ok().body(MessageUtils.success(calendarService.getCalendarList(calendarMonthRequest, user)));
+//    }
 
 }

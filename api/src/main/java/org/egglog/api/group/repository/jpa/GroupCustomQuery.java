@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface GroupCustomQuery {
-    Optional<List<GroupPreviewDto>> findGroupByUserId(Long userId);
+    List<GroupPreviewDto> findGroupByUserId(Long userId);
 }

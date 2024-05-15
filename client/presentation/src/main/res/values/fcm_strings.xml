@@ -2,5 +2,5 @@
 <resources>
     <string name="default_notification_channel_id">egglog-chanel-1205</string>
     <string name="fcm_app_name">egglog</string>
-    <string name="default_notification_channel_name">default_channel</string>
+    <string name="default_notification_channel_name">egglog-default-channel</string>
 </resources>

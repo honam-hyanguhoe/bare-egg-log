@@ -18,6 +18,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -56,7 +57,8 @@ fun SettingScreen(
     onNavigateToAgreeDetailScreen: () -> Unit,
     onNavigateToCalendarSettingScreen: () -> Unit,
     onNavigateToMySettingScreen: () -> Unit,
-    onNavigateToWorkSettingScreen: () -> Unit
+    onNavigateToWorkSettingScreen: () -> Unit,
+    onNavigateToAskSettingScreen: () -> Unit
 ) {
     val context = LocalContext.current
     val state = viewModel.collectAsState().value
@@ -109,6 +111,7 @@ fun SettingScreen(
         onNavigateToCalendarSettingScreen = onNavigateToCalendarSettingScreen,
         onNavigateToMySettingScreen = onNavigateToMySettingScreen,
         onNavigateToWorkSettingScreen = onNavigateToWorkSettingScreen,
+        onNavigateToAskSettingScreen = onNavigateToAskSettingScreen,
         onClickLogout = viewModel::onClickLogout,
         logoutEnabled = state.logoutEnabled,
         selectedIdx = state.selectedIdx
@@ -122,6 +125,7 @@ fun SettingScreen(
     onNavigateToMySettingScreen: () -> Unit,
     onNavigateToCalendarSettingScreen: () -> Unit,
     onNavigateToWorkSettingScreen: () -> Unit,
+    onNavigateToAskSettingScreen: () -> Unit,
     onClickLogout: () -> Unit,
     logoutEnabled: Boolean,
     selectedIdx: Int,
@@ -138,93 +142,95 @@ fun SettingScreen(
         openLogoutDialog.value = false
     }
 
-    Column(
-        modifier = Modifier
-            .background(NaturalWhite)
-            .fillMaxSize()
-            .systemBarsPadding(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
+    Surface(Modifier.systemBarsPadding().background(Black)) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.9f),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize()
+                .background(NaturalWhite),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Spacer(modifier = Modifier.height(18.heightPercent(context).dp))
-            Text(text = "마이페이지", style = Typography.headlineSmall)
-            Spacer(modifier = Modifier.height(18.heightPercent(context).dp))
-            Column (
+            Column(
                 modifier = Modifier
-                    .verticalScroll(rememberScrollState()),
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.9f),
                 horizontalAlignment = Alignment.CenterHorizontally
-            ){
-                Spacer(modifier = Modifier.padding(4.heightPercent(context).dp))
-                // 인증 배지 신청하기 버튼
-                BasicButton(modifier = Modifier
-                    .height(68.heightPercent(context).dp)
-                    .fillMaxWidth(0.94f),
-                    onClick = { openDialog.value = true },
-                    shape = RoundedCornerShape(16.widthPercent(context).dp),
-                    colors = ButtonColors(
-                        containerColor = Warning300,
-                        contentColor = NaturalWhite,
-                        disabledContainerColor = Gray300,
-                        disabledContentColor = NaturalWhite
-                    )) {
-                    Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                        Row(verticalAlignment = Alignment.CenterVertically,) {
-                            LocalImageLoader(imageUrl = R.drawable.small_fry, Modifier.size(32.widthPercent(context).dp))
-                            Spacer(modifier = Modifier.padding(4.widthPercent(context).dp))
-                            Column {
-                                Text(text = "인증 배지 신청하기", style = Typography.bodyLarge)
-                                Text(text = "면허를 인증할 수 있어요", style = Typography.displayMedium)
+            ) {
+                Spacer(modifier = Modifier.height(18.heightPercent(context).dp))
+                Text(text = "마이페이지", style = Typography.headlineSmall)
+                Spacer(modifier = Modifier.height(18.heightPercent(context).dp))
+                Column (
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                    Spacer(modifier = Modifier.padding(4.heightPercent(context).dp))
+                    // 인증 배지 신청하기 버튼
+                    BasicButton(modifier = Modifier
+                        .height(68.heightPercent(context).dp)
+                        .fillMaxWidth(0.94f),
+                        onClick = { openDialog.value = true },
+                        shape = RoundedCornerShape(16.widthPercent(context).dp),
+                        colors = ButtonColors(
+                            containerColor = Warning300,
+                            contentColor = NaturalWhite,
+                            disabledContainerColor = Gray300,
+                            disabledContentColor = NaturalWhite
+                        )) {
+                        Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                            Row(verticalAlignment = Alignment.CenterVertically,) {
+                                LocalImageLoader(imageUrl = R.drawable.small_fry, Modifier.size(32.widthPercent(context).dp))
+                                Spacer(modifier = Modifier.padding(4.widthPercent(context).dp))
+                                Column {
+                                    Text(text = "인증 배지 신청하기", style = Typography.bodyLarge)
+                                    Text(text = "면허를 인증할 수 있어요", style = Typography.displayMedium)
+                                }
                             }
+                            Icon(imageVector = ArrowRight, modifier = Modifier.size(24.widthPercent(context).dp), color = NaturalWhite)
                         }
-                        Icon(imageVector = ArrowRight, modifier = Modifier.size(24.widthPercent(context).dp), color = NaturalWhite)
                     }
-                }
-                InfoList(
-                    onClickPrepared = { openDialog.value = true },
-                    onNavigateToPrivacyDetailScreen = onNavigateToPrivacyDetailScreen,
-                    onNavigateToAgreeDetailScreen = onNavigateToAgreeDetailScreen,
-                    onNavigateToMySettingScreen = onNavigateToMySettingScreen,
-                    onNavigateToCalendarSettingScreen = onNavigateToCalendarSettingScreen,
-                    onNavigateToWorkSettingScreen = onNavigateToWorkSettingScreen,
-                    onClickLogout = { openLogoutDialog.value = true }
-                )
+                    InfoList(
+                        onClickPrepared = { openDialog.value = true },
+                        onNavigateToPrivacyDetailScreen = onNavigateToPrivacyDetailScreen,
+                        onNavigateToAgreeDetailScreen = onNavigateToAgreeDetailScreen,
+                        onNavigateToMySettingScreen = onNavigateToMySettingScreen,
+                        onNavigateToCalendarSettingScreen = onNavigateToCalendarSettingScreen,
+                        onNavigateToWorkSettingScreen = onNavigateToWorkSettingScreen,
+                        onNavigateToAskSettingScreen = onNavigateToAskSettingScreen,
+                        onClickLogout = { openLogoutDialog.value = true }
+                    )
 
-                Spacer(modifier = Modifier.padding(30.heightPercent(context).dp))
-                LocalImageLoader(imageUrl = R.drawable.bottom_logo, Modifier.fillMaxWidth(0.52f))
-                Text("Version $version", style = Typography.displayMedium.copy(color = Gray400))
-                Spacer(modifier = Modifier.padding(4.heightPercent(context).dp))
+                    Spacer(modifier = Modifier.padding(30.heightPercent(context).dp))
+                    LocalImageLoader(imageUrl = R.drawable.bottom_logo, Modifier.fillMaxWidth(0.52f))
+                    Text("Version $version", style = Typography.displayMedium.copy(color = Gray400))
+                    Spacer(modifier = Modifier.padding(4.heightPercent(context).dp))
 
-                when {
-                    openDialog.value -> {
-                        Dialog(
-                            onDismissRequest = { openDialog.value = false },
-                            onConfirmation = { openDialog.value = false },
-                            dialogTitle = "공지",
-                            dialogText = "출시 준비 중입니다",
-                        )
+                    when {
+                        openDialog.value -> {
+                            Dialog(
+                                onDismissRequest = { openDialog.value = false },
+                                onConfirmation = { openDialog.value = false },
+                                dialogTitle = "공지",
+                                dialogText = "출시 준비 중입니다",
+                            )
+                        }
                     }
-                }
 
-                when {
-                    openLogoutDialog.value -> {
-                        Dialog(
-                            enabled = logoutEnabled,
-                            onDismissRequest = { openLogoutDialog.value = false },
-                            onConfirmation = { onClickLogoutConfirm() },
-                            dialogTitle = "로그아웃 하시겠습니까?",
-                            dialogText = "로그아웃 시 로그인 화면으로 돌아갑니다.",
-                        )
+                    when {
+                        openLogoutDialog.value -> {
+                            Dialog(
+                                enabled = logoutEnabled,
+                                onDismissRequest = { openLogoutDialog.value = false },
+                                onConfirmation = { onClickLogoutConfirm() },
+                                dialogTitle = "로그아웃 하시겠습니까?",
+                                dialogText = "로그아웃 시 로그인 화면으로 돌아갑니다.",
+                            )
+                        }
                     }
                 }
             }
+            BottomNavigator(selectedItem = selectedIdx, onItemSelected = { onSelectedIdx(it) })
         }
-        BottomNavigator(selectedItem = selectedIdx, onItemSelected = { onSelectedIdx(it) })
     }
 }
 
@@ -237,7 +243,8 @@ private fun SettingScreenPreview() {
             onNavigateToAgreeDetailScreen = {},
             onNavigateToMySettingScreen = {},
             onNavigateToCalendarSettingScreen = {},
-            onNavigateToWorkSettingScreen = {}
+            onNavigateToWorkSettingScreen = {},
+            onNavigateToAskSettingScreen = {}
         )
     }
 }

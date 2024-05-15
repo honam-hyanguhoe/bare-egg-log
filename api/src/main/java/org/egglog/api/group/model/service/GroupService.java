@@ -1,5 +1,6 @@
 package org.egglog.api.group.model.service;
 
+import com.google.firebase.messaging.Notification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.group.exception.GroupErrorCode;
@@ -13,6 +14,10 @@ import org.egglog.api.group.model.entity.GroupMember;
 import org.egglog.api.group.model.entity.InvitationCode;
 import org.egglog.api.group.repository.redis.GroupInvitationRepository;
 import org.egglog.api.group.repository.jpa.GroupRepository;
+import org.egglog.api.notification.model.entity.FCMTopic;
+import org.egglog.api.notification.model.entity.enums.TopicEnum;
+import org.egglog.api.notification.model.service.FCMService;
+import org.egglog.api.notification.model.service.NotificationService;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.utility.utils.RandomStringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,7 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +37,8 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupInvitationRepository groupInvitationRepository;
 
-
+    private final FCMService fcmService;
+    private final NotificationService notificationService;
     /**
      * 초대수락 메서드
      * 존재하는 코드인지 확인해서 password 검증 후 그룹에 사용자 등록
@@ -66,10 +72,13 @@ public class GroupService {
                     .isAdmin(false)
                     .build();
             groupMemberService.createGroupMember(newMember);
+            notificationService.groupMemberAcceptNotification(user, group);
         }else{
             throw new GroupException(GroupErrorCode.NOT_MATCH_INVITATION);
         }
     }
+
+
 
     /**
      * 초대코드를 요청 받을때
@@ -109,13 +118,17 @@ public class GroupService {
      */
     @Transactional
     public void deleteGroupMember(Long groupId, Long memberId, User user) {
-        GroupMember boss = groupMemberService.getAdminMember(groupId);
-        if(boss.getUser().getId()==user.getId()) {
+        GroupMemberDto boss = groupMemberService.getAdminMember(groupId);
+        if(Objects.equals(boss.getUserId(), user.getId())) {
             //그룹에 해당 멤버가 존재하는지 검증하고 삭제
             GroupMember member = groupMemberService.getGroupMember(groupId, memberId);
             groupMemberService.deleteGroupMember(member);
+
+            notificationService.deleteGroupMemberNotification(groupId, member);
         }
     }
+
+
 
     /**
      * 본인이 속한 그룹리스트 반환
@@ -123,7 +136,7 @@ public class GroupService {
      * @return
      */
     public List<GroupPreviewDto> getGroupList(User user) {
-        List<GroupPreviewDto> groupList = groupRepository.findGroupByUserId(user.getId()).orElse(null);
+        List<GroupPreviewDto> groupList = groupRepository.findGroupByUserId(user.getId());
         return groupList;
     }
 
@@ -135,22 +148,22 @@ public class GroupService {
      */
     public GroupDto retrieveGroup(Long groupId, User user) {
         Group group = groupRepository.findById(groupId).orElseThrow(() -> new GroupException(GroupErrorCode.NOT_FOUND));
-        GroupMember boss = groupMemberService.getAdminMember(groupId);
+        log.debug("getAdmin");
+        GroupMemberDto boss = groupMemberService.getAdminMember(groupId);
         Boolean isBoss = false;
-        if(boss.getUser().getId() == user.getId()){
+
+        if(Objects.equals(boss.getUserId(), user.getId())){
             isBoss = true;
         }
-        List<GroupMemberDto> memberList = groupMemberService
-                .getGroupMeberList(groupId)
-                .stream()
-                .map(GroupMember::toDto)
-                .collect(Collectors.toList());
+
+        log.debug("getMembers");
+        List<GroupMemberDto> memberList = groupMemberService.getGroupMemberList(groupId);
 
         return GroupDto.builder()
                 .id(groupId)
                 .groupImage(group.getGroupImage())
                 .groupName(group.getGroupName())
-                .admin(boss.toDto())
+                .admin(boss)
                 .isAdmin(isBoss)
                 .groupMembers(memberList)
                 .build();
@@ -173,18 +186,18 @@ public class GroupService {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new GroupException(GroupErrorCode.NOT_FOUND));
         try {
-            if(groupUpdateForm.getNewName()!=null){
-                group.setGroupName(groupUpdateForm.getNewName());
-            }
-            if(groupUpdateForm.getNewPassword()!=null){
-                group.setPassword(passwordEncoder.encode(groupUpdateForm.getNewPassword()));
-                InvitationCode invitationCode = groupInvitationRepository.findInvitationCodeByGroupId(groupId).orElse(null);
-                if(invitationCode!=null){
-                    invitationCode.setPassword(group.getPassword());
-                    groupInvitationRepository.save(invitationCode);
-                }
-            }
-            groupRepository.save(group);
+            Group updateGroup = group.update(groupUpdateForm.getNewName(), passwordEncoder.encode(groupUpdateForm.getNewPassword()));
+            InvitationCode invitationCode = groupInvitationRepository.findInvitationCodeByGroupId(groupId)
+                    .orElse(InvitationCode
+                            .builder()
+                            .groupId(groupId)
+                            .code(RandomStringUtils.generateRandomMixChar(10))
+                            .build());
+
+            invitationCode.setPassword(group.getPassword());
+            groupRepository.save(updateGroup);
+            groupInvitationRepository.save(invitationCode);
+
         }catch (Exception e){
             throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
         }
@@ -198,7 +211,7 @@ public class GroupService {
      * @param user
      */
     @Transactional
-    public BossChangeDto updateGroupMember(Long groupId, Long memberId, User user) {
+    public void updateGroupMember(Long groupId, Long memberId, User user) {
         GroupMember boss = groupMemberService.getGroupMember(groupId, user.getId());
         //사용자가 그룹장이 아니라면 권한 에러 403
         if(!boss.getIsAdmin()){
@@ -217,12 +230,9 @@ public class GroupService {
         groupMemberService.createGroupMember(newBoss);
         groupMemberService.createGroupMember(boss);
 
-        //응답 DTO 생성
-        BossChangeDto changes = new BossChangeDto();
-        changes.setCurrentAdmin(newBoss.toDto());
-        changes.setOldAdmin(boss.toDto());
-
-        return changes;
+        Group group = groupRepository.findById(groupId).orElseThrow(()->new GroupException(GroupErrorCode.TRANSACTION_ERROR));
+        group.setAdmin(newBoss);
+        groupRepository.save(group);
     }
 
     /**
@@ -244,6 +254,18 @@ public class GroupService {
                 //더이상 남은 사용자가 없으니 그룹 삭제
                 Group group = groupRepository.findById(groupId).orElseThrow(()->new GroupException(GroupErrorCode.NOT_FOUND));
                 groupRepository.delete(group);
+
+                //해당 멤버가 삭제되었다면 해당 유저의 토픽 구독 취소
+                String loginUserDeviceToken = user.getDeviceToken();
+                FCMTopic topic = FCMTopic.builder()
+                        .topic(TopicEnum.GROUP)
+                        .topicId(groupId)
+                        .build();
+                if (loginUserDeviceToken!=null){
+                    fcmService.unsubscribeFromTopic(loginUserDeviceToken, topic);
+                }
+
+
             }else{
                 throw new GroupException(GroupErrorCode.GROUP_ROLE_NOT_MATCH);
             }
@@ -257,19 +279,23 @@ public class GroupService {
      * @param groupForm
      * @param user
      */
+    @Transactional
     public void generateGroup(GroupForm groupForm, User user) {
         Group newGroup = Group.builder()
-                .admin(user.getName())
                 .groupImage(groupForm.getGroupImage())
                 .groupName(groupForm.getGroupName())
                 .password(passwordEncoder.encode(groupForm.getGroupPassword()))
                 .build();
+
         GroupMember newGroupMember = GroupMember
                 .builder()
                 .isAdmin(true)
                 .group(newGroup)
                 .user(user)
                 .build();
+
+        newGroup.setAdmin(newGroupMember);
+
         try {
             groupRepository.save(newGroup);
             groupMemberService.createGroupMember(newGroupMember);

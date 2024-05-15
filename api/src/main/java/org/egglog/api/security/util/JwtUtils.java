@@ -121,7 +121,7 @@ public class JwtUtils {
         }catch (ExpiredJwtException e){
             log.debug("exception : 리프레쉬 토큰 기간 만료");
             User expiredUser = userJpaRepository.findById(Long.valueOf(e.getClaims().getSubject()))
-                    .orElseThrow(() -> new GlobalException(GlobalErrorCode.SERVER_ERROR));
+                    .orElseThrow(() -> new JwtException(JwtErrorCode.INVALID_REFRESH_TOKEN));
             userJpaRepository.save(expiredUser.doLogout()); //로그아웃 처리
             throw new JwtException(JwtErrorCode.INVALID_REFRESH_TOKEN);
         }catch (UnsupportedJwtException e){

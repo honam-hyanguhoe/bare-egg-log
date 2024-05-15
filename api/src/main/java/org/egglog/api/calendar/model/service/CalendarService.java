@@ -44,6 +44,7 @@ import org.egglog.api.worktype.model.entity.WorkType;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 //import java.util.TimeZone;
 import java.time.format.DateTimeFormatter;
@@ -206,80 +207,134 @@ public class CalendarService {
         }
         return blobPath;
     }
-    /**
-     * 한달 조회
-     * 개인 일정 + 근무
-     *
-     * @param calendarMonthRequest
-     * @return
-     */
-    public CalendarListResponse getCalendarListByMonth(CalendarMonthRequest calendarMonthRequest, User user) {
-        LocalDateTime startDate = calendarMonthRequest.getStartDate();
-        LocalDateTime endDate = calendarMonthRequest.getEndDate();
-        Long calendarGroupId = calendarMonthRequest.getCalendarGroupId();
-        Long userId = user.getId();
 
-        CalendarGroup calendarGroup = calendarGroupRepository.findById(calendarGroupId).orElseThrow(
-                () -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP)
-        );
 
-        List<Work> workList = workQueryRepositoryImpl.findWorkListWithAllByTime(calendarMonthRequest.getCalendarGroupId(), startDate.toLocalDate(), endDate.toLocalDate());
-        Optional<List<Event>> eventsByMonthAndUserId = eventRepository.findEventsByMonthAndUserId(startDate, endDate, userId, calendarGroupId);
+//    /**
+//     * 캘린더 startDate - endDate 조회
+//     * 개인 일정 + 근무 일정
+//     * @param calendarMonthRequest
+//     * @param user
+//     * @return
+//     */
+//    public List<CalendarListResponse> getCalendarList(CalendarMonthRequest calendarMonthRequest, User user) {
+//        Map<LocalDate, CalendarListResponse> dailySchedules = new HashMap<>();
+//
+//        CalendarListResponse calendarListResponse = getCalendarListByMonth(calendarMonthRequest, user);
+//        List<EventListOutputSpec> eventList = calendarListResponse.getEventList();
+//        WorkListResponse workListResponse = calendarListResponse.getWorkList();
+//
+//        if (!eventList.isEmpty()) {
+//            for (EventListOutputSpec event : eventList) {
+//                LocalDate eventStart = event.getStartDate().toLocalDate();
+//                LocalDate eventEnd = event.getEndDate().toLocalDate();
+//
+//                eventStart.datesUntil(eventEnd.plusDays(1)).forEach(date -> {
+//                    CalendarListResponse schedule = dailySchedules.get(date);
+//                    if (schedule == null) {
+//                        schedule = new CalendarListResponse(date);
+//                        dailySchedules.put(date, schedule);
+//                    }
+//                    schedule.addEvent(event);
+//                });
+//            }
+//        }
+//        if (workListResponse != null) {
+//            List<WorkResponse> workList = workListResponse.getWorkList();
+//            CalendarGroupResponse calendarGroup = workListResponse.getCalendarGroup();
+//
+//            for (WorkResponse work : workList) {
+//                LocalDate date = work.getWorkDate();    //근무하는 날짜
+//                CalendarListResponse schedule = dailySchedules.get(date);
+//                if (schedule == null) {
+//                    schedule = new CalendarListResponse(date);
+//                    dailySchedules.put(date, schedule);
+//                }
+//                schedule.addCalendarGroup(calendarGroup);
+//                schedule.addWorkToWorkList(work);
+//                schedule.setCalendarGroupId(calendarGroup.getCalendarGroupId());
+//            }
+//        }
+//        List<CalendarListResponse> result = new ArrayList<>();
+//        for (CalendarListResponse value : dailySchedules.values()) {
+//            result.add(value);
+//        }
+//        return result;
+//    }
 
-        List<WorkResponse> workResponseList = new ArrayList<>();
-        List<EventListOutputSpec> eventListOutputSpecList = new ArrayList<>();
-
-        for (Work work : workList) {
-            WorkType workType = work.getWorkType();
-            WorkTypeResponse workTypeResponse = WorkTypeResponse.builder()
-                    .workTypeId(workType.getId())
-                    .workTypeImgUrl(workType.getWorkTypeImgUrl())
-                    .color(workType.getColor())
-                    .title(workType.getTitle())
-                    .startTime(workType.getStartTime())
-                    .workTime(workType.getWorkTime())
-                    .build();
-
-            WorkResponse workResponse = WorkResponse.builder()
-                    .workId(work.getId())
-                    .workDate(work.getWorkDate())
-                    .workType(workTypeResponse)
-                    .build();
-
-            workResponseList.add(workResponse);
-        }
-
-        CalendarGroupResponse calendarGroupResponse = CalendarGroupResponse.builder()
-                .calendarGroupId(calendarGroupId)
-                .url(calendarGroup.getUrl())
-                .alias(calendarGroup.getAlias())
-                .build();
-
-        WorkListResponse workListResponse = WorkListResponse.builder()
-                .workList(workResponseList)
-                .calendarGroup(calendarGroupResponse)
-                .build();
-
-        if (eventsByMonthAndUserId.isPresent()) {
-            for (Event event : eventsByMonthAndUserId.get()) {
-                EventListOutputSpec eventListOutputSpec = EventListOutputSpec.builder()
-                        .eventId(event.getId())
-                        .eventTitle(event.getEventTitle())
-                        .eventContent(event.getEventContent())
-                        .startDate(event.getStartDate())
-                        .endDate(event.getEndDate())
-                        .calendarGroupId(event.getCalendarGroup().getId())
-                        .build();
-
-                eventListOutputSpecList.add(eventListOutputSpec);
-            }
-        }
-
-        return CalendarListResponse.builder()
-                .workList(workListResponse)
-                .eventList(eventListOutputSpecList)
-                .build();
-    }
+//    /**
+//     * 한달 조회
+//     * 개인 일정 + 근무
+//     *
+//     * @param calendarMonthRequest
+//     * @return
+//     */
+//    private CalendarListResponse getCalendarListByMonth(CalendarMonthRequest calendarMonthRequest, User user) {
+//        LocalDateTime startDate = calendarMonthRequest.getStartDate();
+//        LocalDateTime endDate = calendarMonthRequest.getEndDate();
+//        Long calendarGroupId = calendarMonthRequest.getCalendarGroupId();
+//        Long userId = user.getId();
+//
+//        CalendarGroup calendarGroup = calendarGroupRepository.findById(calendarGroupId).orElseThrow(
+//                () -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP)
+//        );
+//
+//        List<Work> workList = workQueryRepositoryImpl.findWorkListWithAllByTime(calendarMonthRequest.getCalendarGroupId(), startDate.toLocalDate(), endDate.toLocalDate());
+//        Optional<List<Event>> eventsByMonthAndUserId = eventRepository.findEventsByMonthAndUserId(startDate, endDate, userId, calendarGroupId);
+//
+//        List<WorkResponse> workResponseList = new ArrayList<>();
+//        List<EventListOutputSpec> eventListOutputSpecList = new ArrayList<>();
+//
+//        for (Work work : workList) {
+//            WorkType workType = work.getWorkType();
+//            WorkTypeResponse workTypeResponse = WorkTypeResponse.builder()
+//                    .workTypeId(workType.getId())
+//                    .workTypeImgUrl(workType.getWorkTypeImgUrl())
+//                    .color(workType.getColor())
+//                    .title(workType.getTitle())
+//                    .startTime(workType.getStartTime())
+//                    .workTime(workType.getWorkTime())
+//                    .build();
+//
+//            WorkResponse workResponse = WorkResponse.builder()
+//                    .workId(work.getId())
+//                    .workDate(work.getWorkDate())
+//                    .workType(workTypeResponse)
+//                    .build();
+//
+//            workResponseList.add(workResponse);
+//        }
+//
+//        CalendarGroupResponse calendarGroupResponse = CalendarGroupResponse.builder()
+//                .calendarGroupId(calendarGroupId)
+//                .url(calendarGroup.getUrl())
+//                .alias(calendarGroup.getAlias())
+//                .build();
+//
+//        WorkListResponse workListResponse = WorkListResponse.builder()
+//                .workList(workResponseList)
+//                .calendarGroup(calendarGroupResponse)
+//                .build();
+//
+//        if (eventsByMonthAndUserId.isPresent()) {
+//            for (Event event : eventsByMonthAndUserId.get()) {
+//                EventListOutputSpec eventListOutputSpec = EventListOutputSpec.builder()
+//                        .eventId(event.getId())
+//                        .eventTitle(event.getEventTitle())
+//                        .eventContent(event.getEventContent())
+//                        .startDate(event.getStartDate())
+//                        .endDate(event.getEndDate())
+//                        .calendarGroupId(event.getCalendarGroup().getId())
+//                        .build();
+//
+//                eventListOutputSpecList.add(eventListOutputSpec);
+//            }
+//        }
+//
+//        return CalendarListResponse.builder()
+//                .workList(workListResponse)
+//                .eventList(eventListOutputSpecList)
+//                .build();
+//    }
 
     public void updateIcs(Long userId) {
         log.debug("update");

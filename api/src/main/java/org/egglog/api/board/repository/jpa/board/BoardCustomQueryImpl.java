@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 import static org.egglog.api.board.model.entity.QBoard.board;
 import static org.egglog.api.board.model.entity.QBoardLike.boardLike;
 import static org.egglog.api.board.model.entity.QComment.comment;
+import static org.egglog.api.hospital.model.entity.QHospital.hospital;
+import static org.egglog.api.hospital.model.entity.QHospitalAuth.hospitalAuth;
 
 /**
  * ```
@@ -115,15 +117,75 @@ public class BoardCustomQueryImpl implements BoardCustomQuery {
 
     }
 
+//    @Override
+//    public List<BoardListOutputSpec> findBoardList(String keyword, Long groupId, Long hospitalId, Long offset, int size) {
+//        BooleanExpression whereClause = board.isNotNull()
+//                .and(groupId != null ? board.group.id.eq(groupId) : board.group.id.isNull())
+//                .and(hospitalId != null ? board.hospital.id.eq(hospitalId) : board.hospital.id.isNull())
+//                .and(keyword != null && !keyword.isEmpty() ? searchKeyword(keyword) : null);
+//
+//        List<Tuple> results = jpaQueryFactory
+//                .select(
+//                        board,
+//                        comment.countDistinct(),
+//                        boardLike.countDistinct(),
+//                        JPAExpressions.select(board.user.selectedHospital.hospitalName)
+//                                .from(hospital)
+//                                .where(hospital.id.eq(board.user.selectedHospital.id)),
+//                        JPAExpressions.select(hospitalAuth.auth)
+//                                .from(hospitalAuth)
+//                                .where(
+//                                        hospitalAuth.user.eq(board.user),
+//                                        hospitalAuth.hospital.eq(board.user.selectedHospital)
+//                                )
+//                )
+//                .from(board)
+//                .leftJoin(comment).on(comment.board.eq(board))
+//                .leftJoin(boardLike).on(boardLike.board.eq(board))
+//                .where(whereClause)
+//                .groupBy(board.id)
+//                .orderBy(board.id.desc())
+//                .offset(offset)
+//                .limit(size)
+//                .fetch();
+//
+//        return results.stream().map(tuple -> new BoardListOutputSpec(
+//                tuple.get(board),
+//                tuple.get(comment.countDistinct().longValue()),
+//                tuple.get(boardLike.countDistinct().longValue()),
+//                tuple.get(3, String.class),
+//                tuple.get(4, Boolean.class) != null ? tuple.get(4, Boolean.class) : false
+//        )).collect(Collectors.toList());
+//
+//    }
+
     @Override
-    public List<BoardListOutputSpec> findBoardList(String keyword, Long groupId, Long hospitalId, Long offset, int size) {
+    public List<BoardListOutputSpec> findBoardList(String keyword, Long groupId, Long hospitalId, Long offset, int size, Long loginUserId) {
         BooleanExpression whereClause = board.isNotNull()
-                .and(groupId != null ? board.group.id.eq(groupId) :  board.group.id.isNull())
+                .and(groupId != null ? board.group.id.eq(groupId) : board.group.id.isNull())
                 .and(hospitalId != null ? board.hospital.id.eq(hospitalId) : board.hospital.id.isNull())
                 .and(keyword != null && !keyword.isEmpty() ? searchKeyword(keyword) : null);
 
         List<Tuple> results = jpaQueryFactory
-                .select(board, comment.countDistinct(), boardLike.countDistinct())
+                .select(
+                        board,
+                        comment.countDistinct(),
+                        boardLike.countDistinct(),
+                        JPAExpressions.select(board.user.selectedHospital.hospitalName)
+                                .from(hospital)
+                                .where(hospital.id.eq(board.user.selectedHospital.id)),
+                        JPAExpressions.select(hospitalAuth.auth)
+                                .from(hospitalAuth)
+                                .where(
+                                        hospitalAuth.user.eq(board.user),
+                                        hospitalAuth.hospital.eq(board.user.selectedHospital)
+                                ),
+                        JPAExpressions.selectFrom(boardLike)
+                                .where(
+                                        boardLike.user.id.eq(loginUserId),
+                                                boardLike.board.eq(board)
+                                )
+                )
                 .from(board)
                 .leftJoin(comment).on(comment.board.eq(board))
                 .leftJoin(boardLike).on(boardLike.board.eq(board))
@@ -137,7 +199,10 @@ public class BoardCustomQueryImpl implements BoardCustomQuery {
         return results.stream().map(tuple -> new BoardListOutputSpec(
                 tuple.get(board),
                 tuple.get(comment.countDistinct().longValue()),
-                tuple.get(boardLike.countDistinct().longValue())
+                tuple.get(boardLike.countDistinct().longValue()),
+                tuple.get(3, String.class),
+                tuple.get(4, Boolean.class) != null ? tuple.get(4, Boolean.class) : false,
+                tuple.get(5, BoardLike.class) != null ? true : false
         )).collect(Collectors.toList());
 
     }
@@ -147,6 +212,14 @@ public class BoardCustomQueryImpl implements BoardCustomQuery {
                         "function('match_against', {0}, {1}, {2})", board.title, board.content, "+" + keyword + "*")
                 .gt(0);
 
+    }
+
+    public Optional<Board> findWithUserById(Long boardId) {
+        return Optional.ofNullable(jpaQueryFactory
+                .selectFrom(board)
+                .leftJoin(board.user).fetchJoin()
+                .where(board.id.eq(boardId))
+                .fetchOne());
     }
 
 }

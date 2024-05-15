@@ -11,6 +11,7 @@ import org.egglog.api.hospital.model.entity.HospitalAuth;
 import org.egglog.api.hospital.repository.jpa.HospitalAuthJpaRepository;
 import org.egglog.api.hospital.repository.jpa.HospitalAuthQueryRepositoryImpl;
 import org.egglog.api.hospital.repository.jpa.HospitalJpaRepository;
+import org.egglog.api.notification.model.service.NotificationService;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.dto.request.JoinUserRequest;
@@ -40,6 +41,7 @@ public class UserService {
     private final HospitalAuthJpaRepository hospitalAuthJpaRepository;
     private final WorkTypeJpaRepository workTypeJpaRepository;
     private final CalendarGroupRepository calendarGroupRepository;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     public UserResponse findById(Long id){
@@ -72,7 +74,9 @@ public class UserService {
         //todo 1. 기본 태그 자동 생성
         workTypeJpaRepository.saveAll(getDefaultWorkTypes(loginUser));
         //todo 2. 근무 일정 캘린더 그룹 자동 생성
-        CalendarGroup workGroup = calendarGroupRepository.save(CalendarGroup.builder().alias("근무 일정").user(loginUser).build());
+        CalendarGroup workGroup = calendarGroupRepository.save(CalendarGroup.builder().alias("[EGGLOG] 기본 캘린더").user(loginUser).build());
+        //todo 3. 알림 설정 자동생성
+        notificationService.makeDefaultNotification(loginUser);
         return userJpaRepository.save(loginUser.join(request.getUserName(), hospital, request.getEmpNo(), request.getFcmToken(), workGroup.getId()))
                 .toResponse();
     }
@@ -150,8 +154,13 @@ public class UserService {
     @Transactional
     public UserResponse updateFcmUser(User loginUser, UpdateFcmRequest request){
         log.debug(" ==== ==== ==== [ 유저 FCM 수정 서비스 실행] ==== ==== ====");
+        String oldToken = loginUser.getDeviceToken();
         User updateUser = userJpaRepository.save(loginUser.updateFcmToken(request.getFcmToken()));
         Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(updateUser, updateUser.getSelectedHospital());
+
+        //todo 유저의 알림 리스트를 가져와서, 구독 취소 후 재 구독한다.
+        notificationService.updateTopicSubscribeState(oldToken, updateUser);
+
         if (hospitalAuth.isPresent()){
             return updateUser.toResponse(hospitalAuth.get());
         }

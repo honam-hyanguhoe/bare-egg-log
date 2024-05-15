@@ -6,6 +6,7 @@ import org.egglog.api.event.model.dto.params.EventForm;
 import org.egglog.api.event.model.dto.params.EventPeriodRequest;
 import org.egglog.api.event.model.dto.params.EventUpdateForm;
 import org.egglog.api.event.model.dto.response.EventListOutputSpec;
+import org.egglog.api.event.model.dto.response.EventListPeriodSpec;
 import org.egglog.api.event.model.dto.response.EventOutputSpec;
 import org.egglog.api.event.model.service.EventService;
 import org.egglog.api.user.model.entity.User;
@@ -80,7 +81,7 @@ public class EventController {
      * @return
      */
     @GetMapping("/month")
-    public ResponseEntity<MessageUtils<List<EventListOutputSpec>>> getEventListByPeriod(@ModelAttribute @Valid EventPeriodRequest eventPeriodRequest, @AuthenticationPrincipal User user) {
+    public ResponseEntity<MessageUtils<List<EventListPeriodSpec>>> getEventListByPeriod(@ModelAttribute @Valid EventPeriodRequest eventPeriodRequest, @AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(MessageUtils.success(eventService.getEventListByPeriod(eventPeriodRequest, user)));
     }
 

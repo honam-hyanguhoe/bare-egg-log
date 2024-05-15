@@ -34,11 +34,12 @@ public class WorkTypeService {
     }
 
     @Transactional
-    public WorkTypeResponse editWorkType(User loginUser, EditWorkTypeRequest request){
+    public WorkTypeResponse editWorkType(User loginUser, EditWorkTypeRequest request, Long workTypeId){
         log.debug(" ==== ==== ==== [ 근무 타입 수정 서비스 실행 ] ==== ==== ====");
-        WorkType workType = workTypeJpaRepository.findWithUserById(request.getWorkTypeId())
+        WorkType workType = workTypeJpaRepository.findWithUserById(workTypeId)
                 .orElseThrow(() -> new WorkTypeException(NO_EXIST_WORKTYPE));
-        if (workType.getUser().getId() != loginUser.getId()) throw new WorkTypeException(ACCESS_DENIED);
+        if (workType.getUser().getId()!=loginUser.getId()) throw new WorkTypeException(ACCESS_DENIED);
+
         return workTypeJpaRepository.save(workType
                     .edit(request.getTitle(), request.getColor(), request.getWorkTypeImgUrl(), request.getStartTime(), request.getWorkTime()))
                 .toResponse();
@@ -49,8 +50,13 @@ public class WorkTypeService {
         log.debug(" ==== ==== ==== [ 근무 타입 삭제 서비스 실행 ] ==== ==== ==== ");
         WorkType workType = workTypeJpaRepository.findWithUserById(workTypeId)
                 .orElseThrow(() -> new WorkTypeException(NO_EXIST_WORKTYPE));
-        if (workType.getWorkTag().equals(WorkTag.ETC.name())) throw new WorkTypeException(ACCESS_DENIED);
-        if (workType.getUser().getId()!=loginUser.getId()) throw new WorkTypeException(ACCESS_DENIED);
+        log.debug(" ==== ==== ==== [ workType.getWorkTag().equals(WorkTag.ETC) : {} ] ==== ==== ==== ", workType.getWorkTag().equals(WorkTag.ETC));
+        log.debug(" ==== ==== ==== [ workType.getWorkTag().name().equals(WorkTag.ETC.name()) : {} ] ==== ==== ==== ", workType.getWorkTag().name().equals(WorkTag.ETC.name()));
+        log.debug(" ==== ==== ==== [ workType.getUser().equals(loginUser)) : {} ] ==== ==== ==== ", workType.getUser().equals(loginUser));
+        log.debug(" ==== ==== ==== [ workType.getUser().getId()==loginUser.getId() : {} ] ==== ==== ==== ", workType.getUser().getId()==loginUser.getId());
+        if (!(workType.getWorkTag().equals(WorkTag.ETC)) || (workType.getUser().getId()!=loginUser.getId())) {
+            throw new WorkTypeException(ACCESS_DENIED);
+        }
         workTypeJpaRepository.delete(workType);
     }
 
