@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.egglog.api.event.model.entity.Event;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,15 +38,18 @@ public class EventCustomQueryImpl implements EventCustomQuery {
      * @return
      */
     @Override
-    public Optional<List<Event>> findEventsByMonthAndUserId(LocalDateTime startDate, LocalDateTime endDate, Long userId, Long calendarGroupId) {
+    public Optional<List<Event>> findEventsByMonthAndUserId(LocalDate startDate, LocalDate endDate, Long userId, Long calendarGroupId) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
         return Optional.ofNullable(jpaQueryFactory
                 .selectFrom(event)
                 .join(event.user, user)
                 .where(
                         user.id.eq(userId),
                         event.calendarGroup.id.eq(calendarGroupId),
-                        event.startDate.between(startDate, endDate)
-                                .or(event.endDate.between(startDate, endDate))
+                        event.startDate.between(startDateTime, endDateTime)
+                                .or(event.endDate.between(startDateTime, endDateTime))
                 )
                 .fetch());
     }

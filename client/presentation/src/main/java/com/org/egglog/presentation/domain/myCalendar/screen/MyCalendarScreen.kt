@@ -45,6 +45,9 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.Dp
+import com.org.egglog.domain.myCalendar.model.EventListData
+import com.org.egglog.domain.myCalendar.model.PersonalScheduleData
+import com.org.egglog.domain.myCalendar.model.WorkListData
 import com.org.egglog.domain.myCalendar.model.WorkType
 import com.org.egglog.presentation.R
 import com.org.egglog.presentation.component.atoms.buttons.BigButton
@@ -61,6 +64,7 @@ import com.org.egglog.presentation.component.atoms.wheelPicker.TimePicker
 import com.org.egglog.presentation.component.molecules.bottomNavigator.BottomNavigator
 import com.org.egglog.presentation.component.molecules.cards.BigScheduleCard
 import com.org.egglog.presentation.component.molecules.cards.SmallScheduleCard
+import com.org.egglog.presentation.component.molecules.cards.SmallScheduleCard2
 import com.org.egglog.presentation.component.organisms.calendars.MonthlyCalendar
 import com.org.egglog.presentation.component.organisms.dialogs.SheetContent
 import com.org.egglog.presentation.domain.community.activity.CommunityActivity
@@ -173,6 +177,10 @@ fun MyCalendarScreen(
         onNextMonthClick = viewModel::onNextMonthClick,
         onDateClicked = viewModel::onDateClicked,
         workTypeList = state.workTypeList,
+        monthlyWorkList = state.monthlyWorkList,
+        currentWorkData = state.currentWorkData,
+        monthlyPersonalList = state.monthlyPersonalList,
+        currentPersonalData = state.currentPersonalData,
         onSubmitPersonalSchedule = viewModel::onSubmitPersonalSchedule,
         onWorkLabelClick = viewModel::onWorkLabelClick,
         tempWorkList = state.tempWorkList,
@@ -202,6 +210,10 @@ fun MyCalendarScreen(
     onNextMonthClick: () -> Unit,
     onDateClicked: (Int) -> Unit,
     workTypeList: List<WorkType>,
+    monthlyWorkList: List<WorkListData>,
+    currentWorkData: WorkType ?= null,
+    monthlyPersonalList: List<PersonalScheduleData>,
+    currentPersonalData: List<EventListData> ?= listOf(),
     onSubmitPersonalSchedule: () -> Unit,
     onWorkLabelClick: (WorkType) -> Unit,
     tempWorkList: List<Pair<Int, String>>,
@@ -240,7 +252,9 @@ fun MyCalendarScreen(
                     onPrevMonthClick = onPrevMonthClick,
                     onNextMonthClick = onNextMonthClick,
                     selectedDate = selectedDate,
-                    tempWorkList = tempWorkList
+                    tempWorkList = tempWorkList,
+                    monthlyWorkList = monthlyWorkList,
+                    monthlyPersonalList = monthlyPersonalList
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -249,7 +263,7 @@ fun MyCalendarScreen(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                ScheduleList()
+                ScheduleList(currentWorkData, currentPersonalData)
 
             }
 
@@ -344,21 +358,21 @@ fun ScheduleListHeader(
 
 // 일정 카드 리스트
 @Composable
-fun ScheduleList() {
+fun ScheduleList(
+    currentWorkData: WorkType ?= null,
+    currentPersonalData: List<EventListData> ?= listOf()
+) {
     Column() {
-        BigScheduleCard(
-            work = "basic",
-            startTime = "10:00",
-            endTime = "12:00",
-            title = "점심 약속",
-            content = "봉선동 성내 식당",
-            onClickMore = {})
+        if(currentWorkData != null) {
+            val hour1 = currentWorkData.startTime.substring(0,2).toInt()
+            val hour2 = currentWorkData.workTime.substring(0,2).toInt()
+            val endTime = String.format("%02d:00", hour1 + hour2)
+            SmallScheduleCard2(workType = currentWorkData.copy(workTime = endTime))
+        }
 
-//        SmallScheduleCard(work = "day", startTime = "12:00", endTime = "13:00", onClickMore = {})
-//
-//        SmallScheduleCard(work = "night", startTime = "12:00", endTime = "13:00", onClickMore = {})
-//
-//        SmallScheduleCard(work = "eve", startTime = "12:00", endTime = "13:00", onClickMore = {})
+        currentPersonalData?.forEach {personalData ->
+            BigScheduleCard(work = "BASIC", startTime = personalData.startDate.substring(11,16), endTime = personalData.endDate.substring(11,16), content = personalData.eventContent, title = personalData.eventTitle, onClickMore = {})
+        }
     }
 }
 

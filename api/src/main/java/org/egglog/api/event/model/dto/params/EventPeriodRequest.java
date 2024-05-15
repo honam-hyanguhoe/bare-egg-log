@@ -31,12 +31,12 @@ import java.time.LocalDateTime;
 public class EventPeriodRequest {
 
     @NotNull(message = "startDate는 필수 입니다.")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime startDate; //필수
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate startDate; //필수
 
     @NotNull(message = "endDate는 필수 입니다.")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime endDate; //필수
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate endDate; //필수
 
     @NotNull(message = "userId는 필수 값 입니다.")
     @Positive(message = "정확한 ID 값을 입력 해주세요.")
