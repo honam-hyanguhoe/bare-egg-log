@@ -56,4 +56,12 @@ public class CommentCustomQueryImpl implements CommentCustomQuery {
                 .fetch());
 
     }
+    @Override
+    public Optional<Comment> findWithUserById(Long commentId){
+        return Optional.ofNullable(jpaQueryFactory
+                .selectFrom(comment)
+                .leftJoin(comment.user).fetchJoin()
+                .where(comment.id.eq(commentId))
+                .fetchOne());
+    }
 }

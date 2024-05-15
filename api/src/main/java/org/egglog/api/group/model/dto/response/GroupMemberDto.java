@@ -6,16 +6,19 @@ import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
+@AllArgsConstructor
 public class GroupMemberDto {
     private Long userId;
     private Long groupId;
     private String userName;
     private String profileImgUrl;
     private Boolean isAdmin;
+    private String hospitalName;
 }

@@ -27,7 +27,9 @@ import org.egglog.api.hospital.exception.HospitalErrorCode;
 import org.egglog.api.hospital.exception.HospitalException;
 import org.egglog.api.hospital.model.entity.Hospital;
 import org.egglog.api.notification.model.entity.FCMTopic;
+import org.egglog.api.notification.model.entity.enums.TopicEnum;
 import org.egglog.api.notification.model.service.FCMService;
+import org.egglog.api.notification.model.service.NotificationService;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
 import org.egglog.api.user.model.entity.User;
@@ -82,7 +84,7 @@ public class BoardService {
 
     private final StringRedisTemplate redisTemplate;    //급상승 게시물
 
-    private final FCMService fcmService;
+    private final NotificationService notificationService;
 
     /**
      * 게시판 조회
@@ -96,22 +98,19 @@ public class BoardService {
         List<BoardListOutputSpec> boardListOutputSpecList = new ArrayList<>();
         int size = 10;
         try {
-            List<BoardListOutputSpec> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getOffset(), size);
             log.info("boardList 쿼리 실행");
+            List<BoardListOutputSpec> boardList = boardRepository.findBoardList(boardListForm.getSearchWord(), boardListForm.getGroupId(), boardListForm.getHospitalId(), boardListForm.getOffset(), size, user.getId());
+
             for (BoardListOutputSpec board : boardList) {
                 log.info("boardId: {}", board.getBoardId());
-                User writer = userJpaRepository.findById(board.getUserId()).orElseThrow(
-                        () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-                );
+
                 long viewCount = redisViewCountUtil.getViewCount(String.valueOf(board.getBoardId())); //하루 동안의 조회수
                 log.info("redis view count: {}", viewCount);
                 long hitCnt = viewCount + board.getViewCount();
                 log.info("redis + db 조회수 합산: {}", hitCnt);
                 log.info("db 조회수: {}", board.getViewCount());
 
-                //사용자의 병원 인증 정보
-                Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(writer, writer.getSelectedHospital());
-                boolean isUserLiked = false;  //좋아요 누른 여부
+//                boolean isUserLiked = false;  //좋아요 누른 여부
                 boolean isCommented = false;    //댓글 유무 여부
 
                 if (board.getCommentCount() != 0) {
@@ -119,21 +118,13 @@ public class BoardService {
                 }
 
                 //로그인한 사용자가 이미 좋아요를 눌렀는지
-                if (!isNotLiked(user.getId(), board.getBoardId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
-                    isUserLiked = true;
-                }
+//                if (!isNotLiked(user.getId(), board.getBoardId())) { //아직 좋아요 안눌렀다면 true, 이미 좋아요 눌렀다면 false
+//                    isUserLiked = true;
+//                }
 
                 board.setViewCount(hitCnt);
-                board.setIsLiked(isUserLiked);
+                board.setIsLiked(board.getIsLiked());
                 board.setIsCommented(isCommented);
-                board.setHospitalName(writer.getSelectedHospital().getHospitalName());
-
-                //병원 인증배지가 없다면
-                if (hospitalAuth.isEmpty()) {
-                    board.setIsHospitalAuth(false);
-                }
-                //있다면
-                hospitalAuth.ifPresent(auth -> board.setIsHospitalAuth(auth.getAuth()));
 
                 boardListOutputSpecList.add(board);
             }
@@ -147,6 +138,7 @@ public class BoardService {
 
         return boardListOutputSpecList;
     }
+
 
     /**
      * 급상승 게시물 조회
@@ -253,14 +245,14 @@ public class BoardService {
                 .tempNickname(boardForm.getTempNickname())
                 .user(user)
                 .build();
-
+        Group group = null;
         // 전체 게시판
         if (boardForm.getGroupId() == null && boardForm.getHospitalId() == null) {
             board.setBoardType(BoardType.ALL);
 
         } else if (boardForm.getGroupId() != null && boardForm.getHospitalId() == null) {
             //그룹 게시판
-            Group group = groupRepository.findById(boardForm.getGroupId()).orElseThrow(
+            group = groupRepository.findById(boardForm.getGroupId()).orElseThrow(
                     () -> new GroupException(GroupErrorCode.NOT_FOUND)
             );
             board.setBoardType(BoardType.GROUP);
@@ -286,19 +278,7 @@ public class BoardService {
 
         try {
             Board saveBoard = boardRepository.save(board);//저장
-            if (saveBoard.getBoardType().equals(BoardType.GROUP)){
-                //그룹 게시판에 글이 등록되었다면 푸시알림 발송
-                FCMTopic topic = FCMTopic.builder()
-                        .topic(FCMTopic.TopicEnum.group)
-                        .topicId(boardForm.getGroupId())
-                        .build();
-                Notification notification = Notification.builder()
-                        .setTitle(boardForm.getBoardTitle())
-                        .setBody(boardForm.getBoardContent())
-                        .setImage(boardForm.getPictureOne() != null ? boardForm.getPictureOne() : null)
-                        .build();
-                fcmService.sendNotificationToTopic(topic, notification);
-            }
+            notificationService.registerBoardNotification(boardForm, saveBoard, group);
 
         } catch (PersistenceException e) {
             throw new BoardException(BoardErrorCode.TRANSACTION_ERROR);
@@ -309,6 +289,8 @@ public class BoardService {
             throw new BoardException(BoardErrorCode.UNKNOWN_ERROR);
         }
     }
+
+
 
 
     /**
@@ -534,8 +516,7 @@ public class BoardService {
             //병원 인증배지가 없다면
             if (hospitalAuth.isEmpty()) {
                 boardOutputSpec.setIsHospitalAuth(false);
-            }
-            else {
+            } else {
                 boardOutputSpec.setIsHospitalAuth(hospitalAuth.get().getAuth());
             }
 

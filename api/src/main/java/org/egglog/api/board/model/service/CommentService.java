@@ -1,5 +1,6 @@
 package org.egglog.api.board.model.service;
 
+
 import jakarta.persistence.PersistenceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,10 +15,8 @@ import org.egglog.api.board.model.entity.Board;
 import org.egglog.api.board.model.entity.Comment;
 import org.egglog.api.board.repository.jpa.board.BoardRepository;
 import org.egglog.api.board.repository.jpa.comment.CommentRepository;
-import org.egglog.api.user.exception.UserErrorCode;
-import org.egglog.api.user.exception.UserException;
+import org.egglog.api.notification.model.service.NotificationService;
 import org.egglog.api.user.model.entity.User;
-import org.egglog.api.user.repository.jpa.UserJpaRepository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,11 +30,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CommentService {
 
-    private final UserJpaRepository userJpaRepository;
-
     private final BoardRepository boardRepository;
 
     private final CommentRepository commentRepository;
+
+    private final NotificationService notificationService;
 
     /**
      * 댓글 조회 메서드<br/>
@@ -113,14 +112,12 @@ public class CommentService {
      * - 댓글 등록.
      *
      * @param commentForm
-     * @param userId
+     * @param user
      */
-    public void registerComment(CommentForm commentForm, Long userId) {
-        User user = userJpaRepository.findById(userId).orElseThrow(
-                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-        );
+    @Transactional
+    public void registerComment(CommentForm commentForm, User user) {
 
-        Board board = boardRepository.findById(commentForm.getBoardId()).orElseThrow(
+        Board board = boardRepository.findWithUserById(commentForm.getBoardId()).orElseThrow(
                 () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
         );
 
@@ -135,8 +132,8 @@ public class CommentService {
         board.setIsCommented(true);     //댓글 생김
 
         try {
-            commentRepository.save(comment);
-
+            Comment saveComment = commentRepository.save(comment);
+            notificationService.registerCommentNotification(board, saveComment, comment);
         } catch (DataAccessException e) {
             throw new CommentException(CommentErrorCode.DATABASE_CONNECTION_FAILED);
         } catch (Exception e) {
@@ -146,25 +143,24 @@ public class CommentService {
     }
 
 
+
+
     /**
      * 댓글 삭제 메서드<br/>
      * [로직]<br/>
      * - commentId를 토대로 댓글 삭제.
      *
      * @param commentId
-     * @param userId
+     * @param user
      */
-    public void deleteComment(Long commentId, Long userId) {
-        User user = userJpaRepository.findById(userId).orElseThrow(
-                () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
-        );
+    public void deleteComment(Long commentId, User user) {
 
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new CommentException(CommentErrorCode.NO_EXIST_COMMENT)
         );
         try {
             //접속자와 작성자가 같다면 삭제 가능
-            if (comment.getUser().getId().equals(userId)) {
+            if (comment.getUser().getId().equals(user.getId())) {
                 commentRepository.delete(comment);
                 //해당 댓글에 달린 대댓글이 있다면 함께 삭제
                 Optional<List<Comment>> recommentListByCommentId = commentRepository.getRecommentListByCommentId(commentId);

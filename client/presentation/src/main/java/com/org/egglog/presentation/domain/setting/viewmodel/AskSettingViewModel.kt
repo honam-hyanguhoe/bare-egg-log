@@ -48,7 +48,7 @@ class AskSettingViewModel @Inject constructor(
     fun onClickSend() = intent {
         reduce { state.copy(sendEnabled = false) }
         val tokens = getTokenUseCase()
-        postAskUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}", AskParam(email = if(state.email.isEmpty()) null else state.email, content = state.content, title = state.title)).getOrThrow()
+        postAskUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}", AskParam(email = state.email.ifEmpty { null }, content = state.content, title = state.title)).getOrThrow()
         reduce { state.copy(sendEnabled = true) }
     }
 

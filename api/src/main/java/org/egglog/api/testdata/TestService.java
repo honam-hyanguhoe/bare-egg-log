@@ -13,6 +13,7 @@ import org.egglog.api.group.model.service.GroupMemberService;
 import org.egglog.api.group.model.service.GroupService;
 import org.egglog.api.group.repository.jpa.GroupRepository;
 import org.egglog.api.group.repository.redis.GroupInvitationRepository;
+import org.egglog.api.notification.model.service.NotificationService;
 import org.egglog.api.security.model.dto.response.TokenResponse;
 import org.egglog.api.security.model.service.TokenService;
 import org.egglog.api.testdata.dto.request.TestLoginRequest;
@@ -63,12 +64,17 @@ public class TestService {
     private final GroupMemberService groupMemberService;
     private final GroupInvitationRepository groupInvitationRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final NotificationService notificationService;
     public void testDeleteUser(User user){
 
     }
 
-
+    public void createNotification(){
+        List<User> all = userJpaRepository.findAll();
+        for (User user : all) {
+            notificationService.makeDefaultNotification(user);
+        }
+    }
 
     @Transactional
     public void giveGroupUsers(InvitationAcceptForm request){

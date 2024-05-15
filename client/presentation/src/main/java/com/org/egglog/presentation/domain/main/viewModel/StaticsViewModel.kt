@@ -91,9 +91,9 @@ class StaticsViewModel @Inject constructor(
 
     fun onSelectedIdx(selectedIdx: Int) = intent {
         when(selectedIdx) {
-            0 -> postSideEffect(StaticSideEffect.Toast("출시 준비 중입니다."))
+            0 -> postSideEffect(StaticSideEffect.NavigateToMyCalendarActivity)
             1 -> postSideEffect(StaticSideEffect.NavigateToGroupActivity)
-            3 -> postSideEffect(StaticSideEffect.Toast("출시 준비 중입니다."))
+            3 -> postSideEffect(StaticSideEffect.NavigateToCommunityActivity)
             4 -> postSideEffect(StaticSideEffect.NavigateToSettingActivity)
         }
     }
@@ -115,5 +115,7 @@ sealed interface StaticSideEffect {
     data object NavigateToSettingActivity: StaticSideEffect
     data object NavigateToCommunityActivity: StaticSideEffect
     data object NavigateToGroupActivity: StaticSideEffect
+
+    data object NavigateToMyCalendarActivity: StaticSideEffect
 
 }

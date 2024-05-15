@@ -19,14 +19,12 @@ public class CommentForm {
     @Positive(message = "정확한 ID 값을 입력 해주세요.")
     private Long boardId; //필수
 
-    @NotBlank(message = "boardTitle 는 필수 입니다.")
+    @NotBlank(message = "boardTitle는 필수 입니다.")
     private String commentContent; //필수
 
     @NotNull(message = "parentId는 필수 값 입니다.")
     @Positive(message = "정확한 ID 값을 입력 해주세요.")
     private Long parentId; //필수
-
-    private int commentDepth;
 
     private String tempNickname;
 

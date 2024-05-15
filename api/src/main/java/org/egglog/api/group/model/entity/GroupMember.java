@@ -11,10 +11,12 @@ import org.egglog.api.user.model.entity.User;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(indexes = @Index(name = "idx_user_id", columnList = "user_id"))
 public class GroupMember {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     @Column(name = "group_member_id")
     private Long id;
 
@@ -32,9 +34,11 @@ public class GroupMember {
     public GroupMemberDto toDto(){
         return GroupMemberDto.builder()
                 .groupId(group.getId())
+                .userId(user.getId())
                 .userName(user.getName())
                 .profileImgUrl(user.getProfileImgUrl())
                 .isAdmin(this.isAdmin)
+                .hospitalName(this.user.getSelectedHospital().getHospitalName())
                 .build();
     }
 }
