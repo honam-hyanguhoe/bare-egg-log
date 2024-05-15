@@ -7,12 +7,14 @@ import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
 import com.org.egglog.domain.myCalendar.model.AddWorkData
 import com.org.egglog.domain.myCalendar.model.EditWorkData
+import com.org.egglog.domain.myCalendar.model.WorkListData
+import com.org.egglog.domain.myCalendar.model.WorkScheduleData
 import com.org.egglog.domain.myCalendar.model.WorkType
 import com.org.egglog.domain.myCalendar.usecase.CreatePersonalScheduleUseCase
 import com.org.egglog.domain.myCalendar.usecase.CreateWorkScheduleUseCase
 import com.org.egglog.domain.myCalendar.usecase.EditWorkScheduleUseCase
+import com.org.egglog.domain.myCalendar.usecase.GetWorkListUseCase
 import com.org.egglog.domain.myCalendar.usecase.GetWorkTypeListUseCase
-import com.org.egglog.presentation.data.WorkScheduleInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import org.orbitmvi.orbit.Container
@@ -35,7 +37,8 @@ class MyCalendarViewModel @Inject constructor(
     private val createPersonalScheduleUseCase: CreatePersonalScheduleUseCase,
     private val getUserStoreUseCase: GetUserStoreUseCase,
     private val createWorkScheduleUseCase: CreateWorkScheduleUseCase,
-    private val editWorkScheduleUseCase: EditWorkScheduleUseCase
+    private val editWorkScheduleUseCase: EditWorkScheduleUseCase,
+    private val getWorkListUseCase: GetWorkListUseCase
 ) : ViewModel(), ContainerHost<MyCalenderState, MyCalendarSideEffect> {
 
     private var accessToken: String? = null
@@ -54,7 +57,7 @@ class MyCalendarViewModel @Inject constructor(
         load()
     }
 
-    fun load() = intent {
+    private fun load() = intent {
         accessToken = getTokenUseCase().first!!
 
         Log.e("MyCalendarViewModel", "토큰 ${accessToken}")
@@ -66,6 +69,7 @@ class MyCalendarViewModel @Inject constructor(
         Log.e("MyCalendarViewModel", "제 그룹 아이디는 ${userInfo!!.workGroupId}")
 
         // TODO 이번달 1일~마지막일 근무, 개인 일정 리스트 불러오기
+        getWorkList()
 
         reduce {
             state.copy(
@@ -80,6 +84,29 @@ class MyCalendarViewModel @Inject constructor(
                         ""
                     )
                 )
+            )
+        }
+    }
+
+    private fun getWorkList() = intent {
+        val calendar = Calendar.getInstance()
+
+        calendar.set(Calendar.YEAR, state.currentYear)
+        calendar.set(Calendar.MONTH, state.currentMonth - 1)
+        val lastDayOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+
+        val month =
+            if (state.currentMonth < 10) "0${state.currentMonth}" else "${state.currentMonth}"
+
+        val startDate = "${state.currentYear}-${month}-01"
+        val endDate = "${state.currentYear}-${month}-${lastDayOfMonth}"
+
+        val monthlyWorkList = getWorkListUseCase("Bearer $accessToken", startDate, endDate).getOrThrow()
+        Log.e("MyCalendarViewModel", "한 달 근무 일정은 ${monthlyWorkList.workList}")
+
+        reduce {
+            state.copy(
+                monthlyWorkList = monthlyWorkList.workList
             )
         }
     }
@@ -151,6 +178,7 @@ class MyCalendarViewModel @Inject constructor(
 
     fun onPrevMonthClick() = intent {
         // TODO 이전 달 일정 불러오기, 근무 일정 리스트에 대입
+        getWorkList()
 
         if (state.currentMonth == 1) {
             reduce {
@@ -168,6 +196,7 @@ class MyCalendarViewModel @Inject constructor(
 
     fun onNextMonthClick() = intent {
         // TODO 다음 달 일정 불러오기, 근무 일정 리스트에 대입
+        getWorkList()
 
         if (state.currentMonth == 12) {
             reduce {
@@ -208,9 +237,8 @@ class MyCalendarViewModel @Inject constructor(
 
 
         // 기존 근무 일정에 있는지 없는지 판별
-        val targetWorkId: Long? = state.monthlyWorkList
-            .flatMap { it.workList } // 모든 WorkListInfo를 하나의 리스트로 평면화
-            .find { it?.workDate == workDate } // 원하는 날짜와 같은 workDate를 가진 첫 번째 WorkListInfo 반환
+        val targetWorkId: Long? = state.monthlyWorkList // 모든 WorkListInfo를 하나의 리스트로 평면화
+            .find { it.workDate == workDate } // 원하는 날짜와 같은 workDate를 가진 첫 번째 WorkListInfo 반환
             ?.workId
 
         if (targetWorkId == null) { // 생성 요청 보내기
@@ -310,7 +338,7 @@ class MyCalendarViewModel @Inject constructor(
 
         // 날짜 이동 로직 start
         if (workType.title != "NONE") {
-            if (state.selectedDate + 1 <= lastDayOfMonth) {
+            if (state.selectedDate <= lastDayOfMonth) {
                 val index = state.tempWorkList.indexOfFirst {it.first == state.selectedDate} // 이미 입력된 tempWork 가 있따면
                 if(index == -1) {
                     reduce {
@@ -334,18 +362,38 @@ class MyCalendarViewModel @Inject constructor(
                 }
                 reduce {
                     state.copy(
-                        selectedDate = state.selectedDate + 1,
+                        selectedDate = if(state.selectedDate == lastDayOfMonth) state.selectedDate else state.selectedDate + 1,
                     )
                 }
             } else {
                 postSideEffect(MyCalendarSideEffect.Toast("더이상 추가할 수 없습니다"))
             }
         } else {
-            if (state.selectedDate - 1 >= 1) {
+            val index = state.tempWorkList.indexOfFirst {it.first == state.selectedDate} // 이미 입력된 tempWork 가 있따면
+            if (state.selectedDate > 0) {
+                if(index == -1) {
+                    reduce {
+                        state.copy(
+                            tempWorkList = state.tempWorkList.plus(
+                                Pair(
+                                    state.selectedDate,
+                                    ""
+                                )
+                            )
+                        )
+                    }
+                } else {
+                    val updateWorkList = state.tempWorkList.toMutableList()
+                    updateWorkList[index] = updateWorkList[index].copy(second = "")
+                    reduce {
+                        state.copy (
+                            tempWorkList = updateWorkList
+                        )
+                    }
+                }
                 reduce {
                     state.copy(
-                        selectedDate = state.selectedDate - 1,
-                        tempWorkList = state.tempWorkList.filterNot { it.first == state.selectedDate }
+                        selectedDate = if(state.selectedDate == 1) state.selectedDate else state.selectedDate - 1,
                     )
                 }
             } else {
@@ -362,12 +410,12 @@ class MyCalendarViewModel @Inject constructor(
 
         if (state.editWorkList.isNotEmpty()) {
             // TODO 근무 수정 요청 보내고 새로운 근무 일정 불러오기 (근무 조회 기능 구현 후 주석 풀 예정)
-//            val response = editWorkScheduleUseCase("Bearer $accessToken", userInfo!!.workGroupId!!, state.editWorkList)
-//            if(response.isSuccess) {
-//                postSideEffect(MyCalendarSideEffect.Toast("등록되었습니다!"))
-//            } else {
-//                postSideEffect(MyCalendarSideEffect.Toast("등록에 실패하였습니다. 다시 시도해주세요."))
-//            }
+            val response = editWorkScheduleUseCase("Bearer $accessToken", userInfo!!.workGroupId!!, state.editWorkList)
+            if(response.isSuccess) {
+                postSideEffect(MyCalendarSideEffect.Toast("등록되었습니다!"))
+            } else {
+                postSideEffect(MyCalendarSideEffect.Toast("등록에 실패하였습니다. 다시 시도해주세요."))
+            }
         } else if (state.createWorkList.isNotEmpty()) {
             // TODO 근무 생성 요청 보내고 새로운 근무 일정 불러오기
             val response = createWorkScheduleUseCase("Bearer $accessToken", userInfo!!.workGroupId!!, state.createWorkList)
@@ -377,6 +425,8 @@ class MyCalendarViewModel @Inject constructor(
                 postSideEffect(MyCalendarSideEffect.Toast("등록에 실패하였습니다. 다시 시도해주세요."))
             }
         }
+
+        getWorkList()
 
         // 불러온 근무 일정을 monthlyWorkList 에 대입해주기
         reduce {
@@ -410,7 +460,7 @@ data class MyCalenderState(
     val currentMonth: Int = Calendar.getInstance().get(Calendar.MONTH) + 1,
     val selectedDate: Int = Calendar.getInstance().get(Calendar.DAY_OF_MONTH),
     val workTypeList: List<WorkType> = listOf(),
-    val monthlyWorkList: List<WorkScheduleInfo> = listOf(), // 서버로부터 조회한 월간 근무 일정
+    val monthlyWorkList: List<WorkListData> = listOf(), // 서버로부터 조회한 월간 근무 일정
     val createWorkList: List<AddWorkData> = listOf(),
     val editWorkList: List<EditWorkData> = listOf(),
     val tempWorkList: List<Pair<Int, String>> = listOf() // 근무 입력시 달력에 표시할 내용 (workDate, workTitle)

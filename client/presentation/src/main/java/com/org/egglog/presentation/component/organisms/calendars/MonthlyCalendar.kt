@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.org.egglog.domain.myCalendar.model.WorkListData
 import com.org.egglog.presentation.utils.ArrowLeft
 import com.org.egglog.presentation.utils.ArrowRight
 import com.org.egglog.presentation.component.atoms.icons.Icon
@@ -36,9 +37,9 @@ fun MonthlyCalendar(
     onPrevMonthClick: () -> Unit,
     onNextMonthClick: () -> Unit,
     selectedDate: Int,
-    tempWorkList: List<Pair<Int, String>>
+    tempWorkList: List<Pair<Int, String>>,
+    monthlyWorkList: List<WorkListData>
 ) {
-
 
     Column(
         Modifier
@@ -51,8 +52,9 @@ fun MonthlyCalendar(
             currentMonth,
             onDateClicked = onDateClicked,
             selectedDate,
-            tempWorkList = tempWorkList
-        ) // 콜백 전달
+            tempWorkList = tempWorkList,
+            monthlyWorkList = monthlyWorkList
+        )
     }
 }
 
@@ -107,7 +109,8 @@ fun DayList(
     currentMonth: Int,
     onDateClicked: (Int) -> Unit,
     selectedDate: Int,
-    tempWorkList: List<Pair<Int, String>>
+    tempWorkList: List<Pair<Int, String>>,
+    monthlyWorkList: List<WorkListData>
 ) {
     val time = remember { mutableStateOf(Calendar.getInstance()) }
     val date = time.value
@@ -134,7 +137,10 @@ fun DayList(
                     val resultDay = week * 7 + day - thisMonthFirstDay + 1
                     val isSelected = selectedDate == resultDay
                     val dayOfWeek = (day + 1) % 7
-                    val workInfo = tempWorkList.find { it.first == resultDay }
+                    val tempWorkInfo = tempWorkList.find { it.first == resultDay }
+
+                    val tempResultDay = if (resultDay < 10) "0${resultDay}" else "${resultDay}"
+                    val workInfo = monthlyWorkList.find {it.workDate.substring(8,10) == tempResultDay}?.workType?.title
 
 
                     if (resultDay in 1..thisMonthDayMax) {
@@ -168,7 +174,7 @@ fun DayList(
                                 )
                                 Spacer(modifier = Modifier.height(5.dp))
 
-                                Labels(text = workInfo?.second ?: "None")
+                                Labels(text = tempWorkInfo?.second ?: (workInfo ?: ""))
 //                                Text(text = "··")
                             }
                         }

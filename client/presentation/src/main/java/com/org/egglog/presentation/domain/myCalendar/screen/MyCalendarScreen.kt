@@ -45,6 +45,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.Dp
+import com.org.egglog.domain.myCalendar.model.WorkListData
 import com.org.egglog.domain.myCalendar.model.WorkType
 import com.org.egglog.presentation.R
 import com.org.egglog.presentation.component.atoms.buttons.BigButton
@@ -173,6 +174,7 @@ fun MyCalendarScreen(
         onNextMonthClick = viewModel::onNextMonthClick,
         onDateClicked = viewModel::onDateClicked,
         workTypeList = state.workTypeList,
+        monthlyWorkList = state.monthlyWorkList,
         onSubmitPersonalSchedule = viewModel::onSubmitPersonalSchedule,
         onWorkLabelClick = viewModel::onWorkLabelClick,
         tempWorkList = state.tempWorkList,
@@ -202,6 +204,7 @@ fun MyCalendarScreen(
     onNextMonthClick: () -> Unit,
     onDateClicked: (Int) -> Unit,
     workTypeList: List<WorkType>,
+    monthlyWorkList: List<WorkListData>,
     onSubmitPersonalSchedule: () -> Unit,
     onWorkLabelClick: (WorkType) -> Unit,
     tempWorkList: List<Pair<Int, String>>,
@@ -240,7 +243,8 @@ fun MyCalendarScreen(
                     onPrevMonthClick = onPrevMonthClick,
                     onNextMonthClick = onNextMonthClick,
                     selectedDate = selectedDate,
-                    tempWorkList = tempWorkList
+                    tempWorkList = tempWorkList,
+                    monthlyWorkList = monthlyWorkList
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
