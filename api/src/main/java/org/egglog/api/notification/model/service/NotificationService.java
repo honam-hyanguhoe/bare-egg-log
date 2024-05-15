@@ -225,6 +225,22 @@ public class NotificationService {
     }
 
     @Transactional
+    public void hotBoardNotification(Board board){
+        //1. 해당 글이 실시간 급상승 게시판에 등록되면 글 작성자에게 푸시알림 발송
+        UserNotification userNotification = notificationRepository
+                .findByTypeAndUser(TopicEnum.BOARD, board.getUser()).orElseThrow(() -> new NotificationException(NotificationErrorCode.NOTIFICATION_SERVER_ERROR));
+        String deviceToken = board.getUser().getDeviceToken();
+        if (deviceToken!=null&&userNotification.getStatus()){
+            Notification notification = Notification.builder()
+                    .setTitle("[EGGLOG]")
+                    .setBody(board.getUser().getName()+"님 의"+board.getTitle()+" 글이 실시간 급상승 게시판에 등록되었습니다. ")
+                    .build();
+            fcmService.sendPersonalNotification(deviceToken, notification);
+        }
+    }
+
+
+    @Transactional
     public void registerCommentNotification(Board board, Comment saveComment, Comment comment) {
         UserNotification userNotification = notificationRepository
                 .findByTypeAndUser(TopicEnum.BOARD, board.getUser()).orElseThrow(() -> new NotificationException(NotificationErrorCode.NOTIFICATION_SERVER_ERROR));
