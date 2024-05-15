@@ -3,6 +3,8 @@ package org.egglog.api.event.model.service;
 import lombok.RequiredArgsConstructor;
 import net.fortuna.ical4j.util.RandomUidGenerator;
 import net.fortuna.ical4j.util.UidGenerator;
+import org.antlr.v4.runtime.misc.FlexibleHashMap;
+import org.egglog.api.calendar.model.dto.response.CalendarListResponse;
 import org.egglog.api.calendargroup.exception.CalendarGroupErrorCode;
 import org.egglog.api.calendargroup.exception.CalendarGroupException;
 import org.egglog.api.calendargroup.model.entity.CalendarGroup;
@@ -11,6 +13,7 @@ import org.egglog.api.event.model.dto.params.EventForm;
 import org.egglog.api.event.model.dto.params.EventPeriodRequest;
 import org.egglog.api.event.model.dto.params.EventUpdateForm;
 import org.egglog.api.event.model.dto.response.EventListOutputSpec;
+import org.egglog.api.event.model.dto.response.EventListPeriodSpec;
 import org.egglog.api.event.model.dto.response.EventOutputSpec;
 import org.egglog.api.event.exception.EventErrorCode;
 import org.egglog.api.event.exception.EventException;
@@ -25,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.*;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -77,6 +78,7 @@ public class EventService {
         List<EventListOutputSpec> eventListOutputSpecList = new ArrayList<>();
 
         for (Event event : eventList) {
+
             EventListOutputSpec eventListOutputSpec = EventListOutputSpec.builder()
                     .eventId(event.getId())
                     .eventTitle(event.getEventTitle())
@@ -109,7 +111,9 @@ public class EventService {
                 .build();
     }
 
-    public List<EventListOutputSpec> getEventListByPeriod(EventPeriodRequest eventPeriodRequest, User user) {
+    public List<EventListPeriodSpec> getEventListByPeriod(EventPeriodRequest eventPeriodRequest, User user) {
+        Map<LocalDate, EventListPeriodSpec> dailyEvents = new HashMap<>();
+
         LocalDate start = eventPeriodRequest.getStartDate();
         LocalDate end = eventPeriodRequest.getEndDate();
         Long userId = eventPeriodRequest.getUserId();
@@ -128,6 +132,9 @@ public class EventService {
 
         if (eventsByMonthAndUserId.isPresent()) {
             for (Event event : eventsByMonthAndUserId.get()) {
+                LocalDate eventStart = event.getStartDate().toLocalDate();
+                LocalDate eventEnd = event.getEndDate().toLocalDate();
+
                 EventListOutputSpec eventListOutputSpec = EventListOutputSpec.builder()
                         .eventId(event.getId())
                         .eventTitle(event.getEventTitle())
@@ -137,9 +144,22 @@ public class EventService {
                         .build();
 
                 eventListOutputSpecList.add(eventListOutputSpec);
+
+                eventStart.datesUntil(eventEnd.plusDays(1)).forEach(date -> {
+                    EventListPeriodSpec schedule = dailyEvents.get(date);
+                    if (schedule == null) {
+                        schedule = new EventListPeriodSpec(date);
+                        dailyEvents.put(date, schedule);
+                    }
+                    schedule.addEvent(eventListOutputSpec);
+                });
             }
         }
-        return eventListOutputSpecList;
+        List<EventListPeriodSpec> result = new ArrayList<>();
+        for (EventListPeriodSpec value : dailyEvents.values()) {
+            result.add(value);
+        }
+        return result;
     }
 
     @Transactional
