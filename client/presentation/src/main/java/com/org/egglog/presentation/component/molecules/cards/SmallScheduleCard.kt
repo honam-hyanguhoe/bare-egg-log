@@ -95,6 +95,52 @@ fun SmallScheduleCard(workType: WorkType, isMore: Boolean = false, groupOptions:
     }
 }
 
+@Composable
+fun SmallScheduleCard2(workType: com.org.egglog.domain.myCalendar.model.WorkType, groupOptions: List<String> = emptyList(), onSelected: (String, WorkType) -> Unit = { _, _ -> }) {
+    val context = LocalContext.current
+
+    val cardContent: ScheduleInfo = when(workType.workTag) {
+        "DAY" -> ScheduleInfo(DayCard, "Day 근무", R.drawable.day)
+        "EVE" -> ScheduleInfo(EveCard, "Eve 근무", R.drawable.eve)
+        "NIGHT" -> ScheduleInfo(NightCard, "Night 근무", R.drawable.night)
+        "OFF" -> ScheduleInfo(Primary400, "Off", R.drawable.off)
+        "교육" -> ScheduleInfo(Orange300, "교육", R.drawable.education)
+        "휴가" -> ScheduleInfo(Error300, "휴가", R.drawable.vacation)
+        "보건" -> ScheduleInfo(Pink300, "보건", R.drawable.health)
+        else -> ScheduleInfo(if(workType.color.isEmpty()) Gray200 else Color(android.graphics.Color.parseColor(workType.color)), workType.title, R.drawable.dark)
+    }
+
+    val selectedMenuItem by remember { mutableStateOf<String?>(null) }
+
+    BackgroundCard(margin = 4.widthPercent(context).dp, padding = 12.widthPercent(context).dp, color = cardContent.color, borderRadius = 10.widthPercent(context).dp) {
+        Column() {
+            Row(Modifier
+                .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        Modifier
+                            .size(10.widthPercent(context).dp)
+                            .background(Color.Transparent, CircleShape)
+                            .border(3.dp, Primary600, CircleShape)) {}
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(text = "${workType.startTime.substring(0, 5)} - ${workType.workTime.substring(0, 5)}", style = Typography.displayLarge)
+                }
+            }
+            Spacer(modifier = Modifier.height(2.dp))
+            Row(Modifier
+                .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = cardContent.title, style = Typography.bodyLarge.copy(fontSize = 18.sp))
+                LocalImageLoader(imageUrl = cardContent.imageName, Modifier.size(36.dp))
+            }
+        }
+    }
+}
 @Preview
 @Composable
 fun CardPreview() {
