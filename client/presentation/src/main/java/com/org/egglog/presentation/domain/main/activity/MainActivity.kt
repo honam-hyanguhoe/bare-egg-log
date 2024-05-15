@@ -1,7 +1,9 @@
 package com.org.egglog.presentation.domain.main.activity
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +22,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val data : Uri? = intent?.data
+            Log.d("Invite Link", data.toString())
             ClientTheme {
                 MainScreen()
             }

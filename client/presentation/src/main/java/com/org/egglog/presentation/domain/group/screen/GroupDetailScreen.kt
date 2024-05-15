@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.DatePicker
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,6 +33,8 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -177,12 +180,14 @@ private fun GroupDetailScreen(
     var selectedOption by remember { mutableStateOf<String?>(null) }
     val openDialogExit = remember { mutableStateOf(false) }
     val openDialogBoss = remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
     val context = LocalContext.current
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = NaturalWhite)
-            .systemBarsPadding(),
+            .systemBarsPadding()
+            .focusRequester(focusRequester),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -192,7 +197,9 @@ private fun GroupDetailScreen(
                 hasMore = true,
                 hasInvitationButton = true,
                 onClickBack = onClickBack,
-                onClickLink = { copyInvitationLink(context) },
+                onClickLink = {
+                    focusRequester.requestFocus()
+                    copyInvitationLink(context) },
                 options = options,
                 onSelect = {
                     selectedOption = it
@@ -260,7 +267,11 @@ private fun GroupDetailScreen(
         openDialogExit.value -> {
             Dialog(
                 onDismissRequest = { openDialogExit.value = false },
-                onConfirmation = exitGroup,
+                onConfirmation = {
+                    exitGroup()
+                    openDialogExit.value = false
+                    onClickBack()
+                },
                 dialogTitle = "그룹을 나가시겠습니까?",
                 dialogText = "그룹을 나가면 해당 그룹의 모든 활동 및 업데이트를 더 이상 받을 수 없습니다."
             )
@@ -292,6 +303,13 @@ private fun GroupDetailScreen(
             )
         }
     }
+}
+
+@Composable
+fun SelectDateBottomSheetContent(
+    
+){
+
 }
 
 @Composable

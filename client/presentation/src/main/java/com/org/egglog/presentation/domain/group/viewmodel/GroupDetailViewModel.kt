@@ -343,30 +343,26 @@ class GroupDetailViewModel @Inject constructor(
 
 
     // 초대 링크 생성 및 복사
-    private fun getInvitationCode() = intent {
+    private suspend fun getInvitationCode() : String{
         val tokens = getTokenUseCase()
         val result = getInvitationCodeUseCase(
             accessToken = "Bearer ${tokens.first}",
             groupId = groupId
         ).getOrNull()
 
-
-        reduce {
-            state.copy(
-                invitationCode = result ?: ""
-            )
-        }
-
-        Log.d("invitationCode", "${state.invitationCode}")
+        return result ?: ""
     }
 
     fun copyInvitationLink(context: Context) = intent {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        getInvitationCode()
+        val invitationCode = getInvitationCode()
 
+        Log.d("Invite Link", invitationCode)
+        val invitationLink = "egglog://invite?code=${invitationCode}"
         // 수정 예정
-        val clip = ClipData.newPlainText("label", state.invitationCode)
+        val clip = ClipData.newPlainText("Invite Link", invitationLink)
         clipboard.setPrimaryClip(clip)
+        postSideEffect(GroupDetailSideEffect.Toast("초대링크가 복사되었습니다"))
     }
 
 
