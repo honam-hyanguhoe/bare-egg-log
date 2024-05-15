@@ -12,7 +12,7 @@ public interface EventCustomQuery {
 
     Optional<List<Event>> findEventsByCalendarGroupId(Long calendarGroupId);
 
-    Optional<List<Event>> findEventsByMonthAndUserId(LocalDateTime startDate, LocalDateTime endDate, Long userId, Long calendarGroupId);
+    Optional<List<Event>> findEventsByMonthAndUserId(LocalDate startDate, LocalDate endDate, Long userId, Long calendarGroupId);
 
 //    Optional<List<Event>> findByMonthAndUserId(LocalDateTime startDate, LocalDateTime endDate, Long userId);
 
