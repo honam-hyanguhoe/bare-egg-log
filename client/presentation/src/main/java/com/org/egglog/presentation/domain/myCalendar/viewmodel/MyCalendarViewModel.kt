@@ -177,6 +177,12 @@ class MyCalendarViewModel @Inject constructor(
 
     fun onPrevMonthClick() = intent {
         // TODO 이전 달 일정 불러오기, 근무 일정 리스트에 대입
+        reduce {
+            state.copy(
+                monthlyWorkList = listOf()
+            )
+        }
+
         getWorkList()
 
         if (state.currentMonth == 1) {
@@ -195,6 +201,12 @@ class MyCalendarViewModel @Inject constructor(
 
     fun onNextMonthClick() = intent {
         // TODO 다음 달 일정 불러오기, 근무 일정 리스트에 대입
+        reduce {
+            state.copy(
+                monthlyWorkList = listOf()
+            )
+        }
+
         getWorkList()
 
         if (state.currentMonth == 12) {
@@ -476,7 +488,8 @@ data class MyCalenderState(
     val createWorkList: List<AddWorkData> = listOf(),
     val editWorkList: List<EditWorkData> = listOf(),
     val tempWorkList: List<Pair<Int, String>> = listOf(), // 근무 입력시 달력에 표시할 내용 (workDate, workTitle)
-    val currentWorkData: WorkType ?= null
+    val currentWorkData: WorkType ?= null,
+    val monthlyPersonalList: List<String> = listOf(),
 )
 
 sealed interface MyCalendarSideEffect {
