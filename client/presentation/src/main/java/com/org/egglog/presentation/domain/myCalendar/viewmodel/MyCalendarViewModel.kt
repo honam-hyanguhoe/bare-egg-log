@@ -14,6 +14,7 @@ import com.org.egglog.domain.myCalendar.model.WorkScheduleData
 import com.org.egglog.domain.myCalendar.model.WorkType
 import com.org.egglog.domain.myCalendar.usecase.CreatePersonalScheduleUseCase
 import com.org.egglog.domain.myCalendar.usecase.CreateWorkScheduleUseCase
+import com.org.egglog.domain.myCalendar.usecase.DeletePersonalScheduleUseCase
 import com.org.egglog.domain.myCalendar.usecase.EditWorkScheduleUseCase
 import com.org.egglog.domain.myCalendar.usecase.GetPersonalScheduleUseCase
 import com.org.egglog.domain.myCalendar.usecase.GetWorkListUseCase
@@ -42,7 +43,8 @@ class MyCalendarViewModel @Inject constructor(
     private val createWorkScheduleUseCase: CreateWorkScheduleUseCase,
     private val editWorkScheduleUseCase: EditWorkScheduleUseCase,
     private val getWorkListUseCase: GetWorkListUseCase,
-    private val getPersonalScheduleUseCase: GetPersonalScheduleUseCase
+    private val getPersonalScheduleUseCase: GetPersonalScheduleUseCase,
+    private val deletePersonalScheduleUseCase: DeletePersonalScheduleUseCase
 ) : ViewModel(), ContainerHost<MyCalenderState, MyCalendarSideEffect> {
 
     private var accessToken: String? = null
@@ -511,6 +513,18 @@ class MyCalendarViewModel @Inject constructor(
                 createWorkList = listOf(),
                 editWorkList = listOf(),
             )
+        }
+    }
+
+    fun onDeletePersonalSchedule(eventId: Int) = intent {
+        Log.e("MyCalendarViewModel", "$eventId 번 일정 삭제")
+        val response = deletePersonalScheduleUseCase("Bearer $accessToken", eventId)
+
+        if(response.isSuccess) {
+            postSideEffect(MyCalendarSideEffect.Toast("삭제되었습니다"))
+            getPersonalList()
+        } else {
+            postSideEffect(MyCalendarSideEffect.Toast("삭제 실패. 다시 시도해주세요."))
         }
     }
 }

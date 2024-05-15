@@ -7,11 +7,13 @@ import com.org.egglog.data.myCalendar.model.WorkTypeResponse
 import com.org.egglog.data.retrofit.CommonResponse
 import okhttp3.RequestBody
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface MyCalendarService {
@@ -60,4 +62,11 @@ interface MyCalendarService {
         @Query("userId") userId: Long,
         @Query("calendarGroupId") calendarGroupId: Long
     ): CommonResponse<List<PersonalScheduleResponse>>
+
+    @DELETE("events/{event_id}")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun deletePersonalSchedule(
+        @Header("Authorization") accessToken: String,
+        @Path("event_id") eventId: Int
+    ): CommonResponse<String>
 }

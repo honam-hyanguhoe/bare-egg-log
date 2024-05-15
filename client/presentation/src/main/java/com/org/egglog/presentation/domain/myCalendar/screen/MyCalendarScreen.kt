@@ -186,7 +186,8 @@ fun MyCalendarScreen(
         tempWorkList = state.tempWorkList,
         onCancelWorkSchedule = viewModel::onCancelWorkSchedule,
         onSubmitWorkSchedule = viewModel::onSubmitWorkSchedule,
-        onNavigateToWorkSettingScreen = onNavigateToWorkSettingScreen
+        onNavigateToWorkSettingScreen = onNavigateToWorkSettingScreen,
+        onDeletePersonalSchedule = viewModel::onDeletePersonalSchedule
     )
 
 }
@@ -219,7 +220,8 @@ fun MyCalendarScreen(
     tempWorkList: List<Pair<Int, String>>,
     onCancelWorkSchedule: () -> Unit,
     onSubmitWorkSchedule: () -> Unit,
-    onNavigateToWorkSettingScreen: () -> Unit
+    onNavigateToWorkSettingScreen: () -> Unit,
+    onDeletePersonalSchedule: (Int) -> Unit
 ) {
 
     val context = LocalContext.current
@@ -263,7 +265,7 @@ fun MyCalendarScreen(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                ScheduleList(currentWorkData, currentPersonalData)
+                ScheduleList(currentWorkData, currentPersonalData, onDeletePersonalSchedule)
 
             }
 
@@ -360,7 +362,8 @@ fun ScheduleListHeader(
 @Composable
 fun ScheduleList(
     currentWorkData: WorkType ?= null,
-    currentPersonalData: List<EventListData> ?= listOf()
+    currentPersonalData: List<EventListData> ?= listOf(),
+    onDeletePersonalSchedule: (Int) -> Unit
 ) {
     Column() {
         if(currentWorkData != null) {
@@ -370,8 +373,9 @@ fun ScheduleList(
             SmallScheduleCard2(workType = currentWorkData.copy(workTime = endTime))
         }
 
+
         currentPersonalData?.forEach {personalData ->
-            BigScheduleCard(work = "BASIC", startTime = personalData.startDate.substring(11,16), endTime = personalData.endDate.substring(11,16), content = personalData.eventContent, title = personalData.eventTitle, onClickMore = {})
+            BigScheduleCard(personalData, onClickDelete = { onDeletePersonalSchedule(personalData.eventId) })
         }
     }
 }
