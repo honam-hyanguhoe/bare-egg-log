@@ -162,6 +162,19 @@ public class NotificationService {
     }
 
     @Transactional
+    public void createGroupNotification(User loginUser, Group group){
+        FCMTopic topic = FCMTopic.builder()
+                .topic(TopicEnum.GROUP)
+                .topicId(group.getId())
+                .build();
+        String loginUserDeviceToken = loginUser.getDeviceToken();
+        if (loginUserDeviceToken!=null){
+            fcmService.subscribeToTopic(loginUserDeviceToken, topic);
+        }
+    }
+
+
+    @Transactional
     public void deleteGroupMemberNotification(Long groupId, GroupMember member) {
         //해당 멤버가 삭제되었다면 해당 유저의 토픽 구독 취소
         String userDeviceToken = member.getUser().getDeviceToken();

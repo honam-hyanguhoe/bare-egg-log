@@ -297,8 +297,10 @@ public class GroupService {
         newGroup.setAdmin(newGroupMember);
 
         try {
-            groupRepository.save(newGroup);
+            Group createGroup = groupRepository.save(newGroup);
             groupMemberService.createGroupMember(newGroupMember);
+            //토픽 구독이 필요함
+            notificationService.createGroupNotification(user, createGroup);
         }catch (Exception e){
             throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
         }
