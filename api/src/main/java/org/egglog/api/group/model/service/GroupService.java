@@ -256,14 +256,7 @@ public class GroupService {
                 groupRepository.delete(group);
 
                 //해당 멤버가 삭제되었다면 해당 유저의 토픽 구독 취소
-                String loginUserDeviceToken = user.getDeviceToken();
-                FCMTopic topic = FCMTopic.builder()
-                        .topic(TopicEnum.GROUP)
-                        .topicId(groupId)
-                        .build();
-                if (loginUserDeviceToken!=null){
-                    fcmService.unsubscribeFromTopic(loginUserDeviceToken, topic);
-                }
+                notificationService.exitGroupNotification(user, groupId);
 
 
             }else{
