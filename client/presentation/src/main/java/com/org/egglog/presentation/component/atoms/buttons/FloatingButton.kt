@@ -39,11 +39,12 @@ fun FloatingButton(
         onSettingClick: () -> Unit,
         horizontalPadding : Dp,
         verticalPadding : Dp,
+        isVisible: Boolean,
+
 ) {
     val fabInteractionSource = remember {
         MutableInteractionSource()
     }
-    val (isVisible, setVisible) = remember { mutableStateOf(false) }
 
     Column(
             modifier = Modifier
@@ -67,8 +68,6 @@ fun FloatingButton(
         FloatingActionButton(
                 onClick = {
                     onClick()
-                    println("isVisible $isVisible")
-                    setVisible(!isVisible)
                 },
                 modifier = Modifier
                         .padding(5.dp),
