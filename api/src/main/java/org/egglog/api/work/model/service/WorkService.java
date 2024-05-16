@@ -130,6 +130,7 @@ public class WorkService {
                 .collect(Collectors.toList());
     }
 
+
     @Transactional
     public List<WorkResponse> updateWork(User loginUser, EditAndDeleteWorkListRequest request){
         log.debug(" ==== ==== ==== [ 유저의 근무 일정 수정 및 삭제 서비스 실행 ] ==== ==== ====");
