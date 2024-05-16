@@ -1,4 +1,4 @@
-package com.org.egglog.presentation.utils
+package com.org.egglog.presentation.receiver
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
