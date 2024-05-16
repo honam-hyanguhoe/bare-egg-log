@@ -4,10 +4,12 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -126,6 +128,7 @@ private fun WritePostScreen(
                         Text(text = "내용", style = Typography.displayLarge)
                         Spacer(modifier = Modifier.height(12.heightPercent(LocalContext.current).dp))
                         MultiInput(
+                            modifier = Modifier.width(320.widthPercent(LocalContext.current).dp),
                             text = content,
                             placeholder = "내용을 입력해주세요",
                             onValueChange = onContentChange,
@@ -135,7 +138,9 @@ private fun WritePostScreen(
                         Spacer(modifier = Modifier.height(24.heightPercent(LocalContext.current).dp))
                         Text(text = "사진 (선택)", style = Typography.displayLarge)
                         Spacer(modifier = Modifier.height(12.heightPercent(LocalContext.current).dp))
-                        ImageUploader(viewModel = viewModel)
+                        Box(Modifier.fillMaxWidth(0.9f)) {
+                            ImageUploader(viewModel = viewModel)
+                        }
                     }
                 }
                 BigButton(
