@@ -97,10 +97,6 @@
             android:name=".receiver.ForegroundService"
             android:foregroundServiceType="location"/>
         <receiver android:name=".receiver.StopServiceReceiver"/>
-
-        <receiver android:name=".receiver.AlarmBroadcastReceiver"
-            android:exported="true"
-            tools:ignore="ExportedReceiver" />
     </application>
 
 </manifest>
