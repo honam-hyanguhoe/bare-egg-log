@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.org.egglog.domain.scheduler.AlarmConst
+import com.org.egglog.domain.scheduler.AlarmManagerHelper
 import com.org.egglog.domain.scheduler.SchedulerUseCase
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -20,6 +21,12 @@ class StopServiceReceiver : BroadcastReceiver() {
             putExtra(AlarmConst.REQUEST_CODE, key)
         }
         context.stopService(stopIntent)
+
+        val alarmData = AlarmManagerHelper.getAlarm(key)
+        if (alarmData != null) {
+            alarmData.stopByUser = true
+            AlarmManagerHelper.addAlarm(alarmData)
+        }
         schedulerUseCase.cancelAllAlarms(key)
         Log.e("AlarmTest", "All alarms have been canceled.")
     }

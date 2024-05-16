@@ -1,4 +1,3 @@
-// data/scheduler/ForegroundService.kt
 package com.org.egglog.presentation.receiver
 
 import android.annotation.SuppressLint
@@ -6,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.media.MediaPlayer
@@ -16,12 +16,12 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.core.app.NotificationCompat
 import com.org.egglog.domain.scheduler.AlarmConst
+import com.org.egglog.domain.scheduler.AlarmData
+import com.org.egglog.domain.scheduler.AlarmManagerHelper
 import com.org.egglog.domain.scheduler.SchedulerUseCase
 import com.org.egglog.presentation.R
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -32,35 +32,20 @@ class ForegroundService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
+        vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val formatter = DateTimeFormatter.ofPattern("HH:mm")
-        val repeatCount = intent?.getIntExtra(AlarmConst.REPEAT_COUNT, 0) ?: 0
         val key = intent?.getIntExtra(AlarmConst.REQUEST_CODE, 0) ?: 0
-        val curRepeatCount = intent?.getIntExtra(AlarmConst.CUR_REPEAT_COUNT, repeatCount) ?: repeatCount
-        val initialTime = LocalTime.of(intent?.getIntExtra(AlarmConst.INTERVAL_HOUR, 0) ?: 0,
-            intent?.getIntExtra(AlarmConst.INTERVAL_MINUTE, 0) ?: 0)
-        val targetDateTime = LocalDateTime.of(
-            intent?.getIntExtra(AlarmConst.TARGET_DATE_YEAR, 0) ?: 0,
-            intent?.getIntExtra(AlarmConst.TARGET_DATE_MONTH, 1) ?: 1,
-            intent?.getIntExtra(AlarmConst.TARGET_DATE_DAY, 1) ?: 1,
-            initialTime.hour,
-            initialTime.minute
-        )
-        val minutesToAdd = intent?.getLongExtra(AlarmConst.MINUTES_TO_ADD, 5L) ?: 5L
-        val stopByUser = intent?.getBooleanExtra(AlarmConst.STOP_BY_USER, false) ?: false
-
-        startForegroundService(key = key, curRepeatCount = curRepeatCount, message = LocalTime.now().format(formatter), repeatCount = repeatCount, minutesToAdd = minutesToAdd, targetDateTime = targetDateTime, stopByUser = stopByUser)
+        startForegroundService(key)
         return START_STICKY
     }
 
     @SuppressLint("LaunchActivityFromNotification")
-    private fun startForegroundService(key: Int, title: String = "에그로그 알림", message: String, curRepeatCount: Int, repeatCount: Int, minutesToAdd: Long, targetDateTime: LocalDateTime, stopByUser: Boolean) {
+    private fun startForegroundService(key: Int) {
         val channelId = getString(R.string.default_notification_channel_id)
         val channelName: CharSequence = getString(R.string.default_notification_channel_name)
-        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val notificationChannel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
         notificationChannel.enableLights(true)
@@ -71,12 +56,12 @@ class ForegroundService : Service() {
             putExtra(AlarmConst.STOP_BY_USER, true)
             putExtra(AlarmConst.REQUEST_CODE, key)
         }
-        val pendingIntent = PendingIntent.getBroadcast(this, 0, stopIntent, PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent = PendingIntent.getBroadcast(this, key, stopIntent, PendingIntent.FLAG_IMMUTABLE)
 
         val notification = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.dark)
-            .setContentTitle(title)
-            .setContentText(message)
+            .setContentTitle("에그로그 알림")
+            .setContentText("반복 알람 실행 중...")
             .setAutoCancel(true)
             .setOngoing(true)
             .setSound(null)
@@ -85,7 +70,7 @@ class ForegroundService : Service() {
 
         startForeground(1, notification)
         startVibrationAndSound()
-        stopSelfInOneMinute(key, curRepeatCount, repeatCount, minutesToAdd, targetDateTime, stopByUser)
+        stopSelfInOneMinute(key)
     }
 
     private fun startVibrationAndSound() {
@@ -98,27 +83,36 @@ class ForegroundService : Service() {
         }
     }
 
-    private fun stopSelfInOneMinute(key: Int, curRepeatCount: Int, repeatCount: Int, minutesToAdd: Long, targetDateTime: LocalDateTime, stopByUser: Boolean) {
-        val handler = Handler(mainLooper)
-        handler.postDelayed({
-            if (!stopByUser) {
-                stopSelf()
-                if (curRepeatCount < repeatCount) {
-                    val nextDateTime = targetDateTime.plusMinutes(minutesToAdd)
-                    schedulerUseCase.setAlarm(key = key, curRepeatCount = curRepeatCount + 1, repeatCount = repeatCount, minutesToAdd = minutesToAdd, targetDateTime = nextDateTime)
+    private fun stopSelfInOneMinute(key: Int) {
+        Handler().postDelayed({
+            stopForeground(true)
+            stopSelf()
+            mediaPlayer?.stop()
+            mediaPlayer?.release()
+            mediaPlayer = null
+            vibrator.cancel()
+
+            val alarmData = AlarmManagerHelper.getAlarm(key)
+            if (alarmData != null) {
+                if (!alarmData.stopByUser && alarmData.curRepeatCount < alarmData.repeatCount) {
+                    val nextTime = alarmData.targetDateTime.plusMinutes(alarmData.minutesToAdd)
+                    schedulerUseCase.setAlarm(key, alarmData.curRepeatCount + 1, alarmData.repeatCount, alarmData.minutesToAdd, nextTime, alarmData.stopByUser)
+                } else {
+                    schedulerUseCase.cancelAllAlarms(key)
                 }
             }
-        }, 60000) // 60000 ms == 1 minute
-    }
-
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
+        }, 60000)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        vibrator.cancel()
         mediaPlayer?.stop()
         mediaPlayer?.release()
+        mediaPlayer = null
+        vibrator.cancel()
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        return null
     }
 }

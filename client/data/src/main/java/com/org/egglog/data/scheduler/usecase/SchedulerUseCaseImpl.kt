@@ -5,9 +5,10 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.icu.util.Calendar
-import android.os.Build
 import com.org.egglog.presentation.receiver.AlarmBroadcastReceiver
 import com.org.egglog.domain.scheduler.AlarmConst
+import com.org.egglog.domain.scheduler.AlarmData
+import com.org.egglog.domain.scheduler.AlarmManagerHelper
 import com.org.egglog.domain.scheduler.SchedulerUseCase
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -16,16 +17,12 @@ class SchedulerUseCaseImpl @Inject constructor(
     private val context: Context,
     private val alarmManager: AlarmManager
 ) : SchedulerUseCase {
-    private var isAlarmActive = true
 
     private fun getPendingIntent(key: Int, receiverIntent: Intent? = null): PendingIntent {
         val intent = receiverIntent ?: Intent(context, AlarmBroadcastReceiver::class.java)
         return PendingIntent.getBroadcast(
             context, key, intent,
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            else
-                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
     }
 
@@ -34,9 +31,18 @@ class SchedulerUseCaseImpl @Inject constructor(
         curRepeatCount: Int,
         repeatCount: Int,
         minutesToAdd: Long,
-        targetDateTime: LocalDateTime
+        targetDateTime: LocalDateTime,
+        stopByUser: Boolean
     ) {
-        if (!isAlarmActive) return
+        val alarmData = AlarmData(
+            key = key,
+            stopByUser = false,
+            repeatCount = repeatCount,
+            curRepeatCount = curRepeatCount,
+            targetDateTime = targetDateTime,
+            minutesToAdd = minutesToAdd
+        )
+        AlarmManagerHelper.addAlarm(alarmData)
 
         val receiverIntent = Intent(context, AlarmBroadcastReceiver::class.java).apply {
             putExtra(AlarmConst.REQUEST_CODE, key)
@@ -67,9 +73,8 @@ class SchedulerUseCaseImpl @Inject constructor(
     }
 
     override fun cancelAllAlarms(key: Int) {
-        val intent = Intent(context, AlarmBroadcastReceiver::class.java)
-        isAlarmActive = false
-        val pendingIntent = getPendingIntent(key, intent)
+        AlarmManagerHelper.deleteAlarm(key)
+        val pendingIntent = getPendingIntent(key)
         alarmManager.cancel(pendingIntent)
     }
 }

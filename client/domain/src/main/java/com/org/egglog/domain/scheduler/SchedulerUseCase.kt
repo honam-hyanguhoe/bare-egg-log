@@ -9,7 +9,8 @@ interface SchedulerUseCase {
         curRepeatCount: Int,
         repeatCount: Int,
         minutesToAdd: Long,
-        targetDateTime: LocalDateTime
+        targetDateTime: LocalDateTime,
+        stopByUser: Boolean
     )
 
     fun cancelAllAlarms(key: Int)
