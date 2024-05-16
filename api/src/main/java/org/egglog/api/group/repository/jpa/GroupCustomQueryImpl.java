@@ -42,4 +42,6 @@ public class GroupCustomQueryImpl implements GroupCustomQuery{
                 .groupBy(group.id, group.groupName, group.groupImage, user.id, user.name)
                 .fetch();
     }
+
+
 }

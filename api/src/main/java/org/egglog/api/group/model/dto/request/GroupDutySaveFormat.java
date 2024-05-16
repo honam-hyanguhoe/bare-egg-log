@@ -2,10 +2,13 @@ package org.egglog.api.group.model.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * ```
@@ -21,8 +24,10 @@ import java.util.List;
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class GroupDutySaveFormat {
-    private List<String> dutyList;
+    private Map<String,List<String>> dutyList;
     //없는 경우 기존 값으로 저장됨
     private CustomWorkTag customWorkTag;
     private String userName;

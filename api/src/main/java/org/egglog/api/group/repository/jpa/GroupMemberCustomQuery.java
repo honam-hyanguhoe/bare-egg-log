@@ -22,5 +22,7 @@ public interface GroupMemberCustomQuery {
     Integer countGroupMember(Long groupId);
 
     GroupDutySummary getGroupDutySummary(Long groupId, LocalDate targetDate);
+
+    List<Long> findGroupIdByUserId(Long id);
 }
 

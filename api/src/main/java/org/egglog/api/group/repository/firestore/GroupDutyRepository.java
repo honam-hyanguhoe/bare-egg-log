@@ -11,11 +11,9 @@ import org.egglog.api.worktype.model.entity.WorkTag;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Repository
@@ -29,33 +27,48 @@ public class GroupDutyRepository {
                 .collection(groupDutyData.getDate());
         log.debug("====== countQuery start ======");
         Long count = collection.count().get().get().getCount();
+        CustomWorkTag customWorkTag = groupDutyData.getCustomWorkTag();
         //custom work tag 관련 작업
-        if(groupDutyData.getCustomWorkTag()==null){
+        if (customWorkTag.getDay().isEmpty()&&customWorkTag.getEve().isEmpty()&&customWorkTag.getNight().isEmpty()&&customWorkTag.getOff().isEmpty()) {
             log.debug("getCustomWorkTag");
             groupDutyData.setCustomWorkTag(getGroupWorkTag(groupId));
-        }else{
+        } else {
             log.debug("saveCustomWorkTag");
-            saveGroupWorkTag(groupId,groupDutyData.getCustomWorkTag());
+            saveGroupWorkTag(groupId, groupDutyData.getCustomWorkTag());
         }
         log.debug("===== save data =====");
 
         //데이터 삽입 쿼리
-        ApiFuture<WriteResult> apiFuture = firestore
-                .collection("duty")
-                .document(String.valueOf(groupId))
-                .collection(groupDutyData.getDate())
-                .document(String.valueOf(count))
-                .set(GroupDutySaveFormat.builder()
-                        .day(groupDutyData.getDay())
-                        .userName(groupDutyData.getUserName())
-                        .customWorkTag(groupDutyData.getCustomWorkTag())
-                        .dutyList(groupDutyData.getDutyList())
-                        .build()
-                );
+        try {
+            GroupDutySaveFormat groupDutySaveFormat = GroupDutySaveFormat.builder()
+                    .day(groupDutyData.getDay())
+                    .userName(groupDutyData.getUserName())
+                    .customWorkTag(groupDutyData.getCustomWorkTag())
+                    .dutyList(groupDutyData.toMap())
+                    .build();
+
+            log.debug(groupDutySaveFormat.toString());
+
+            ApiFuture<WriteResult> apiFuture = firestore
+                    .collection("duty")
+                    .document(String.valueOf(groupId))
+                    .collection(groupDutyData.getDate())
+                    .document(String.valueOf(count))
+                    .set(groupDutySaveFormat);
+
+            // 쿼리 실행 결과를 기다림
+            WriteResult writeResult = apiFuture.get();
+            log.info("Document successfully written at: {}", writeResult.getUpdateTime());
+
+        } catch (Exception e) {
+            log.error("Error saving document", e);
+        }
+
     }
 
     /**
      * 그룹에 커스텀된 work tag 저장하는 메서드
+     *
      * @param groupId
      * @param customWorkTag
      */
@@ -69,6 +82,7 @@ public class GroupDutyRepository {
 
     /**
      * group에 저장된 worktag를 가져옴
+     *
      * @param groupId
      * @return
      */
@@ -82,6 +96,30 @@ public class GroupDutyRepository {
             // convert document to POJO
             return document.toObject(CustomWorkTag.class);
         }
-        return null;
+        return new CustomWorkTag();
+    }
+
+    public List<GroupDutySaveFormat> getDutyListByGroupIdList(List<Long> groupList, String date) throws ExecutionException, InterruptedException {
+        log.debug("=== find group duty list ===");
+        List<GroupDutySaveFormat> groupDutyList=new ArrayList<>();
+        for (Long groupId : groupList) {
+            CollectionReference dutyDataDoc = firestore.collection("duty")
+                    .document(String.valueOf(groupId))
+                    .collection(date);
+            log.debug("querying...");
+            ApiFuture<QuerySnapshot> future = dutyDataDoc.get();
+            log.debug("find all documents...");
+            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+            log.debug("found!!");
+            for(DocumentSnapshot doc : documents){
+                log.debug("processing...");
+                log.debug(doc.toString());
+                GroupDutySaveFormat duty = doc.toObject(GroupDutySaveFormat.class);
+                if(duty != null){
+                    groupDutyList.add(duty);
+                }
+            }
+        }
+        return groupDutyList;
     }
 }

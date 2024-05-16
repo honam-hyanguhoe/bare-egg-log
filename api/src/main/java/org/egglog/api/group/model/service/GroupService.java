@@ -340,12 +340,15 @@ public class GroupService {
     /**
      * 등록된 엑셀 데이터 반환
      * @param user
-     * @param groupId
      * @return
      */
-    public SuccessType getGroupDutyList(User user, Long groupId, String yearAndMonth) {
-
-        return SuccessType.CREATE;
+    public List<GroupDutySaveFormat> getGroupDutyList(User user, String date) {
+        List<Long> groupList = groupMemberService.getUserGroupIdList(user.getId());
+        try{
+            return groupDutyRepository.getDutyListByGroupIdList(groupList,date);
+        }catch (Exception e){
+            throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
+        }
     }
 
     /**
@@ -365,4 +368,5 @@ public class GroupService {
             throw new GroupException(GroupErrorCode.GROUP_ROLE_NOT_MATCH);
         }
     }
+
 }

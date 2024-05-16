@@ -38,7 +38,12 @@ import java.util.List;
 @Slf4j
 public class GroupController {
     private final GroupService groupService;
-
+    /**
+     * 저장된 근무 태그(파싱용 alias) 반환
+     * @param user
+     * @param groupId
+     * @return
+     */
     @GetMapping("/duty/work-tag/{groupId}")
     public ResponseEntity<MessageUtils> getDutyWorkTags(
             @AuthenticationPrincipal User user,
@@ -48,18 +53,17 @@ public class GroupController {
     }
 
     /**
-     * 그룹 근무 엑셀 파일 업로드 요청(기존 데이터 반환
+     * 업로드된 그룹 근무 엑셀 파일 리스트 조회
      * @param user 로그인한 유저(JWT 토큰)
-     * @param groupId 그룹 아이디
+     * @param date yyyy-mm
      * @return
      * @author 김다희
      */
     @GetMapping("/duty")
     public ResponseEntity<MessageUtils> getDutyDataList(
             @AuthenticationPrincipal User user,
-            @PathVariable("groupId") Long groupId,
             @PathParam("date") String date){
-        return ResponseEntity.ok().body(MessageUtils.success(groupService.getGroupDutyList(user, groupId,date)));
+        return ResponseEntity.ok().body(MessageUtils.success(groupService.getGroupDutyList(user, date)));
     }
     /**
      * 그룹 근무 엑셀 파일(json 변환 데이터) 업로드

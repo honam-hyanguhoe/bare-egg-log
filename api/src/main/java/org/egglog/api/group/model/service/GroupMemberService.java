@@ -82,12 +82,28 @@ public class GroupMemberService {
     }
 
     /**
-     *
+     * 그룹의 근무별 그룹원 요약
+     * @param groupId
+     * @param date
+     * @return
      */
     public GroupDutySummary getGroupDutySummary(Long groupId,String date){
         String[] parsedDate=date.split("-");
         LocalDate targetDate = LocalDate.of(Integer.parseInt(parsedDate[0]),Integer.parseInt(parsedDate[1]),Integer.parseInt(parsedDate[2]));
         GroupDutySummary groupDutySummary = groupMemberRepository.getGroupDutySummary(groupId,targetDate);
         return groupDutySummary;
+    }
+
+    /**
+     * 사용자가 소속된 그룹 리스트를 아이디만 반환
+     * @param userId
+     * @return
+     */
+    public List<Long> getUserGroupIdList(Long userId){
+        try {
+            return groupMemberRepository.findGroupIdByUserId(userId);
+        }catch (Exception e){
+            throw new GroupMemberException(GroupMemberErrorCode.TRANSACTION_ERROR);
+        }
     }
 }
