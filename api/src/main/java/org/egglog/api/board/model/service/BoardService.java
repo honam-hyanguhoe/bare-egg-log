@@ -473,7 +473,7 @@ public class BoardService {
                     .pictureThree(board.getPictureThree())
                     .pictureFour(board.getPictureFour())
                     .viewCount(hitCnt)
-                    .userId(user.getId())
+                    .userId(writer.getId())
                     .tempNickname(board.getTempNickname())
                     .profileImgUrl(writer.getProfileImgUrl())
                     .commentCount(commentCnt)

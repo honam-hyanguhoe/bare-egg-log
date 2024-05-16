@@ -22,6 +22,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.google.cloud.storage.Blob;
+
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -39,6 +40,7 @@ public class BoardScheduler {
     private final CalendarService calendarService;
     private final RealTimeBoardRepository realTimeBoardRepository;
     private final NotificationService notificationService;
+
     /**
      * 조회수 자정에 DB 업데이트
      */
@@ -106,19 +108,21 @@ public class BoardScheduler {
                     .stream()
                     .map(RealTimeBoard::getBoardId)
                     .collect(Collectors.toCollection(HashSet::new));
+
             for (Long id = 1L; id <= 2L; id++) {
                 Long hotBoardID = hotBoardIds.get(id.intValue() - 1);
                 Optional<RealTimeBoard> tempBoard = realTimeBoardRepository.findById(id);
-                if (tempBoard.isPresent()){
+
+                if (tempBoard.isPresent()) {
                     RealTimeBoard realTimeBoard = tempBoard.get();
                     realTimeBoardRepository.save(realTimeBoard.updateBoardId(hotBoardID));
-                    if (!oldHotIds.contains(hotBoardID)){
+                    if (!oldHotIds.contains(hotBoardID)) {
                         //이전 게시물이 아닐 경우에만 알림 발송
                         Board board = boardRepository.findWithUserById(hotBoardID).orElseThrow(
                                 () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD));
                         notificationService.hotBoardNotification(board);
                     }
-                }else {
+                } else {
                     realTimeBoardRepository.save(RealTimeBoard.builder()
                             .id(id)
                             .boardId(hotBoardID)
@@ -139,16 +143,17 @@ public class BoardScheduler {
 //        }
 
     }
+
     /**
      * 매일 ics 파일 업데이트<br>
      */
     @Scheduled(cron = "0 0 0 * * *")
-    public void updateIcsFile(){
-        Iterator<Blob> blobIterator=null;
+    public void updateIcsFile() {
+        Iterator<Blob> blobIterator = null;
         try {
             Page<Blob> blobs = bucket.list();
             blobIterator = (Iterator<Blob>) blobs.iterateAll();
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new CalendarException(CalendarErrorCode.DATABASE_CONNECTION_FAILED);
         }
         while (blobIterator.hasNext()) {
@@ -157,7 +162,7 @@ public class BoardScheduler {
                 // 사용자 id 가져오기
                 Long userId = Long.parseLong(blob.getBlobId().getName());
                 calendarService.updateIcs(userId);
-            }catch (Exception e){
+            } catch (Exception e) {
                 log.warn(e.getMessage());
             }
         }
