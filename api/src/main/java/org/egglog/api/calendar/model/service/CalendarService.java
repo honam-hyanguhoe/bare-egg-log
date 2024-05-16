@@ -208,6 +208,95 @@ public class CalendarService {
         return blobPath;
     }
 
+    public void updateIcs(Long userId) {
+        log.debug("update");
+        Calendar calendar = new Calendar();
+        calendar.add(new ProdId("-//Ben Fortuna//iCal4j 4.0//EN"));
+        calendar.add(ImmutableVersion.VERSION_2_0);
+        calendar.add(ImmutableCalScale.GREGORIAN);
+
+//        TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
+//        TimeZone timezone = registry.getTimeZone("Asia/Seoul");
+//        VTimeZone tz = timezone.getVTimeZone();
+//        calendar.getComponents().add(tz);
+
+        try {
+            log.debug("get schedules from database");
+            //사용자의 모든 근무 일정 가져오기
+            List<Work> workList = workQueryRepositoryImpl.findAllWorkWithWorkTypeByUser(userId);
+            //사용자의 모든 개인 일정 가져오기
+            List<Event> eventList = eventRepository.findAllByUserId(userId);
+            //일정이 없다면 에러 처리
+            log.debug("no schedules");
+            if(workList.isEmpty()&&eventList.isEmpty()){
+                throw new CalendarException(CalendarErrorCode.SCHEDULE_NOT_FOUND);
+            }
+            //Uid 생성기
+            //일정을 기록할 캘린더 객체 생성
+            log.debug("create..");
+            List<CalendarComponent> calendarWorkComponentList = workList.stream().map(
+                    work -> {
+                        //시작 시간와 근무 이름을 통해 새로운 VEvent 생성
+                        return new VEvent(work.getWorkDate(),work.getWorkType().getTitle())
+                                .withProperty(new TzId("Asia/Seoul"))
+                                .withProperty(new Uid(work.getUuid()))
+                                .<VEvent>getFluentTarget();
+                    }).collect(Collectors.toList());
+            log.debug(calendarWorkComponentList.toString());
+            List<CalendarComponent> calendarEventComponentList = eventList.stream()
+                    .filter(event -> event.getStartDate()!=null) //start date가 존재하는 경우만 처리
+                    .map(event -> {
+                        if(event.getEndDate()==null){ //end date 없는 경우 처리
+                            return new VEvent(event.getStartDate(),event.getEventTitle())
+                                    .withProperty(new TzId("Asia/Seoul"))
+                                    .withProperty(new Uid(event.getUuid()))
+                                    .<VEvent>getFluentTarget();
+                        }else {
+                            return new VEvent(event.getStartDate(), event.getEndDate(), event.getEventTitle())
+                                    .withProperty(new TzId("Asia/Seoul"))
+                                    .withProperty(new Uid(event.getUuid()))
+                                    .getFluentTarget();
+                        }
+                    }).collect(Collectors.toList());
+            log.debug(calendarEventComponentList.toString());
+            //캘린더 객체에 일정 추가
+            ComponentList<CalendarComponent> components = calendar.getComponentList();
+            components.addAll(calendarWorkComponentList);
+            components.addAll(calendarEventComponentList);
+            calendar.setComponentList(components);
+            log.debug("component : {}",components.getAll().toString());
+        }catch (Exception e){
+            log.warn(e.getMessage());
+            throw new CalendarException(CalendarErrorCode.CREATE_FAIL);
+        }
+        try{
+            //업로드
+            uploadCalendar(userId,calendar);
+        }catch (Exception e){
+            log.warn("업로드 실패");
+        }
+    }
+
+    public void uploadCalendar(Long userId, Calendar calendar){
+        //TODO data query
+        String blob = "ics/" + userId + "/calendar.ics";
+        try {
+            log.debug("upload..");
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            new CalendarOutputter().output(calendar, outputStream);
+            // 파일을 바이트 배열로 변환
+            byte[] bytes = outputStream.toByteArray();
+            if (bucket.get(blob) != null) {
+                bucket.get(blob).delete();
+            }
+            // Firebase Storage에 파일 업로드
+            bucket.create(blob, bytes, "text/calendar");
+        } catch (IOException e) {
+            log.warn("here");
+            throw new CalendarException(CalendarErrorCode.DATABASE_CONNECTION_FAILED);
+        }
+    }
+
 
 //    /**
 //     * 캘린더 startDate - endDate 조회
@@ -336,83 +425,6 @@ public class CalendarService {
 //                .build();
 //    }
 
-    public void updateIcs(Long userId) {
-        log.debug("update");
-        Calendar calendar = new Calendar();
-        calendar.add(new ProdId("-//Ben Fortuna//iCal4j 4.0//EN"));
-        calendar.add(ImmutableVersion.VERSION_2_0);
-        calendar.add(ImmutableCalScale.GREGORIAN);
-//        System.setProperty("net.fortuna.ical4j.timezone.data", "/static/asia");
-        // 아시아/서울 시간대 생성
-        TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
-        TimeZone timezone = registry.getTimeZone("Asia/Seoul");
-        VTimeZone tz = timezone.getVTimeZone();
 
-        try {
-            log.debug("get schedules from database");
-            //사용자의 모든 근무 일정 가져오기
-            List<Work> workList = workQueryRepositoryImpl.findAllWorkWithWorkTypeByUser(userId);
-            //사용자의 모든 개인 일정 가져오기
-            List<Event> eventList = eventRepository.findAllByUserId(userId);
-            //일정이 없다면 에러 처리
-            if(workList.isEmpty()&&eventList.isEmpty()){
-                throw new CalendarException(CalendarErrorCode.SCHEDULE_NOT_FOUND);
-            }
-            //Uid 생성기
-            //일정을 기록할 캘린더 객체 생성
-            List<CalendarComponent> calendarWorkComponentList = workList.stream().map(
-                    work -> {
-                        //시작 시간와 근무 이름을 통해 새로운 VEvent 생성
-                        return new VEvent(work.getWorkDate(),work.getWorkType().getTitle())
-                                .withProperty(tz.getTimeZoneId().get())
-                                        .withProperty(new Uid(work.getUuid()))
-                                .<VEvent>getFluentTarget();
-                    }).collect(Collectors.toList());
-            List<CalendarComponent> calendarEventComponentList = eventList.stream()
-                    .filter(event -> event.getStartDate()!=null) //start date가 존재하는 경우만 처리
-                    .map(event -> {
-                        if(event.getEndDate()==null){ //end date 없는 경우 처리
-                            return new VEvent(event.getStartDate(),event.getEventTitle())
-                                    .withProperty(tz.getTimeZoneId().get())
-                                    .withProperty(new Uid(event.getUuid()))
-                                    .<VEvent>getFluentTarget();
-                        }else {
-                            return new VEvent(event.getStartDate(), event.getEndDate(), event.getEventTitle())
-                                    .withProperty(tz.getTimeZoneId().get())
-                                    .withProperty(new Uid(event.getUuid()))
-                                    .getFluentTarget();
-                        }
-                    }).collect(Collectors.toList());
-            //캘린더 객체에 일정 추가
-            calendar.getComponents().addAll(calendarWorkComponentList);
-            calendar.getComponents().addAll(calendarEventComponentList);
-        }catch (Exception e){
-            log.warn(e.getMessage());
-            throw new CalendarException(CalendarErrorCode.CREATE_FAIL);
-        }
-        try{
-            //업로드
-            uploadCalendar(userId,calendar);
-        }catch (Exception e){
-            log.warn("업로드 실패");
-        }
-    }
-    public void uploadCalendar(Long userId, Calendar calendar){
-        //TODO data query
-        String blob = "ics/" + userId + "/calendar.ics";
-        try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            new CalendarOutputter().output(calendar, outputStream);
-            // 파일을 바이트 배열로 변환
-            byte[] bytes = outputStream.toByteArray();
-            if (bucket.get(blob) != null) {
-                bucket.get(blob).delete();
-            }
-            // Firebase Storage에 파일 업로드
-            bucket.create(blob, bytes, "text/calendar");
-        } catch (IOException e) {
-            log.warn("here");
-            throw new CalendarException(CalendarErrorCode.DATABASE_CONNECTION_FAILED);
-        }
-    }
+
 }
