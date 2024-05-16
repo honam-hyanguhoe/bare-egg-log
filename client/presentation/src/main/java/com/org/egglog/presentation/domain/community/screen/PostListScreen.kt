@@ -168,7 +168,7 @@ private fun PostListScreen(
     ) {
         Column(
             Modifier
-                .fillMaxHeight(0.92f)
+                .fillMaxHeight(0.9f)
                 .padding(
                     start = 10.widthPercent(context).dp,
                     top = 20.heightPercent(context).dp,
@@ -344,8 +344,8 @@ fun CustomFloatingActionButton(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.92f)
-            .padding(horizontal = 10.dp),
+            .fillMaxHeight(0.9f)
+            .padding(top = 0.dp, start = 10.dp, end = 10.dp, bottom = 10.dp),
         contentAlignment = Alignment.BottomEnd
     ) {
         FloatingActionButton(
