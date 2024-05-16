@@ -15,6 +15,8 @@ object AlarmConst {
     const val INTERVAL_SECOND = "interval_second"
     const val REPEAT_COUNT = "repeat_count"
     const val MINUTES_TO_ADD = "minutes_to_add"
+    const val CUR_REPEAT_COUNT = "cur_repeat_count"
+    const val STOP_BY_USER = "stop_by_user"
 
     const val requestAlarmClock = 0
     const val requestDate = 1
@@ -23,6 +25,8 @@ object AlarmConst {
     const val PENDING_REPEAT_CLOCK = 0
     const val PENDING_SINGLE_DATE = 1
     const val PENDING_REPEAT = 2
+
+    private var isAlarmActive = true
 
     private fun getPendingIntent(context: Context, requestCode: Int, receiverIntent: Intent? = null): PendingIntent {
         val intent = receiverIntent ?: Intent(context, AlarmBroadcastReceiver::class.java)
@@ -35,14 +39,18 @@ object AlarmConst {
         )
     }
 
-    fun setAlarm(context: Context, alarmManager: AlarmManager, repeatCount: Int, time: LocalTime, minutesToAdd: Long) {
+    fun setAlarm(context: Context, alarmManager: AlarmManager, curRepeatCount: Int, repeatCount: Int, time: LocalTime, minutesToAdd: Long) {
+        if (!isAlarmActive) return
+
         val receiverIntent = Intent(context, AlarmBroadcastReceiver::class.java).apply {
             putExtra(REQUEST_CODE, requestAlarmClock)
             putExtra(INTERVAL_HOUR, time.hour)
             putExtra(INTERVAL_MINUTE, time.minute)
             putExtra(INTERVAL_SECOND, 0)
             putExtra(REPEAT_COUNT, repeatCount)
+            putExtra(CUR_REPEAT_COUNT, curRepeatCount)
             putExtra(MINUTES_TO_ADD, minutesToAdd)
+            putExtra(STOP_BY_USER, false)
         }
 
         val pendingIntent = getPendingIntent(context, requestAlarmClock, receiverIntent)
@@ -51,14 +59,15 @@ object AlarmConst {
             set(Calendar.HOUR_OF_DAY, time.hour)
             set(Calendar.MINUTE, time.minute)
             set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
         }
 
         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
     }
 
-    fun cancelAlarm(context: Context, alarmManager: AlarmManager) {
-        val receiverIntent = Intent(context, AlarmBroadcastReceiver::class.java)
-        val pendingIntent = getPendingIntent(context, requestAlarmClock, receiverIntent)
+    fun cancelAllAlarms(context: Context, alarmManager: AlarmManager) {
+        isAlarmActive = false
+        val pendingIntent = getPendingIntent(context, requestAlarmClock)
         alarmManager.cancel(pendingIntent)
     }
 }

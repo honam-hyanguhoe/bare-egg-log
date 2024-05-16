@@ -19,7 +19,9 @@ import java.time.LocalTime
 @Composable
 fun AlarmManager(alarmManager: AlarmManager) {
     val context = LocalContext.current
-    AlarmConst.setAlarm(context = context, alarmManager = alarmManager, repeatCount = 0, time = LocalTime.of(23, 45), minutesToAdd = 2L)
+    AlarmConst.setAlarm(context = context, alarmManager = alarmManager, curRepeatCount = 0, repeatCount = 3, time = LocalTime.of(13, 15), minutesToAdd = 5L)
+    AlarmConst.setAlarm(context = context, alarmManager = alarmManager, curRepeatCount = 0, repeatCount = 5, time = LocalTime.of(13, 17), minutesToAdd = 10L)
+    AlarmConst.setAlarm(context = context, alarmManager = alarmManager, curRepeatCount = 0, repeatCount = 3, time = LocalTime.of(13, 19), minutesToAdd = 2L)
     Column(
         Modifier
             .padding(horizontal = 8.widthPercent(context).dp)
