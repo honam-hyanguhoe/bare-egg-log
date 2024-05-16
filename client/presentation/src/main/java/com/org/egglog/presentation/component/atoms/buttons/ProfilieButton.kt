@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.org.egglog.client.data.UserInfo
+import com.org.egglog.domain.group.model.Member
 import com.org.egglog.presentation.component.atoms.imageLoader.UrlImageLoader
 import com.org.egglog.presentation.theme.*
 import com.org.egglog.presentation.utils.heightPercent
@@ -33,7 +34,7 @@ fun ProfileButton(onClick: () -> Unit, userInfo: UserInfo, isSelected: Boolean, 
     val name = if (isMine) "${userInfo.userName}(나)" else userInfo.userName
     Surface(
         onClick = onClick,
-        modifier = Modifier.size(82.widthPercent(context).dp, 108.heightPercent(context).dp),
+        modifier = Modifier.size(62.widthPercent(context).dp, 108.heightPercent(context).dp),
         shape = RoundedCornerShape(24.widthPercent(context).dp),
         color = if(isSelected) Gray200 else Color.Transparent
     ) {
@@ -52,7 +53,38 @@ fun ProfileButton(onClick: () -> Unit, userInfo: UserInfo, isSelected: Boolean, 
                     )
                     Spacer(Modifier.padding(2.widthPercent(context).dp))
                 }
-                Text(style = Typography.bodyMedium, text = name)
+                Text(style = Typography.bodySmall, text = name)
+            }
+        }
+    }
+}
+
+@Composable
+fun GroupProfileButton(onClick: () -> Unit, userInfo: Member, isSelected: Boolean, isMine: Boolean){
+    val context = LocalContext.current
+    val name = if (isMine) "${userInfo.userName}(나)" else userInfo.userName
+    Surface(
+        onClick = onClick,
+        modifier = Modifier.size(62.widthPercent(context).dp, 108.heightPercent(context).dp),
+        shape = RoundedCornerShape(24.widthPercent(context).dp),
+        color = if(isSelected) Gray200 else Color.Transparent
+    ) {
+        Column(Modifier.fillMaxWidth(), Arrangement.Center, Alignment.CenterHorizontally) {
+            UrlImageLoader(imageUrl = userInfo.profileImgUrl, modifier = Modifier
+                .size(50.widthPercent(LocalContext.current).dp)
+                .clip(CircleShape))
+            Spacer(Modifier.padding(4.heightPercent(context).dp))
+            Row(Modifier.fillMaxWidth(), Arrangement.Center, Alignment.CenterVertically) {
+                if(isMine) {
+                    Box(
+                        modifier = Modifier
+                            .size(5.widthPercent(LocalContext.current).dp)
+                            .border(width = 0.dp, color = Warning300, shape = CircleShape)
+                            .background(Warning300, CircleShape)
+                    )
+                    Spacer(Modifier.padding(2.widthPercent(context).dp))
+                }
+                Text(style = Typography.bodySmall, text = name)
             }
         }
     }

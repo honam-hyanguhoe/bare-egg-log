@@ -4,7 +4,6 @@ import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,30 +13,27 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
@@ -64,19 +60,25 @@ import com.org.egglog.presentation.domain.setting.activity.SettingActivity
 import com.org.egglog.presentation.theme.*
 import com.org.egglog.presentation.utils.AddBox
 import com.org.egglog.presentation.utils.widthPercent
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GroupListScreen(
-    groupListViewModel: GroupListViewModel = hiltViewModel()
+    groupListViewModel: GroupListViewModel = hiltViewModel(),
+    onNavigateToGroupDetailScreen: (groupId: Long) -> Unit,
 ) {
     val groupListState = groupListViewModel.collectAsState().value
     val context = LocalContext.current
     val showBottomSheet by groupListViewModel.showBottomSheet.collectAsState()
-    val onDismiss = { groupListViewModel.setShowBottomSheet(false) }
-//    var showBottomSheet by remember { mutableStateOf(false) }
-//    val onDismiss = { showBottomSheet = false }
+
+    LaunchedEffect(Unit) {
+        Log.d("groupList", "왔니")
+        groupListViewModel.getGroupList()
+    }
 
     groupListViewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
@@ -118,6 +120,18 @@ fun GroupListScreen(
         }
     }
 
+//    val pullToRefreshState = rememberPullToRefreshState()
+//    var isRefreshing by remember { mutableStateOf(false) }
+//
+//    val refresh = @androidx.compose.runtime.Composable {
+//        isRefreshing = true
+//        LaunchedEffect(Unit) {
+//            delay(2000)
+//            isRefreshing = false
+//        }
+//    }
+
+
     GroupListScreen(
         groupList = groupListState.groupList,
         selectedIdx = groupListState.selectedIdx,
@@ -128,10 +142,12 @@ fun GroupListScreen(
         groupPassword = groupListState.groupPassword,
         onGroupNameChange = groupListViewModel::onChangeGroupName,
         onGroupPasswordChange = groupListViewModel::onChangeGroupPassword,
-        createGroup = groupListViewModel::createGroup
+        createGroup = groupListViewModel::createGroup,
+        onClickGroup = { groupId: Long -> onNavigateToGroupDetailScreen(groupId) }
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun GroupListScreen(
     groupList: List<Group>,
@@ -144,12 +160,14 @@ private fun GroupListScreen(
     onGroupNameChange: (String) -> Unit,
     onGroupPasswordChange: (String) -> Unit,
     createGroup: () -> Unit,
+    onClickGroup: (groupId: Long) -> Unit
 ) {
     Column(
         modifier = Modifier
+
             .background(NaturalWhite)
-            .fillMaxSize(),
-//            .systemBarsPadding(),
+            .fillMaxSize()
+            .systemBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
@@ -171,7 +189,7 @@ private fun GroupListScreen(
             ) {
                 items(groupList) { group ->
                     GroupButton(
-                        onClick = { },
+                        onClick = { onClickGroup(group.groupId) },
                         groupMaster = group.admin,
                         groupName = group.groupName,
                         memberCnt = group.memberCount,
@@ -180,7 +198,6 @@ private fun GroupListScreen(
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                 }
-
                 item {
                     MiddleButton(
                         onClick = {

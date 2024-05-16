@@ -160,7 +160,7 @@ private fun PostListScreen(
     categoryList: List<Pair<Int, String>>,
     postListFlow: Flow<PagingData<PostData>>,
     hotPostList: List<HotPostInfo>,
-    onClickPost: (postId: Int) -> Unit,
+    onClickPost: (postId: Int) -> Unit ,
     onClickWriteButton: (hospitalId: Int?, groupId: Int?) -> Unit,
     onSelectCategory: (index: Int) -> Unit,
     onClickSearch: (hospitalId: Int?, groupId: Int?) -> Unit,

@@ -48,6 +48,7 @@ android {
     }
 }
 
+val poiVersion = "5.2.3"
 dependencies {
     implementation(libs.appcompat)
     implementation(libs.core.ktx)
@@ -75,6 +76,7 @@ dependencies {
     implementation(libs.material.icons.extended)
     implementation(libs.material.icons.core)
     implementation(libs.compose.material)
+//    implementation("androidx.compose.material3:material3:1.3.0-alpha06")
 
     // hilt
     implementation(libs.hilt)
@@ -125,8 +127,11 @@ dependencies {
     // ui controller
     implementation(libs.accompanist.insets)
 
+    implementation("org.apache.poi:poi:$poiVersion")
+    implementation("org.apache.poi:poi-ooxml:$poiVersion")
     // refresh
     implementation(libs.accompanist.swiperefresh)
+
 
     implementation(project(":domain"))
 }
