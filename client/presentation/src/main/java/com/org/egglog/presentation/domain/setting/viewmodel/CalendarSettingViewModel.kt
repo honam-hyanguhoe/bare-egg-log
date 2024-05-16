@@ -1,5 +1,6 @@
 package com.org.egglog.presentation.domain.setting.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.org.egglog.domain.auth.model.UserDetail
 import com.org.egglog.domain.setting.usecase.GetCalendarGroupMapStoreUseCase
@@ -60,6 +61,7 @@ class CalendarSettingViewModel @Inject constructor(
                 calendarGroupMapStore[calendarGroup.calendarGroupId.toString()] == true
             } else { false }
             val isBasic = calendarGroup.calendarGroupId == user?.workGroupId
+            map[calendarGroup.calendarGroupId.toString()] = isBasic || isEnabled
             calendarGroup.copy(
                 isEnabled = isEnabled || isBasic,
                 isBasic = isBasic
@@ -67,6 +69,7 @@ class CalendarSettingViewModel @Inject constructor(
         }
 
         setCalendarGroupMapStoreUseCase(map)
+        Log.e("Calendar", "$map")
         reduce { state.copy(calendarGroupList = updateList ?: emptyList(), user = user) }
     }
 
