@@ -2,6 +2,8 @@ package org.egglog.api.work.model.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.egglog.api.alarm.model.entity.Alarm;
+import org.egglog.api.alarm.repository.jpa.AlarmRepository;
 import org.egglog.api.calendargroup.exception.CalendarGroupErrorCode;
 import org.egglog.api.calendargroup.exception.CalendarGroupException;
 import org.egglog.api.calendargroup.model.entity.CalendarGroup;
@@ -15,6 +17,8 @@ import org.egglog.api.user.repository.jpa.UserJpaRepository;
 import org.egglog.api.work.exception.WorkErrorCode;
 import org.egglog.api.work.exception.WorkException;
 import org.egglog.api.work.model.dto.request.*;
+import org.egglog.api.work.model.dto.response.WorkWithAlarmListResponse;
+import org.egglog.api.work.model.dto.response.WorkWithAlarmResponse;
 import org.egglog.api.work.model.dto.response.completed.CompletedWorkCountWeekResponse;
 import org.egglog.api.work.model.dto.response.upcoming.UpComingCountWorkResponse;
 import org.egglog.api.work.model.dto.response.WorkListResponse;
@@ -38,6 +42,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -65,7 +70,7 @@ public class WorkService {
     private final WorkTypeJpaRepository workTypeJpaRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final UserJpaRepository userJpaRepository;
-
+    private final AlarmRepository alarmRepository;
     @Transactional
     public List<WorkResponse> createWork(User loginUser, CreateWorkListRequest request){
         log.debug(" ==== ==== ==== [ 근무 일정 생성 서비스 실행 ] ==== ==== ====");
@@ -169,6 +174,29 @@ public class WorkService {
         return WorkListResponse.builder()
                 .calendarGroup(calendarGroup.toResponse())
                 .workList(workResponses)
+                .build();
+    }
+
+
+    @Transactional(readOnly = true)
+    public WorkWithAlarmListResponse findWorkWithAlarmList(User loginUser, FindWorkListRequest request){
+        log.debug(" ==== ==== ==== [ 로그인 유저의 근무 일정 정보 및 알람 조회 서비스 실행 ] ==== ==== ====");
+        CalendarGroup calendarGroup = calendarGroupRepository.findCalendarGroupWithUserById(loginUser.getWorkGroupId())
+                .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
+        if (calendarGroup.getUser().getId()!=loginUser.getId()) throw new WorkException(WorkErrorCode.ACCESS_DENIED);
+
+        Map<WorkType, Alarm> alarmMap = alarmRepository.findAlarmListByUserId(loginUser.getId()).get()
+                .stream().collect(Collectors.toMap(Alarm::getWorkType, alarm -> alarm));
+
+        List<WorkWithAlarmResponse> res = workJpaRepository
+                .findWorkListWithAllByTime(calendarGroup.getId(), request.getStartDate(), request.getEndDate())
+                .stream()
+                .map(value -> value.toResponse(alarmMap))
+                .collect(Collectors.toList());
+
+        return WorkWithAlarmListResponse.builder()
+                .calendarGroup(calendarGroup.toResponse())
+                .workList(res)
                 .build();
     }
 
