@@ -417,6 +417,7 @@ fun ScheduleList(
 
 
         currentPersonalData?.forEach { personalData ->
+            Log.e("MyCalendar", "내 개인 일정 ${personalData}")
             BigScheduleCard(
                 personalData,
                 onClickDelete = { onDeletePersonalSchedule(personalData.eventId) },
@@ -424,6 +425,15 @@ fun ScheduleList(
                     isPersonalBottomSheet.value = true
                     onClickModify(personalData.eventId)
                 })
+        }
+
+        if(currentWorkData == null && currentPersonalData == null) {
+            Box(
+                modifier = Modifier.padding(vertical = 20.dp).fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "등록된 일정이 없습니다", color = NaturalBlack)
+            }
         }
     }
 }
@@ -444,6 +454,7 @@ fun PersonalScheduleForm(
     onModifyPersonalSchedule: (Int) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
+    val scope = rememberCoroutineScope()
 
     Column(
         Modifier
