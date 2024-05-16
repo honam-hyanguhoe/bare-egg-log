@@ -103,15 +103,13 @@ public class WorkService {
 
 
     @Transactional
-    public List<WorkResponse> syncWork(User loginUser, GroupDutyDataDto groupDutyData){
-        //업데이트를 희망하는 월 지정
-        String[] date=groupDutyData.getDate().split("-");
-        LocalDate targetMonth = LocalDate.of(Integer.parseInt(date[0]), Integer.parseInt(date[1]), 1);
-        CreateWorkListRequest request = new CreateWorkListRequest();
-
+    public List<WorkResponse> syncWork(User loginUser, CreateWorkListRequest request, LocalDate targetMonth){
         log.debug(" ==== ==== ==== [ 근무 일정 동기화 서비스 실행 ] ==== ==== ====");
-        CalendarGroup calendarGroup = calendarGroupRepository.findById(loginUser.getWorkGroupId())
+        if (loginUser.getWorkGroupId()!= request.getCalendarGroupId()) throw new CalendarGroupException(CalendarGroupErrorCode.WORK_GROUP_ACCESS_DENY);
+        CalendarGroup calendarGroup = calendarGroupRepository.findById(request.getCalendarGroupId())
                 .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
+
+        if (calendarGroup.getUser().getId()!=loginUser.getId()) throw new WorkException(WorkErrorCode.ACCESS_DENIED);
 
         Map<Long, WorkType> userWorkTypeMap = workTypeJpaRepository
                 .findByUser(loginUser).stream().collect(Collectors.toMap(WorkType::getId, wt -> wt));
@@ -119,7 +117,7 @@ public class WorkService {
         LocalDate startOfMonth = targetMonth.withDayOfMonth(1);
         LocalDate endOfMonth = targetMonth.withDayOfMonth(targetMonth.lengthOfMonth());
 
-        Map<LocalDate, Work> dateMap = workJpaRepository.findWorkListWithAllByTime(loginUser.getWorkGroupId(), startOfMonth, endOfMonth)
+        Map<LocalDate, Work> dateMap = workJpaRepository.findWorkListWithAllByTime(request.getCalendarGroupId(), startOfMonth, endOfMonth)
                 .stream()
                 .collect(Collectors.toMap(Work::getWorkDate, work -> work));
 
@@ -139,6 +137,7 @@ public class WorkService {
                 .stream()
                 .map(Work::toResponse)
                 .collect(Collectors.toList());
+
     }
 
 
