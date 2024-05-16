@@ -23,6 +23,8 @@ public class AlarmListOutputSpec {
     private int replayTime;
 
     private Boolean isAlarmOn;
+    
+    private Long workTypeId;    //근무 아이디
 
     private String workTypeTitle;   //근무 제목
 

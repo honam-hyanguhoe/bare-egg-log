@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AlarmCustomQuery {
-    List<Alarm> findAlarmList(Long userId);
+    Optional<List<Alarm>> findAlarmListByUserId(Long userId);
     Optional<Alarm> findWithUserAndWorkTypeById(Long userId);
     Optional<Alarm> findWithUserById(Long userId);
 }

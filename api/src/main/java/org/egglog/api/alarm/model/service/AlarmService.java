@@ -26,8 +26,10 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -42,22 +44,25 @@ public class AlarmService {
 
     @Transactional(readOnly = true)
     public List<AlarmListOutputSpec> getAlarmList(User loginUser) {
-
         List<AlarmListOutputSpec> alarmListOutputSpecList = new ArrayList<>();
-
         try {
-            List<Alarm> alarmList = alarmRepository.findAlarmList(loginUser.getId());
+            Optional<List<Alarm>> alarmList = alarmRepository.findAlarmListByUserId(loginUser.getId());
+            if (alarmList.isPresent()) {
+                for (Alarm alarm : alarmList.get()) {
+                    WorkType workType = alarm.getWorkType();
+                    AlarmListOutputSpec alarmListOutputSpec = AlarmListOutputSpec.builder()
+                            .alarmId(alarm.getId())
+                            .alarmTime(alarm.getAlarmTime())
+                            .replayCnt(alarm.getReplayCnt())
+                            .replayTime(alarm.getReplayTime())
+                            .isAlarmOn(alarm.getIsAlarmOn())
+                            .workTypeId(workType.getId())
+                            .workTypeTitle(workType.getTitle())
+                            .workTypeColor(workType.getColor())
+                            .build();
 
-            for (Alarm alarm : alarmList) {
-                AlarmListOutputSpec alarmListOutputSpec = AlarmListOutputSpec.builder()
-                        .alarmId(alarm.getId())
-                        .alarmTime(alarm.getAlarmTime())
-                        .replayCnt(alarm.getReplayCnt())
-                        .replayTime(alarm.getReplayTime())
-                        .isAlarmOn(alarm.getIsAlarmOn())
-                        .build();
-
-                alarmListOutputSpecList.add(alarmListOutputSpec);
+                    alarmListOutputSpecList.add(alarmListOutputSpec);
+                }
             }
 
         } catch (DataAccessException e) {
