@@ -259,14 +259,7 @@ public class GroupService {
                 groupRepository.delete(group);
 
                 //해당 멤버가 삭제되었다면 해당 유저의 토픽 구독 취소
-                String loginUserDeviceToken = user.getDeviceToken();
-                FCMTopic topic = FCMTopic.builder()
-                        .topic(TopicEnum.GROUP)
-                        .topicId(groupId)
-                        .build();
-                if (loginUserDeviceToken!=null){
-                    fcmService.unsubscribeFromTopic(loginUserDeviceToken, topic);
-                }
+                notificationService.exitGroupNotification(user, groupId);
 
 
             }else{
@@ -298,8 +291,10 @@ public class GroupService {
                 .build();
 
         try {
-            groupRepository.save(newGroup);
+            Group createGroup = groupRepository.save(newGroup);
             groupMemberService.createGroupMember(newGroupMember);
+            //토픽 구독이 필요함
+            notificationService.createGroupNotification(user, createGroup);
         }catch (Exception e){
             throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
         }

@@ -65,4 +65,9 @@ public class Work {
                 .build();
     }
 
+    public Work updateWorkType(WorkType updateWorkType){
+        this.workType = updateWorkType;
+        return this;
+    }
+
 }

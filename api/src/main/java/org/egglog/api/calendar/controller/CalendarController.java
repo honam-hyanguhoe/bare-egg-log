@@ -92,9 +92,9 @@ public class CalendarController {
      * @param user
      * @return
      */
-    @GetMapping("/month")
-    public ResponseEntity<MessageUtils<List<CalendarListResponse>>> getCalendarByMonth(@ModelAttribute @Valid CalendarMonthRequest calendarMonthRequest, @AuthenticationPrincipal User user) {
-        return ResponseEntity.ok().body(MessageUtils.success(calendarService.getCalendarList(calendarMonthRequest, user)));
-    }
+//    @GetMapping("/month")
+//    public ResponseEntity<MessageUtils<List<CalendarListResponse>>> getCalendarByMonth(@ModelAttribute @Valid CalendarMonthRequest calendarMonthRequest, @AuthenticationPrincipal User user) {
+//        return ResponseEntity.ok().body(MessageUtils.success(calendarService.getCalendarList(calendarMonthRequest, user)));
+//    }
 
 }

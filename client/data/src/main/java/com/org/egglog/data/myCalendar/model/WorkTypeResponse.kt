@@ -17,3 +17,4 @@ data class WorkTypeResponse (
 fun WorkTypeResponse.toDomainModel(): WorkType {
     return WorkType(workTypeId, title, color, workTypeImgUrl, workTag, startTime, workTime)
 }
+

@@ -1,5 +1,6 @@
 package com.org.egglog.presentation.component.organisms.calendars
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,10 +22,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.org.egglog.domain.myCalendar.model.PersonalScheduleData
+import com.org.egglog.domain.myCalendar.model.WorkListData
+import com.org.egglog.domain.myCalendar.model.WorkType
 import com.org.egglog.presentation.utils.ArrowLeft
 import com.org.egglog.presentation.utils.ArrowRight
 import com.org.egglog.presentation.component.atoms.icons.Icon
 import com.org.egglog.presentation.component.atoms.labels.Labels
+import com.org.egglog.presentation.component.atoms.labels.Labels2
 import com.org.egglog.presentation.theme.*
 import java.util.Calendar
 
@@ -36,9 +41,10 @@ fun MonthlyCalendar(
     onPrevMonthClick: () -> Unit,
     onNextMonthClick: () -> Unit,
     selectedDate: Int,
-    tempWorkList: List<Pair<Int, String>>
+    tempWorkList: List<Pair<Int, WorkType?>>,
+    monthlyWorkList: List<WorkListData>,
+    monthlyPersonalList: List<PersonalScheduleData>
 ) {
-
 
     Column(
         Modifier
@@ -51,8 +57,10 @@ fun MonthlyCalendar(
             currentMonth,
             onDateClicked = onDateClicked,
             selectedDate,
-            tempWorkList = tempWorkList
-        ) // 콜백 전달
+            tempWorkList = tempWorkList,
+            monthlyWorkList = monthlyWorkList,
+            monthlyPersonalList = monthlyPersonalList
+        )
     }
 }
 
@@ -107,7 +115,9 @@ fun DayList(
     currentMonth: Int,
     onDateClicked: (Int) -> Unit,
     selectedDate: Int,
-    tempWorkList: List<Pair<Int, String>>
+    tempWorkList: List<Pair<Int, WorkType?>>,
+    monthlyWorkList: List<WorkListData>,
+    monthlyPersonalList: List<PersonalScheduleData>
 ) {
     val time = remember { mutableStateOf(Calendar.getInstance()) }
     val date = time.value
@@ -134,7 +144,29 @@ fun DayList(
                     val resultDay = week * 7 + day - thisMonthFirstDay + 1
                     val isSelected = selectedDate == resultDay
                     val dayOfWeek = (day + 1) % 7
-                    val workInfo = tempWorkList.find { it.first == resultDay }
+                    val tempWorkInfo = tempWorkList.find { it.first == resultDay }
+
+                    val tempResultDay = if (resultDay < 10) "0${resultDay}" else "${resultDay}"
+                    val workInfo = monthlyWorkList.find {
+                        it.workDate.substring(
+                            8,
+                            10
+                        ) == tempResultDay
+                    }?.workType
+
+                    val tempEventCnt = monthlyPersonalList.find {
+                        it.date.substring(
+                            8,
+                            10
+                        ) == tempResultDay
+                    }?.eventList?.size
+                    val eventCnt = when (tempEventCnt) {
+                        null -> ""
+                        0 -> ""
+                        1 -> "·"
+                        2 -> "··"
+                        else -> "···"
+                    }
 
 
                     if (resultDay in 1..thisMonthDayMax) {
@@ -167,9 +199,12 @@ fun DayList(
                                     }
                                 )
                                 Spacer(modifier = Modifier.height(5.dp))
-
-                                Labels(text = workInfo?.second ?: "None")
-//                                Text(text = "··")
+                                if (tempWorkInfo?.second != null) Labels2(tempWorkInfo.second) else if(workInfo != null) Labels2(workInfo) else Labels(text = "")
+                                Text(
+                                    text = eventCnt,
+                                    color = Gray600,
+                                    style = Typography.labelLarge
+                                )
                             }
                         }
                     } else {

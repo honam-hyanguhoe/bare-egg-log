@@ -13,6 +13,7 @@ import org.egglog.api.group.model.service.GroupMemberService;
 import org.egglog.api.group.model.service.GroupService;
 import org.egglog.api.group.repository.jpa.GroupRepository;
 import org.egglog.api.group.repository.redis.GroupInvitationRepository;
+import org.egglog.api.notification.model.service.FCMService;
 import org.egglog.api.notification.model.service.NotificationService;
 import org.egglog.api.security.model.dto.response.TokenResponse;
 import org.egglog.api.security.model.service.TokenService;
@@ -65,6 +66,7 @@ public class TestService {
     private final GroupInvitationRepository groupInvitationRepository;
     private final PasswordEncoder passwordEncoder;
     private final NotificationService notificationService;
+    private final FCMService fcmService;
     public void testDeleteUser(User user){
 
     }
@@ -108,6 +110,7 @@ public class TestService {
             }
         }
     }
+
 
 
     public TokenResponse testLogin(TestLoginRequest request, AuthProvider provider){
