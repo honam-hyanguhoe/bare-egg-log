@@ -153,7 +153,6 @@ fun BasicHeaderContents(
                     color = NaturalBlack,
                     onClick = onClickClose)
             } else if (hasMore) {
-
                 ScrollableMenus(
                     options = options,
                     selectedOption = selectedOption,

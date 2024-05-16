@@ -93,19 +93,21 @@ class WorkViewModel @Inject constructor(
     }
 
     fun onPrevClick(localDate: LocalDate) = intent {
-        val finalStartDate = dataSource.getStartOfWeek(localDate).minusDays(1)
+//        val finalStartDate = dataSource.getStartOfWeek(localDate).minusDays(1)
+        val finalStartDate = dataSource.getStartOfWeek(localDate)
         Log.d("weekly", "finalStartDate ${localDate} --- ${finalStartDate}")
 
         val calendarUiModel: WeeklyUiModel =
-            dataSource.getData(startDate = finalStartDate, lastSelectedDate = finalStartDate)
+            dataSource.getData(startDate = finalStartDate.minusDays(2), lastSelectedDate = finalStartDate)
         Log.d("weekly", "${calendarUiModel}")
-        loadWork(calendarUiModel.startDate.date.toString(), finalStartDate.toString())
+
+        loadWork(calendarUiModel.startDate.date.toString(), finalStartDate.plusDays(6).toString())
 
         reduce {
             state.copy(
                 currentWeekDays = calendarUiModel,
                 startDate = calendarUiModel.startDate.date,
-                endDate = finalStartDate
+                endDate = finalStartDate.plusDays(6)
             )
         }
 
@@ -121,7 +123,7 @@ class WorkViewModel @Inject constructor(
 
         val calendarUiModel: WeeklyUiModel =
             dataSource.getData(
-                startDate = finalStartDate.plusDays(7),
+                startDate = finalStartDate,
                 lastSelectedDate = finalStartDate.plusDays(1)
             )
         loadWork(calendarUiModel.startDate.date.toString(), finalStartDate.plusDays(7).toString())
@@ -149,7 +151,6 @@ data class WorkState(
     val startDate: LocalDate = LocalDate.now(),
     val endDate: LocalDate = LocalDate.now(),
     val labels: List<String> = listOf("NIGHT", "NIGHT", "NIGHT", "NIGHT", "NIGHT", "NIGHT", "NIGHT"),
-
 )
 
 sealed class WorkSideEffect {
@@ -162,19 +163,3 @@ sealed class WorkSideEffect {
 }
 
 
-//val dataSource = WeeklyDataSource()
-//var calendarUiModel by remember { mutableStateOf(dataSource.getData(lastSelectedDate = dataSource.today)) }
-//
-// 마지막
-//val onPrevClick: (LocalDate) -> Unit = { startDate ->
-//    val finalStartDate = startDate.minusDays(1)
-//    calendarUiModel = dataSource.getData(startDate = finalStartDate, lastSelectedDate = finalStartDate)
-//    println("선택한 날짜는 ${finalStartDate}")}
-
-
-// 시작일
-//val onNextClick: (LocalDate) -> Unit = { endDate ->
-//    val finalStartDate = endDate.plusDays(2)
-//    calendarUiModel = dataSource.getData(startDate = finalStartDate, lastSelectedDate = finalStartDate.minusDays(1))
-//    println("선택한 날짜는 ${finalStartDate.minusDays(1)}")
-//}

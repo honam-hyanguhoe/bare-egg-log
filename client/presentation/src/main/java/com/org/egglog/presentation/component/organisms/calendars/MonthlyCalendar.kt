@@ -154,12 +154,12 @@ fun DayList(
                         ) == tempResultDay
                     }?.workType
 
-                    val tempEventCnt = monthlyPersonalList.find {
-                        it.date.substring(
-                            8,
-                            10
-                        ) == tempResultDay
-                    }?.eventList?.size
+                    val tempEventCnt = monthlyPersonalList.filter {
+                        it.date.substring(8, 10) == tempResultDay
+                    }.flatMap {
+                        it.eventList
+                    }.size
+
                     val eventCnt = when (tempEventCnt) {
                         null -> ""
                         0 -> ""
@@ -199,7 +199,9 @@ fun DayList(
                                     }
                                 )
                                 Spacer(modifier = Modifier.height(5.dp))
-                                if (tempWorkInfo?.second != null) Labels2(tempWorkInfo.second) else if(workInfo != null) Labels2(workInfo) else Labels(text = "")
+                                if (tempWorkInfo?.second != null) Labels2(tempWorkInfo.second) else if (workInfo != null) Labels2(
+                                    workInfo
+                                ) else Labels(text = "")
                                 Text(
                                     text = eventCnt,
                                     color = Gray600,

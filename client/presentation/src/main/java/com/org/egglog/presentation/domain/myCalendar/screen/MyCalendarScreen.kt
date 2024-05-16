@@ -98,7 +98,7 @@ import java.util.Calendar
 @Composable
 fun MyCalendarScreen(
     viewModel: MyCalendarViewModel = hiltViewModel(),
-    onNavigateToExcelScreen: () -> Unit,
+    onNavigateToExcelScreen: (Int, Int) -> Unit,
     onNavigateToCalendarSettingScreen: () -> Unit,
     onNavigateToWorkSettingScreen: () -> Unit
 ) {
@@ -201,7 +201,7 @@ fun MyCalendarScreen(
 @Composable
 fun MyCalendarScreen(
     selectedIdx: Int,
-    onClickExcelSync: () -> Unit,
+    onClickExcelSync: (Int, Int) -> Unit,
     onSelectedIdx: (Int) -> Unit,
     scheduleTitle: String,
     scheduleContent: String,
@@ -274,7 +274,7 @@ fun MyCalendarScreen(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                ScheduleListHeader(currentMonth, selectedDate, onClickExcelSync)
+                ScheduleListHeader(currentYear, currentMonth, selectedDate, onClickExcelSync)
 
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -356,9 +356,10 @@ fun MyCalendarScreen(
 
 @Composable
 fun ScheduleListHeader(
+    currentYear: Int,
     currentMonth: Int,
     selectedDate: Int,
-    onClickExcelSync: () -> Unit
+    onClickExcelSync: (Int,Int) -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -381,7 +382,7 @@ fun ScheduleListHeader(
 
         Row(
             Modifier.clickable {
-                onClickExcelSync()
+                onClickExcelSync(currentYear, currentMonth)
             },
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -416,6 +417,7 @@ fun ScheduleList(
 
 
         currentPersonalData?.forEach { personalData ->
+            Log.e("MyCalendar", "내 개인 일정 ${personalData}")
             BigScheduleCard(
                 personalData,
                 onClickDelete = { onDeletePersonalSchedule(personalData.eventId) },
@@ -423,6 +425,15 @@ fun ScheduleList(
                     isPersonalBottomSheet.value = true
                     onClickModify(personalData.eventId)
                 })
+        }
+
+        if(currentWorkData == null && currentPersonalData == null) {
+            Box(
+                modifier = Modifier.padding(vertical = 20.dp).fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "등록된 일정이 없습니다", color = NaturalBlack)
+            }
         }
     }
 }
@@ -443,6 +454,7 @@ fun PersonalScheduleForm(
     onModifyPersonalSchedule: (Int) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
+    val scope = rememberCoroutineScope()
 
     Column(
         Modifier
@@ -615,10 +627,7 @@ fun WorkScheduleForm(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            Log.e("MyCalendarScreen", "근무타입리스트는 $workTypeList")
-
             val groupedTypeList = workTypeList.chunked(4)
-
 
             groupedTypeList.forEach { rowList ->
                 Row(

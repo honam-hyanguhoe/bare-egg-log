@@ -1,9 +1,10 @@
-package com.org.egglog.presentation.receiver
+package com.org.egglog.data.scheduler
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.org.egglog.presentation.receiver.ForegroundService
 
 class AlarmBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {

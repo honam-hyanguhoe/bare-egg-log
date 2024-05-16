@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.org.egglog.presentation.component.atoms.buttons.BasicButton
@@ -33,7 +34,7 @@ fun Dialog(
                 onClick = { onConfirmation() },
                 modifier = Modifier.fillMaxWidth(0.485f),
                 colors = ButtonColors(contentColor = NaturalWhite, containerColor = Warning300, disabledContentColor = NaturalWhite, disabledContainerColor = Gray300),
-                shape = RoundedCornerShape(24.widthPercent(LocalContext.current).dp)
+                shape = RoundedCornerShape(12.widthPercent(LocalContext.current).dp)
             ) {
                 Text(text = "확인")
             }
@@ -43,12 +44,12 @@ fun Dialog(
                 onClick = { onDismissRequest() },
                 modifier = Modifier.fillMaxWidth(0.485f),
                 colors = ButtonColors(contentColor = NaturalWhite, containerColor = Gray300, disabledContentColor = NaturalWhite, disabledContainerColor = Gray300),
-                shape = RoundedCornerShape(24.widthPercent(LocalContext.current).dp)
+                shape = RoundedCornerShape(12.widthPercent(LocalContext.current).dp)
             ) {
                 Text(text = "취소")
             }
         },
-        title = { Text(text = dialogTitle) },
+        title = { Text(text = dialogTitle, style = Typography.headlineLarge.copy(fontWeight = FontWeight.Bold)) },
         text = {
             Column {
                 Text(text = dialogText)

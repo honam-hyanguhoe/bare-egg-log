@@ -1,6 +1,7 @@
 package org.egglog.api.group.controller;
 
 import jakarta.validation.Valid;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.group.model.dto.request.GroupDutyData;
@@ -37,19 +38,47 @@ import java.util.List;
 @Slf4j
 public class GroupController {
     private final GroupService groupService;
+    /**
+     * 저장된 근무 태그(파싱용 alias) 반환
+     * @param user
+     * @param groupId
+     * @return
+     */
+    @GetMapping("/duty/work-tag/{groupId}")
+    public ResponseEntity<MessageUtils> getDutyWorkTags(
+            @AuthenticationPrincipal User user,
+            @PathVariable("groupId") Long groupId
+    ){
+        return ResponseEntity.ok().body(MessageUtils.success(groupService.getGroupWorkTags(user,groupId)));
+    }
 
-    //TODO kafka 적용해 이벤트 큐에 파싱 요청 송신하는 형태로 작성할 것
-
+    /**
+     * 업로드된 그룹 근무 엑셀 파일 리스트 조회
+     * @param user 로그인한 유저(JWT 토큰)
+     * @param date yyyy-mm
+     * @return
+     * @author 김다희
+     */
+    @GetMapping("/duty")
+    public ResponseEntity<MessageUtils> getDutyDataList(
+            @AuthenticationPrincipal User user,
+            @PathParam("date") String date){
+        return ResponseEntity.ok().body(MessageUtils.success(groupService.getGroupDutyList(user, date)));
+    }
     /**
      * 그룹 근무 엑셀 파일(json 변환 데이터) 업로드
      * @param user 로그인한 유저(JWT 토큰)
+     * @param groupId 그룹 아이디
      * @param groupDutyData 근무 엑셀 파일 데이터
      * @return
      * @author 김다희
      */
-    @PostMapping("/duty")
-    public ResponseEntity<MessageUtils> generateGroupDuty(@AuthenticationPrincipal User user, @RequestBody GroupDutyData groupDutyData){
-        Long userId=1L;
+    @PostMapping("/duty/{groupId}")
+    public ResponseEntity<MessageUtils> generateGroupDuty(
+            @AuthenticationPrincipal User user,
+            @PathVariable("groupId") Long groupId,
+            @RequestBody @Valid GroupDutyData groupDutyData){
+        groupService.addDuty(user,groupId,groupDutyData);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }
 
@@ -226,4 +255,5 @@ public class GroupController {
     ){
         return ResponseEntity.ok().body(MessageUtils.success(groupService.getGroupDuty(groupId,user,date)));
     }
+
 }

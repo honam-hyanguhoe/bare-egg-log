@@ -4,12 +4,12 @@ import com.org.egglog.domain.main.model.WeeklyWork
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class WeeklyWorkReponse(
+data class WeeklyWorkResponse(
     val workList: List<WorkDTO>,
     val calendarGroup: CalendarGroupDTO
 )
 
-fun WeeklyWorkReponse.toDomainModel(): WeeklyWork {
+fun WeeklyWorkResponse.toDomainModel(): WeeklyWork {
     return WeeklyWork(
         workList = workList.mapNotNull { it.toDomainModel() },
         calendarGroup = calendarGroup.toDomainModel()

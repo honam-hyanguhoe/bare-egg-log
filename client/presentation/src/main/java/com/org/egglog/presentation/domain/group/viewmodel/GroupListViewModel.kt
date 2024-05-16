@@ -49,11 +49,6 @@ class GroupListViewModel @Inject constructor(
             }
         })
 
-    init {
-        getGroupList()
-        // state 값의 groupImage 번호 설정
-    }
-
     private val _showBottomSheet = MutableStateFlow(false)
     val showBottomSheet: StateFlow<Boolean> = _showBottomSheet.asStateFlow()
 
@@ -115,14 +110,14 @@ class GroupListViewModel @Inject constructor(
     }
 
 
-    private fun getGroupList() = intent {
+    fun getGroupList() = intent {
         val tokens = getTokenUseCase()
 
         Log.d("groupList", "${tokens.first}")
         val result = getGroupListUseCase(
             accessToken = "Bearer ${tokens.first}"
         ).getOrNull()
-        Log.d("groupList", result.toString())
+        Log.d("groupList", "ddd ${result.toString()}")
 
         reduce {
             val lastGroup = result?.lastOrNull()

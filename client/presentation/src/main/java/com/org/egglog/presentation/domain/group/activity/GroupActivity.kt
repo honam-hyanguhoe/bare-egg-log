@@ -1,6 +1,8 @@
 package com.org.egglog.presentation.domain.group.activity
 
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import com.org.egglog.presentation.domain.community.navigation.CommunityNavigationHost
@@ -12,9 +14,12 @@ import dagger.hilt.android.AndroidEntryPoint
 class GroupActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val deepLinkUri: Uri? = intent?.data
+        val code = intent?.getStringExtra("code")
+        val name = intent?.getStringExtra("name")
         setContent{
             ClientTheme {
-                GroupNavigationHost()
+                GroupNavigationHost(deepLinkUri = deepLinkUri, code = code ?: "", groupName = name ?: "")
             }
         }
     }
