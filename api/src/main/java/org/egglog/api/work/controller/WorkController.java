@@ -44,6 +44,26 @@ import java.util.List;
 public class WorkController {
     private final WorkService workService;
 
+
+    /**
+     * 그룹내 엑셀 근무 동기화
+     * @param loginUser 로그인한 유저(JWT 토큰)
+     * @param request 캘린더 그룹 ID, List[{근무 타입 ID, 근무 일}]
+     * @param targetMonth 해당 월
+     * @return 생성된 근무 일정 객체 응답 리스트
+     * @author 김형민
+     */
+    @PostMapping("/sync/{targetMonth}")
+    public ResponseEntity<MessageUtils<List<WorkResponse>>> syncWork(
+            @AuthenticationPrincipal User loginUser,
+            @RequestBody @Valid CreateWorkListRequest request,
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetMonth
+    ){
+        return ResponseEntity.ok().body(
+                MessageUtils.success(workService.syncWork(loginUser, request, targetMonth)));
+    }
+
+
     /**
      * 근무 일정 생성
      * @param loginUser 로그인한 유저(JWT 토큰)
@@ -78,7 +98,7 @@ public class WorkController {
     /**
      * 근무 일정 조회
      * @param loginUser 로그인한 유저(JWT 토큰)
-     * @param request  캘린더 그룹 ID, 조회할 시작 일, 조회할 마지막 일
+     * @param request  조회할 시작 일, 조회할 마지막 일
      * @return 조회 된 근무 일정 객체 응답 리스트
      * @author 김형민
      */
@@ -167,5 +187,14 @@ public class WorkController {
     ){
         return ResponseEntity.ok().body(
                 MessageUtils.success(workService.findCompletedWorkCount(loginUser, today, month)));
+    }
+
+    @PostMapping("/sync")
+    public ResponseEntity<MessageUtils> syncWorkWithParsedData(
+            @AuthenticationPrincipal User loginUser,
+            @RequestBody @Valid GroupDutyDataDto groupDutyDataDto
+    ){
+        workService.syncWork(loginUser,groupDutyDataDto);
+        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }
 }

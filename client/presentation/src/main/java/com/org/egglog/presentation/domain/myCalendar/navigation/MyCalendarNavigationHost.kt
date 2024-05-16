@@ -78,7 +78,7 @@ fun MyCalendarNavigationHost() {
         }
 
         composable(route = SettingRoute.WorkSettingScreen.name) {
-            WorkSettingScreen()
+//            WorkSettingScreen()
         }
     }
 }

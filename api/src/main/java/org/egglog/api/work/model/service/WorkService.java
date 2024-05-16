@@ -30,6 +30,8 @@ import org.egglog.api.work.repository.jpa.WorkJpaRepository;
 import org.egglog.api.worktype.model.entity.WorkTag;
 import org.egglog.api.worktype.model.entity.WorkType;
 import org.egglog.api.worktype.repository.jpa.WorkTypeJpaRepository;
+import org.egglog.utility.utils.MonthUtils;
+import org.egglog.utility.utils.MonthUtils.Month;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,10 +41,7 @@ import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.IsoFields;
 import java.time.temporal.TemporalAdjusters;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -91,16 +90,28 @@ public class WorkService {
                 .map(Work::toResponse)
                 .collect(Collectors.toList());
     }
+//    public List<WorkType> groupDutyDateToRequest(GroupDutyDataDto groupDutyDataDto, User loginUser){
+//        CreateWorkListRequest request = new CreateWorkListRequest();
+//        List<CreateWorkRequest> workRequests = new ArrayList<>();
+//
+//        request.setCalendarGroupId(loginUser.getWorkGroupId());
+//        //사번으로 근무 정보 가져옴
+//        List<String> dutyList=groupDutyDataDto.getDutyList().get(loginUser.getEmpNo());
+//        //
+//        return request;
+//    }
 
 
     @Transactional
-    public List<WorkResponse> syncWork(User loginUser, CreateWorkListRequest request, LocalDate targetMonth){
-        log.debug(" ==== ==== ==== [ 근무 일정 동기화 서비스 실행 ] ==== ==== ====");
-        if (loginUser.getWorkGroupId()!= request.getCalendarGroupId()) throw new CalendarGroupException(CalendarGroupErrorCode.WORK_GROUP_ACCESS_DENY);
-        CalendarGroup calendarGroup = calendarGroupRepository.findById(request.getCalendarGroupId())
-                .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
+    public List<WorkResponse> syncWork(User loginUser, GroupDutyDataDto groupDutyData){
+        //업데이트를 희망하는 월 지정
+        String[] date=groupDutyData.getDate().split("-");
+        LocalDate targetMonth = LocalDate.of(Integer.parseInt(date[0]), Integer.parseInt(date[1]), 1);
+        CreateWorkListRequest request = new CreateWorkListRequest();
 
-        if (calendarGroup.getUser().getId()!=loginUser.getId()) throw new WorkException(WorkErrorCode.ACCESS_DENIED);
+        log.debug(" ==== ==== ==== [ 근무 일정 동기화 서비스 실행 ] ==== ==== ====");
+        CalendarGroup calendarGroup = calendarGroupRepository.findById(loginUser.getWorkGroupId())
+                .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
 
         Map<Long, WorkType> userWorkTypeMap = workTypeJpaRepository
                 .findByUser(loginUser).stream().collect(Collectors.toMap(WorkType::getId, wt -> wt));
@@ -108,7 +119,7 @@ public class WorkService {
         LocalDate startOfMonth = targetMonth.withDayOfMonth(1);
         LocalDate endOfMonth = targetMonth.withDayOfMonth(targetMonth.lengthOfMonth());
 
-        Map<LocalDate, Work> dateMap = workJpaRepository.findWorkListWithAllByTime(request.getCalendarGroupId(), startOfMonth, endOfMonth)
+        Map<LocalDate, Work> dateMap = workJpaRepository.findWorkListWithAllByTime(loginUser.getWorkGroupId(), startOfMonth, endOfMonth)
                 .stream()
                 .collect(Collectors.toMap(Work::getWorkDate, work -> work));
 
