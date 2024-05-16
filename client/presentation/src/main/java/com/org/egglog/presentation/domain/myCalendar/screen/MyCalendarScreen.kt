@@ -238,7 +238,7 @@ fun MyCalendarScreen(
         LazyColumn(
             Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.92f)
+                .fillMaxHeight(0.9f)
                 .padding(
                     start = 10.widthPercent(context).dp,
                     top = 10.heightPercent(context).dp,
@@ -280,7 +280,7 @@ fun MyCalendarScreen(
         onPersonalClick = { isPersonalBottomSheet.value = true },
         onSettingClick = onClickCalendarSetting,
         horizontalPadding = 10.dp,
-        verticalPadding = 75.heightPercent(context).dp
+        verticalPadding = 90.heightPercent(context).dp
     )
 
     if (isWorkBottomSheet.value) {
