@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.alarm.model.entity.Alarm;
+import org.egglog.api.alarm.model.service.AlarmService;
 import org.egglog.api.alarm.repository.jpa.AlarmRepository;
 import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.calendargroup.repository.jpa.CalendarGroupRepository;
@@ -45,7 +46,7 @@ public class UserService {
     private final WorkTypeJpaRepository workTypeJpaRepository;
     private final CalendarGroupRepository calendarGroupRepository;
     private final NotificationService notificationService;
-    private final AlarmRepository alarmRepository;
+    private final AlarmService alarmService;
 
     @Transactional(readOnly = true)
     public UserResponse findById(Long id) {
@@ -75,30 +76,23 @@ public class UserService {
     @Transactional
     public UserResponse joinUser(User loginUser, JoinUserRequest request) {
         log.debug(" ==== ==== ==== [ 회원가입 서비스 실행] ==== ==== ====");
+        if (loginUser.isJoin()) throw new UserException(UserErrorCode.JOIN_USER);
         Hospital hospital = hospitalJpaRepository.findById(request.getHospitalId())
                 .orElseThrow(() -> new HospitalException(HospitalErrorCode.NOT_FOUND));
         //todo 1. 기본 태그 자동 생성
-        workTypeJpaRepository.saveAll(getDefaultWorkTypes(loginUser));
+        List<WorkType> workTypes = workTypeJpaRepository.saveAll(getDefaultWorkTypes(loginUser));
         //todo 2. 근무 일정 캘린더 그룹 자동 생성
-        CalendarGroup workGroup = calendarGroupRepository.save(CalendarGroup.builder().alias("[EGGLOG] 기본 캘린더").user(loginUser).build());
+        CalendarGroup workGroup = calendarGroupRepository.save(CalendarGroup.builder()
+                .alias("기본 캘린더").user(loginUser).build());
         //todo 3. 알림 설정 자동생성
         notificationService.makeDefaultNotification(loginUser);
         //todo 4. 기본 알람 자동 생성
-        List<WorkType> defaultWorkTypes = workTypeJpaRepository.findWorkTypesByUserId(loginUser.getId());
-        for (WorkType workType : defaultWorkTypes) {
-            Alarm alarm = Alarm.builder()
-                    .alarmTime(workType.getStartTime())
-                    .replayTime(5)
-                    .replayCnt(5)
-                    .isAlarmOn(false)
-                    .workType(workType)
-                    .user(loginUser)
-                    .build();
-            alarmRepository.save(alarm);
-        }
+        alarmService.makeDefaultAlarm(workTypes);
         return userJpaRepository.save(loginUser.join(request.getUserName(), hospital, request.getEmpNo(), request.getFcmToken(), workGroup.getId()))
                 .toResponse();
     }
+
+
 
     private List<WorkType> getDefaultWorkTypes(User loginUser) {
         List<WorkType> defaultWorkTypes = new ArrayList<>();

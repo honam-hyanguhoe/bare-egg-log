@@ -58,7 +58,7 @@ public class NotificationService {
     //설정 생성
     @Transactional
     public void makeDefaultNotification(User loginUser){
-        log.debug(" ==== ==== ==== [ 기본 알람 설정 생성 조회 서비스 실행 ] ==== ==== ====");
+        log.debug(" ==== ==== ==== [ 기본 알람 설정 생성 서비스 실행 ] ==== ==== ====");
         List<UserNotification> list = new ArrayList<>();
         for (TopicEnum topicEnum : TopicEnum.values()) {
             list.add(UserNotification.builder()
