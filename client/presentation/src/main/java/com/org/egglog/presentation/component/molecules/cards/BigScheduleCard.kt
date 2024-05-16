@@ -94,7 +94,7 @@ fun BigScheduleCard(eventData: EventListData, color: Color? = Gray100, onClickDe
             Column() {
                 Text(text = cardContent.title, style = Typography.bodyLarge.copy(fontSize = 18.sp))
                 Spacer(modifier = Modifier.height(6.dp))
-                    Text(eventData.eventContent, style = Typography.displayMedium)
+                    Text(eventData.eventContent ?: "", style = Typography.displayMedium)
                 }
                 if(cardContent.imageName != "") {
                     LocalImageLoader(imageUrl = cardContent.imageName, Modifier.size(42.widthPercent(context).dp))

@@ -34,7 +34,6 @@ import java.time.LocalTime
 
 @Composable
 fun WorkSettingScreen(
-    alarmManager: AlarmManager,
     viewModel: WorkSettingViewModel = hiltViewModel()
 ) {
     val state = viewModel.collectAsState().value
@@ -66,7 +65,7 @@ fun WorkSettingScreen(
         onSelected = viewModel::onSelected,
         selectedWorkType = state.selectedWorkType,
         deleteSelectedWorkType = viewModel::deleteSelectedWorkType,
-        alarmManager = alarmManager
+        setAlarm = viewModel::setAlarm
     )
 }
 
@@ -92,7 +91,7 @@ fun WorkSettingScreen(
     onSelected: (String, WorkType) -> Unit,
     selectedWorkType: WorkType?,
     deleteSelectedWorkType: () -> Unit,
-    alarmManager: AlarmManager
+    setAlarm: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
@@ -141,7 +140,12 @@ fun WorkSettingScreen(
                     addEnabled = addEnabled,
                     deleteSelectedWorkType = deleteSelectedWorkType
                 ) },
-            secendContent = { AlarmManager(alarmManager) })
+            secendContent = {
+                AlarmManager(
+                    setAlarm = setAlarm
+                )
+            }
+        )
     }
 }
 

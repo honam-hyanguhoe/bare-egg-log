@@ -1,8 +1,10 @@
 package com.org.egglog.presentation.domain.setting.viewmodel
 
+import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
+import com.org.egglog.domain.scheduler.SchedulerUseCase
 import com.org.egglog.domain.setting.model.WorkType
 import com.org.egglog.domain.setting.model.WorkTypeParam
 import com.org.egglog.domain.setting.usecase.DeleteWorkTypeUseCase
@@ -19,6 +21,7 @@ import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
+import java.time.LocalDateTime
 import java.time.LocalTime
 import javax.annotation.concurrent.Immutable
 import javax.inject.Inject
@@ -29,7 +32,8 @@ class WorkSettingViewModel @Inject constructor(
     private val getWorkTypeListUseCase: GetWorkTypeListUseCase,
     private val postWorkTypeUseCase: PostWorkTypeUseCase,
     private val updateWorkTypeUseCase: UpdateWorkTypeUseCase,
-    private val deleteWorkTypeUseCase: DeleteWorkTypeUseCase
+    private val deleteWorkTypeUseCase: DeleteWorkTypeUseCase,
+    private val schedulerUseCase: SchedulerUseCase
 ): ViewModel(), ContainerHost<WorkSettingState, WorkSettingSideEffect>{
     override val container: Container<WorkSettingState, WorkSettingSideEffect> = container(
         initialState = WorkSettingState(),
@@ -83,6 +87,10 @@ class WorkSettingViewModel @Inject constructor(
         } else if(selected == "수정") {
             reduce { state.copy(selectedWorkType = workType, showModifyBottomSheet = true, title = workType.title, color =  workType.color) }
         }
+    }
+
+    fun setAlarm() = intent {
+        schedulerUseCase.setAlarm(curRepeatCount = 0, repeatCount = 3, time = LocalTime.of(17, 55), minutesToAdd = 2L, targetDateTime = LocalDateTime.now(), key = 1)
     }
 
     @OptIn(OrbitExperimental::class)
