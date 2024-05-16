@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import java.time.LocalTime
 
 class StopServiceReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
@@ -15,6 +16,10 @@ class StopServiceReceiver : BroadcastReceiver() {
 
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         AlarmConst.cancelAllAlarms(context, alarmManager)
-        Log.e("AlarmTest", "All alarms have been canceled.")
+
+        val initialTime = LocalTime.parse(intent?.getStringExtra(AlarmConst.INITIAL_TIME)) ?: return
+        AlarmConst.setDailyAlarm(context, alarmManager, initialTime)
+
+        Log.e("AlarmTest", "All alarms have been canceled and daily alarm reset.")
     }
 }

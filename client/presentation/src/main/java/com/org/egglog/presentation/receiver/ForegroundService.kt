@@ -34,8 +34,7 @@ class ForegroundService : Service() {
         val formatter = DateTimeFormatter.ofPattern("HH:mm")
         val repeatCount = intent?.getIntExtra(AlarmConst.REPEAT_COUNT, 0) ?: 0
         val curRepeatCount = intent?.getIntExtra(AlarmConst.CUR_REPEAT_COUNT, repeatCount) ?: repeatCount
-        val initialTime = LocalTime.of(intent?.getIntExtra(AlarmConst.INTERVAL_HOUR, 0) ?: 0,
-            intent?.getIntExtra(AlarmConst.INTERVAL_MINUTE, 0) ?: 0)
+        val initialTime = LocalTime.parse(intent?.getStringExtra(AlarmConst.INITIAL_TIME)) ?: LocalTime.of(0, 0)
         val minutesToAdd = intent?.getLongExtra(AlarmConst.MINUTES_TO_ADD, 5) ?: 5L
         stopByUser = intent?.getBooleanExtra(AlarmConst.STOP_BY_USER, false) ?: false
 
@@ -56,6 +55,7 @@ class ForegroundService : Service() {
 
         val stopIntent = Intent(this, StopServiceReceiver::class.java).apply {
             putExtra(AlarmConst.STOP_BY_USER, true)
+            putExtra(AlarmConst.INITIAL_TIME, initialTime.toString())
         }
         val pendingIntent = PendingIntent.getBroadcast(this, 0, stopIntent, PendingIntent.FLAG_IMMUTABLE)
 
@@ -87,13 +87,10 @@ class ForegroundService : Service() {
     private fun stopSelfInOneMinute(curRepeatCount: Int, repeatCount: Int, initialTime: LocalTime, minutesToAdd: Long) {
         val handler = Handler(mainLooper)
         handler.postDelayed({
-            if (!stopByUser) {
-                stopSelf()
-                if (curRepeatCount < repeatCount) {
-                    val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                    val nextTime = initialTime.plusMinutes(minutesToAdd)
-                    AlarmConst.setAlarm(context = this, alarmManager = alarmManager, repeatCount = repeatCount, time = nextTime, curRepeatCount = curRepeatCount + 1, minutesToAdd = minutesToAdd)
-                }
+            stopSelf()
+            if (!stopByUser && curRepeatCount < repeatCount) {
+                val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                AlarmConst.setOneTimeAlarm(context = this, alarmManager = alarmManager, repeatCount = repeatCount, initialTime = initialTime, curRepeatCount = curRepeatCount + 1, minutesToAdd = minutesToAdd)
             }
         }, 60000) // 60000 ms == 1 minute
     }
