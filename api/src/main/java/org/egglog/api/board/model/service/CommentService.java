@@ -133,7 +133,7 @@ public class CommentService {
 
         try {
             Comment saveComment = commentRepository.save(comment);
-            notificationService.registerCommentNotification(board, saveComment, comment);
+            notificationService.registerCommentNotification(board, saveComment);
         } catch (DataAccessException e) {
             throw new CommentException(CommentErrorCode.DATABASE_CONNECTION_FAILED);
         } catch (Exception e) {
