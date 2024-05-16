@@ -125,5 +125,8 @@ dependencies {
     // ui controller
     implementation(libs.accompanist.insets)
 
+    // refresh
+    implementation(libs.accompanist.swiperefresh)
+
     implementation(project(":domain"))
 }

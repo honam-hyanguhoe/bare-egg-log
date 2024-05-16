@@ -16,7 +16,10 @@ import com.org.egglog.presentation.data.toUiModel
 import com.org.egglog.presentation.domain.setting.viewmodel.SettingSideEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
@@ -45,6 +48,9 @@ class PostListViewModel @Inject constructor(
     private var groupId: Int? = null
     private var hospitalId: Int? = null
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
     override val container: Container<PostListState, PostListSideEffect> = container(
         initialState = PostListState(),
         buildSettings = {
@@ -65,14 +71,9 @@ class PostListViewModel @Inject constructor(
         val userInfo = getUserUseCase("Bearer $accessToken").getOrThrow()
 
         Log.e("PostListViewModel", "token은 ${accessToken}")
-        hotPostList = getHotPostListUseCase("Bearer ${accessToken}").map {
-            it.map {
-                it!!.toUiModel()
-            }
-        }.getOrDefault(listOf())
 
-        val postListFlow = getPostListUseCase("Bearer ${accessToken}", state.hospitalId, state.groupId, state.searchWord
-        ).getOrThrow()
+        getHotPostList()
+        getPostList()
 
         groupList = getCommunityGroupUseCase("Bearer ${accessToken}").map{ it.toUiModel()}.getOrThrow()
 
@@ -88,9 +89,41 @@ class PostListViewModel @Inject constructor(
         reduce {
             state.copy(
                 isHospitalAuth =  userInfo?.hospitalAuth != null,
-                hotPostList = if(hotPostList.isEmpty()) listOf() else hotPostList,
-                postListFlow = postListFlow!!,
                 categoryList = if(categoryList.isEmpty()) listOf((0 to "전체")) else categoryList
+            )
+        }
+    }
+
+    fun refreshSomething() = intent {
+        _isLoading.value = true
+        delay(1000L)
+        _isLoading.value = false
+
+        getHotPostList()
+        getPostList()
+    }
+
+    fun getHotPostList() = intent {
+        hotPostList = getHotPostListUseCase("Bearer ${accessToken}").map {
+            it.map {
+                it!!.toUiModel()
+            }
+        }.getOrDefault(listOf())
+
+        reduce {
+            state.copy(
+                hotPostList = if(hotPostList.isEmpty()) listOf() else hotPostList,
+            )
+        }
+    }
+
+    fun getPostList() = intent {
+        val postListFlow = getPostListUseCase("Bearer ${accessToken}", state.hospitalId, state.groupId, state.searchWord
+        ).getOrThrow()
+
+        reduce {
+            state.copy(
+                postListFlow = postListFlow!!
             )
         }
     }
