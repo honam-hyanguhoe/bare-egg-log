@@ -50,6 +50,7 @@ import org.orbitmvi.orbit.viewmodel.container
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
@@ -114,7 +115,8 @@ class GroupDetailViewModel @Inject constructor(
 
         reduce {
             state.copy(
-                selectedWorkDate = selected
+                selectedWorkDate = selected,
+
             )
         }
     }
@@ -154,9 +156,11 @@ class GroupDetailViewModel @Inject constructor(
             newGroupWorkList = newGroupWorkList +  memberWork
         }
 
-        state.copy(
-            groupWorkList = newGroupWorkList
-        )
+        reduce {
+            state.copy(
+                groupWorkList = newGroupWorkList
+            )
+        }
         Log.d("date group", "get ${state.groupWorkList}")
     }
 

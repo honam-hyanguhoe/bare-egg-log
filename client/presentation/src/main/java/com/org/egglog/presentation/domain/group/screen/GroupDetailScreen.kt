@@ -954,6 +954,9 @@ private fun MemberCalendar(
     val currentYear = remember { mutableStateOf(Calendar.getInstance().get(Calendar.YEAR)) }
     val currentMonth = remember { mutableStateOf(Calendar.getInstance().get(Calendar.MONTH) + 1) }
 
+    currentYear.value = selectedWorkDate!!.year
+    currentMonth.value = selectedWorkDate.monthValue
+    Log.d("date group", "current $currentYear  $currentMonth")
 //    val workList = myWorkList + groupWorkList
 
     Column(
