@@ -57,6 +57,7 @@ public class NotificationService {
     //설정 생성
     @Transactional
     public void makeDefaultNotification(User loginUser){
+        log.debug(" ==== ==== ==== [ 기본 알람 설정 생성 조회 서비스 실행 ] ==== ==== ====");
         List<UserNotification> list = new ArrayList<>();
         for (TopicEnum topicEnum : TopicEnum.values()) {
             list.add(UserNotification.builder()
@@ -72,6 +73,7 @@ public class NotificationService {
 //    상태 변경
     @Transactional
     public List<NotificationResponse> updateNotification (List<NotificationRequest> requests, User loginUser){
+        log.debug(" ==== ==== ==== [ 알림 설정 변경 서비스 실행 ] ==== ==== ====");
         //todo : 상태변경 후 해당 구독 취소, 구독 을 하는 로직 필요
         Map<Long, UserNotification> notificationMap = notificationRepository.findMapByUser(loginUser);
         ArrayList<UserNotification> notificationList = new ArrayList<>();
@@ -115,6 +117,7 @@ public class NotificationService {
     //현재 상태 조회
     @Transactional
     public List<NotificationResponse> findNotificationList(User loginUser){
+        log.debug(" ==== ==== ==== [ 알림 설정 리스트 조회 서비스 실행 ] ==== ==== ====");
         return notificationRepository.findListByUser(loginUser)
                 .stream()
                 .map(UserNotification::toResponse)
@@ -123,6 +126,7 @@ public class NotificationService {
 
     @Transactional
     public void updateTopicSubscribeState(String oldToken, User loginUser){
+        log.debug(" ==== ==== ==== [ 토픽 재구독 서비스 실행 ] ==== ==== ====");
         //현재 토픽 알림은 그룹 밖에 없다. 나중에 수정 필요.... 전체 토픽으로 설정된 값을 재 구독하는 방식으로..
         List<GroupPreviewDto> groupByUserId = groupRepository.findGroupByUserId(loginUser.getId());
         UserNotification groupNotification = notificationRepository.findByTypeAndUser(TopicEnum.GROUP, loginUser)
@@ -143,6 +147,7 @@ public class NotificationService {
 
     @Transactional
     public void groupMemberAcceptNotification(User user, Group group) {
+        log.debug(" ==== ==== ==== [ 그룹 멤버 가입 알림 및 구독 서비스 실행 ] ==== ==== ====");
         //1. 그룹에 새 멤버가 추가되었다면 해당 그룹 토픽으로 FCM 알림 발송
         FCMTopic topic = FCMTopic.builder()
                 .topic(TopicEnum.GROUP)
@@ -163,6 +168,7 @@ public class NotificationService {
 
     @Transactional
     public void createGroupNotification(User loginUser, Group group){
+        log.debug(" ==== ==== ==== [ 그룹 멤버 가입 구독 서비스 실행 ] ==== ==== ====");
         FCMTopic topic = FCMTopic.builder()
                 .topic(TopicEnum.GROUP)
                 .topicId(group.getId())
@@ -174,6 +180,7 @@ public class NotificationService {
     }
     @Transactional
     public void exitGroupNotification(User user, Long groupId){
+        log.debug(" ==== ==== ==== [ 그룹 멤버 탈퇴 구독 취소 서비스 실행 ] ==== ==== ====");
         String userDeviceToken = user.getDeviceToken();
         FCMTopic topic = FCMTopic.builder()
                 .topic(TopicEnum.GROUP)
@@ -186,6 +193,7 @@ public class NotificationService {
 
     @Transactional
     public void deleteGroupMemberNotification(Long groupId, GroupMember member) {
+        log.debug(" ==== ==== ==== [ 그룹 멤버 탈퇴 구독 취소 및 알림 서비스 실행 ] ==== ==== ====");
         //해당 멤버가 삭제되었다면 해당 유저의 토픽 구독 취소
         String userDeviceToken = member.getUser().getDeviceToken();
         //알림을 거부했는지 확인
@@ -209,6 +217,7 @@ public class NotificationService {
 
     @Transactional
     public void registerBoardNotification(BoardForm boardForm, Board saveBoard, Group group) {
+        log.debug(" ==== ==== ==== [ 그룹 커뮤니티 새 글 알림 서비스 실행 ] ==== ==== ====");
         if (saveBoard.getBoardType().equals(BoardType.GROUP) && group != null) {
             //그룹 게시판에 글이 등록되었다면 푸시알림 발송
             FCMTopic topic = FCMTopic.builder()
@@ -226,6 +235,7 @@ public class NotificationService {
 
     @Transactional
     public void hotBoardNotification(Board board){
+        log.debug(" ==== ==== ==== [ 실시간 게시판 등록 알림 서비스 실행 ] ==== ==== ====");
         //1. 해당 글이 실시간 급상승 게시판에 등록되면 글 작성자에게 푸시알림 발송
         UserNotification userNotification = notificationRepository
                 .findByTypeAndUser(TopicEnum.BOARD, board.getUser()).orElseThrow(() -> new NotificationException(NotificationErrorCode.NOTIFICATION_SERVER_ERROR));
@@ -241,12 +251,13 @@ public class NotificationService {
 
 
     @Transactional
-    public void registerCommentNotification(Board board, Comment saveComment, Comment comment) {
+    public void registerCommentNotification(Board board, Comment saveComment) {
+        log.debug(" ==== ==== ==== [ 댓글 등록 알림 서비스 실행 ] ==== ==== ====");
         UserNotification userNotification = notificationRepository
                 .findByTypeAndUser(TopicEnum.BOARD, board.getUser()).orElseThrow(() -> new NotificationException(NotificationErrorCode.NOTIFICATION_SERVER_ERROR));
         //1. 해당 글에 댓글이 등록되었다면 글 작성자에게 푸시알림 발송
         String deviceToken = board.getUser().getDeviceToken();
-        if (deviceToken!=null&&userNotification.getStatus()){
+        if (deviceToken!=null&&userNotification.getStatus()&&!board.getUser().equals(saveComment.getUser())){
             Notification notification = Notification.builder()
                     .setTitle("[EGGLOG] 커뮤니티 글에 새 댓글이 달렸습니다.")
                     .setBody(saveComment.getContent())
@@ -256,7 +267,7 @@ public class NotificationService {
 
 
         // 2. 대 댓글이라면 부모 ID 작성자에게도 알림을 보낸다.
-        Long parentId = comment.getParentId();
+        Long parentId = saveComment.getParentId();
         if (!parentId.equals(0L)&&!parentId.equals(board.getUser().getId())){//대 댓글이면서 부모 댓글의 아이디가 글 작성자가 아닐때만 발송한다.
             Comment cocoment = commentRepository.findWithUserById(parentId).orElseThrow(
                     () -> new CommentException(CommentErrorCode.NO_EXIST_COMMENT));
