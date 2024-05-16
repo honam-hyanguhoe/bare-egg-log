@@ -14,6 +14,7 @@ import org.egglog.api.group.model.dto.response.GroupPreviewDto;
 import org.egglog.api.group.model.entity.Group;
 import org.egglog.api.group.model.entity.GroupMember;
 import org.egglog.api.group.repository.jpa.GroupRepository;
+import org.egglog.api.hospital.model.entity.HospitalAuth;
 import org.egglog.api.notification.exception.NotificationErrorCode;
 import org.egglog.api.notification.exception.NotificationException;
 import org.egglog.api.notification.model.dto.request.NotificationRequest;
@@ -282,5 +283,22 @@ public class NotificationService {
                 fcmService.sendPersonalNotification(cocomentDeviceToken, notification);
             }
         }
+    }
+
+
+    @Transactional
+    public void certHospitalNotification(HospitalAuth hospitalAuth){
+        log.debug(" ==== ==== ==== [ 재직 인증 승인 알림 서비스 실행 ] ==== ==== ====");
+        User user = hospitalAuth.getUser();
+        String deviceToken = user.getDeviceToken();
+        UserNotification userNotification = notificationRepository.findByTypeAndUser(TopicEnum.SYSTEM, user).orElseThrow(
+                () -> new CommentException(CommentErrorCode.NO_EXIST_COMMENT));
+        if (deviceToken!=null&&userNotification.getStatus()){
+            Notification notification = Notification.builder()
+                    .setTitle("[EGGLOG] 새 인증 정보 알림")
+                    .setBody(hospitalAuth.getHospital() + "의 재직 및 간호 인증이 완료 되었습니다..")
+                    .build();
+            fcmService.sendPersonalNotification(deviceToken, notification);
+            }
     }
 }
