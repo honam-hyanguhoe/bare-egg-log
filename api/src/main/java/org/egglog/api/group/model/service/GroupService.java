@@ -342,7 +342,7 @@ public class GroupService {
      * @param user
      * @return
      */
-    public List<GroupDutySaveFormat> getGroupDutyList(User user, String date) {
+    public List<GroupDutyDto> getGroupDutyList(User user, String date) {
         List<Long> groupList = groupMemberService.getUserGroupIdList(user.getId());
         try{
             return groupDutyRepository.getDutyListByGroupIdList(groupList,date);

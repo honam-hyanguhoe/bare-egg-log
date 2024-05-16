@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.group.model.dto.request.CustomWorkTag;
 import org.egglog.api.group.model.dto.request.GroupDutyData;
 import org.egglog.api.group.model.dto.request.GroupDutySaveFormat;
+import org.egglog.api.group.model.dto.response.GroupDutyDataDto;
+import org.egglog.api.group.model.dto.response.GroupDutyDto;
 import org.egglog.api.worktype.model.entity.WorkTag;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
@@ -99,9 +101,9 @@ public class GroupDutyRepository {
         return new CustomWorkTag();
     }
 
-    public List<GroupDutySaveFormat> getDutyListByGroupIdList(List<Long> groupList, String date) throws ExecutionException, InterruptedException {
+    public List<GroupDutyDto> getDutyListByGroupIdList(List<Long> groupList, String date) throws ExecutionException, InterruptedException {
         log.debug("=== find group duty list ===");
-        List<GroupDutySaveFormat> groupDutyList=new ArrayList<>();
+        List<GroupDutyDto> groupDutyList=new ArrayList<>();
         for (Long groupId : groupList) {
             CollectionReference dutyDataDoc = firestore.collection("duty")
                     .document(String.valueOf(groupId))
@@ -116,7 +118,18 @@ public class GroupDutyRepository {
                 log.debug(doc.toString());
                 GroupDutySaveFormat duty = doc.toObject(GroupDutySaveFormat.class);
                 if(duty != null){
-                    groupDutyList.add(duty);
+                    GroupDutyDto dutyDto = GroupDutyDto.builder()
+                            .day(duty.getDay())
+                            .userName(duty.getUserName())
+                            .dutyData(GroupDutyDataDto.builder()
+                                    .dutyList(duty.getDutyList())
+                                    .customWorkTag(duty.getCustomWorkTag())
+                                    .groupId(String.valueOf(groupId))
+                                    .date(date)
+                                    .index(doc.getId())
+                                    .build())
+                            .build();
+                    groupDutyList.add(dutyDto);
                 }
             }
         }
