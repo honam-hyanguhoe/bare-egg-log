@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,16 +36,17 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.org.egglog.presentation.theme.NaturalBlack
 
 
 enum class ComposePinInputStyle {
     BOX,
     UNDERLINE
 }
-
 @Composable
 public fun ComposePinInput(
     value: String,
@@ -68,14 +70,15 @@ public fun ComposePinInput(
     borderThickness: Dp = 2.dp,
     style: ComposePinInputStyle = ComposePinInputStyle.BOX
 ) {
-
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusedState = remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { focusRequester.requestFocus() }
     ) {
         BasicTextField(
             value = value,
@@ -84,6 +87,7 @@ public fun ComposePinInput(
                     onValueChange(text)
                     if (text.length == maxSize) {
                         onPinEntered?.invoke(text)
+                        keyboardController?.hide()
                     }
                 }
             },
@@ -95,102 +99,56 @@ public fun ComposePinInput(
                 keyboardController?.hide()
             }),
             modifier = Modifier
-                .alpha(0.01f)
+                .focusRequester(focusRequester)
                 .onFocusChanged {
                     focusedState.value = it.isFocused
                 }
-                .focusRequester(focusRequester),
-
-            textStyle = TextStyle.Default.copy(color = Color.Transparent),
-
-            )
+                .offset { IntOffset.Zero }
+                .alpha(0.01f),
+            textStyle = TextStyle.Default.copy(color = Color.Transparent)
+        )
 
         // UI for the Pin
-        val boxWidth = cellSize
         Row(
             horizontalArrangement = Arrangement.spacedBy(cellPadding),
-            modifier = Modifier
-                .padding(rowPadding)
+            modifier = Modifier.padding(rowPadding)
         ) {
             repeat(maxSize) { index ->
                 val isActiveBox = focusedState.value && index == value.length
 
-                if (style == ComposePinInputStyle.BOX) {
-                    // Box Style Pin field logic starts from here
-                    Box(
-                        modifier = Modifier
-                            .size(cellSize)
-                            .background(
-                                color = if (index < value.length) cellColorOnSelect else cellBackgroundColor,
-                                shape = cellShape
-                            )
-                            .border(
-                                width = cellBorderWidth,
-                                color = when {
-                                    isError -> errorBorderColor
-                                    isActiveBox -> focusedCellBorderColor
-                                    else -> cellBorderColor
-                                },
-                                shape = cellShape
-                            )
-                            .clickable(
-                                indication = null, // Disable ripple effect
-                                interactionSource = remember { MutableInteractionSource() }
-                            ) { focusRequester.requestFocus() }
-                    ) {
-                        if (index < value.length) {
-                            val displayChar = mask ?: value[index]
-                            Text(
-                                text = displayChar.toString(),
-                                modifier = Modifier.align(Alignment.Center),
-                                fontSize = textFontSize,
-                                color = fontColor
-                            )
-                        }
-                    }
-
-
-                } else {
-                    // Underline style logic here
-                    Box(
-                        modifier = Modifier
-                            .size(boxWidth, cellSize + borderThickness)
-                            .background(color = if (index < value.length) cellColorOnSelect else cellBackgroundColor)
-                            .clickable(
-                                indication = null, // Disable ripple effect
-                                interactionSource = remember { MutableInteractionSource() }
-                            ) { focusRequester.requestFocus() }
-                    ) {
-                        Canvas(modifier = Modifier.fillMaxSize(), onDraw = {
-                            drawLine(
-                                color = when {
-                                    isError -> errorBorderColor
-                                    isActiveBox -> focusedCellBorderColor
-                                    else -> cellBorderColor
-                                },
-                                start = Offset(x = 0f, y = size.height - borderThickness.toPx()),
-                                end = Offset(
-                                    x = size.width,
-                                    y = size.height - borderThickness.toPx()
-                                ),
-                                strokeWidth = borderThickness.toPx()
-                            )
-                        })
-
-                        if (index < value.length) {
-                            val displayChar = mask ?: value[index]
-                            val lineHeightDp: Dp = with(LocalDensity.current) {
-                                textFontSize.toDp()
-                            }
-                            Text(
-                                text = displayChar.toString(),
-                                modifier = Modifier
-                                    .align(Alignment.TopCenter)
-                                    .padding(top = (cellSize - lineHeightDp) / 2),
-                                fontSize = textFontSize,
-                                color = fontColor
-                            )
-                        }
+                Box(
+                    modifier = Modifier
+                        .size(cellSize)
+                        .background(
+                            color = if (index < value.length) cellColorOnSelect else cellBackgroundColor,
+                            shape = cellShape
+                        )
+                        .border(
+                            width = cellBorderWidth,
+                            color = when {
+                                isError -> errorBorderColor
+                                isActiveBox -> focusedCellBorderColor
+                                else -> cellBorderColor
+                            },
+                            shape = cellShape
+                        )
+                        .clickable(
+                            indication = null, // Disable ripple effect
+                            interactionSource = remember { MutableInteractionSource() }
+                        ) {
+                            onValueChange(value.take(index)) // Move cursor to the correct position
+                            focusRequester.requestFocus()
+                            keyboardController?.show()
+                        },
+                    contentAlignment = Alignment.Center // Center alignment for cursor
+                ) {
+                    if (index < value.length) {
+                        val displayChar = mask ?: value[index]
+                        Text(
+                            text = displayChar.toString(),
+                            fontSize = textFontSize,
+                            color = fontColor
+                        )
                     }
                 }
             }

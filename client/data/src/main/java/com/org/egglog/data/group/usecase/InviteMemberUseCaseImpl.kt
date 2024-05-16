@@ -28,7 +28,7 @@ class InviteMemberUseCaseImpl @Inject constructor(
 
         val response = groupService.inviteMember(accessToken, requestParam.toRequestBody())
 
-        response.dataBody
+        response.dataBody.toString()
     }
 
 }

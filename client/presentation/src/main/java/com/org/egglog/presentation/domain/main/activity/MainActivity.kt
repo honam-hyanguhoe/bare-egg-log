@@ -11,6 +11,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.lifecycleScope
+import com.org.egglog.presentation.domain.main.navigation.MainNavigationHost
 import com.org.egglog.presentation.domain.main.screen.MainScreen
 import com.org.egglog.presentation.domain.main.viewModel.MainViewModel
 import com.org.egglog.presentation.theme.ClientTheme
@@ -21,11 +22,10 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val deepLinkUri: Uri? = intent?.data
         setContent {
-            val data : Uri? = intent?.data
-            Log.d("Invite Link", data.toString())
             ClientTheme {
-                MainScreen()
+                MainNavigationHost(deepLinkUri)
             }
         }
     }

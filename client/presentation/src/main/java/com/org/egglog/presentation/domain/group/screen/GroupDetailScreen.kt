@@ -54,6 +54,7 @@ import com.google.android.datatransport.runtime.scheduling.jobscheduling.Uploade
 import com.org.egglog.client.ui.molecules.radioButtons.WorkRadioButton
 import com.org.egglog.domain.group.model.Member
 import com.org.egglog.presentation.R
+import com.org.egglog.presentation.component.atoms.buttons.CustomIconButton
 import com.org.egglog.presentation.component.atoms.buttons.GroupProfileButton
 import com.org.egglog.presentation.component.atoms.buttons.HalfBigButton
 import com.org.egglog.presentation.component.atoms.buttons.ThinButton
@@ -73,6 +74,7 @@ import com.org.egglog.presentation.domain.group.viewmodel.FileUploadViewModel
 import com.org.egglog.presentation.domain.group.viewmodel.GroupDetailSideEffect
 import com.org.egglog.presentation.domain.group.viewmodel.GroupDetailViewModel
 import com.org.egglog.presentation.theme.*
+import com.org.egglog.presentation.utils.ArrowDown
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
 import org.orbitmvi.orbit.compose.collectAsState
@@ -95,6 +97,7 @@ fun GroupDetailScreen(
     val selected = groupDetailViewModel.selected
     val showBottomSheet by groupDetailViewModel.showBottomSheet.collectAsState()
     val showUploadBottomSheet by groupDetailViewModel.showUploadBottomSheet.collectAsState()
+    val showDateBottomSheet by groupDetailViewModel.showDateBottomSheet.collectAsState()
     val showSecondUploadBottomSheet by groupDetailViewModel.showSecondUploadBottomSheet.collectAsState()
     val selectedDate = fileUploadViewModel.selectedDate
 
@@ -131,7 +134,7 @@ fun GroupDetailScreen(
     LaunchedEffect(Unit) {
         Log.d("groupDetailScreen", "가져올게")
         groupDetailViewModel.getGroupDuty()
-        groupDetailViewModel.getMyWork()
+        groupDetailViewModel.getMyWork(LocalDate.now())
         groupDetailViewModel.initSelectedMembers()
     }
 
@@ -139,6 +142,8 @@ fun GroupDetailScreen(
         groupDetailViewModel.setSelected(selected.value)
         Log.d("groupDetail", "radio ${selected.value}")
     }
+
+
 
     GroupDetailScreen(
         groupId = groupId,
@@ -165,6 +170,9 @@ fun GroupDetailScreen(
         showBottomSheet = showBottomSheet,
         setShowBottomSheet = groupDetailViewModel::setShowBottomSheet,
 
+        showDateBottomSheet = showDateBottomSheet,
+        setShowDateBottomSheet = groupDetailViewModel::setShowDateBottomSheet,
+
         showUploadBottomSheet = showUploadBottomSheet,
         setShowUploadBottomSheet = groupDetailViewModel::onClickUpload,
 
@@ -173,6 +181,10 @@ fun GroupDetailScreen(
         // settings
         tempGroupName = groupDetailState.tempGroupName,
         tempGroupPassword = groupDetailState.tempGroupPassword,
+
+        selectedWorkDate=  groupDetailState.selectedWorkDate,
+        setSelectedWorkDate = groupDetailViewModel::setSelectedWorkDate,
+        getSelectedDateWork = groupDetailViewModel::getSelectedDateWork,
 
         setSelectedDate = fileUploadViewModel::setSelectedDate,
         customDutyList = fileUploadState.customDutyList,
@@ -218,6 +230,11 @@ private fun GroupDetailScreen(
     showSecondUploadBottomSheet: Boolean,
     setShowSecondUploadBottomSheet: (Boolean) -> Unit,
 
+    getSelectedDateWork : () -> Unit,
+    selectedWorkDate: LocalDate?,
+    setSelectedWorkDate : (LocalDate?) -> Unit,
+    showDateBottomSheet: Boolean,
+    setShowDateBottomSheet: (Boolean) -> Unit,
     // 그룹 설정
     tempGroupName: String,
     tempGroupPassword: String,
@@ -323,7 +340,7 @@ private fun GroupDetailScreen(
         }
         item {
             Spacer(modifier = Modifier.height(30.dp))
-            MemberCalendar(myWorkList = myWorkList, groupWorkList = groupWorkList)
+            MemberCalendar(myWorkList = myWorkList, groupWorkList = groupWorkList, setShowDateBottomSheet = setShowDateBottomSheet, selectedWorkDate = selectedWorkDate)
         }
     }
 
@@ -373,7 +390,7 @@ private fun GroupDetailScreen(
     if (showUploadBottomSheet) {
         BottomSheet(
             height = 300.dp,
-            showBottomSheet = showBottomSheet,
+            showBottomSheet = showUploadBottomSheet,
             onDismiss = { setShowUploadBottomSheet(false) },
         ) {
             SelectDateBottomSheetContent(
@@ -387,6 +404,28 @@ private fun GroupDetailScreen(
                     setShowUploadBottomSheet(false)
                     setShowSecondUploadBottomSheet(true)
                 }
+            )
+        }
+    }
+
+    if (showDateBottomSheet) {
+        BottomSheet(
+            height = 300.dp,
+            showBottomSheet = showDateBottomSheet,
+            onDismiss = { setShowDateBottomSheet(false) },
+        ) {
+            SelectDateBottomSheetContent(
+                onDateTimeSelected = { date ->
+                    selectedDate = date
+                    setSelectedWorkDate(date)
+                },
+                onClickCancel = { setShowDateBottomSheet(false) },
+                onClickNext = {
+                    getSelectedDateWork()
+                    setShowDateBottomSheet(false)
+                },
+                title = "조회할 근무 날짜를 선택하세요",
+                buttonText = "완료"
             )
         }
     }
@@ -567,9 +606,11 @@ fun UploadFileBottomSheetContent(
 
 @Composable
 fun SelectDateBottomSheetContent(
+    title : String = "업로드할 근무 날짜를 선택하세요",
     onDateTimeSelected: (LocalDate) -> Unit,
     onClickNext: () -> Unit,
-    onClickCancel: () -> Unit
+    onClickCancel: () -> Unit,
+    buttonText : String = "다음"
 ) {
     val context = LocalContext.current
 
@@ -586,7 +627,7 @@ fun SelectDateBottomSheetContent(
             horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "업로드할 근무 날짜를 선택하세요", style = Typography.headlineSmall.copy(
+                text = title, style = Typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold, textAlign = TextAlign.Start
                 )
             )
@@ -628,7 +669,7 @@ fun SelectDateBottomSheetContent(
                 ) {
                     Text(
                         style = Typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                        text = "다음"
+                        text = buttonText
                     )
                 }
             }
@@ -906,23 +947,32 @@ private fun MembersCard(
 @Composable
 private fun MemberCalendar(
     myWorkList: Map<String, Map<String, String>>,
-    groupWorkList: Map<String, Map<String, String>>
+    groupWorkList: Map<String, Map<String, String>>,
+    setShowDateBottomSheet : (Boolean) -> Unit,
+    selectedWorkDate: LocalDate?
 ) {
     val currentYear = remember { mutableStateOf(Calendar.getInstance().get(Calendar.YEAR)) }
     val currentMonth = remember { mutableStateOf(Calendar.getInstance().get(Calendar.MONTH) + 1) }
 
-    val workList = myWorkList + groupWorkList
+//    val workList = myWorkList + groupWorkList
 
     Column(
         modifier = Modifier
             .width(340.widthPercent(LocalContext.current).dp)
             .padding(8.dp, 15.dp, 8.dp, 0.dp)
     ) {
-        Text(
-            text = "2024. 04", style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
-        )
+        Row(
+            modifier = Modifier,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "${selectedWorkDate!!.year}.${selectedWorkDate.monthValue}", style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
+            )
+            
+            CustomIconButton(size = 24.dp, imageVector = ArrowDown, color = NaturalBlack, onClick = { setShowDateBottomSheet(true) })
+        }
         Spacer(modifier = Modifier.height(10.dp))
-        GroupCalenar(currentYear = currentYear, currentMonth = currentMonth, workList)
+        GroupCalenar(currentYear = currentYear, currentMonth = currentMonth, myWorkList+groupWorkList)
     }
 }
 
@@ -930,4 +980,5 @@ private fun MemberCalendar(
 @Composable
 fun GroupDetailPreviewScreen() {
 //    GroupDetailScreen()
+//    MemberCalendar(myWorkList = emptyMap(), groupWorkList = emptyMap(), setShowDateBottomSheet= {})
 }

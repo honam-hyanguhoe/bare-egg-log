@@ -25,28 +25,60 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:host="oauth"
-                    android:scheme="@string/kakao_redirection_scheme" />
-                <data
-                    android:scheme="egglog"
-                    android:host="invite" />
+
+                <data android:scheme="@string/kakao_redirection_scheme" />
+                <data android:host="oauth" />
             </intent-filter>
         </activity>
 
         <!-- MAIN -->
-        <activity android:name=".domain.main.activity.MainActivity" android:hardwareAccelerated="true" />
+        <activity android:name=".domain.main.activity.MainActivity" android:hardwareAccelerated="true" android:exported="true">
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+
+                <data android:scheme="egglog" />
+                <data android:host="honam.com" />
+<!--                <data android:pathPrefix="/invite" />-->
+            </intent-filter>
+        </activity>
 
         <!-- SETTING -->
         <activity android:name=".domain.setting.activity.SettingActivity" />
 
 <!--        <activity android:name=".domain.community.posteditor.activity.PostEditorActivity" />-->
-        <activity android:name=".domain.community.activity.CommunityActivity"/>
+        <activity android:name=".domain.community.activity.CommunityActivity">
+<!--            <intent-filter android:autoVerify="true">-->
+<!--                <action android:name="android.intent.action.VIEW" />-->
+
+<!--                <category android:name="android.intent.category.DEFAULT" />-->
+<!--                <category android:name="android.intent.category.BROWSABLE" />-->
+
+
+<!--                <data android:scheme="egglog" />-->
+<!--                <data android:host="honam.com" />-->
+<!--                <data android:pathPrefix="/invite" />-->
+<!--            </intent-filter>-->
+        </activity>
 
         <!-- GROUP -->
-        <activity android:name=".domain.group.activity.GroupActivity"/>
+        <activity android:name=".domain.group.activity.GroupActivity">
+<!--            <intent-filter android:autoVerify="true">-->
+<!--                <action android:name="android.intent.action.VIEW" />-->
+
+<!--                <category android:name="android.intent.category.DEFAULT" />-->
+<!--                <category android:name="android.intent.category.BROWSABLE" />-->
+<!--                <data android:scheme="egglog" />-->
+<!--                <data android:host="honam.com" />-->
+<!--                <data android:pathPrefix="/invite" />-->
+<!--            </intent-filter>-->
+        </activity>
 
         <!-- MY CALENDAR -->
         <activity android:name=".domain.myCalendar.activity.MyCalendarActivity" />

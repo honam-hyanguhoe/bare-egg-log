@@ -48,6 +48,8 @@ import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
 import java.time.LocalDate
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
@@ -83,6 +85,11 @@ class GroupDetailViewModel @Inject constructor(
     val showUploadBottomSheet : StateFlow<Boolean> = _showUploadBottomSheet.asStateFlow()
     private val _showSecondUploadBottomSheet = MutableStateFlow(false)
     val showSecondUploadBottomSheet : StateFlow<Boolean> = _showSecondUploadBottomSheet.asStateFlow()
+    private val _showDateBottomSheet = MutableStateFlow(false)
+    val showDateBottomSheet : StateFlow<Boolean> = _showDateBottomSheet.asStateFlow()
+    private val _selectedDate = MutableStateFlow<LocalDate?>(null)
+    val selectedDate : StateFlow<LocalDate?> = _selectedDate.asStateFlow()
+
     init {
         loadInit()
     }
@@ -101,11 +108,24 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
+    fun setSelectedWorkDate(selected: LocalDate?) = intent{
+        _selectedDate.value = selected
+        Log.d("group", "selected $selected")
+
+        reduce {
+            state.copy(
+                selectedWorkDate = selected
+            )
+        }
+    }
 
     fun setShowBottomSheet(show: Boolean) {
         _showBottomSheet.value = show
     }
 
+    fun setShowDateBottomSheet(show: Boolean) {
+        _showDateBottomSheet.value = show
+    }
     fun setSelected(newValue: String) = intent {
         reduce { state.copy(dutyType = newValue) }
         updateData()
@@ -119,7 +139,26 @@ class GroupDetailViewModel @Inject constructor(
         _showSecondUploadBottomSheet.value = show
     }
 
+    fun getSelectedDateWork() = intent {
 
+        Log.d("date group", "선택한 날짜 ${state.selectedWorkDate}")
+        getMyWork(state.selectedWorkDate)
+
+        Log.d("date group", "선택한 날짜 - 내 근무 ${state.myWorkList}")
+        val currentMembers = state.selectedMembers
+        var newGroupWorkList : Map<String, Map<String, String>> = emptyMap()
+
+        currentMembers.forEach { member ->
+            val memberWork = getGroupWork(member.userId, member.userName, state.selectedWorkDate)
+            Log.d("date group", "memberWork ${memberWork}")
+            newGroupWorkList = newGroupWorkList +  memberWork
+        }
+
+        state.copy(
+            groupWorkList = newGroupWorkList
+        )
+        Log.d("date group", "get ${state.groupWorkList}")
+    }
 
     // 멤버 선택 근무 일정 조회
     fun toggleMemberSelection(member: Member) {
@@ -136,7 +175,7 @@ class GroupDetailViewModel @Inject constructor(
             } else if (currentMembers.size < 3) {
                 newMembers = currentMembers + member
                 newGroupWorkList =
-                    currentGroupWorkList + getGroupWork(member.userId, member.userName)
+                    currentGroupWorkList + getGroupWork(member.userId, member.userName, state.selectedWorkDate)
             } else {
                 newMembers = currentMembers
                 newGroupWorkList = currentGroupWorkList
@@ -144,9 +183,12 @@ class GroupDetailViewModel @Inject constructor(
             reduce {
                 state.copy(selectedMembers = newMembers, groupWorkList = newGroupWorkList)
             }
+
+            Log.d("date group", "gwl ${state.groupWorkList}")
         }
     }
-
+    
+    // 근무 값 보정
     private fun formatWork(
         weeklyWork: WeeklyWork?,
         userName: String
@@ -168,13 +210,15 @@ class GroupDetailViewModel @Inject constructor(
         return mapOf(userName to workMap)
     }
 
-    fun getMyWork() = intent {
+    suspend fun getMyWork(date : LocalDate?) = intent {
         val tokens = getTokenUseCase()
         val user = getUserStoreUseCase()
+        
+        val tempStartAndEndDate = getStartAndEndOfMonth(date!!.year, date.monthValue )
+        val tempStartDate = tempStartAndEndDate.first
+        val tempEnddate = tempStartAndEndDate.second
+        Log.d("date group", "mymymym $tempStartDate -- $tempEnddate")
 
-        val tempStartDate =
-            dataSource.getStartOfMonth(LocalDate.now().year, LocalDate.now().monthValue)
-        val tempEnddate = dataSource.getEndOfMonth(LocalDate.now().year, LocalDate.now().monthValue)
 
         val result = getWeeklyWorkUseCase(
             accessToken = "Bearer ${tokens.first}",
@@ -185,21 +229,33 @@ class GroupDetailViewModel @Inject constructor(
 
         val userName = getUserStoreUseCase()!!.userName
         val scheduleWork = formatWork(result, userName)
-
+        Log.d("date group", "sw ${scheduleWork}")
         reduce {
             state.copy(myWorkList = scheduleWork)
         }
-        Log.d("weekCal", "${state.myWorkList}")
     }
 
+    // 년, 월이 주어졌을 때 시작일과 마지막 일 구하기
+    fun getStartAndEndOfMonth(year: Int, month: Int): Pair<String, String> {
+        val yearMonth = YearMonth.of(year, month)
+        val startDate = yearMonth.atDay(1)
+        val endDate = yearMonth.atEndOfMonth()
+
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val formattedStartDate = startDate.format(formatter)
+        val formattedEndDate = endDate.format(formatter)
+
+        return Pair(formattedStartDate, formattedEndDate)
+    }
 
     // 선택한 유저의 근무일정 조회
-    suspend fun getGroupWork(userId: Long, userName: String): Map<String, Map<String, String>> {
+    suspend fun getGroupWork(userId: Long, userName: String, date : LocalDate?): Map<String, Map<String, String>>  {
         val tokens = getTokenUseCase()
 
-        val tempStartDate =
-            dataSource.getStartOfMonth(LocalDate.now().year, LocalDate.now().monthValue)
-        val tempEnddate = dataSource.getEndOfMonth(LocalDate.now().year, LocalDate.now().monthValue)
+        val tempStartAndEndDate = getStartAndEndOfMonth(date!!.year, date.monthValue )
+        val tempStartDate = tempStartAndEndDate.first
+        val tempEnddate = tempStartAndEndDate.second
+        Log.d("date group", "$tempStartDate -- $tempEnddate")
 
         val result = getMembersWorkUseCase(
             accessToken = "Bearer ${tokens.first}",
@@ -234,11 +290,6 @@ class GroupDetailViewModel @Inject constructor(
     // 주간 달력 터치 & 함께 일하는 동료 조회
     fun onPrevClick(clickedDate: LocalDate) = intent {
         val finalStartDate = dataSource.getStartOfWeek(clickedDate)
-//        val calendarUiModel: WeeklyUiModel =
-//            dataSource.getData(
-//                startDate = finalStartDate.minusDays(2),
-//                lastSelectedDate = finalStartDate
-//            )
         val calendarUiModel = dataSource.getData(startDate = finalStartDate, lastSelectedDate = finalStartDate)
 
         reduce {
@@ -252,18 +303,7 @@ class GroupDetailViewModel @Inject constructor(
         }
         Log.d("weekCal", "${state.startDate} ${state.endDate}")
         getGroupDuty()
-
         val userName = getUserStoreUseCase()!!.userName
-
-//        Log.d("weekCal", "myWork ${state.myWorkList} ${clickedDate.toString()}")
-//        val todayWork = state.myWorkList[userName]?.get(clickedDate.toString()) ?: "NONE"
-//        Log.d("weekCal", "works $todayWork  ${state.myWorkList[userName]?.get("2024-05-05")}")
-//
-//        if(todayWork == "NONE"){
-//            setSelected("Day")
-//        }else{
-//            setSelected(capitalizeFirstLetter(todayWork))
-//        }
     }
 
     fun capitalizeFirstLetter(input: String): String {
@@ -367,7 +407,8 @@ class GroupDetailViewModel @Inject constructor(
         val invitationCode = getInvitationCode()
 
         Log.d("Invite Link", invitationCode)
-        val invitationLink = "egglog://invite?code=${invitationCode}"
+        val invitationLink = "egglog://honam.com/invite/${invitationCode}/${state.groupInfo.groupName}"
+        Log.d("Invite Link", "link $invitationLink")
         // 수정 예정
         val clip = ClipData.newPlainText("Invite Link", invitationLink)
         clipboard.setPrimaryClip(clip)
@@ -434,8 +475,6 @@ class GroupDetailViewModel @Inject constructor(
             )
         }
     }
-
-
 
 
     // 그룹원 관리
@@ -547,10 +586,10 @@ data class GroupDetailState(
     val etc: List<Member> = emptyList(),
     val selectedDuty: List<Member> = emptyList(),
 
-    // invitation
-    val invitationCode: String = "",
+
 
     // 선택한 멤버 근무 조회
+    val selectedWorkDate : LocalDate? = LocalDate.now(),
     val selectedMembers: List<Member> = emptyList(),
     val myWorkList: Map<String, Map<String, String>> = emptyMap(),
     val groupWorkList: Map<String, Map<String, String>> = emptyMap()

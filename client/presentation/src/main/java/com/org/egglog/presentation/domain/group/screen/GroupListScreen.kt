@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,11 +20,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -52,9 +60,12 @@ import com.org.egglog.presentation.domain.setting.activity.SettingActivity
 import com.org.egglog.presentation.theme.*
 import com.org.egglog.presentation.utils.AddBox
 import com.org.egglog.presentation.utils.widthPercent
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GroupListScreen(
     groupListViewModel: GroupListViewModel = hiltViewModel(),
@@ -109,6 +120,18 @@ fun GroupListScreen(
         }
     }
 
+//    val pullToRefreshState = rememberPullToRefreshState()
+//    var isRefreshing by remember { mutableStateOf(false) }
+//
+//    val refresh = @androidx.compose.runtime.Composable {
+//        isRefreshing = true
+//        LaunchedEffect(Unit) {
+//            delay(2000)
+//            isRefreshing = false
+//        }
+//    }
+
+
     GroupListScreen(
         groupList = groupListState.groupList,
         selectedIdx = groupListState.selectedIdx,
@@ -124,6 +147,7 @@ fun GroupListScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun GroupListScreen(
     groupList: List<Group>,
@@ -140,6 +164,7 @@ private fun GroupListScreen(
 ) {
     Column(
         modifier = Modifier
+
             .background(NaturalWhite)
             .fillMaxSize()
             .systemBarsPadding(),

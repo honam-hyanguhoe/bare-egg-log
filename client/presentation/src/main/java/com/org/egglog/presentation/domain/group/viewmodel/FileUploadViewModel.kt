@@ -57,6 +57,7 @@ class FileUploadViewModel @Inject constructor(
             )
         }
     }
+
     fun onChangeFileDay(value : String) = blockingIntent {
         reduce {
             val updateCustomDutyList = state.customDutyList.toMutableMap()
