@@ -232,6 +232,7 @@ class MyCalendarViewModel @Inject constructor(
         }
 
         getWorkList()
+        getPersonalList()
 
         if (state.currentMonth == 1) {
             reduce {
@@ -256,6 +257,7 @@ class MyCalendarViewModel @Inject constructor(
         }
 
         getWorkList()
+        getPersonalList()
 
         if (state.currentMonth == 12) {
             reduce {
