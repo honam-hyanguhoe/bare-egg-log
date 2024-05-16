@@ -187,7 +187,11 @@ fun MyCalendarScreen(
         onCancelWorkSchedule = viewModel::onCancelWorkSchedule,
         onSubmitWorkSchedule = viewModel::onSubmitWorkSchedule,
         onNavigateToWorkSettingScreen = onNavigateToWorkSettingScreen,
-        onDeletePersonalSchedule = viewModel::onDeletePersonalSchedule
+        onDeletePersonalSchedule = viewModel::onDeletePersonalSchedule,
+        onClickModify = viewModel::onClickModify,
+        isModifyState = state.isModifyState,
+        currentEventId = state.currentEventId,
+        onModifyPersonalSchedule = viewModel::onModifyPersonalSchedule
     )
 
 }
@@ -212,16 +216,20 @@ fun MyCalendarScreen(
     onDateClicked: (Int) -> Unit,
     workTypeList: List<WorkType>,
     monthlyWorkList: List<WorkListData>,
-    currentWorkData: WorkType ?= null,
+    currentWorkData: WorkType? = null,
     monthlyPersonalList: List<PersonalScheduleData>,
-    currentPersonalData: List<EventListData> ?= listOf(),
+    currentPersonalData: List<EventListData>? = listOf(),
     onSubmitPersonalSchedule: () -> Unit,
     onWorkLabelClick: (WorkType) -> Unit,
     tempWorkList: List<Pair<Int, String>>,
     onCancelWorkSchedule: () -> Unit,
     onSubmitWorkSchedule: () -> Unit,
     onNavigateToWorkSettingScreen: () -> Unit,
-    onDeletePersonalSchedule: (Int) -> Unit
+    onDeletePersonalSchedule: (Int) -> Unit,
+    onClickModify: (Int) -> Unit,
+    isModifyState: Boolean,
+    currentEventId: Int,
+    onModifyPersonalSchedule: (Int) -> Unit
 ) {
 
     val context = LocalContext.current
@@ -265,7 +273,13 @@ fun MyCalendarScreen(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                ScheduleList(currentWorkData, currentPersonalData, onDeletePersonalSchedule)
+                ScheduleList(
+                    currentWorkData,
+                    currentPersonalData,
+                    onDeletePersonalSchedule,
+                    isPersonalBottomSheet,
+                    onClickModify
+                )
 
             }
 
@@ -292,7 +306,7 @@ fun MyCalendarScreen(
             onWorkLabelClick,
             onCancelWorkSchedule,
             onSubmitWorkSchedule,
-            onNavigateToWorkSettingScreen=onNavigateToWorkSettingScreen
+            onNavigateToWorkSettingScreen = onNavigateToWorkSettingScreen
         )
     }
 
@@ -300,7 +314,13 @@ fun MyCalendarScreen(
         BottomSheet(
             height = 650.heightPercent(context).dp,
             showBottomSheet = isPersonalBottomSheet.value,
-            onDismiss = { isPersonalBottomSheet.value = false }) {
+            onDismiss = {
+                isPersonalBottomSheet.value = false
+                onChangeScheduleTitle("")
+                onChangeScheduleContent("")
+                onChangeStartTime(LocalDateTime.now())
+                onChangeEndTime(LocalDateTime.now())
+            }) {
             PersonalScheduleForm(
                 scheduleTitle,
                 scheduleContent,
@@ -309,7 +329,10 @@ fun MyCalendarScreen(
                 onChangeStartTime = onChangeStartTime,
                 onChangeEndTime = onChangeEndTime,
                 isPersonalBottomSheet = isPersonalBottomSheet,
-                onSubmitPersonalSchedule = onSubmitPersonalSchedule
+                onSubmitPersonalSchedule = onSubmitPersonalSchedule,
+                isModifyState = isModifyState,
+                currentEventId = currentEventId,
+                onModifyPersonalSchedule = onModifyPersonalSchedule
             )
         }
     }
@@ -361,21 +384,29 @@ fun ScheduleListHeader(
 // 일정 카드 리스트
 @Composable
 fun ScheduleList(
-    currentWorkData: WorkType ?= null,
-    currentPersonalData: List<EventListData> ?= listOf(),
-    onDeletePersonalSchedule: (Int) -> Unit
+    currentWorkData: WorkType? = null,
+    currentPersonalData: List<EventListData>? = listOf(),
+    onDeletePersonalSchedule: (Int) -> Unit,
+    isPersonalBottomSheet: MutableState<Boolean>,
+    onClickModify: (Int) -> Unit
 ) {
     Column() {
-        if(currentWorkData != null) {
-            val hour1 = currentWorkData.startTime.substring(0,2).toInt()
-            val hour2 = currentWorkData.workTime.substring(0,2).toInt()
+        if (currentWorkData != null) {
+            val hour1 = currentWorkData.startTime.substring(0, 2).toInt()
+            val hour2 = currentWorkData.workTime.substring(0, 2).toInt()
             val endTime = String.format("%02d:00", hour1 + hour2)
             SmallScheduleCard2(workType = currentWorkData.copy(workTime = endTime))
         }
 
 
-        currentPersonalData?.forEach {personalData ->
-            BigScheduleCard(personalData, onClickDelete = { onDeletePersonalSchedule(personalData.eventId) })
+        currentPersonalData?.forEach { personalData ->
+            BigScheduleCard(
+                personalData,
+                onClickDelete = { onDeletePersonalSchedule(personalData.eventId) },
+                onClickModify = {
+                    isPersonalBottomSheet.value = true
+                    onClickModify(personalData.eventId)
+                })
         }
     }
 }
@@ -390,7 +421,10 @@ fun PersonalScheduleForm(
     onChangeStartTime: (LocalDateTime) -> Unit,
     onChangeEndTime: (LocalDateTime) -> Unit,
     isPersonalBottomSheet: MutableState<Boolean>,
-    onSubmitPersonalSchedule: () -> Unit
+    onSubmitPersonalSchedule: () -> Unit,
+    isModifyState: Boolean,
+    currentEventId: Int,
+    onModifyPersonalSchedule: (Int) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -441,7 +475,11 @@ fun PersonalScheduleForm(
                 disabledContainerColor = Gray300,
                 disabledContentColor = NaturalWhite
             ), onClick = {
-                onSubmitPersonalSchedule()
+                if(isModifyState) {
+                    onModifyPersonalSchedule(currentEventId)
+                } else {
+                    onSubmitPersonalSchedule()
+                }
                 isPersonalBottomSheet.value = false
             },
             enabled = (scheduleTitle != "" && scheduleContent != "") // title과 content 값이 없으면 disabled
@@ -449,7 +487,7 @@ fun PersonalScheduleForm(
             Text(
                 style = Typography.bodyLarge,
                 color = NaturalWhite,
-                text = "추가 하기"
+                text = if(isModifyState) "수정 하기" else "추가 하기"
             )
         }
     }
@@ -466,7 +504,7 @@ fun InteractiveBottomSheet(
     onWorkLabelClick: (WorkType) -> Unit,
     onCancelWorkSchedule: () -> Unit,
     onSubmitWorkSchedule: () -> Unit,
-    onNavigateToWorkSettingScreen: ()->Unit,
+    onNavigateToWorkSettingScreen: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
 
