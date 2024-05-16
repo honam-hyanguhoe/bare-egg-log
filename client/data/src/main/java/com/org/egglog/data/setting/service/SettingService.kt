@@ -76,4 +76,10 @@ interface SettingService {
         @Header("Authorization") accessToken: String,
         @Body requestBody: RequestBody
     ): CommonResponse<Unit?>
+
+    @GET("calendar/link")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun getCalendarLink(
+        @Header("Authorization") accessToken: String,
+    ): CommonResponse<String>
 }
