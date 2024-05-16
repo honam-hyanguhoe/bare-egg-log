@@ -68,7 +68,8 @@ import com.org.egglog.presentation.theme.NaturalBlack
 fun PostDetailScreen(
     viewModel: PostDetailViewModel = hiltViewModel(),
     postId: Int,
-    onNavigateToPostListScreen: () -> Unit
+    onNavigateToPostListScreen: () -> Unit,
+    onNavigateToModifyScreen: (Int) -> Unit
 ) {
     val context = LocalContext.current
     val state = viewModel.collectAsState().value
@@ -104,7 +105,7 @@ fun PostDetailScreen(
         commentValue = state.comment,
         onNavigateToPostListScreen = onNavigateToPostListScreen,
         onDeletePost = viewModel::onDeletePost,
-        onClickModify = {}, // 수정 버튼 클릭시
+        onClickModify = onNavigateToModifyScreen, // 수정 버튼 클릭시
         onDeleteComment = viewModel::onDeleteComment,
         onChangeComment = viewModel::onChangeComment,
         onClickRecomment = viewModel::onClickRecomment,
@@ -126,7 +127,7 @@ private fun PostDetailScreen(
     commentValue: String,
     onNavigateToPostListScreen: () -> Unit,
     onDeletePost: () -> Unit,
-    onClickModify: () -> Unit,
+    onClickModify: (Int) -> Unit,
     onDeleteComment: (Long) -> Unit,
     onChangeComment: (String) -> Unit,
     onClickRecomment: (Long) -> Unit,
@@ -155,8 +156,7 @@ private fun PostDetailScreen(
                     hasArrow = true,
                     hasMore = true,
                     onClickBack = onNavigateToPostListScreen,
-//                    options = listOf("수정하기", "삭제하기"),
-                    options = listOf("삭제하기"),
+                    options = listOf("수정하기", "삭제하기"),
                     selectedOption = selectedMenuItem,
                     onSelect = {
                         selectedMenuItem = it
@@ -164,7 +164,7 @@ private fun PostDetailScreen(
                             onDeletePost()
                         } else if (it == "수정하기") {
                             // TODO : 게시글 수정 로직 추가
-                            onClickModify()
+                            onClickModify(postId)
                         }
                     }
 

@@ -10,4 +10,6 @@ sealed class CommunityRoute(
     data object PostDetailScreen: CommunityRoute("PostDetailScreen")
 
     data object WritePostScreen: CommunityRoute("WritePostScreen")
+
+    data object ModifyPostScreen: CommunityRoute("ModifyPostScreen")
 }
