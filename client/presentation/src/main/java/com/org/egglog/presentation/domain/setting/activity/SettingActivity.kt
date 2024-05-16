@@ -12,14 +12,12 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class SettingActivity : AppCompatActivity() {
-    private lateinit var alarmManager: AlarmManager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         enableEdgeToEdge()
         setContent{
             ClientTheme {
-                SettingNavigationHost(alarmManager)
+                SettingNavigationHost()
             }
         }
     }

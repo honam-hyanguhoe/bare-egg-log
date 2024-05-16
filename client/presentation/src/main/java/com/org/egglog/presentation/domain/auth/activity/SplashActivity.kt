@@ -30,7 +30,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.org.egglog.presentation.R
 import com.org.egglog.presentation.domain.main.activity.MainActivity
-import com.org.egglog.presentation.receiver.AlarmConst
 import kotlinx.coroutines.tasks.await
 
 @AndroidEntryPoint
