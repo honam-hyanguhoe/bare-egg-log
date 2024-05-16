@@ -72,7 +72,7 @@ class MyCalendarViewModel @Inject constructor(
 
         Log.e("MyCalendarViewModel", "토큰 ${accessToken}")
 
-        val workTypeList = getWorkTypeListUseCase("Bearer $accessToken").getOrThrow()
+        getWorkTypeList()
 
         userInfo = getUserStoreUseCase()
 
@@ -81,6 +81,10 @@ class MyCalendarViewModel @Inject constructor(
         // TODO 이번달 1일~마지막일 근무, 개인 일정 리스트 불러오기
         getWorkList()
         getPersonalList()
+    }
+
+    fun getWorkTypeList() = intent {
+        val workTypeList = getWorkTypeListUseCase("Bearer $accessToken").getOrThrow()
 
         reduce {
             state.copy(
@@ -88,7 +92,7 @@ class MyCalendarViewModel @Inject constructor(
                     WorkType(
                         0,
                         "NONE",
-                        "",
+                        "#D0D5DD",
                         "",
                         "NONE",
                         "",
@@ -432,14 +436,14 @@ class MyCalendarViewModel @Inject constructor(
                             tempWorkList = state.tempWorkList.plus(
                                 Pair(
                                     state.selectedDate,
-                                    workType.title
+                                    workType
                                 )
                             )
                         )
                     }
                 } else {
                     val updateWorkList = state.tempWorkList.toMutableList()
-                    updateWorkList[index] = updateWorkList[index].copy(second = workType.title)
+                    updateWorkList[index] = updateWorkList[index].copy(second = workType)
                     reduce {
                         state.copy(
                             tempWorkList = updateWorkList
@@ -464,14 +468,14 @@ class MyCalendarViewModel @Inject constructor(
                             tempWorkList = state.tempWorkList.plus(
                                 Pair(
                                     state.selectedDate,
-                                    ""
+                                    null
                                 )
                             )
                         )
                     }
                 } else {
                     val updateWorkList = state.tempWorkList.toMutableList()
-                    updateWorkList[index] = updateWorkList[index].copy(second = "")
+                    updateWorkList[index] = updateWorkList[index].copy(second = null)
                     reduce {
                         state.copy(
                             tempWorkList = updateWorkList
@@ -612,7 +616,7 @@ data class MyCalenderState(
     val monthlyWorkList: List<WorkListData> = listOf(), // 서버로부터 조회한 월간 근무 일정
     val createWorkList: List<AddWorkData> = listOf(),
     val editWorkList: List<EditWorkData> = listOf(),
-    val tempWorkList: List<Pair<Int, String>> = listOf(), // 근무 입력시 달력에 표시할 내용 (workDate, workTitle)
+    val tempWorkList: List<Pair<Int, WorkType?>> = listOf(), // 근무 입력시 달력에 표시할 내용 (workDate, workTitle)
     val currentWorkData: WorkType? = null,
     val monthlyPersonalList: List<PersonalScheduleData> = listOf(),
     val currentPersonalData: List<EventListData>? = listOf(),

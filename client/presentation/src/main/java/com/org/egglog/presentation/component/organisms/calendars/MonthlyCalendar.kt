@@ -24,10 +24,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.org.egglog.domain.myCalendar.model.PersonalScheduleData
 import com.org.egglog.domain.myCalendar.model.WorkListData
+import com.org.egglog.domain.myCalendar.model.WorkType
 import com.org.egglog.presentation.utils.ArrowLeft
 import com.org.egglog.presentation.utils.ArrowRight
 import com.org.egglog.presentation.component.atoms.icons.Icon
 import com.org.egglog.presentation.component.atoms.labels.Labels
+import com.org.egglog.presentation.component.atoms.labels.Labels2
 import com.org.egglog.presentation.theme.*
 import java.util.Calendar
 
@@ -39,7 +41,7 @@ fun MonthlyCalendar(
     onPrevMonthClick: () -> Unit,
     onNextMonthClick: () -> Unit,
     selectedDate: Int,
-    tempWorkList: List<Pair<Int, String>>,
+    tempWorkList: List<Pair<Int, WorkType?>>,
     monthlyWorkList: List<WorkListData>,
     monthlyPersonalList: List<PersonalScheduleData>
 ) {
@@ -113,7 +115,7 @@ fun DayList(
     currentMonth: Int,
     onDateClicked: (Int) -> Unit,
     selectedDate: Int,
-    tempWorkList: List<Pair<Int, String>>,
+    tempWorkList: List<Pair<Int, WorkType?>>,
     monthlyWorkList: List<WorkListData>,
     monthlyPersonalList: List<PersonalScheduleData>
 ) {
@@ -145,13 +147,23 @@ fun DayList(
                     val tempWorkInfo = tempWorkList.find { it.first == resultDay }
 
                     val tempResultDay = if (resultDay < 10) "0${resultDay}" else "${resultDay}"
-                    val workInfo = monthlyWorkList.find {it.workDate.substring(8,10) == tempResultDay}?.workType?.title
+                    val workInfo = monthlyWorkList.find {
+                        it.workDate.substring(
+                            8,
+                            10
+                        ) == tempResultDay
+                    }?.workType
 
-                    val tempEventCnt = monthlyPersonalList.find {it.date.substring(8,10) == tempResultDay}?.eventList?.size
+                    val tempEventCnt = monthlyPersonalList.find {
+                        it.date.substring(
+                            8,
+                            10
+                        ) == tempResultDay
+                    }?.eventList?.size
                     val eventCnt = when (tempEventCnt) {
                         null -> ""
                         0 -> ""
-                        1-> "·"
+                        1 -> "·"
                         2 -> "··"
                         else -> "···"
                     }
@@ -187,8 +199,12 @@ fun DayList(
                                     }
                                 )
                                 Spacer(modifier = Modifier.height(5.dp))
-                                Labels(text = tempWorkInfo?.second ?: (workInfo ?: ""))
-                                Text(text = eventCnt, color = Gray600, style = Typography.labelLarge)
+                                if (tempWorkInfo?.second != null) Labels2(tempWorkInfo.second) else if(workInfo != null) Labels2(workInfo) else Labels(text = "")
+                                Text(
+                                    text = eventCnt,
+                                    color = Gray600,
+                                    style = Typography.labelLarge
+                                )
                             }
                         }
                     } else {

@@ -58,6 +58,7 @@ import com.org.egglog.presentation.component.atoms.dialogs.BottomSheet
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.presentation.component.atoms.inputs.SingleInput
 import com.org.egglog.presentation.component.atoms.labels.Labels
+import com.org.egglog.presentation.component.atoms.labels.Labels2
 import com.org.egglog.presentation.component.atoms.toggle.Toggle
 import com.org.egglog.presentation.component.atoms.wheelPicker.DateTimePicker
 import com.org.egglog.presentation.component.atoms.wheelPicker.TimePicker
@@ -191,7 +192,8 @@ fun MyCalendarScreen(
         onClickModify = viewModel::onClickModify,
         isModifyState = state.isModifyState,
         currentEventId = state.currentEventId,
-        onModifyPersonalSchedule = viewModel::onModifyPersonalSchedule
+        onModifyPersonalSchedule = viewModel::onModifyPersonalSchedule,
+        getWorkTypeList = viewModel::getWorkTypeList
     )
 
 }
@@ -221,7 +223,7 @@ fun MyCalendarScreen(
     currentPersonalData: List<EventListData>? = listOf(),
     onSubmitPersonalSchedule: () -> Unit,
     onWorkLabelClick: (WorkType) -> Unit,
-    tempWorkList: List<Pair<Int, String>>,
+    tempWorkList: List<Pair<Int, WorkType?>>,
     onCancelWorkSchedule: () -> Unit,
     onSubmitWorkSchedule: () -> Unit,
     onNavigateToWorkSettingScreen: () -> Unit,
@@ -229,7 +231,8 @@ fun MyCalendarScreen(
     onClickModify: (Int) -> Unit,
     isModifyState: Boolean,
     currentEventId: Int,
-    onModifyPersonalSchedule: (Int) -> Unit
+    onModifyPersonalSchedule: (Int) -> Unit,
+    getWorkTypeList: () -> Unit
 ) {
 
     val context = LocalContext.current
@@ -290,7 +293,10 @@ fun MyCalendarScreen(
 
     FloatingButton(
         onClick = { /*TODO*/ },
-        onWorkClick = { isWorkBottomSheet.value = true },
+        onWorkClick = {
+            isWorkBottomSheet.value = true
+            getWorkTypeList()
+        },
         onPersonalClick = { isPersonalBottomSheet.value = true },
         onSettingClick = onClickCalendarSetting,
         horizontalPadding = 10.dp,
@@ -475,7 +481,7 @@ fun PersonalScheduleForm(
                 disabledContainerColor = Gray300,
                 disabledContentColor = NaturalWhite
             ), onClick = {
-                if(isModifyState) {
+                if (isModifyState) {
                     onModifyPersonalSchedule(currentEventId)
                 } else {
                     onSubmitPersonalSchedule()
@@ -487,7 +493,7 @@ fun PersonalScheduleForm(
             Text(
                 style = Typography.bodyLarge,
                 color = NaturalWhite,
-                text = if(isModifyState) "수정 하기" else "추가 하기"
+                text = if (isModifyState) "수정 하기" else "추가 하기"
             )
         }
     }
@@ -612,7 +618,7 @@ fun WorkScheduleForm(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     rowList.forEach { type ->
-                        Labels(text = type.title, size = "big", onClick = {
+                        Labels2(type, size = "big", onClick = {
                             // TODO 선택된 날짜 -> 다음 날짜로 변경
                             onWorkLabelClick(type)
                         })
