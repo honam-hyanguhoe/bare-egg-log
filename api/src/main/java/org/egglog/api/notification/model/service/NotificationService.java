@@ -139,7 +139,7 @@ public class NotificationService {
                         .topic(TopicEnum.GROUP)
                         .topicId(groupPreviewDto.getGroupId())
                         .build();
-                fcmService.unsubscribeFromTopic(oldToken, topic); //예전 토큰 구독 취소
+                if (oldToken!=null) fcmService.unsubscribeFromTopic(oldToken, topic); //예전 토큰 구독 취소
                 fcmService.subscribeToTopic(newToken, topic); //새 토큰으로 구독
             }
         }
