@@ -42,9 +42,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.Dp
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
+import com.google.accompanist.swiperefresh.SwipeRefreshState
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.org.egglog.domain.myCalendar.model.EventListData
 import com.org.egglog.domain.myCalendar.model.PersonalScheduleData
 import com.org.egglog.domain.myCalendar.model.WorkListData
@@ -160,7 +165,12 @@ fun MyCalendarScreen(
         }
     }
 
+    val isLoading by viewModel.isLoading.collectAsState()
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isLoading)
+
     MyCalendarScreen(
+        swipeRefreshState = swipeRefreshState,
+        refreshSomething = viewModel::refreshSomething,
         selectedIdx = state.selectedIdx,
         onClickExcelSync = onNavigateToExcelScreen,
         onSelectedIdx = viewModel::onSelectedIdx,
@@ -200,6 +210,8 @@ fun MyCalendarScreen(
 
 @Composable
 fun MyCalendarScreen(
+    swipeRefreshState: SwipeRefreshState,
+    refreshSomething: () -> Unit,
     selectedIdx: Int,
     onClickExcelSync: (Int, Int) -> Unit,
     onSelectedIdx: (Int) -> Unit,
@@ -248,46 +260,59 @@ fun MyCalendarScreen(
             .fillMaxSize()
             .background(NaturalWhite)
     ) {
-        LazyColumn(
-            Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.9f)
-                .padding(
-                    start = 10.widthPercent(context).dp,
-                    top = 10.heightPercent(context).dp,
-                    end = 10.widthPercent(context).dp
+        SwipeRefresh(
+            state = swipeRefreshState,
+            onRefresh = refreshSomething,
+            indicator = { state, refreshTrigger ->
+                SwipeRefreshIndicator(
+                    state = state,
+                    refreshTriggerDistance = refreshTrigger,
+                    backgroundColor = NaturalBlack,
+                    contentColor = NaturalWhite
                 )
+            }
         ) {
+            LazyColumn(
+                Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.9f)
+                    .padding(
+                        start = 10.widthPercent(context).dp,
+                        top = 10.heightPercent(context).dp,
+                        end = 10.widthPercent(context).dp
+                    )
+            ) {
 
-            item {
-                MonthlyCalendar(
-                    currentYear = currentYear,
-                    currentMonth = currentMonth,
-                    onDateClicked = onDateClicked,
-                    onPrevMonthClick = onPrevMonthClick,
-                    onNextMonthClick = onNextMonthClick,
-                    selectedDate = selectedDate,
-                    tempWorkList = tempWorkList,
-                    monthlyWorkList = monthlyWorkList,
-                    monthlyPersonalList = monthlyPersonalList
-                )
+                item {
+                    MonthlyCalendar(
+                        currentYear = currentYear,
+                        currentMonth = currentMonth,
+                        onDateClicked = onDateClicked,
+                        onPrevMonthClick = onPrevMonthClick,
+                        onNextMonthClick = onNextMonthClick,
+                        selectedDate = selectedDate,
+                        tempWorkList = tempWorkList,
+                        monthlyWorkList = monthlyWorkList,
+                        monthlyPersonalList = monthlyPersonalList
+                    )
 
-                Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                ScheduleListHeader(currentYear, currentMonth, selectedDate, onClickExcelSync)
+                    ScheduleListHeader(currentYear, currentMonth, selectedDate, onClickExcelSync)
 
-                Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                ScheduleList(
-                    currentWorkData,
-                    currentPersonalData,
-                    onDeletePersonalSchedule,
-                    isPersonalBottomSheet,
-                    onClickModify
-                )
+                    ScheduleList(
+                        currentWorkData,
+                        currentPersonalData,
+                        onDeletePersonalSchedule,
+                        isPersonalBottomSheet,
+                        onClickModify
+                    )
+
+                }
 
             }
-
         }
 
         BottomNavigator(selectedItem = selectedIdx, onItemSelected = onSelectedIdx)
