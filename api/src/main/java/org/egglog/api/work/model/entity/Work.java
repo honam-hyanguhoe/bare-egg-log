@@ -2,13 +2,16 @@ package org.egglog.api.work.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.egglog.api.alarm.model.entity.Alarm;
 import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.work.model.dto.response.WorkResponse;
+import org.egglog.api.work.model.dto.response.WorkWithAlarmResponse;
 import org.egglog.api.worktype.model.entity.WorkType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Objects;
 
 
@@ -70,4 +73,12 @@ public class Work {
         return this;
     }
 
+    public WorkWithAlarmResponse toResponse(Map<WorkType, Alarm> alarmMap){
+        return WorkWithAlarmResponse.builder()
+                .workId(this.id)
+                .workDate(this.workDate)
+                .workType(this.workType.toResponse())
+                .alarm(alarmMap.get(this.workType).toOutputSpec())
+                .build();
+    }
 }

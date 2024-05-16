@@ -54,6 +54,16 @@ public class Alarm {
                 .build();
     }
 
+    public AlarmOutputSpec toOutputSpec(){
+        return AlarmOutputSpec.builder()
+                .alarmId(this.id)
+                .alarmTime(this.alarmTime)
+                .alarmReplayCnt(this.replayCnt)
+                .alarmReplayTime(this.replayTime)
+                .isAlarmOn(this.isAlarmOn)
+                .build();
+    }
+
     public Alarm modify(LocalTime editAlarmTime, Integer editReplayCnt, Integer editReplayTime, WorkType editWorkTypeId){
         this.alarmTime = editAlarmTime == null ? this.alarmTime : alarmTime;
         this.replayCnt = editReplayCnt == null ? this.replayCnt : editReplayCnt;

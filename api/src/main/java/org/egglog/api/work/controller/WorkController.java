@@ -7,6 +7,7 @@ import org.egglog.api.user.model.entity.User;
 import org.egglog.api.work.model.dto.request.*;
 import org.egglog.api.work.model.dto.response.WorkListResponse;
 import org.egglog.api.work.model.dto.response.WorkResponse;
+import org.egglog.api.work.model.dto.response.WorkWithAlarmListResponse;
 import org.egglog.api.work.model.dto.response.completed.CompletedWorkCountResponse;
 import org.egglog.api.work.model.dto.response.upcoming.UpComingCountWorkResponse;
 import org.egglog.api.work.model.dto.response.upcoming.enums.DateType;
@@ -105,6 +106,28 @@ public class WorkController {
         return ResponseEntity.ok().body(
                 MessageUtils.success(workService.findGroupUserWorkList(loginUser, request)));
     }
+
+
+    /**
+     * 근무 일정 조회
+     * @param loginUser 로그인한 유저(JWT 토큰)
+     * @param request  캘린더 그룹 ID, 조회할 시작 일, 조회할 마지막 일
+     * @return 조회 된 근무 일정 객체 응답 리스트
+     * @author 김형민
+     */
+    @GetMapping("/alarm-find")
+    public ResponseEntity<MessageUtils<WorkWithAlarmListResponse>> findWorkWithAlarmList(
+            @AuthenticationPrincipal User loginUser,
+            @ModelAttribute @Valid FindWorkListRequest request
+    ){
+        return ResponseEntity.ok().body(
+                MessageUtils.success(workService.findWorkWithAlarmList(loginUser, request)));
+    }
+
+
+
+
+
 
     /**
      * 주, 월의 이번주 남은 근무 당 개수
