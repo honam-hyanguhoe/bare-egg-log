@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class EventListResponse (
     val eventId: Int,
     val eventTitle: String,
-    val eventContent: String,
+    val eventContent: String ?= "",
     val startDate: String,
     val endDate: String,
     val calendarGroupId: Long

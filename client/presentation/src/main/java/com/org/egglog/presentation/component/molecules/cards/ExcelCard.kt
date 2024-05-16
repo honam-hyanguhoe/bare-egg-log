@@ -38,7 +38,7 @@ fun ExcelCard(color: String, date: String, name: String, onClickCard: () -> Unit
     }
 
     Box(modifier = Modifier
-            .size(120.widthPercent(context).dp)
+            .size(140.widthPercent(context).dp)
             .background(boxColor, RoundedCornerShape(10.dp))
             .border(1.dp, Success600, RoundedCornerShape(10.dp))
             .clickable { onClickCard() }
