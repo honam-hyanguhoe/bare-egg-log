@@ -160,8 +160,13 @@ public class BoardService {
                             () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
                     );
 
+                    //작성자
+                    User writer = userJpaRepository.findById(board.getUser().getId()).orElseThrow(
+                            () -> new UserException(UserErrorCode.NOT_EXISTS_USER)
+                    );
+
                     //사용자의 병원 인증 정보
-                    Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(user, user.getSelectedHospital());
+                    Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(writer, writer.getSelectedHospital());
                     long commentCnt = commentRepository.getCommentCount(board.getId());
                     long likeCnt = boardRepository.getLikeCount(board.getId());
                     long viewCount = redisViewCountUtil.getViewCount(String.valueOf(hotBoard.getBoardId())); //하루 동안의 조회수
@@ -340,6 +345,9 @@ public class BoardService {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
         );
+        if (!board.getUser().getId().equals(user.getId())) {
+            throw new BoardException(BoardErrorCode.NOT_SAME_WRITER);
+        }
         BoardModifyOutputSpec boardOutputSpec = null;
 
         try {
@@ -354,16 +362,17 @@ public class BoardService {
             Optional<HospitalAuth> hospitalAuth = hospitalAuthJpaRepository.findByUserAndHospital(user, user.getSelectedHospital());
 
             long viewCount = redisViewCountUtil.getViewCount(String.valueOf(board.getId())); //하루 동안의 조회수
-            Long hitCnt = viewCount + board.getViewCount();     // DB + redis
-            Long commentCnt = commentRepository.getCommentCount(board.getId());
-            Long likeCnt = boardRepository.getLikeCount(board.getId());
+            long hitCnt = viewCount + board.getViewCount();     // DB + redis
+            long commentCnt = commentRepository.getCommentCount(board.getId());
+            long likeCnt = boardRepository.getLikeCount(board.getId());
 
             boolean isUserLiked = false;  //좋아요 누른 여부
             boolean isCommented = false;    //댓글 유무 여부
 
-            if (commentCnt != null) {
+            if (commentCnt == 0) {
                 isCommented = true;
             }
+
             //사용자가 이미 좋아요를 눌렀는지
             if (!isNotLiked(user.getId(), board.getId())) {
                 isUserLiked = true;
