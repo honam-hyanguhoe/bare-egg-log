@@ -6,11 +6,10 @@ import android.content.Context
 import android.content.Intent
 import android.icu.util.Calendar
 import android.os.Build
-import com.org.egglog.data.scheduler.AlarmBroadcastReceiver
+import com.org.egglog.presentation.receiver.AlarmBroadcastReceiver
 import com.org.egglog.domain.scheduler.AlarmConst
 import com.org.egglog.domain.scheduler.SchedulerUseCase
 import java.time.LocalDateTime
-import java.time.LocalTime
 import javax.inject.Inject
 
 class SchedulerUseCaseImpl @Inject constructor(
@@ -34,7 +33,6 @@ class SchedulerUseCaseImpl @Inject constructor(
         key: Int,
         curRepeatCount: Int,
         repeatCount: Int,
-        time: LocalTime,
         minutesToAdd: Long,
         targetDateTime: LocalDateTime
     ) {
@@ -42,8 +40,8 @@ class SchedulerUseCaseImpl @Inject constructor(
 
         val receiverIntent = Intent(context, AlarmBroadcastReceiver::class.java).apply {
             putExtra(AlarmConst.REQUEST_CODE, key)
-            putExtra(AlarmConst.INTERVAL_HOUR, time.hour)
-            putExtra(AlarmConst.INTERVAL_MINUTE, time.minute)
+            putExtra(AlarmConst.INTERVAL_HOUR, targetDateTime.hour)
+            putExtra(AlarmConst.INTERVAL_MINUTE, targetDateTime.minute)
             putExtra(AlarmConst.INTERVAL_SECOND, 0)
             putExtra(AlarmConst.REPEAT_COUNT, repeatCount)
             putExtra(AlarmConst.CUR_REPEAT_COUNT, curRepeatCount)
@@ -59,8 +57,8 @@ class SchedulerUseCaseImpl @Inject constructor(
             set(Calendar.YEAR, targetDateTime.year)
             set(Calendar.MONTH, targetDateTime.monthValue - 1)
             set(Calendar.DAY_OF_MONTH, targetDateTime.dayOfMonth)
-            set(Calendar.HOUR_OF_DAY, time.hour)
-            set(Calendar.MINUTE, time.minute)
+            set(Calendar.HOUR_OF_DAY, targetDateTime.hour)
+            set(Calendar.MINUTE, targetDateTime.minute)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
         }
@@ -69,8 +67,9 @@ class SchedulerUseCaseImpl @Inject constructor(
     }
 
     override fun cancelAllAlarms(key: Int) {
+        val intent = Intent(context, AlarmBroadcastReceiver::class.java)
         isAlarmActive = false
-        val pendingIntent = getPendingIntent(key)
+        val pendingIntent = getPendingIntent(key, intent)
         alarmManager.cancel(pendingIntent)
     }
 }

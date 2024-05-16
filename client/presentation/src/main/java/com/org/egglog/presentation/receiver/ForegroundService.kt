@@ -25,11 +25,10 @@ import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ForegroundService () : Service() {
+class ForegroundService : Service() {
     @Inject lateinit var schedulerUseCase: SchedulerUseCase
     private lateinit var vibrator: Vibrator
     private var mediaPlayer: MediaPlayer? = null
-    private var stopByUser = false
 
     override fun onCreate() {
         super.onCreate()
@@ -50,15 +49,15 @@ class ForegroundService () : Service() {
             initialTime.hour,
             initialTime.minute
         )
-        val minutesToAdd = intent?.getLongExtra(AlarmConst.MINUTES_TO_ADD, 5) ?: 5L
-        stopByUser = intent?.getBooleanExtra(AlarmConst.STOP_BY_USER, false) ?: false
+        val minutesToAdd = intent?.getLongExtra(AlarmConst.MINUTES_TO_ADD, 5L) ?: 5L
+        val stopByUser = intent?.getBooleanExtra(AlarmConst.STOP_BY_USER, false) ?: false
 
-        startForegroundService(key = key, curRepeatCount = curRepeatCount, message = LocalTime.now().format(formatter), repeatCount = repeatCount, initialTime = initialTime, minutesToAdd = minutesToAdd, stopByUser = stopByUser, targetDateTime = targetDateTime)
+        startForegroundService(key = key, curRepeatCount = curRepeatCount, message = LocalTime.now().format(formatter), repeatCount = repeatCount, minutesToAdd = minutesToAdd, targetDateTime = targetDateTime, stopByUser = stopByUser)
         return START_STICKY
     }
 
     @SuppressLint("LaunchActivityFromNotification")
-    private fun startForegroundService(key: Int, title: String = "에그로그 알림", message: String, curRepeatCount: Int, repeatCount: Int, initialTime: LocalTime, minutesToAdd: Long, stopByUser: Boolean, targetDateTime: LocalDateTime) {
+    private fun startForegroundService(key: Int, title: String = "에그로그 알림", message: String, curRepeatCount: Int, repeatCount: Int, minutesToAdd: Long, targetDateTime: LocalDateTime, stopByUser: Boolean) {
         val channelId = getString(R.string.default_notification_channel_id)
         val channelName: CharSequence = getString(R.string.default_notification_channel_name)
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -70,6 +69,7 @@ class ForegroundService () : Service() {
 
         val stopIntent = Intent(this, StopServiceReceiver::class.java).apply {
             putExtra(AlarmConst.STOP_BY_USER, true)
+            putExtra(AlarmConst.REQUEST_CODE, key)
         }
         val pendingIntent = PendingIntent.getBroadcast(this, 0, stopIntent, PendingIntent.FLAG_IMMUTABLE)
 
@@ -85,7 +85,7 @@ class ForegroundService () : Service() {
 
         startForeground(1, notification)
         startVibrationAndSound()
-        stopSelfInOneMinute(key, curRepeatCount, repeatCount, initialTime, minutesToAdd, targetDateTime)
+        stopSelfInOneMinute(key, curRepeatCount, repeatCount, minutesToAdd, targetDateTime, stopByUser)
     }
 
     private fun startVibrationAndSound() {
@@ -98,14 +98,14 @@ class ForegroundService () : Service() {
         }
     }
 
-    private fun stopSelfInOneMinute(key: Int, curRepeatCount: Int, repeatCount: Int, initialTime: LocalTime, minutesToAdd: Long, targetDateTime: LocalDateTime) {
+    private fun stopSelfInOneMinute(key: Int, curRepeatCount: Int, repeatCount: Int, minutesToAdd: Long, targetDateTime: LocalDateTime, stopByUser: Boolean) {
         val handler = Handler(mainLooper)
         handler.postDelayed({
             if (!stopByUser) {
                 stopSelf()
                 if (curRepeatCount < repeatCount) {
-                    val nextTime = initialTime.plusMinutes(minutesToAdd)
-                    schedulerUseCase.setAlarm(key = key, curRepeatCount = curRepeatCount + 1, repeatCount = repeatCount, time = nextTime, minutesToAdd = minutesToAdd, targetDateTime = targetDateTime)
+                    val nextDateTime = targetDateTime.plusMinutes(minutesToAdd)
+                    schedulerUseCase.setAlarm(key = key, curRepeatCount = curRepeatCount + 1, repeatCount = repeatCount, minutesToAdd = minutesToAdd, targetDateTime = nextDateTime)
                 }
             }
         }, 60000) // 60000 ms == 1 minute

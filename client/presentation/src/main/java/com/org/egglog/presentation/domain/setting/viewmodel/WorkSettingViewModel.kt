@@ -90,7 +90,7 @@ class WorkSettingViewModel @Inject constructor(
     }
 
     fun setAlarm() = intent {
-        schedulerUseCase.setAlarm(curRepeatCount = 0, repeatCount = 3, time = LocalTime.of(17, 55), minutesToAdd = 2L, targetDateTime = LocalDateTime.now(), key = 1)
+        schedulerUseCase.setAlarm(curRepeatCount = 0, repeatCount = 3, minutesToAdd = 2L, targetDateTime = LocalDateTime.now().plusMinutes(1), key = 1)
     }
 
     @OptIn(OrbitExperimental::class)

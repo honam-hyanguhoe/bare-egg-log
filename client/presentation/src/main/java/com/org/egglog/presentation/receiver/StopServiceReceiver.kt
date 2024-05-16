@@ -17,6 +17,7 @@ class StopServiceReceiver : BroadcastReceiver() {
         val key = intent?.getIntExtra(AlarmConst.REQUEST_CODE, 0) ?: 0
         val stopIntent = Intent(context, ForegroundService::class.java).apply {
             putExtra(AlarmConst.STOP_BY_USER, true)
+            putExtra(AlarmConst.REQUEST_CODE, key)
         }
         context.stopService(stopIntent)
         schedulerUseCase.cancelAllAlarms(key)

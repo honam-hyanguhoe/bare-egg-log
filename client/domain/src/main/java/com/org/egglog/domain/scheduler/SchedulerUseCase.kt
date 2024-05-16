@@ -8,7 +8,6 @@ interface SchedulerUseCase {
         key: Int,
         curRepeatCount: Int,
         repeatCount: Int,
-        time: LocalTime,
         minutesToAdd: Long,
         targetDateTime: LocalDateTime
     )
