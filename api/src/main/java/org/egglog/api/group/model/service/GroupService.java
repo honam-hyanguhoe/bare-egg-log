@@ -1,17 +1,18 @@
 package org.egglog.api.group.model.service;
 
-import com.google.firebase.messaging.Notification;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.Query;
+import com.google.firebase.cloud.FirestoreClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.group.exception.GroupErrorCode;
 import org.egglog.api.group.exception.GroupException;
-import org.egglog.api.group.model.dto.request.GroupForm;
-import org.egglog.api.group.model.dto.request.GroupUpdateForm;
-import org.egglog.api.group.model.dto.request.InvitationAcceptForm;
+import org.egglog.api.group.model.dto.request.*;
 import org.egglog.api.group.model.dto.response.*;
 import org.egglog.api.group.model.entity.Group;
 import org.egglog.api.group.model.entity.GroupMember;
 import org.egglog.api.group.model.entity.InvitationCode;
+import org.egglog.api.group.repository.firestore.GroupDutyRepository;
 import org.egglog.api.group.repository.redis.GroupInvitationRepository;
 import org.egglog.api.group.repository.jpa.GroupRepository;
 import org.egglog.api.notification.model.entity.FCMTopic;
@@ -19,12 +20,17 @@ import org.egglog.api.notification.model.entity.enums.TopicEnum;
 import org.egglog.api.notification.model.service.FCMService;
 import org.egglog.api.notification.model.service.NotificationService;
 import org.egglog.api.user.model.entity.User;
+import org.egglog.api.worktype.model.entity.WorkTag;
 import org.egglog.utility.utils.RandomStringUtils;
+import org.egglog.utility.utils.SuccessType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -35,6 +41,7 @@ public class GroupService {
     private final GroupMemberService groupMemberService;
 
     private final GroupRepository groupRepository;
+    private final GroupDutyRepository groupDutyRepository;
     private final GroupInvitationRepository groupInvitationRepository;
 
     private final FCMService fcmService;
@@ -229,10 +236,6 @@ public class GroupService {
         //변경 정보 DB 반영
         groupMemberService.createGroupMember(newBoss);
         groupMemberService.createGroupMember(boss);
-
-        Group group = groupRepository.findById(groupId).orElseThrow(()->new GroupException(GroupErrorCode.TRANSACTION_ERROR));
-        group.setAdmin(newBoss);
-        groupRepository.save(group);
     }
 
     /**
@@ -287,8 +290,6 @@ public class GroupService {
                 .user(user)
                 .build();
 
-        newGroup.setAdmin(newGroupMember);
-
         try {
             Group createGroup = groupRepository.save(newGroup);
             groupMemberService.createGroupMember(newGroupMember);
@@ -299,10 +300,73 @@ public class GroupService {
         }
     }
 
+    /**
+     * 그룹내 듀티별 해당자 요약
+     * @param groupId
+     * @param user
+     * @param date
+     * @return
+     */
     public GroupDutySummary getGroupDuty(Long groupId, User user, String date) {
         if(!groupMemberService.isGroupMember(groupId,user.getId())){
             throw new GroupException(GroupErrorCode.GROUP_ROLE_NOT_MATCH);
         }
         return groupMemberService.getGroupDutySummary(groupId, date);
     }
+
+    /**
+     * 파싱된 엑셀 데이터 firestore에 저장
+     * @param user
+     * @param groupId
+     * @param groupDutyData
+     */
+    public void addDuty(User user, Long groupId, GroupDutyData groupDutyData) {
+        if(groupMemberService.isGroupMember(groupId,user.getId())){
+            try {
+                groupDutyData.setUserName(user.getName());
+                SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
+                Date now = new Date();
+                String nowDay = dayFormat.format(now);
+                groupDutyData.setDay(nowDay);
+                groupDutyRepository.saveDuty(groupId,groupDutyData);
+            }catch (Exception e){
+                throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
+            }
+        }else {
+            throw new GroupException(GroupErrorCode.GROUP_ROLE_NOT_MATCH);
+        }
+    }
+
+    /**
+     * 등록된 엑셀 데이터 반환
+     * @param user
+     * @return
+     */
+    public List<GroupDutySaveFormat> getGroupDutyList(User user, String date) {
+        List<Long> groupList = groupMemberService.getUserGroupIdList(user.getId());
+        try{
+            return groupDutyRepository.getDutyListByGroupIdList(groupList,date);
+        }catch (Exception e){
+            throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
+        }
+    }
+
+    /**
+     * 저장된 그룹 근무 태그 반환
+     * @param user
+     * @param groupId
+     * @return
+     */
+    public CustomWorkTag getGroupWorkTags(User user, Long groupId) {
+        if(groupMemberService.isGroupMember(groupId, user.getId())){
+            try {
+                return groupDutyRepository.getGroupWorkTag(groupId);
+            } catch (Exception e){
+                throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
+            }
+        } else {
+            throw new GroupException(GroupErrorCode.GROUP_ROLE_NOT_MATCH);
+        }
+    }
+
 }

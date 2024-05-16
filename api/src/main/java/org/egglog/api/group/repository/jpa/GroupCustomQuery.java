@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface GroupCustomQuery {
     List<GroupPreviewDto> findGroupByUserId(Long userId);
+
+
 }
