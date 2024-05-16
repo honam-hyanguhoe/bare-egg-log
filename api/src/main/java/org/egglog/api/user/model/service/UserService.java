@@ -103,7 +103,7 @@ public class UserService {
                 .build());
         defaultWorkTypes.add(WorkType.builder()
                 .title("NIGHT")
-                .color("#E55555")
+                .color("#485E88")
                 .workTag(WorkTag.NIGHT)
                 .workTypeImgUrl("https://firebasestorage.googleapis.com/v0/b/egglog-422207.appspot.com/o/honam%2Feggs%2FNIGHT.png?alt=media&token=1181cfa8-1e19-402b-a977-eb8d096a8576")
                 .startTime(LocalTime.of(2,0))//오전 6시 ~ 오후 2시 | 오후 2시 ~ 10시 | 오후 10시 + 익일 오전 6시
