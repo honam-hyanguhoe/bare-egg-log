@@ -45,15 +45,17 @@ public class BoardScheduler {
     @Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행
     @Transactional
     public void boardScheduledMethod() {
+        log.info("게시판 조회수 DB 업데이트 스케줄러 실행");
         if (!redisUtil.getAllViewedBoards().isEmpty()) {
             for (ZSetOperations.TypedTuple<String> tuple : redisUtil.getAllViewedBoards()) {
                 Long boardId = Long.parseLong(Objects.requireNonNull(tuple.getValue())); //boardId
-                Long score = Objects.requireNonNull(tuple.getScore()).longValue(); //조회수
+                long score = Objects.requireNonNull(tuple.getScore()).longValue(); //조회수
 
                 Board board = boardRepository.findById(boardId).orElseThrow(
                         () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD)
                 );
-                Long viewCnt = board.getViewCount() + score;    // DB 조회수 + 하루 동안의 조회수
+                long viewCnt = board.getViewCount() + score;    // DB 조회수 + 하루 동안의 조회수
+                log.info("boardId " + boardId + "의 조회수: " + viewCnt);
                 board.setViewCount(viewCnt);    // DB에 저장
             }
         }
