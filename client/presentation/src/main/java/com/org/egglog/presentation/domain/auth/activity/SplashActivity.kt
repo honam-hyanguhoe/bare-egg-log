@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.org.egglog.presentation.R
 import com.org.egglog.presentation.domain.main.activity.MainActivity
+import com.org.egglog.presentation.receiver.AlarmConst
 import kotlinx.coroutines.tasks.await
 
 @AndroidEntryPoint
@@ -56,7 +57,7 @@ class SplashActivity : AppCompatActivity() {
         // 권한 요청 예시
         askForPermissions(listOf(
             Manifest.permission.POST_NOTIFICATIONS,
-            Manifest.permission.INTERNET
+            Manifest.permission.SCHEDULE_EXACT_ALARM
         ))
     }
 
@@ -79,12 +80,11 @@ class SplashActivity : AppCompatActivity() {
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
             if (isGranted) {
-                Log.i("Permission: ", "Granted")
+                Log.e("Permission: ", "Granted")
             } else {
-                Log.i("Permission: ", "Denied")
+                Log.e("Permission: ", "Denied")
             }
         }
-
 
     private fun startLifecycleScopeWork() {
         lifecycleScope.launch {

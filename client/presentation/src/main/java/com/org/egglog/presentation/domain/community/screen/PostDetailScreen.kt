@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,6 +58,11 @@ import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
+import com.google.accompanist.swiperefresh.SwipeRefreshState
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.org.egglog.presentation.theme.NaturalBlack
 
 @Composable
 fun PostDetailScreen(
@@ -86,6 +92,9 @@ fun PostDetailScreen(
         }
     }
 
+    val isLoading by viewModel.isLoading.collectAsState()
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isLoading)
+
     PostDetailScreen(
         userId = state.userId!!,
         postId = postId,
@@ -100,7 +109,9 @@ fun PostDetailScreen(
         onChangeComment = viewModel::onChangeComment,
         onClickRecomment = viewModel::onClickRecomment,
         onClickSend = viewModel::onClickSend,
-        onClickLike = viewModel::onClickLike
+        onClickLike = viewModel::onClickLike,
+        swipeRefreshState = swipeRefreshState,
+        refreshSomething = viewModel::refreshSomething
     )
 }
 
@@ -120,10 +131,10 @@ private fun PostDetailScreen(
     onChangeComment: (String) -> Unit,
     onClickRecomment: (Long) -> Unit,
     onClickSend: () -> Unit,
-    onClickLike: () -> Unit
+    onClickLike: () -> Unit,
+    swipeRefreshState: SwipeRefreshState,
+    refreshSomething: () -> Unit
 ) {
-
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -139,6 +150,7 @@ private fun PostDetailScreen(
         Column(modifier = Modifier.weight(1f)) {
             // 내 글일 경우만 수정, 삭제 버튼 활성화
             if (userId.toInt() == postDetailInfo?.userId) {
+                Log.e("PostDetail", "${userId.toInt()}, ${postDetailInfo.userId}, ${postId}")
                 BasicHeader(
                     hasArrow = true,
                     hasMore = true,
@@ -166,87 +178,100 @@ private fun PostDetailScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            LazyColumn(Modifier.padding(bottom = 10.dp)) {
-                if (postDetailInfo != null) {
-                    item {
-                        val profile = Profile(
-                            postDetailInfo.userId.toLong(),
-                            postDetailInfo.tempNickname ?: "익명의 구운란",
-                            postDetailInfo.hospitalName ?: "",
-                            postDetailInfo.isHospitalAuth
-                        )
-                        val postInfo = com.org.egglog.client.data.PostInfo(
-                            postDetailInfo.boardId,
-                            postDetailInfo.boardTitle,
-                            postDetailInfo.boardContent,
-                            postDetailInfo.boardCreatedAt,
-                            postDetailInfo.pictureOne,
-                            postDetailInfo.pictureTwo ?: "",
-                            postDetailInfo.pictureThree ?: "",
-                            postDetailInfo.pictureFour ?: ""
-                        )
-                        val postReaction = PostReactionInfo(
-                            postDetailInfo.boardId,
-                            postDetailInfo.boardLikeCount,
-                            postDetailInfo.commentCount,
-                            postDetailInfo.viewCount,
-                            postDetailInfo.isLiked,
-                            postDetailInfo.isCommented
-                        )
-                        Box(modifier = Modifier.padding(horizontal = 20.dp)) {
-                            PostCard(
-                                profile = profile,
-                                postInfo = postInfo,
-                                postReaction = postReaction,
-                                onClickLike = onClickLike
+            SwipeRefresh(
+                state = swipeRefreshState,
+                onRefresh = refreshSomething,
+                indicator = { state, refreshTrigger ->
+                    SwipeRefreshIndicator(
+                        state = state,
+                        refreshTriggerDistance = refreshTrigger,
+                        backgroundColor = NaturalBlack,
+                        contentColor = NaturalWhite
+                    )
+                }
+            ) {
+                LazyColumn(Modifier.padding(bottom = 10.dp)) {
+                    if (postDetailInfo != null) {
+                        item {
+                            val profile = Profile(
+                                postDetailInfo.userId.toLong(),
+                                postDetailInfo.tempNickname ?: "익명의 구운란",
+                                postDetailInfo.hospitalName ?: "",
+                                postDetailInfo.isHospitalAuth
                             )
+                            val postInfo = com.org.egglog.client.data.PostInfo(
+                                postDetailInfo.boardId,
+                                postDetailInfo.boardTitle,
+                                postDetailInfo.boardContent,
+                                postDetailInfo.boardCreatedAt,
+                                postDetailInfo.pictureOne,
+                                postDetailInfo.pictureTwo ?: "",
+                                postDetailInfo.pictureThree ?: "",
+                                postDetailInfo.pictureFour ?: ""
+                            )
+                            val postReaction = PostReactionInfo(
+                                postDetailInfo.boardId,
+                                postDetailInfo.boardLikeCount,
+                                postDetailInfo.commentCount,
+                                postDetailInfo.viewCount,
+                                postDetailInfo.isLiked,
+                                postDetailInfo.isCommented
+                            )
+                            Box(modifier = Modifier.padding(horizontal = 20.dp)) {
+                                PostCard(
+                                    profile = profile,
+                                    postInfo = postInfo,
+                                    postReaction = postReaction,
+                                    onClickLike = onClickLike
+                                )
+                            }
+                        }
+                    } else {
+                        item {
+                            Text(text = "게시글을 불러오는데 실패했습니다.")
                         }
                     }
-                } else {
-                    item {
-                        Text(text = "게시글을 불러오는데 실패했습니다.")
-                    }
-                }
 
-                if (commentList!!.isNotEmpty()) {
-                    items(
-                        count = commentList.size,
-                        key = { index -> commentList[index].commentId }
-                    ) { index ->
-                        Column(modifier = Modifier.padding(horizontal = 20.dp)) {
-                            val commentInfo = commentList[index]
-                            // 게시글 작성자와 댓글 작성자의 userId 비교
-                            val isPostAuthor = commentInfo.userId == userId
-                            // 댓글 작성자가 게시글 작성자와 같을 경우 tempNickname을 변경
-                            val tempNickname =
-                                if (isPostAuthor) "익명의 구운란" else commentInfo.tempNickname
+                    if (commentList!!.isNotEmpty()) {
+                        items(
+                            count = commentList.size,
+                            key = { index -> commentList[index].commentId }
+                        ) { index ->
+                            Column(modifier = Modifier.padding(horizontal = 20.dp)) {
+                                val commentInfo = commentList[index]
+                                // 게시글 작성자와 댓글 작성자의 userId 비교
+                                val isPostAuthor = commentInfo.userId == userId
+                                // 댓글 작성자가 게시글 작성자와 같을 경우 tempNickname을 변경
+                                val tempNickname =
+                                    if (isPostAuthor) "익명의 구운란" else commentInfo.tempNickname
 
-                            CommentCard(
-                                commentInfo = commentInfo.copy(tempNickname = tempNickname),
-                                myUserId = userId,
-                                onDeleteClick = { commentId ->
-                                    onDeleteComment(commentId)
-                                },
-                                onRecommentClick = { commentId ->
-                                    focusManager.moveFocus(FocusDirection.Previous)
-                                    onClickRecomment(commentId)
-                                }
-                            )
+                                CommentCard(
+                                    commentInfo = commentInfo.copy(tempNickname = tempNickname),
+                                    myUserId = userId,
+                                    onDeleteClick = { commentId ->
+                                        onDeleteComment(commentId)
+                                    },
+                                    onRecommentClick = { commentId ->
+                                        focusManager.moveFocus(FocusDirection.Previous)
+                                        onClickRecomment(commentId)
+                                    }
+                                )
 
-                            if (commentInfo.recomment.isNotEmpty()) {
-                                commentInfo.recomment.forEach { recomment ->
-                                    val recommentTempNickname =
-                                        if (isPostAuthor) "익명의 구운란" else recomment.tempNickname
+                                if (commentInfo.recomment.isNotEmpty()) {
+                                    commentInfo.recomment.forEach { recomment ->
+                                        val recommentTempNickname =
+                                            if (isPostAuthor) "익명의 구운란" else recomment.tempNickname
 
-                                    CommentCard(
-                                        true,
-                                        commentInfo = recomment.copy(tempNickname = recommentTempNickname),
-                                        myUserId = userId,
-                                        onDeleteClick = { commentId ->
-                                            onDeleteComment(commentId)
-                                        },
-                                        onRecommentClick = {}
-                                    )
+                                        CommentCard(
+                                            true,
+                                            commentInfo = recomment.copy(tempNickname = recommentTempNickname),
+                                            myUserId = userId,
+                                            onDeleteClick = { commentId ->
+                                                onDeleteComment(commentId)
+                                            },
+                                            onRecommentClick = {}
+                                        )
+                                    }
                                 }
                             }
                         }

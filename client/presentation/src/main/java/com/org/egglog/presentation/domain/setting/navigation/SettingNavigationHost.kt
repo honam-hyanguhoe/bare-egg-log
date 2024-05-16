@@ -1,5 +1,6 @@
 package com.org.egglog.presentation.domain.setting.navigation
 
+import android.app.AlarmManager
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -14,7 +15,7 @@ import com.org.egglog.presentation.domain.setting.screen.SettingScreen
 import com.org.egglog.presentation.domain.setting.screen.WorkSettingScreen
 
 @Composable
-fun SettingNavigationHost() {
+fun SettingNavigationHost(alarmManager: AlarmManager) {
     val navController  = rememberNavController()
 
     NavHost(
@@ -55,7 +56,7 @@ fun SettingNavigationHost() {
         }
 
         composable(route = SettingRoute.WorkSettingScreen.name) {
-            WorkSettingScreen()
+            WorkSettingScreen(alarmManager)
         }
 
         composable(route = SettingRoute.AskSettingScreen.name) {
