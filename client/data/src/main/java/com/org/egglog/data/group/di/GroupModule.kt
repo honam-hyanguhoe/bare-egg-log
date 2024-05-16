@@ -5,6 +5,7 @@ import com.org.egglog.data.group.usecase.ChangeLeaderUseCaseImpl
 import com.org.egglog.data.group.usecase.CreateGroupUseCaseImpl
 import com.org.egglog.data.group.usecase.DeleteMemberUseCaseImpl
 import com.org.egglog.data.group.usecase.ExitGroupUseCaseImpl
+import com.org.egglog.data.group.usecase.GetDutyTagUseCaseImpl
 import com.org.egglog.data.group.usecase.GetGroupDutyUseCaseImpl
 import com.org.egglog.data.group.usecase.GetGroupInfoUseCaseImpl
 import com.org.egglog.data.group.usecase.GetGroupListUseCaseImpl
@@ -24,6 +25,7 @@ import com.org.egglog.domain.group.usecase.GetInvitationCodeUseCase
 import com.org.egglog.domain.group.usecase.GetMembersWorkUseCase
 import com.org.egglog.domain.group.usecase.InviteMemberUseCase
 import com.org.egglog.domain.group.usecase.UpdateGroupInfoUseCase
+import com.org.egglog.domain.group.usecase.getDutyTagUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -64,4 +66,8 @@ abstract class GroupModule {
 
     @Binds
     abstract fun exitGroupUseCaseImpl(uc : ExitGroupUseCaseImpl) : ExitGroupUseCase
+
+    @Binds
+    abstract fun getDutyTagUseCaseImpl(uc : GetDutyTagUseCaseImpl) : getDutyTagUseCase
+
 }

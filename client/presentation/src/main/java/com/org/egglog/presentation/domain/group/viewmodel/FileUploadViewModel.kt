@@ -7,8 +7,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
+import com.org.egglog.domain.auth.usecase.GetTokenUseCase
+import com.org.egglog.domain.group.usecase.getDutyTagUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +33,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FileUploadViewModel @Inject constructor(
-
+    private val getUserTokenUseCase: GetTokenUseCase,
+    private val getDutyTagUseCase: getDutyTagUseCase,
+    savedStateHandle: SavedStateHandle
 ) :ViewModel(), ContainerHost<FileUploadState, FileUploadSideEffect>{
     override val container: Container<FileUploadState, FileUploadSideEffect> = container(
         initialState = FileUploadState(),
@@ -46,7 +51,35 @@ class FileUploadViewModel @Inject constructor(
 //    var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
     private val _selectedDate = MutableStateFlow<LocalDate?>(null)
     val selectedDate : StateFlow<LocalDate?> = _selectedDate.asStateFlow()
+    val groupId = savedStateHandle.get<Long>("groupId")
+        ?: throw IllegalStateException("GroupId must be provided")
 
+    init {
+        initDutyTag()
+    }
+
+    fun initDutyTag() = intent {
+        val tokens = getUserTokenUseCase()
+
+        val result = getDutyTagUseCase(
+            accessToken = "Bearer ${tokens.first}",
+            groupId = groupId
+        ).getOrNull()
+
+
+        Log.d("upload", "init ${result}")
+        reduce {
+            val updateCustomDutyList = state.customDutyList.toMutableMap()
+            updateCustomDutyList["DAY"] = result?.day ?: ""
+            updateCustomDutyList["EVE"] = result?.eve ?: ""
+            updateCustomDutyList["NIGHT"] = result?.night ?: ""
+            updateCustomDutyList["OFF"] = result?.off ?: ""
+
+            state.copy(
+                customDutyList = updateCustomDutyList
+            )
+        }
+    }
     fun setSelectedDate(selected: LocalDate?) = intent{
         _selectedDate.value = selected
         Log.d("upload", "selected $selected")
