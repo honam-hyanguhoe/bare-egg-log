@@ -1,5 +1,6 @@
 package com.org.egglog.presentation.component.atoms.labels
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.org.egglog.domain.myCalendar.model.WorkType
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
 import com.org.egglog.presentation.theme.*
@@ -69,6 +71,45 @@ fun Labels(text: String, size: String? = null, onClick: (()->Unit)? = null) {
                 style= textStyle
         )
     }
+}
+
+@Composable
+fun Labels2(workType: WorkType? = null,  tempWorkType: Pair<Int, String>? = null, size: String ?= null, onClick: (() -> Unit)? = null) {
+
+    var color: Color = Gray100
+    if(workType != null) {
+        color = Color(android.graphics.Color.parseColor(workType.color))
+    }
+
+    var textStyle = when(size) {
+        "big" -> Typography.labelLarge.copy(fontWeight = FontWeight.SemiBold)
+        else -> Typography.labelMedium.copy(fontSize = 10.sp)
+    }
+
+    val width = if (size == "big") 75.widthPercent(LocalContext.current).dp else 42.widthPercent(LocalContext.current).dp
+    val height = if (size == "big") 34.heightPercent(LocalContext.current).dp else 18.heightPercent(LocalContext.current).dp
+    val border = if (size == "big") 50.widthPercent(LocalContext.current).dp else 4.widthPercent(LocalContext.current).dp
+
+    Box(modifier = Modifier
+        .background(color, RoundedCornerShape(border))
+        .size(width = width, height = height)
+        .run {
+            if (onClick != null) {
+                clickable(onClick = onClick)
+            } else {
+                this // onClick이 null인 경우 clickable을 적용하지 않음
+            }
+        },
+        contentAlignment = Alignment.Center
+
+    ) {
+        Text(
+            text = workType?.title ?: (tempWorkType?.second ?: ""),
+            color = Color.White,
+            style = textStyle
+        )
+    }
+
 }
 
 
