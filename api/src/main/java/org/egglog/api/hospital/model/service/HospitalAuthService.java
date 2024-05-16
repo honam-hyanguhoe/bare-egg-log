@@ -9,6 +9,7 @@ import org.egglog.api.hospital.model.dto.response.HospitalAuthListResponse;
 import org.egglog.api.hospital.model.dto.response.HospitalAuthResponse;
 import org.egglog.api.hospital.model.entity.HospitalAuth;
 import org.egglog.api.hospital.repository.jpa.HospitalAuthJpaRepository;
+import org.egglog.api.notification.model.service.NotificationService;
 import org.egglog.api.security.exception.JwtErrorCode;
 import org.egglog.api.security.exception.JwtException;
 import org.egglog.api.user.exception.UserErrorCode;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
 public class HospitalAuthService {
 
     private final HospitalAuthJpaRepository hospitalAuthJpaRepository;
-
+    private final NotificationService notificationService;
     /**
      * 병원 인증 요청입니다. 요청 데이터가 존재했다면 상태 업데이트, 새 요청이라면 생성합니다.
      * @param loginUser 요청을 보내는 로그인 유저
@@ -81,7 +82,9 @@ public class HospitalAuthService {
         log.debug(" ==== ==== ==== [ [관리자] 인증하기 서비스 실행 ] ==== ==== ====");
         HospitalAuth hospitalAuth = hospitalAuthJpaRepository.findByIdWithHospitalAndUser(authHospitalId)
                 .orElseThrow(() -> new HospitalException(HospitalErrorCode.AUTH_NOT_FOUND));
-        return hospitalAuthJpaRepository.save(hospitalAuth.confirm(adminUser)).toResponse();
+        HospitalAuth confirm = hospitalAuth.confirm(adminUser);
+        notificationService.certHospitalNotification(confirm);
+        return hospitalAuthJpaRepository.save(confirm).toResponse();
     }
 
 }

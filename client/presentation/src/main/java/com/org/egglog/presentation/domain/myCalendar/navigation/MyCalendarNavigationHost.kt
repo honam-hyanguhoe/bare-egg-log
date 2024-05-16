@@ -1,9 +1,11 @@
 package com.org.egglog.presentation.domain.myCalendar.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.org.egglog.presentation.domain.community.navigation.CommunityRoute
 import com.org.egglog.presentation.domain.myCalendar.screen.ExcelListScreen
 import com.org.egglog.presentation.domain.myCalendar.screen.MyCalendarScreen
@@ -22,9 +24,9 @@ fun MyCalendarNavigationHost() {
     ) {
         composable(route = MyCalendarRoute.MyCalendarScreen.name) {
             MyCalendarScreen(
-                onNavigateToExcelScreen = {
+                onNavigateToExcelScreen = { currentYear, currentMonth ->
                     navController.navigate(
-                        MyCalendarRoute.ExcelListScreen.name
+                        route = "${MyCalendarRoute.ExcelListScreen.name}/$currentYear/$currentMonth"
                     )
                 },
                 onNavigateToCalendarSettingScreen = {
@@ -40,8 +42,18 @@ fun MyCalendarNavigationHost() {
             )
         }
 
-        composable(route = MyCalendarRoute.ExcelListScreen.name) {
+        composable(
+            route = "${MyCalendarRoute.ExcelListScreen.name}/{currentYear}/{currentMonth}",
+            arguments = listOf(
+                navArgument("currentYear") { type = NavType.IntType },
+                navArgument("currentMonth") { type = NavType.IntType }
+            )
+        ) {backStackEntry ->
+            val currentYear = backStackEntry.arguments!!.getInt("currentYear")
+            val currentMonth = backStackEntry.arguments!!.getInt("currentMonth")
             ExcelListScreen(
+                currentYear = currentYear,
+                currentMonth = currentMonth,
                 onNavigateToMyCalendarScreen = {
                     navController.navigate(
                         route = MyCalendarRoute.MyCalendarScreen.name,

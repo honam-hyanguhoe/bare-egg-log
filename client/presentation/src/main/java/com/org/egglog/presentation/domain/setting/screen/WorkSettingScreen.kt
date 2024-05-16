@@ -1,6 +1,7 @@
 package com.org.egglog.presentation.domain.setting.screen
 
 import android.app.Activity
+import android.app.AlarmManager
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -33,7 +34,8 @@ import java.time.LocalTime
 
 @Composable
 fun WorkSettingScreen(
-    viewModel: WorkSettingViewModel = hiltViewModel(),
+    alarmManager: AlarmManager,
+    viewModel: WorkSettingViewModel = hiltViewModel()
 ) {
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
@@ -63,7 +65,8 @@ fun WorkSettingScreen(
         deleteEnabled = state.deleteEnabled,
         onSelected = viewModel::onSelected,
         selectedWorkType = state.selectedWorkType,
-        deleteSelectedWorkType = viewModel::deleteSelectedWorkType
+        deleteSelectedWorkType = viewModel::deleteSelectedWorkType,
+        alarmManager = alarmManager
     )
 }
 
@@ -88,7 +91,8 @@ fun WorkSettingScreen(
     modifyEnabled: Boolean,
     onSelected: (String, WorkType) -> Unit,
     selectedWorkType: WorkType?,
-    deleteSelectedWorkType: () -> Unit
+    deleteSelectedWorkType: () -> Unit,
+    alarmManager: AlarmManager
 ) {
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
@@ -137,7 +141,7 @@ fun WorkSettingScreen(
                     addEnabled = addEnabled,
                     deleteSelectedWorkType = deleteSelectedWorkType
                 ) },
-            secendContent = { AlarmManager() })
+            secendContent = { AlarmManager(alarmManager) })
     }
 }
 

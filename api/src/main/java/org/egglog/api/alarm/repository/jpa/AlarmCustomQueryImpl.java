@@ -19,26 +19,26 @@ public class AlarmCustomQueryImpl implements AlarmCustomQuery {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<Alarm> findAlarmList(Long userId) {
-        return jpaQueryFactory
+    public Optional<List<Alarm>> findAlarmListByUserId(Long userId) {
+        return Optional.of(jpaQueryFactory
                 .selectFrom(alarm)
+                .leftJoin(alarm.workType, workType).fetchJoin()
                 .where(alarm.user.id.eq(userId))
-                .fetch();
+                .fetch());
     }
-
-    public Optional<Alarm> findWithUserAndWorkTypeById(Long userId) {
+    public Optional<Alarm> findWithUserAndWorkTypeById(Long alarmId) {
         return Optional.of(jpaQueryFactory
                 .selectFrom(alarm)
                 .leftJoin(alarm.workType, workType).fetchJoin()
                 .leftJoin(alarm.user, user).fetchJoin()
-                .where(alarm.user.id.eq(userId))
+                .where(alarm.id.eq(alarmId))
                 .fetchOne());
     }
-    public Optional<Alarm> findWithUserById(Long userId) {
+    public Optional<Alarm> findWithUserById(Long alarmId) {
         return Optional.of(jpaQueryFactory
                 .selectFrom(alarm)
                 .leftJoin(alarm.user, user).fetchJoin()
-                .where(alarm.user.id.eq(userId))
+                .where(alarm.id.eq(alarmId))
                 .fetchOne());
     }
 

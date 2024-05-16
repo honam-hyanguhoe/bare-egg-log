@@ -20,5 +20,6 @@ import lombok.*;
 @Setter
 @Builder
 public class UpdateFcmRequest {
+    @NotBlank(message = "fcm 토큰은 null일 수 없습니다.")
     private String fcmToken;
 }

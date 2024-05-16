@@ -28,10 +28,6 @@ public class Group {
     @Column(name = "group_password",nullable = false)
     private String password;
 
-    @JoinColumn(name = "group_admin_id")
-    @ManyToOne(fetch = FetchType.LAZY)
-    private GroupMember admin;
-
     public GroupSimpleDto toSimpleDto(){
         GroupSimpleDto simpleDto = new GroupSimpleDto();
         simpleDto.setGroupId(this.id);

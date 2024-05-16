@@ -16,12 +16,17 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.org.egglog.domain.myCalendar.model.EventListData
 import com.org.egglog.presentation.data.ScheduleInfo
 import com.org.egglog.presentation.utils.MoreHoriz
 import com.org.egglog.presentation.utils.widthPercent
@@ -30,12 +35,15 @@ import com.org.egglog.presentation.component.atoms.icons.Icon
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.presentation.theme.*
 import com.org.egglog.presentation.R
+import com.org.egglog.presentation.component.atoms.menus.ScrollableMenus
 
 @Composable
-fun BigScheduleCard(work: String, startTime: String, endTime: String, content: String, title: String? = "", color: Color? = Gray100, onClickMore: () -> Unit) {
+fun BigScheduleCard(eventData: EventListData, color: Color? = Gray100, onClickDelete: () -> Unit = {}, onClickModify: () -> Unit = {}) {
     val context = LocalContext.current
 
-    val cardContent: ScheduleInfo = when(work) {
+    var selectedMenuItem by remember { mutableStateOf<String?>(null) }
+
+    val cardContent: ScheduleInfo = when(eventData.eventTitle) {
         "day" -> ScheduleInfo(DayCard, "Day 근무", R.drawable.day)
         "eve" -> ScheduleInfo(EveCard, "Eve 근무", R.drawable.eve)
         "night" -> ScheduleInfo(NightCard, "Night 근무", R.drawable.night)
@@ -43,7 +51,7 @@ fun BigScheduleCard(work: String, startTime: String, endTime: String, content: S
         "교육" -> ScheduleInfo(Orange300, "교육", R.drawable.education)
         "휴가" -> ScheduleInfo(Error300, "휴가", R.drawable.vacation)
         "보건" -> ScheduleInfo(Pink300, "보건", R.drawable.health)
-        else -> ScheduleInfo(color ?: Gray100, title ?: "", "")
+        else -> ScheduleInfo(color ?: Gray100, eventData.eventTitle ?: "", "")
     }
 
     BackgroundCard(margin = 4.widthPercent(context).dp, padding = 12.widthPercent(context).dp, color = cardContent.color, borderRadius = 10.widthPercent(context).dp) {
@@ -59,11 +67,23 @@ fun BigScheduleCard(work: String, startTime: String, endTime: String, content: S
                             .background(Color.Transparent, CircleShape)
                             .border(3.dp, Primary600, CircleShape)) {}
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "${startTime} - ${endTime}", style = Typography.displayLarge)
+                    Text(text = "${eventData.startDate.substring(11,16)} - ${eventData.endDate.substring(11,16)}", style = Typography.displayLarge)
                 }
-                IconButton(onClick = { onClickMore() }, Modifier.size(20.dp)) {
-                    Icon(imageVector = MoreHoriz, modifier = Modifier.fillMaxSize())
-                }
+                ScrollableMenus(
+                    iconShape = MoreHoriz,
+                    boxSize = 20,
+                    iconSize = 20,
+                    options = listOf("수정하기", "삭제하기"),
+                    selectedOption = selectedMenuItem,
+                    onSelect = {
+                        selectedMenuItem = it
+                        if(selectedMenuItem == "삭제하기") {
+                            onClickDelete()
+                        } else if(selectedMenuItem == "수정하기") {
+                            onClickModify()
+                        }
+                     }
+                )
             }
             Spacer(modifier = Modifier.height(6.dp))
             Row(Modifier
@@ -72,11 +92,11 @@ fun BigScheduleCard(work: String, startTime: String, endTime: String, content: S
                     verticalAlignment = Alignment.CenterVertically
             ) {
             Column() {
-                Text(text = "${cardContent.title}", style = Typography.bodyLarge.copy(fontSize = 18.sp))
+                Text(text = cardContent.title, style = Typography.bodyLarge.copy(fontSize = 18.sp))
                 Spacer(modifier = Modifier.height(6.dp))
-                    Text("${content}", style = Typography.displayMedium)
+                    Text(eventData.eventContent ?: "", style = Typography.displayMedium)
                 }
-                if(!cardContent.imageName.equals("")) {
+                if(cardContent.imageName != "") {
                     LocalImageLoader(imageUrl = cardContent.imageName, Modifier.size(42.widthPercent(context).dp))
                 }
             }

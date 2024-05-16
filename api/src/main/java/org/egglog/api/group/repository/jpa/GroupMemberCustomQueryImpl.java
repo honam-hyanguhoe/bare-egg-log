@@ -131,4 +131,13 @@ public class GroupMemberCustomQueryImpl implements GroupMemberCustomQuery{
         }
         return groupDutySummary;
     }
+
+    @Override
+    public List<Long> findGroupIdByUserId(Long userId) {
+        return jpaQueryFactory
+                .selectDistinct(groupMember.group.id)
+                .from(groupMember)
+                .where(groupMember.user.id.eq(userId))
+                .fetch();
+    }
 }

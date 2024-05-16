@@ -23,6 +23,7 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +36,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
+import com.google.accompanist.swiperefresh.SwipeRefreshState
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.org.egglog.client.data.PostInfo
 import com.org.egglog.client.data.PostReactionInfo
 import com.org.egglog.client.data.Profile
 import com.org.egglog.domain.community.model.PostData
@@ -120,6 +126,10 @@ fun PostListScreen(
             }
         }
     }
+
+    val isLoading by viewModel.isLoading.collectAsState()
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isLoading)
+
     PostListScreen(
         selectedIdx = state.selectedIdx,
         onSelectedIdx = viewModel::onSelectedIdx,
@@ -133,7 +143,9 @@ fun PostListScreen(
         onClickPost = { postId: Int -> onNavigateToDetailScreen(postId) },
         onClickWriteButton = onNavigateToWriteScreen,
         onSelectCategory = viewModel::onSelectCategoryIndex,
-        onClickSearch = onNavigateToSearchScreen
+        onClickSearch = onNavigateToSearchScreen,
+        swipeRefreshState = swipeRefreshState,
+        refreshSomething = viewModel::refreshSomething,
     )
 }
 
@@ -151,7 +163,9 @@ private fun PostListScreen(
     onClickPost: (postId: Int) -> Unit ,
     onClickWriteButton: (hospitalId: Int?, groupId: Int?) -> Unit,
     onSelectCategory: (index: Int) -> Unit,
-    onClickSearch: (hospitalId: Int?, groupId: Int?) -> Unit
+    onClickSearch: (hospitalId: Int?, groupId: Int?) -> Unit,
+    swipeRefreshState: SwipeRefreshState,
+    refreshSomething: () -> Unit
 ) {
     val context = LocalContext.current
     var selectedMenuItem by remember { mutableStateOf(categoryList[0].second) }
@@ -168,7 +182,7 @@ private fun PostListScreen(
     ) {
         Column(
             Modifier
-                .fillMaxHeight(0.92f)
+                .fillMaxHeight(0.9f)
                 .padding(
                     start = 10.widthPercent(context).dp,
                     top = 20.heightPercent(context).dp,
@@ -191,127 +205,141 @@ private fun PostListScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            LazyColumn(state = scrollState, modifier = Modifier.padding(10.dp)) {
-                item {
-                    BackgroundCard(
-                        margin = 0.dp,
-                        padding = 0.dp,
-                        color = Warning200,
-                        borderRadius = 10.dp,
-                        onClickCard = null
-                    ) {
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(Modifier.padding(vertical = 14.dp, horizontal = 4.dp)) {
-                                Text(text = "에그로그에 친구를 초대하고,", style = Typography.displayLarge)
-                                Text(
-                                    text = "친구와 함께 일정을 공유하세요!",
-                                    style = Typography.displayLarge
-                                )
-                            }
-
-                            Column(
-                                Modifier
-                                    .fillMaxHeight()
-                                    .height(70.heightPercent(context).dp)
-                                    .padding(top = 10.dp, end = 14.dp),
-                                verticalArrangement = Arrangement.Bottom,
-                                horizontalAlignment = Alignment.End
-                            ) {
-                                LocalImageLoader(
-                                    imageUrl = R.drawable.dark,
-                                    Modifier.size(60.dp)
-                                )
-                            }
-                        }
-                    }
+            SwipeRefresh(
+                state = swipeRefreshState,
+                onRefresh = refreshSomething,
+                indicator = { state, refreshTrigger ->
+                    SwipeRefreshIndicator(
+                        state = state,
+                        refreshTriggerDistance = refreshTrigger,
+                        backgroundColor = NaturalBlack,
+                        contentColor = NaturalWhite
+                    )
                 }
-
-                if (groupId == null && hospitalId == null) {
+            ) {
+                LazyColumn(state = scrollState, modifier = Modifier.padding(10.dp)) {
                     item {
-                        Column {
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Text(text = "\uD83D\uDD25 급상승 게시글")
-                            Spacer(modifier = Modifier.height(8.dp))
+                        BackgroundCard(
+                            margin = 0.dp,
+                            padding = 0.dp,
+                            color = Warning200,
+                            borderRadius = 10.dp,
+                            onClickCard = null
+                        ) {
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(Modifier.padding(vertical = 14.dp, horizontal = 4.dp)) {
+                                    Text(text = "에그로그에 친구를 초대하고,", style = Typography.displayLarge)
+                                    Text(
+                                        text = "친구와 함께 일정을 공유하세요!",
+                                        style = Typography.displayLarge
+                                    )
+                                }
+
+                                Column(
+                                    Modifier
+                                        .fillMaxHeight()
+                                        .height(70.heightPercent(context).dp)
+                                        .padding(top = 10.dp, end = 14.dp),
+                                    verticalArrangement = Arrangement.Bottom,
+                                    horizontalAlignment = Alignment.End
+                                ) {
+                                    LocalImageLoader(
+                                        imageUrl = R.drawable.dark,
+                                        Modifier.size(60.dp)
+                                    )
+                                }
+                            }
                         }
                     }
 
-                    if (hotPostList.isNotEmpty()) {
-                        items(count = hotPostList.size,
-                            key = { index -> "0${hotPostList[index].postId}" }) { index ->
-                            val tempNickname = hotPostList[index].name ?: "익명의 구운란"
-                            HotPostCard(postInfo = hotPostList[index].copy(name = tempNickname),
-                                onClickPost = { postId -> onClickPost(postId) })
+                    if (groupId == null && hospitalId == null) {
+                        item {
+                            Column {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(text = "\uD83D\uDD25 급상승 게시글")
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+                        }
+
+                        if (hotPostList.isNotEmpty()) {
+                            items(count = hotPostList.size,
+                                key = { index -> "0${hotPostList[index].postId}" }) { index ->
+                                val tempNickname = hotPostList[index].name ?: "익명의 구운란"
+                                HotPostCard(postInfo = hotPostList[index].copy(name = tempNickname),
+                                    onClickPost = { postId -> onClickPost(postId) })
+                            }
+                        } else {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 20.dp, bottom = 10.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(text = "아직 급상승 게시글이 없어요")
+                                }
+                            }
+                        }
+                    }
+
+                    item {
+                        Spacer(modifier = Modifier.height(30.dp))
+                    }
+
+                    if (list.itemCount != 0) {
+                        items(count = list.itemCount,
+                            key = { index ->
+                                list[index]?.boardId ?: "UniqueKey_$index"
+                            }) { index ->
+                            list[index]?.run {
+                                val profile = Profile(
+                                    this.userId,
+                                    this.tempNickname ?: "익명의 구운란",
+                                    this.hospitalName,
+                                    this.isHospitalAuth
+                                )
+                                val postInfo = PostInfo(
+                                    this.boardId,
+                                    this.boardTitle,
+                                    this.boardContent,
+                                    this.boardCreatedAt,
+                                    this.pictureOne
+                                )
+                                val postReaction = PostReactionInfo(
+                                    this.boardId,
+                                    this.likeCount,
+                                    this.commentCount,
+                                    this.viewCount,
+                                    this.isLiked,
+                                    this.isCommented
+                                )
+
+                                Column {
+                                    PostCard(profile = profile,
+                                        postInfo = postInfo,
+                                        postReaction = postReaction,
+                                        onClick = { postId -> onClickPost(postId) })
+                                    Spacer(modifier = Modifier.height(10.dp))
+                                }
+                            }
                         }
                     } else {
                         item {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
+                                    .fillMaxHeight(0.9f)
                                     .padding(top = 20.dp, bottom = 10.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(text = "아직 급상승 게시글이 없어요")
+                                Text(text = "아직 등록된 게시글이 없어요")
                             }
-                        }
-                    }
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(30.dp))
-                }
-
-                if (list.itemCount != 0) {
-                    items(count = list.itemCount,
-                        key = { index ->
-                            list[index]?.boardId ?: "UniqueKey_$index"
-                        }) { index ->
-                        list[index]?.run {
-                            val profile = Profile(
-                                this.userId,
-                                this.tempNickname ?: "익명의 구운란",
-                                this.hospitalName,
-                                this.isHospitalAuth
-                            )
-                            val postInfo = com.org.egglog.client.data.PostInfo(
-                                this.boardId,
-                                this.boardTitle,
-                                this.boardContent,
-                                this.boardCreatedAt,
-                                this.pictureOne
-                            )
-                            val postReaction = PostReactionInfo(
-                                this.boardId,
-                                this.likeCount,
-                                this.commentCount,
-                                this.viewCount,
-                                this.isLiked,
-                                this.isCommented
-                            )
-
-                            Column {
-                                PostCard(profile = profile,
-                                    postInfo = postInfo,
-                                    postReaction = postReaction,
-                                    onClick = { postId -> onClickPost(postId) })
-                                Spacer(modifier = Modifier.height(10.dp))
-                            }
-                        }
-                    }
-                } else {
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 20.dp, bottom = 10.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = "아직 등록된 게시글이 없어요")
                         }
                     }
                 }
@@ -344,8 +372,8 @@ fun CustomFloatingActionButton(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.92f)
-            .padding(horizontal = 10.dp),
+            .fillMaxHeight(0.9f)
+            .padding(top = 0.dp, start = 10.dp, end = 10.dp, bottom = 10.dp),
         contentAlignment = Alignment.BottomEnd
     ) {
         FloatingActionButton(
