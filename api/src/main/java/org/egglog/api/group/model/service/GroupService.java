@@ -15,6 +15,7 @@ import org.egglog.api.group.model.dto.response.*;
 import org.egglog.api.group.model.entity.Group;
 import org.egglog.api.group.model.entity.GroupMember;
 import org.egglog.api.group.model.entity.InvitationCode;
+import org.egglog.api.group.repository.firestore.GroupDutyRepository;
 import org.egglog.api.group.repository.redis.GroupInvitationRepository;
 import org.egglog.api.group.repository.jpa.GroupRepository;
 import org.egglog.api.notification.model.entity.FCMTopic;
@@ -22,12 +23,17 @@ import org.egglog.api.notification.model.entity.enums.TopicEnum;
 import org.egglog.api.notification.model.service.FCMService;
 import org.egglog.api.notification.model.service.NotificationService;
 import org.egglog.api.user.model.entity.User;
+import org.egglog.api.worktype.model.entity.WorkTag;
 import org.egglog.utility.utils.RandomStringUtils;
+import org.egglog.utility.utils.SuccessType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -38,6 +44,7 @@ public class GroupService {
     private final GroupMemberService groupMemberService;
 
     private final GroupRepository groupRepository;
+    private final GroupDutyRepository groupDutyRepository;
     private final GroupInvitationRepository groupInvitationRepository;
 
     private final FCMService fcmService;
@@ -322,18 +329,29 @@ public class GroupService {
      * @param groupDutyData
      */
     public void addDuty(User user, Long groupId, GroupDutyData groupDutyData) {
-//        Query query = FIRE_STORE.collection(
-//                COLLECTION_NAME).whereEqualTo("email", user.getEmail());
-//        ApiFuture<QuerySnapshot> querySnapshot = query.get();
-//
-//        DocumentReference document = null;
-//        if (isNotExistEmail(querySnapshot)) {
-//            document = FIRE_STORE.collection(COLLECTION_NAME).document();
-//            user.setId(document.getId());
-//            document.set(user);
-//            log.info("새로운 문서가 추가되었습니다. document ID: {}", document.getId());
-//        } else {
-//            throw new RuntimeException("이미 가입된 이메일입니다.");
-//        }
+        if(groupMemberService.isGroupMember(groupId,user.getId())){
+            try {
+                groupDutyData.setUserName(user.getName());
+                SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
+                Date now = new Date();
+                String nowDay = dayFormat.format(now);
+                groupDutyData.setDay(nowDay);
+                groupDutyRepository.saveDuty(groupId,groupDutyData);
+            }catch (Exception e){
+                throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
+            }
+        }else {
+            throw new GroupException(GroupErrorCode.GROUP_ROLE_NOT_MATCH);
+        }
+    }
+
+    /**
+     *
+     * @param user
+     * @param groupId
+     * @return
+     */
+    public SuccessType getGroupDutyList(User user, Long groupId, String yearAndMonth) {
+        return SuccessType.CREATE;
     }
 }
