@@ -46,7 +46,7 @@ public class WorkController {
 
 
     /**
-     * 그룹내 엑셀 근무 동기화
+     * 근무 동기화
      * @param loginUser 로그인한 유저(JWT 토큰)
      * @param request 캘린더 그룹 ID, List[{근무 타입 ID, 근무 일}]
      * @param targetMonth 해당 월
@@ -62,6 +62,7 @@ public class WorkController {
         return ResponseEntity.ok().body(
                 MessageUtils.success(workService.syncWork(loginUser, request, targetMonth)));
     }
+
 
 
     /**
@@ -189,12 +190,4 @@ public class WorkController {
                 MessageUtils.success(workService.findCompletedWorkCount(loginUser, today, month)));
     }
 
-    @PostMapping("/sync")
-    public ResponseEntity<MessageUtils> syncWorkWithParsedData(
-            @AuthenticationPrincipal User loginUser,
-            @RequestBody @Valid GroupDutyDataDto groupDutyDataDto
-    ){
-        workService.syncWork(loginUser,groupDutyDataDto);
-        return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
-    }
 }

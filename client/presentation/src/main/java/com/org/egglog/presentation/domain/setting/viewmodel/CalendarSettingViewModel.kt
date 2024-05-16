@@ -1,6 +1,10 @@
 package com.org.egglog.presentation.domain.setting.viewmodel
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.util.Log
+import androidx.core.content.getSystemService
 import androidx.lifecycle.ViewModel
 import com.org.egglog.domain.auth.model.UserDetail
 import com.org.egglog.domain.setting.usecase.GetCalendarGroupMapStoreUseCase
@@ -10,6 +14,7 @@ import com.org.egglog.domain.setting.model.AddCalendarGroupParam
 import com.org.egglog.domain.setting.model.CalendarGroup
 import com.org.egglog.domain.setting.usecase.DeleteCalendarGroupUseCase
 import com.org.egglog.domain.setting.usecase.GetCalendarGroupListUseCase
+import com.org.egglog.domain.setting.usecase.GetCalendarLinkUseCase
 import com.org.egglog.domain.setting.usecase.PostCalendarGroupUseCase
 import com.org.egglog.domain.setting.usecase.PostCalendarSyncUseCase
 import com.org.egglog.domain.setting.usecase.SetCalendarGroupMapStoreUseCase
@@ -35,7 +40,8 @@ class CalendarSettingViewModel @Inject constructor(
     private val deleteCalendarGroupUseCase: DeleteCalendarGroupUseCase,
     private val getCalendarGroupListUseCase: GetCalendarGroupListUseCase,
     private val postCalendarGroupUseCase: PostCalendarGroupUseCase,
-    private val postCalendarSyncUseCase: PostCalendarSyncUseCase
+    private val postCalendarSyncUseCase: PostCalendarSyncUseCase,
+    private val getCalendarLinkUseCase: GetCalendarLinkUseCase
 ): ViewModel(), ContainerHost<CalendarSettingState, CalendarSettingSideEffect>{
     override val container: Container<CalendarSettingState, CalendarSettingSideEffect> = container(
         initialState = CalendarSettingState(),
@@ -120,6 +126,16 @@ class CalendarSettingViewModel @Inject constructor(
     @OptIn(OrbitExperimental::class)
     fun onAliasChange(alias: String) = blockingIntent {
         reduce { state.copy(alias = alias) }
+    }
+
+    fun getCalendarLink(context: Context) = intent {
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val tokens = getTokenUseCase()
+        val link = getCalendarLinkUseCase("Bearer ${tokens.first}").getOrThrow()
+        Log.e("Setting", link)
+        val clip = ClipData.newPlainText("Calendar Link", link)
+        clipboard.setPrimaryClip(clip)
+        postSideEffect(CalendarSettingSideEffect.Toast("내보내기 링크가 복사되었습니다"))
     }
 }
 

@@ -1,6 +1,7 @@
 package com.org.egglog.presentation.domain.setting.screen
 
 import android.app.Activity
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -68,7 +69,8 @@ fun CalendarSettingScreen(
         syncEnabled = state.syncEnabled,
         deleteEnabled = state.deleteEnabled,
         addEnabled = state.addEnabled,
-        user = state.user
+        user = state.user,
+        getCalendarLink = viewModel::getCalendarLink
     )
 }
 
@@ -83,7 +85,8 @@ fun CalendarSettingScreen(
     syncEnabled: Boolean,
     deleteEnabled: Boolean,
     addEnabled: Boolean,
-    user: UserDetail?
+    user: UserDetail?,
+    getCalendarLink: (Context) -> Unit
 ) {
     val context = LocalContext.current
     val currentDate = LocalDate.now()
@@ -122,7 +125,8 @@ fun CalendarSettingScreen(
                 }
 
                 calendarGroupList?.map {calendarGroup ->
-                    CalendarSettingSwiper(onDelete = { onClickDelete(calendarGroup.calendarGroupId) }, deleteEnabled = user?.workGroupId != calendarGroup.calendarGroupId && deleteEnabled, enabled = user?.workGroupId != calendarGroup.calendarGroupId) {
+                    val enableToDelete = user?.workGroupId != calendarGroup.calendarGroupId && deleteEnabled
+                    CalendarSettingSwiper(onClick = { if(enableToDelete) { onClickDelete(calendarGroup.calendarGroupId) } else { getCalendarLink(context) } }, deleteEnabled = enableToDelete) {
                         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
                             Text(text = "${if(calendarGroup.isBasic) "[기본]" else "[구독]"} ${calendarGroup.alias}", style = Typography.bodyMedium)
                             Toggle(checked = calendarGroup.isEnabled, onCheckedChange = {

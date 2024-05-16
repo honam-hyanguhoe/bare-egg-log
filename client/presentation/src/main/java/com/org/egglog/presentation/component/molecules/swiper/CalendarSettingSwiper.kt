@@ -2,6 +2,7 @@ package com.org.egglog.presentation.component.molecules.swiper
 
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -36,10 +37,10 @@ import kotlin.math.roundToInt
 
 @OptIn(ExperimentalWearMaterialApi::class)
 @Composable
-fun CalendarSettingSwiper(onDelete: () -> Unit, deleteEnabled: Boolean, enabled: Boolean = true, children: @Composable () -> Unit) {
+fun CalendarSettingSwiper(onClick: () -> Unit, deleteEnabled: Boolean, enabled: Boolean = true, children: @Composable () -> Unit) {
     val swipeAbleState = rememberSwipeableState(initialValue = 0)
     val coroutineScope = rememberCoroutineScope()
-    val squareSize = 54.widthPercent(LocalContext.current).dp
+    val squareSize = 70.widthPercent(LocalContext.current).dp
     val sizePx = with(LocalDensity.current) { squareSize.toPx() }
     val anchors = mapOf(0f to 0, -sizePx to 1)
 
@@ -63,18 +64,18 @@ fun CalendarSettingSwiper(onDelete: () -> Unit, deleteEnabled: Boolean, enabled:
                 .align(Alignment.CenterEnd)
         ) {
             TextButton(
-                enabled = deleteEnabled && swipeAbleState.currentValue == 1,
+                enabled = true,
                 modifier = Modifier
-                    .width(54.widthPercent(LocalContext.current).dp)
+                    .width(70.widthPercent(LocalContext.current).dp)
                     .fillMaxHeight()
-                    .background(Gray300),
+                    .background(if(deleteEnabled) Gray300 else Warning300),
                 onClick = {
                     coroutineScope.launch {
                         swipeAbleState.animateTo(0, tween(600, 0))
                     }
-                    onDelete()
+                    onClick()
                 }) {
-                Text("삭제", color= NaturalWhite)
+                if(deleteEnabled) Text("삭제", color= NaturalWhite) else Text(text = "캘린더\n내보내기", color = NaturalWhite, textAlign = TextAlign.Center)
             }
         }
 
