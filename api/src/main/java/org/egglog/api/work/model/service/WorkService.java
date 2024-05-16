@@ -68,7 +68,7 @@ public class WorkService {
 
     @Transactional
     public List<WorkResponse> createWork(User loginUser, CreateWorkListRequest request){
-        log.debug(" ==== ==== ==== [ 그룹내 유저의 근무 일정 생성 서비스 실행 ] ==== ==== ====");
+        log.debug(" ==== ==== ==== [ 근무 일정 생성 서비스 실행 ] ==== ==== ====");
         if (loginUser.getWorkGroupId()!= request.getCalendarGroupId()) throw new CalendarGroupException(CalendarGroupErrorCode.WORK_GROUP_ACCESS_DENY);
         CalendarGroup calendarGroup = calendarGroupRepository.findById(request.getCalendarGroupId())
                 .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
@@ -79,9 +79,47 @@ public class WorkService {
                 .findByUser(loginUser).stream().collect(Collectors.toMap(WorkType::getId, wt -> wt));
 
         return workJpaRepository.saveAll(
-                request.getWorkTypes().stream()
-                        .map(value-> value.toEntity(loginUser, userWorkTypeMap, calendarGroup))
-                        .collect(Collectors.toList()))
+                        request.getWorkTypes().stream()
+                                .map(value-> value.toEntity(loginUser, userWorkTypeMap, calendarGroup))
+                                .collect(Collectors.toList()))
+                .stream()
+                .map(Work::toResponse)
+                .collect(Collectors.toList());
+    }
+
+
+    @Transactional
+    public List<WorkResponse> syncWork(User loginUser, CreateWorkListRequest request, LocalDate targetMonth){
+        log.debug(" ==== ==== ==== [ 근무 일정 동기화 서비스 실행 ] ==== ==== ====");
+        if (loginUser.getWorkGroupId()!= request.getCalendarGroupId()) throw new CalendarGroupException(CalendarGroupErrorCode.WORK_GROUP_ACCESS_DENY);
+        CalendarGroup calendarGroup = calendarGroupRepository.findById(request.getCalendarGroupId())
+                .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
+
+        if (calendarGroup.getUser().getId()!=loginUser.getId()) throw new WorkException(WorkErrorCode.ACCESS_DENIED);
+
+        Map<Long, WorkType> userWorkTypeMap = workTypeJpaRepository
+                .findByUser(loginUser).stream().collect(Collectors.toMap(WorkType::getId, wt -> wt));
+
+        LocalDate startOfMonth = targetMonth.withDayOfMonth(1);
+        LocalDate endOfMonth = targetMonth.withDayOfMonth(targetMonth.lengthOfMonth());
+
+        Map<LocalDate, Work> dateMap = workJpaRepository.findWorkListWithAllByTime(request.getCalendarGroupId(), startOfMonth, endOfMonth)
+                .stream()
+                .collect(Collectors.toMap(Work::getWorkDate, work -> work));
+
+        //todo 만약 해당 일에 work가 존재한다면 해당 work를 수정, 만약 존재하지 않는다면 새 entity를 만들어서 저장
+        return workJpaRepository.saveAll(
+                        request.getWorkTypes().stream()
+                                .map(value -> {
+                                    LocalDate workDate = value.getWorkDate();
+                                    if (dateMap.containsKey(workDate)) {
+                                        // 이미 존재하는 work 업데이트
+                                        return dateMap.get(workDate).updateWorkType(userWorkTypeMap.get(value.getWorkTypeId()));
+                                    }
+                                    // 새로운 work 엔티티 생성
+                                    return value.toEntity(loginUser, userWorkTypeMap, calendarGroup);
+                                })
+                                .collect(Collectors.toList()))
                 .stream()
                 .map(Work::toResponse)
                 .collect(Collectors.toList());
@@ -89,7 +127,7 @@ public class WorkService {
 
     @Transactional
     public List<WorkResponse> updateWork(User loginUser, EditAndDeleteWorkListRequest request){
-        log.debug(" ==== ==== ==== [ 그룹내 유저의 근무 일정 수정 및 삭제 서비스 실행 ] ==== ==== ====");
+        log.debug(" ==== ==== ==== [ 유저의 근무 일정 수정 및 삭제 서비스 실행 ] ==== ==== ====");
         if (loginUser.getWorkGroupId()!= request.getCalendarGroupId()) throw new CalendarGroupException(CalendarGroupErrorCode.WORK_GROUP_ACCESS_DENY);
         CalendarGroup calendarGroup = calendarGroupRepository.findCalendarGroupWithUserById(request.getCalendarGroupId())
                 .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
