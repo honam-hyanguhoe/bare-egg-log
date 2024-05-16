@@ -4,8 +4,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.org.egglog.domain.scheduler.AlarmConst
-import com.org.egglog.domain.scheduler.SchedulerUseCase
+import com.org.egglog.domain.scheduler.model.AlarmConst
+import com.org.egglog.domain.scheduler.usecase.SchedulerUseCase
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

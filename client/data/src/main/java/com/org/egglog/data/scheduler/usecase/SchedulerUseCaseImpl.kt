@@ -6,10 +6,10 @@ import android.content.Context
 import android.content.Intent
 import android.icu.util.Calendar
 import com.org.egglog.presentation.receiver.AlarmBroadcastReceiver
-import com.org.egglog.domain.scheduler.AlarmConst
-import com.org.egglog.domain.scheduler.AlarmData
-import com.org.egglog.domain.scheduler.AlarmManagerHelper
-import com.org.egglog.domain.scheduler.SchedulerUseCase
+import com.org.egglog.domain.scheduler.model.AlarmConst
+import com.org.egglog.domain.scheduler.model.AlarmData
+import com.org.egglog.domain.scheduler.model.AlarmManagerHelper
+import com.org.egglog.domain.scheduler.usecase.SchedulerUseCase
 import java.time.LocalDateTime
 import javax.inject.Inject
 

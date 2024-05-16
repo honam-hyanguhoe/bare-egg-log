@@ -15,13 +15,11 @@ import android.os.IBinder
 import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.core.app.NotificationCompat
-import com.org.egglog.domain.scheduler.AlarmConst
-import com.org.egglog.domain.scheduler.AlarmData
-import com.org.egglog.domain.scheduler.AlarmManagerHelper
-import com.org.egglog.domain.scheduler.SchedulerUseCase
+import com.org.egglog.domain.scheduler.model.AlarmConst
+import com.org.egglog.domain.scheduler.model.AlarmManagerHelper
+import com.org.egglog.domain.scheduler.usecase.SchedulerUseCase
 import com.org.egglog.presentation.R
 import dagger.hilt.android.AndroidEntryPoint
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -65,6 +63,7 @@ class ForegroundService : Service() {
             .setAutoCancel(true)
             .setOngoing(true)
             .setSound(null)
+            .setVibrate(null)
             .setContentIntent(pendingIntent)
             .build()
 
@@ -116,3 +115,4 @@ class ForegroundService : Service() {
         return null
     }
 }
+

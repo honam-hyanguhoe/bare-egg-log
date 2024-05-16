@@ -1,6 +1,8 @@
 package com.org.egglog.data.setting.service
 
 import com.org.egglog.data.retrofit.CommonResponse
+import com.org.egglog.data.setting.model.AlarmResponse
+import com.org.egglog.data.setting.model.AlarmUpdateResponse
 import com.org.egglog.data.setting.model.CalendarGroupResponse
 import com.org.egglog.data.setting.model.WorkTypeResponse
 import com.org.egglog.domain.setting.model.CalendarGroup
@@ -76,4 +78,17 @@ interface SettingService {
         @Header("Authorization") accessToken: String,
         @Body requestBody: RequestBody
     ): CommonResponse<Unit?>
+
+    @GET("alarms")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun getAlarmList(
+        @Header("Authorization") accessToken: String
+    ): CommonResponse<List<AlarmResponse>?>
+
+    @PATCH("alarms/status")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun updateAlarmStatus(
+        @Header("Authorization") accessToken: String,
+        @Body requestBody: RequestBody
+    ): CommonResponse<AlarmUpdateResponse?>
 }

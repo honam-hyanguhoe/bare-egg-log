@@ -1,4 +1,4 @@
-package com.org.egglog.domain.scheduler
+package com.org.egglog.domain.scheduler.model
 
 object AlarmManagerHelper {
     private val alarms = mutableMapOf<Int, AlarmData>()

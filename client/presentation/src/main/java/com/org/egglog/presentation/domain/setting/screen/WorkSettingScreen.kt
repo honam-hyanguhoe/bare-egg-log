@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.org.egglog.domain.setting.model.Alarm
 import com.org.egglog.domain.setting.model.WorkType
 import com.org.egglog.presentation.component.atoms.cards.BannerCard
 import com.org.egglog.presentation.component.molecules.headers.BasicHeader
@@ -65,7 +66,16 @@ fun WorkSettingScreen(
         onSelected = viewModel::onSelected,
         selectedWorkType = state.selectedWorkType,
         deleteSelectedWorkType = viewModel::deleteSelectedWorkType,
-        setAlarm = viewModel::setAlarm
+
+        setAlarm = viewModel::setAlarm,
+        alarmList = state.alarmList,
+        getAlarmListInit = viewModel::getAlarmListInit,
+        onClickToggle = viewModel::onClickToggle,
+        toggleEnabled = state.toggleEnabled,
+        showModifyBottomSheetAlarm = state.showModifyBottomSheetAlarm,
+        selectedAlarm = state.selectedAlarm,
+        modifyEnabledAlarm = state.modifyEnabledAlarm,
+        setShowModifyBottomSheetAlarm = viewModel::setShowModifyBottomSheetAlarm
     )
 }
 
@@ -91,13 +101,23 @@ fun WorkSettingScreen(
     onSelected: (String, WorkType) -> Unit,
     selectedWorkType: WorkType?,
     deleteSelectedWorkType: () -> Unit,
-    setAlarm: () -> Unit
+
+    setAlarm: () -> Unit,
+    alarmList: List<Alarm>,
+    getAlarmListInit: () -> Unit,
+    onClickToggle: (Alarm) -> Unit,
+    toggleEnabled: Boolean,
+    showModifyBottomSheetAlarm: Boolean,
+    selectedAlarm: Alarm?,
+    modifyEnabledAlarm: Boolean,
+    setShowModifyBottomSheetAlarm: (Boolean) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
-    LaunchedEffect(addEnabled, deleteEnabled, modifyEnabled) {
+    LaunchedEffect(addEnabled, deleteEnabled, modifyEnabled, toggleEnabled) {
         getWorkListInit()
+        getAlarmListInit()
     }
 
     Column(
@@ -142,7 +162,13 @@ fun WorkSettingScreen(
                 ) },
             secendContent = {
                 AlarmManager(
-                    setAlarm = setAlarm
+                    setAlarm = setAlarm,
+                    alarmList = alarmList,
+                    onClickToggle = onClickToggle,
+                    showModifyBottomSheetAlarm = showModifyBottomSheetAlarm,
+                    selectedAlarm = selectedAlarm,
+                    modifyEnabledAlarm = modifyEnabledAlarm,
+                    setShowModifyBottomSheetAlarm = setShowModifyBottomSheetAlarm
                 )
             }
         )

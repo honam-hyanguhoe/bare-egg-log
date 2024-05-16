@@ -1,4 +1,4 @@
-package com.org.egglog.domain.scheduler
+package com.org.egglog.domain.scheduler.usecase
 
 import java.time.LocalDateTime
 import java.time.LocalTime

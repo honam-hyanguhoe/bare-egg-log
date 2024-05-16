@@ -1,15 +1,18 @@
 package com.org.egglog.presentation.domain.setting.viewmodel
 
-import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
-import com.org.egglog.domain.scheduler.SchedulerUseCase
+import com.org.egglog.domain.scheduler.usecase.SchedulerUseCase
+import com.org.egglog.domain.setting.model.Alarm
+import com.org.egglog.domain.setting.model.AlarmStatusParam
 import com.org.egglog.domain.setting.model.WorkType
 import com.org.egglog.domain.setting.model.WorkTypeParam
 import com.org.egglog.domain.setting.usecase.DeleteWorkTypeUseCase
+import com.org.egglog.domain.setting.usecase.GetAlarmListUseCase
 import com.org.egglog.domain.setting.usecase.GetWorkTypeListUseCase
 import com.org.egglog.domain.setting.usecase.PostWorkTypeUseCase
+import com.org.egglog.domain.setting.usecase.UpdateAlarmStatusUseCase
 import com.org.egglog.domain.setting.usecase.UpdateWorkTypeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -33,6 +36,8 @@ class WorkSettingViewModel @Inject constructor(
     private val postWorkTypeUseCase: PostWorkTypeUseCase,
     private val updateWorkTypeUseCase: UpdateWorkTypeUseCase,
     private val deleteWorkTypeUseCase: DeleteWorkTypeUseCase,
+    private val getAlarmListUseCase: GetAlarmListUseCase,
+    private val updateAlarmStatusUseCase: UpdateAlarmStatusUseCase,
     private val schedulerUseCase: SchedulerUseCase
 ): ViewModel(), ContainerHost<WorkSettingState, WorkSettingSideEffect>{
     override val container: Container<WorkSettingState, WorkSettingSideEffect> = container(
@@ -64,7 +69,6 @@ class WorkSettingViewModel @Inject constructor(
     fun onClickAdd() = intent {
         reduce { state.copy(addEnabled = false) }
         val tokens = getTokenUseCase()
-        Log.e("test", "${state.title} ${state.color}")
         postWorkTypeUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}", workTypeParam = WorkTypeParam(title = state.title, color = state.color, workTypeImgUrl = "", startTime = state.startTime, workTime = state.endTime)).getOrThrow()
         reduce { state.copy(title = "", color = "", showCreateBottomSheet = false, addEnabled = true) }
     }
@@ -87,10 +91,6 @@ class WorkSettingViewModel @Inject constructor(
         } else if(selected == "수정") {
             reduce { state.copy(selectedWorkType = workType, showModifyBottomSheet = true, title = workType.title, color =  workType.color) }
         }
-    }
-
-    fun setAlarm() = intent {
-        schedulerUseCase.setAlarm(curRepeatCount = 0, repeatCount = 3, minutesToAdd = 2L, targetDateTime = LocalDateTime.now().plusMinutes(1), key = 1, stopByUser = false)
     }
 
     @OptIn(OrbitExperimental::class)
@@ -117,6 +117,30 @@ class WorkSettingViewModel @Inject constructor(
     fun onEndTimeChange(endTime: LocalTime) = blockingIntent {
         reduce { state.copy(endTime = endTime) }
     }
+
+    /**
+     * 알람
+     */
+    fun setAlarm() = intent {
+//        schedulerUseCase.setAlarm(curRepeatCount = 0, repeatCount = 3, minutesToAdd = 2L, targetDateTime = LocalDateTime.now().plusMinutes(1), key = 1, stopByUser = false)
+    }
+
+    fun getAlarmListInit() = intent {
+        val tokens = getTokenUseCase()
+        val alarmList = getAlarmListUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}").getOrThrow()
+        reduce { state.copy(alarmList = alarmList ?: emptyList()) }
+    }
+
+    fun onClickToggle(selected: Alarm) = intent {
+        reduce { state.copy(toggleEnabled = false) }
+        val tokens = getTokenUseCase()
+        updateAlarmStatusUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}", AlarmStatusParam(alarmId = selected.alarmId, isAlarmOn = !selected.isAlarmOn)).getOrThrow()
+        reduce { state.copy(toggleEnabled = true) }
+    }
+
+    fun setShowModifyBottomSheetAlarm(enabled: Boolean) = intent {
+        reduce { state.copy(showModifyBottomSheetAlarm = enabled) }
+    }
 }
 
 @Immutable
@@ -131,7 +155,13 @@ data class WorkSettingState(
     val color: String = "",
     val startTime: LocalTime = LocalTime.now(),
     val endTime: LocalTime = LocalTime.now(),
-    val selectedWorkType: WorkType? = null
+    val selectedWorkType: WorkType? = null,
+
+    val alarmList: List<Alarm> = emptyList(),
+    val toggleEnabled: Boolean = true,
+    val selectedAlarm: Alarm? = null,
+    val showModifyBottomSheetAlarm: Boolean = false,
+    val modifyEnabledAlarm: Boolean = true,
 )
 
 sealed interface WorkSettingSideEffect {
