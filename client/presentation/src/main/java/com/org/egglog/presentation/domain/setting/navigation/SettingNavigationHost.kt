@@ -15,7 +15,7 @@ import com.org.egglog.presentation.domain.setting.screen.SettingScreen
 import com.org.egglog.presentation.domain.setting.screen.WorkSettingScreen
 
 @Composable
-fun SettingNavigationHost(alarmManager: AlarmManager) {
+fun SettingNavigationHost() {
     val navController  = rememberNavController()
 
     NavHost(
@@ -56,7 +56,7 @@ fun SettingNavigationHost(alarmManager: AlarmManager) {
         }
 
         composable(route = SettingRoute.WorkSettingScreen.name) {
-            WorkSettingScreen(alarmManager)
+            WorkSettingScreen()
         }
 
         composable(route = SettingRoute.AskSettingScreen.name) {
