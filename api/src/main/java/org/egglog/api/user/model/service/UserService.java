@@ -84,7 +84,7 @@ public class UserService {
         //todo 3. 알림 설정 자동생성
         notificationService.makeDefaultNotification(loginUser);
         //todo 4. 기본 알람 자동 생성
-        List<WorkType> defaultWorkTypes = getDefaultWorkTypes(loginUser);
+        List<WorkType> defaultWorkTypes = workTypeJpaRepository.findWorkTypesByUserId(loginUser.getId());
         for (WorkType workType : defaultWorkTypes) {
             Alarm alarm = Alarm.builder()
                     .alarmTime(workType.getStartTime())
