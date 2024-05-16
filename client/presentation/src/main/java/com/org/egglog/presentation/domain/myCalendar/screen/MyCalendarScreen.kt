@@ -241,6 +241,8 @@ fun MyCalendarScreen(
     val isWorkBottomSheet = remember { mutableStateOf(false) }
     val isPersonalBottomSheet = remember { mutableStateOf(false) }
 
+    val (isVisible, setVisible) = remember { mutableStateOf(false) }
+
     Column(
         Modifier
             .fillMaxSize()
@@ -292,15 +294,23 @@ fun MyCalendarScreen(
     }
 
     FloatingButton(
-        onClick = { /*TODO*/ },
+        onClick = { setVisible(!isVisible) },
         onWorkClick = {
             isWorkBottomSheet.value = true
             getWorkTypeList()
+            setVisible(!isVisible)
         },
-        onPersonalClick = { isPersonalBottomSheet.value = true },
-        onSettingClick = onClickCalendarSetting,
+        onPersonalClick = {
+            isPersonalBottomSheet.value = true
+            setVisible(!isVisible)
+        },
+        onSettingClick = {
+            onClickCalendarSetting()
+            setVisible(!isVisible)
+        },
         horizontalPadding = 10.dp,
-        verticalPadding = 90.heightPercent(context).dp
+        verticalPadding = 90.heightPercent(context).dp,
+        isVisible = isVisible
     )
 
     if (isWorkBottomSheet.value) {
