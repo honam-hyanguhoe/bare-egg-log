@@ -3,6 +3,7 @@ package com.org.egglog.presentation.domain.community.viewmodel
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.org.egglog.client.data.CommentInfo
 import com.org.egglog.client.data.toUiModel
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
@@ -18,6 +19,10 @@ import com.org.egglog.presentation.data.PostDetailInfo
 import com.org.egglog.presentation.data.toUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.annotation.OrbitExperimental
@@ -46,6 +51,10 @@ class PostDetailViewModel @Inject constructor(
     private val postId: Int = savedStateHandle.get<Int>("postId") ?: throw IllegalArgumentException("postId is required")
     private var accessToken: String ?= ""
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
+
     override val container: Container<PostDetailState, PostDetailSideEffect> = container(
         initialState = PostDetailState(),
         buildSettings = {
@@ -60,7 +69,7 @@ class PostDetailViewModel @Inject constructor(
     }
 
     // 초기 렌더링
-    private fun load() = intent {
+    fun load() = intent {
          accessToken = getTokenUseCase().first!!
 
         val userDetail = getUserUseCase("Bearer ${accessToken}").getOrThrow()
@@ -85,6 +94,14 @@ class PostDetailViewModel @Inject constructor(
                 commentList = commentList
             )
         }
+    }
+
+    fun refreshSomething() = intent {
+        _isLoading.value = true
+        delay(1000L)
+        _isLoading.value = false
+
+        load()
     }
 
     // 게시글 삭제 시
