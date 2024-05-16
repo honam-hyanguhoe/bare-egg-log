@@ -22,4 +22,11 @@ public class CustomWorkTag {
     private String eve;
     private String night;
     private String off;
+
+    public CustomWorkTag(){
+        this.day="";
+        this.eve="";
+        this.off="";
+        this.night="";
+    }
 }

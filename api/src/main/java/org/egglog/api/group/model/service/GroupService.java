@@ -7,10 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.group.exception.GroupErrorCode;
 import org.egglog.api.group.exception.GroupException;
-import org.egglog.api.group.model.dto.request.GroupDutyData;
-import org.egglog.api.group.model.dto.request.GroupForm;
-import org.egglog.api.group.model.dto.request.GroupUpdateForm;
-import org.egglog.api.group.model.dto.request.InvitationAcceptForm;
+import org.egglog.api.group.model.dto.request.*;
 import org.egglog.api.group.model.dto.response.*;
 import org.egglog.api.group.model.entity.Group;
 import org.egglog.api.group.model.entity.GroupMember;
@@ -346,12 +343,31 @@ public class GroupService {
     }
 
     /**
-     *
+     * 등록된 엑셀 데이터 반환
      * @param user
      * @param groupId
      * @return
      */
     public SuccessType getGroupDutyList(User user, Long groupId, String yearAndMonth) {
+
         return SuccessType.CREATE;
+    }
+
+    /**
+     * 저장된 그룹 근무 태그 반환
+     * @param user
+     * @param groupId
+     * @return
+     */
+    public CustomWorkTag getGroupWorkTags(User user, Long groupId) {
+        if(groupMemberService.isGroupMember(groupId, user.getId())){
+            try {
+                return groupDutyRepository.getGroupWorkTag(groupId);
+            } catch (Exception e){
+                throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
+            }
+        } else {
+            throw new GroupException(GroupErrorCode.GROUP_ROLE_NOT_MATCH);
+        }
     }
 }
