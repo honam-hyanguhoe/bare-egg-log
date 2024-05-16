@@ -13,6 +13,8 @@ import java.time.LocalTime;
 @Builder
 public class AlarmForm {
 
+    //알람명, 색상
+
     private LocalTime alarmTime; //필수
 
     private int replayCnt;
