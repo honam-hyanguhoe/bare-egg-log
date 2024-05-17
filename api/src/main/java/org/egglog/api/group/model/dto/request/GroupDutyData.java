@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.egglog.api.worktype.model.entity.WorkTag;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,4 +32,5 @@ public class GroupDutyData {
     private List<DutyFormat> dutyList;
     //없는 경우 기존 값으로 저장됨
     private CustomWorkTag customWorkTag;
+    private String groupName;
 }
