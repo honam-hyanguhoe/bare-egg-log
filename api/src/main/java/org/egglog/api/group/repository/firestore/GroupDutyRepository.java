@@ -29,12 +29,7 @@ public class GroupDutyRepository {
 
 
     public void saveDuty(String userName, Long groupId, GroupDutyData groupDutyData, String nowDay) throws ExecutionException, InterruptedException {
-        CollectionReference collection = firestore.collection("duty")
-                .document(String.valueOf(groupId))
-                .collection(groupDutyData.getDate());
-
         log.debug("====== countQuery start ======");
-        Long count = collection.count().get().get().getCount();
         CustomWorkTag customWorkTag = groupDutyData.getCustomWorkTag();
         CustomWorkTag currentCustomWorkTag = getGroupWorkTag(groupId);
 
@@ -69,16 +64,12 @@ public class GroupDutyRepository {
                     .dutyList(dutyList)
                     .build();
 
-            log.debug("path {}/{}/{}/{}","duty",groupId,groupDutyData.getDate(),count);
-            if(count==null){
-                count = 0L;
-            }
+            log.debug("path {}/{}/{}","duty",groupId,groupDutyData.getDate());
             String group = String.valueOf(groupId);
             String date = groupDutyData.getDate();
-            String countStr = String.valueOf(count);
 
-            log.debug("{} {} {}",group==null,date==null,countStr==null);
-            if(group==null || date == null || countStr ==null){
+            log.debug("{} {}",group==null,date==null);
+            if(group==null || date == null){
                 log.warn("null 등장 ~~~~~~~~~~~~~~~~~~~~");
                 throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
             }
@@ -87,7 +78,7 @@ public class GroupDutyRepository {
                     .collection("duty")
                     .document(group)
                     .collection(date)
-                    .document(countStr)
+                    .document()
                     .set(groupDutySaveFormat);
 
             // 쿼리 실행 결과를 기다림
