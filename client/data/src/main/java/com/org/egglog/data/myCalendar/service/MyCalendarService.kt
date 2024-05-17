@@ -2,6 +2,7 @@ package com.org.egglog.data.myCalendar.service
 
 import com.google.android.gms.common.internal.service.Common
 import com.org.egglog.data.myCalendar.model.EventListResponse
+import com.org.egglog.data.myCalendar.model.ExcelListResponse
 import com.org.egglog.data.myCalendar.model.PersonalScheduleResponse
 import com.org.egglog.data.myCalendar.model.WorkListResponse
 import com.org.egglog.data.myCalendar.model.WorkScheduleResponse
@@ -86,4 +87,18 @@ interface MyCalendarService {
         @Path("event_id") eventId: Int,
         @Body requestBody: RequestBody
     ): CommonResponse<EventListResponse>
+
+    @GET("groups/duty")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun getExcelList(
+        @Header("Authorization") accessToken: String,
+        @Query("date") date: String
+    ): CommonResponse<List<ExcelListResponse>>
+
+    @POST("work/sync")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun requestWorkSync(
+        @Header("Authorization") accessToken: String,
+        @Body requestBody: RequestBody
+    ): CommonResponse<Unit?>
 }

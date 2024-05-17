@@ -57,7 +57,7 @@ interface SettingService {
         @Body requestBody: RequestBody
     ): CommonResponse<WorkTypeResponse?>
 
-    @DELETE("worktypes/{workTypeId}")
+    @PATCH("worktypes/{workTypeId}")
     @Headers("Content-Type:application/json; charset=UTF8")
     suspend fun deleteWorkType(
         @Header("Authorization") accessToken: String,
