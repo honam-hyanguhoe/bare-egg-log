@@ -68,6 +68,9 @@ public class GroupDutyRepository {
                     .build();
 
             log.debug("path {}/{}/{}/{}","duty",groupId,groupDutyData.getDate(),count);
+            if(count==null){
+                count = 0L;
+            }
 
             ApiFuture<WriteResult> apiFuture = firestore
                     .collection("duty")
