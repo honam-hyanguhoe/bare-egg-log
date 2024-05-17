@@ -36,6 +36,7 @@ import com.org.egglog.presentation.domain.auth.viewmodel.PlusLoginSideEffect
 import com.org.egglog.presentation.domain.community.viewmodel.PostDetailSideEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -91,9 +92,23 @@ class GroupDetailViewModel @Inject constructor(
     private val _selectedDate = MutableStateFlow<LocalDate?>(null)
     val selectedDate : StateFlow<LocalDate?> = _selectedDate.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
     init {
         loadInit()
     }
+
+//    fun refreshSomething() = intent {
+//        _isLoading.value = true
+//        delay(1000L)
+//        _isLoading.value = false
+//
+//        loadInit()
+//        getGroupDuty()
+//        getMyWork(LocalDate.now())
+//        initSelectedMembers()
+//    }
+//
 
     private fun loadInit() = intent {
         getGroupInfo(groupId = groupId)
