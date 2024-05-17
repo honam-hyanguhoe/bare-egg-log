@@ -25,7 +25,8 @@ fun AlarmListItem(
     title: String,
     body: String,
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
+    toggleEnabled: Boolean = true
 ) {
     val context = LocalContext.current
     Column(
@@ -47,6 +48,7 @@ fun AlarmListItem(
                 Text(text = body, style = Typography.displayMedium.copy(color = Gray500))
             }
             Toggle(
+                toggleEnabled = toggleEnabled,
                 checked = checked,
                 onCheckedChange = onCheckedChange
             )
