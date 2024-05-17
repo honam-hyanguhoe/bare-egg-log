@@ -5,19 +5,23 @@ import com.org.egglog.data.myCalendar.usecase.CreateWorkScheduleUseCaseImpl
 import com.org.egglog.data.myCalendar.usecase.DeletePersonalScheduleUseCaseImpl
 import com.org.egglog.data.myCalendar.usecase.EditWorkScheduleUseCaseImpl
 import com.org.egglog.data.myCalendar.usecase.GetDetailPersonalScheduleUseCaseImpl
+import com.org.egglog.data.myCalendar.usecase.GetExcelListUseCaseImpl
 import com.org.egglog.data.myCalendar.usecase.GetPersonalScheduleUseCaseImpl
 import com.org.egglog.data.myCalendar.usecase.GetWorkListUseCaseImpl
 import com.org.egglog.data.myCalendar.usecase.GetWorkTypeListUseCaseImpl
 import com.org.egglog.data.myCalendar.usecase.ModifyPersonalScheduleUseCaseImpl
+import com.org.egglog.data.myCalendar.usecase.RequestWorkSyncUseCaseImpl
 import com.org.egglog.domain.myCalendar.usecase.CreatePersonalScheduleUseCase
 import com.org.egglog.domain.myCalendar.usecase.CreateWorkScheduleUseCase
 import com.org.egglog.domain.myCalendar.usecase.DeletePersonalScheduleUseCase
 import com.org.egglog.domain.myCalendar.usecase.EditWorkScheduleUseCase
 import com.org.egglog.domain.myCalendar.usecase.GetDetailPersonalScheduleUseCase
+import com.org.egglog.domain.myCalendar.usecase.GetExcelListUseCase
 import com.org.egglog.domain.myCalendar.usecase.GetPersonalScheduleUseCase
 import com.org.egglog.domain.myCalendar.usecase.GetWorkListUseCase
 import com.org.egglog.domain.myCalendar.usecase.GetWorkTypeListUseCase
 import com.org.egglog.domain.myCalendar.usecase.ModifyPersonalScheduleUseCase
+import com.org.egglog.domain.myCalendar.usecase.RequestWorkSyncUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -54,4 +58,9 @@ abstract class MyCalendarModule {
     @Binds
     abstract fun bindModifyPersonalScheduleUseCaseImpl(uc: ModifyPersonalScheduleUseCaseImpl): ModifyPersonalScheduleUseCase
 
+    @Binds
+    abstract fun bindGetExcelListUseCaseImpl(uc: GetExcelListUseCaseImpl): GetExcelListUseCase
+
+    @Binds
+    abstract fun bindRequestWorkSyncUseCaseImpl(uc: RequestWorkSyncUseCaseImpl): RequestWorkSyncUseCase
 }

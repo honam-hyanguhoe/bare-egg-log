@@ -86,6 +86,7 @@ class WorkSettingViewModel @Inject constructor(
     fun onSelected(selected: String, workType: WorkType) = intent {
         val tokens = getTokenUseCase()
         if(selected == "삭제") {
+            Log.e("WorkSetting", "$workType")
             reduce { state.copy(addEnabled = false) }
             deleteWorkTypeUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}", workTypeId = workType.workTypeId).getOrThrow()
             postSideEffect(WorkSettingSideEffect.Toast("삭제 되었습니다."))
