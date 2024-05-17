@@ -54,11 +54,13 @@ public class RedisViewCountUtil {
         return redis.opsForZSet().reverseRangeWithScores("view_count_board:", 0, 1);
     }
 
+    //해당 게시물을 조회한 유저 아이디
     public void deleteViewCount(String boardId, String userId) {
         log.info("deleteViewCount 실행 {}", boardId);
         redis.opsForSet().remove("view_count_number: " + boardId, userId);
     }
 
+    //boardId의 조회수 카운트
     public void deleteViewCountBoard(String boardId) {
         redis.opsForZSet().remove("view_count_board:", boardId); // 조회수 점수 삭제
     }
