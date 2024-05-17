@@ -7,10 +7,12 @@ import com.org.egglog.presentation.theme.*
 
 @Composable
 fun Toggle(
+    toggleEnabled: Boolean = true,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
     Switch(
+        enabled = toggleEnabled,
         colors = SwitchColors(
             checkedBorderColor = Warning400,
             checkedIconColor = White,

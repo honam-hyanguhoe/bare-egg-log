@@ -2,6 +2,8 @@ package com.org.egglog.presentation.domain.setting.screen
 
 import android.app.Activity
 import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,7 +13,9 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
@@ -19,10 +23,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.org.egglog.domain.setting.model.Notification
 import com.org.egglog.domain.setting.model.toBody
 import com.org.egglog.domain.setting.model.toTitle
+import com.org.egglog.presentation.component.atoms.indicators.IndeterminateCircularIndicator
 import com.org.egglog.presentation.component.molecules.headers.BasicHeader
 import com.org.egglog.presentation.component.molecules.listItems.AlarmListItem
 import com.org.egglog.presentation.domain.setting.viewmodel.NotificationSettingSideEffect
 import com.org.egglog.presentation.domain.setting.viewmodel.NotificationSettingViewModel
+import com.org.egglog.presentation.theme.Gray300
+import com.org.egglog.presentation.theme.Gray800
 import com.org.egglog.presentation.utils.addFocusCleaner
 import com.org.egglog.presentation.utils.widthPercent
 import org.orbitmvi.orbit.compose.collectAsState
@@ -45,7 +52,8 @@ fun NotificationSettingScreen(
         getNotificationInit = viewModel::getNotificationInit,
         toggleEnabled = state.toggleEnabled,
         totalStatus = state.totalStatus,
-        onToggleChange = viewModel::onToggleChange
+        onToggleChange = viewModel::onToggleChange,
+        onToggleAllChange = viewModel::onToggleAllChange
     )
 }
 
@@ -55,7 +63,8 @@ fun NotificationSettingScreen(
     getNotificationInit: () -> Unit,
     toggleEnabled: Boolean,
     totalStatus: Boolean,
-    onToggleChange: (Long, Boolean) -> Unit
+    onToggleChange: (Long, Boolean) -> Unit,
+    onToggleAllChange: () -> Unit
 
 ) {
     val context = LocalContext.current
@@ -66,31 +75,49 @@ fun NotificationSettingScreen(
     }
 
     Surface {
-        Column(
+        Box(
             Modifier
                 .fillMaxSize()
                 .systemBarsPadding()
                 .imePadding()
                 .addFocusCleaner(focusManager)
         ) {
-            BasicHeader(
-                title = "알림 설정",
-                hasTitle = true,
-                hasArrow = true,
-                hasProgressBar = true,
-                onClickBack = { (context as? Activity)?.onBackPressed() },
-                onClickLink = { },
-                onClickMenus = { },
-                selectedOption = null
-            )
             Column(
                 Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.widthPercent(context).dp),
-            ) {
-                AlarmListItem(title = "전체 알림", body = "전체 알림을 관리합니다.", checked = totalStatus, onCheckedChange = {})
-                notificationList?.map {
-                    AlarmListItem(title = it.type.toTitle(), body = it.type.toBody(), checked = it.status, onCheckedChange = { enabled -> onToggleChange(it.notificationId, enabled) })
+            ){
+                BasicHeader(
+                    title = "알림 설정",
+                    hasTitle = true,
+                    hasArrow = true,
+                    hasProgressBar = true,
+                    onClickBack = { (context as? Activity)?.onBackPressed() },
+                    onClickLink = { },
+                    onClickMenus = { },
+                    selectedOption = null
+                )
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.widthPercent(context).dp),
+                ) {
+                    AlarmListItem(title = "전체 알림", body = "전체 알림을 관리합니다.", checked = totalStatus, onCheckedChange = { onToggleAllChange() }, toggleEnabled = toggleEnabled)
+                    notificationList?.map {
+                        AlarmListItem(title = it.type.toTitle(), body = it.type.toBody(), checked = it.status, onCheckedChange = { enabled -> onToggleChange(it.notificationId, enabled) }, toggleEnabled = toggleEnabled)
+                    }
+                }
+            }
+
+            if (!toggleEnabled) {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .background(color = Gray800.copy(0.5f))
+                    ,
+                    contentAlignment = Alignment.Center
+                ) {
+                    IndeterminateCircularIndicator(loading = true)
                 }
             }
         }
