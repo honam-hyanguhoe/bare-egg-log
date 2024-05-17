@@ -4,6 +4,7 @@ import com.org.egglog.data.retrofit.CommonResponse
 import com.org.egglog.data.setting.model.AlarmResponse
 import com.org.egglog.data.setting.model.AlarmUpdateResponse
 import com.org.egglog.data.setting.model.CalendarGroupResponse
+import com.org.egglog.data.setting.model.NotificationResponse
 import com.org.egglog.data.setting.model.WorkTypeResponse
 import com.org.egglog.domain.setting.model.CalendarGroup
 import okhttp3.RequestBody
@@ -104,4 +105,17 @@ interface SettingService {
     suspend fun getCalendarLink(
         @Header("Authorization") accessToken: String,
     ): CommonResponse<String>
+
+    @GET("notification/list")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun getNotificationList(
+        @Header("Authorization") accessToken: String
+    ): CommonResponse<List<NotificationResponse>?>
+
+    @PATCH("notification/update")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun updateNotification(
+        @Header("Authorization") accessToken: String,
+        @Body requestBody: RequestBody
+    ): CommonResponse<List<NotificationResponse>?>
 }

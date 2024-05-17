@@ -1,7 +1,10 @@
 package com.org.egglog.presentation.domain.setting.screen
 
 import android.content.Intent
+import android.os.Build
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -44,12 +47,14 @@ import com.org.egglog.presentation.domain.auth.activity.LoginActivity
 import com.org.egglog.presentation.domain.community.activity.CommunityActivity
 import com.org.egglog.presentation.domain.group.activity.GroupActivity
 import com.org.egglog.presentation.domain.main.activity.MainActivity
+import com.org.egglog.presentation.domain.myCalendar.activity.MyCalendarActivity
 import com.org.egglog.presentation.domain.setting.viewmodel.SettingSideEffect
 import com.org.egglog.presentation.domain.setting.viewmodel.SettingViewModel
 import com.org.egglog.presentation.utils.getVersionInfo
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun SettingScreen(
     viewModel: SettingViewModel = hiltViewModel(),
@@ -58,7 +63,8 @@ fun SettingScreen(
     onNavigateToCalendarSettingScreen: () -> Unit,
     onNavigateToMySettingScreen: () -> Unit,
     onNavigateToWorkSettingScreen: () -> Unit,
-    onNavigateToAskSettingScreen: () -> Unit
+    onNavigateToAskSettingScreen: () -> Unit,
+    onNavigateToNotificationSettingScreen: () -> Unit
 ) {
     val context = LocalContext.current
     val state = viewModel.collectAsState().value
@@ -78,6 +84,15 @@ fun SettingScreen(
                 context.startActivity(
                     Intent(
                         context, LoginActivity::class.java
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                )
+            }
+            SettingSideEffect.NavigateToMyCalendarActivity -> {
+                context.startActivity(
+                    Intent(
+                        context, MyCalendarActivity::class.java
                     ).apply {
                         flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                     }
@@ -112,12 +127,14 @@ fun SettingScreen(
         onNavigateToMySettingScreen = onNavigateToMySettingScreen,
         onNavigateToWorkSettingScreen = onNavigateToWorkSettingScreen,
         onNavigateToAskSettingScreen = onNavigateToAskSettingScreen,
+        onNavigateToNotificationSettingScreen = onNavigateToNotificationSettingScreen,
         onClickLogout = viewModel::onClickLogout,
         logoutEnabled = state.logoutEnabled,
         selectedIdx = state.selectedIdx
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun SettingScreen(
     onNavigateToPrivacyDetailScreen: () -> Unit,
@@ -126,6 +143,7 @@ fun SettingScreen(
     onNavigateToCalendarSettingScreen: () -> Unit,
     onNavigateToWorkSettingScreen: () -> Unit,
     onNavigateToAskSettingScreen: () -> Unit,
+    onNavigateToNotificationSettingScreen: () -> Unit,
     onClickLogout: () -> Unit,
     logoutEnabled: Boolean,
     selectedIdx: Int,
@@ -190,13 +208,13 @@ fun SettingScreen(
                         }
                     }
                     InfoList(
-                        onClickPrepared = { openDialog.value = true },
                         onNavigateToPrivacyDetailScreen = onNavigateToPrivacyDetailScreen,
                         onNavigateToAgreeDetailScreen = onNavigateToAgreeDetailScreen,
                         onNavigateToMySettingScreen = onNavigateToMySettingScreen,
                         onNavigateToCalendarSettingScreen = onNavigateToCalendarSettingScreen,
                         onNavigateToWorkSettingScreen = onNavigateToWorkSettingScreen,
                         onNavigateToAskSettingScreen = onNavigateToAskSettingScreen,
+                        onNavigateToNotificationSettingScreen = onNavigateToNotificationSettingScreen,
                         onClickLogout = { openLogoutDialog.value = true }
                     )
 
@@ -231,20 +249,5 @@ fun SettingScreen(
             }
             BottomNavigator(selectedItem = selectedIdx, onItemSelected = { onSelectedIdx(it) })
         }
-    }
-}
-
-@Preview
-@Composable
-private fun SettingScreenPreview() {
-    ClientTheme {
-        SettingScreen(
-            onNavigateToPrivacyDetailScreen = {},
-            onNavigateToAgreeDetailScreen = {},
-            onNavigateToMySettingScreen = {},
-            onNavigateToCalendarSettingScreen = {},
-            onNavigateToWorkSettingScreen = {},
-            onNavigateToAskSettingScreen = {}
-        )
     }
 }
