@@ -2,6 +2,7 @@ package org.egglog.api.work.model.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.fortuna.ical4j.util.RandomUidGenerator;
 import org.egglog.api.alarm.model.entity.Alarm;
 import org.egglog.api.alarm.repository.jpa.AlarmRepository;
 import org.egglog.api.calendargroup.exception.CalendarGroupErrorCode;
@@ -9,6 +10,7 @@ import org.egglog.api.calendargroup.exception.CalendarGroupException;
 import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.calendargroup.repository.jpa.CalendarGroupRepository;
 import org.egglog.api.group.model.entity.GroupMember;
+import org.egglog.api.group.model.service.GroupService;
 import org.egglog.api.group.repository.jpa.GroupMemberRepository;
 import org.egglog.api.user.exception.UserErrorCode;
 import org.egglog.api.user.exception.UserException;
@@ -70,6 +72,8 @@ public class WorkService {
     private final GroupMemberRepository groupMemberRepository;
     private final UserJpaRepository userJpaRepository;
     private final AlarmRepository alarmRepository;
+    private final GroupService groupService;
+
     @Transactional
     public List<WorkResponse> createWork(User loginUser, CreateWorkListRequest request){
         log.debug(" ==== ==== ==== [ 근무 일정 생성 서비스 실행 ] ==== ==== ====");
@@ -90,54 +94,58 @@ public class WorkService {
                 .map(Work::toResponse)
                 .collect(Collectors.toList());
     }
-//    public List<WorkType> groupDutyDateToRequest(GroupDutyDataDto groupDutyDataDto, User loginUser){
-//        CreateWorkListRequest request = new CreateWorkListRequest();
-//        List<CreateWorkRequest> workRequests = new ArrayList<>();
-//
-//        request.setCalendarGroupId(loginUser.getWorkGroupId());
-//        //사번으로 근무 정보 가져옴
-//        List<String> dutyList=groupDutyDataDto.getDutyList().get(loginUser.getEmpNo());
-//        //
-//        return request;
-//    }
 
 
     @Transactional
-    public List<WorkResponse> syncWork(User loginUser, CreateWorkListRequest request, LocalDate targetMonth){
+    public List<WorkResponse> syncWork(User loginUser, SyncExcelWorkRequest request){
         log.debug(" ==== ==== ==== [ 근무 일정 동기화 서비스 실행 ] ==== ==== ====");
-        if (loginUser.getWorkGroupId()!= request.getCalendarGroupId()) throw new CalendarGroupException(CalendarGroupErrorCode.WORK_GROUP_ACCESS_DENY);
-        CalendarGroup calendarGroup = calendarGroupRepository.findById(request.getCalendarGroupId())
+
+        CalendarGroup calendarGroup = calendarGroupRepository.findById(loginUser.getWorkGroupId())
                 .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
 
         if (calendarGroup.getUser().getId()!=loginUser.getId()) throw new WorkException(WorkErrorCode.ACCESS_DENIED);
 
-        Map<Long, WorkType> userWorkTypeMap = workTypeJpaRepository
-                .findByUser(loginUser).stream().collect(Collectors.toMap(WorkType::getId, wt -> wt));
 
-        LocalDate startOfMonth = targetMonth.withDayOfMonth(1);
-        LocalDate endOfMonth = targetMonth.withDayOfMonth(targetMonth.lengthOfMonth());
+        Map<LocalDate, WorkType> excelDataMap = groupService.getUserExcelData(request.getGroupId(), request.getTargetMonth(), request.getIndex(), loginUser);
 
-        Map<LocalDate, Work> dateMap = workJpaRepository.findWorkListWithAllByTime(request.getCalendarGroupId(), startOfMonth, endOfMonth)
+        LocalDate startOfMonth = request.getTargetMonth().withDayOfMonth(1);
+        LocalDate endOfMonth = request.getTargetMonth().withDayOfMonth(request.getTargetMonth().lengthOfMonth());
+
+        List<LocalDate> dateList = new ArrayList<>();
+        LocalDate currentDay = startOfMonth;
+        while (!currentDay.isAfter(endOfMonth)) {
+            dateList.add(currentDay);
+            currentDay = currentDay.plusDays(1);
+        }
+
+        Map<LocalDate, Work> userDateMap = workJpaRepository.findWorkListWithAllByTime(loginUser.getWorkGroupId(), startOfMonth, endOfMonth)
                 .stream()
                 .collect(Collectors.toMap(Work::getWorkDate, work -> work));
 
-        //todo 만약 해당 일에 work가 존재한다면 해당 work를 수정, 만약 존재하지 않는다면 새 entity를 만들어서 저장
-        return workJpaRepository.saveAll(
-                        request.getWorkTypes().stream()
-                                .map(value -> {
-                                    LocalDate workDate = value.getWorkDate();
-                                    if (dateMap.containsKey(workDate)) {
-                                        // 이미 존재하는 work 업데이트
-                                        return dateMap.get(workDate).updateWorkType(userWorkTypeMap.get(value.getWorkTypeId()));
-                                    }
-                                    // 새로운 work 엔티티 생성
-                                    return value.toEntity(loginUser, userWorkTypeMap, calendarGroup);
-                                })
-                                .collect(Collectors.toList()))
-                .stream()
-                .map(Work::toResponse)
-                .collect(Collectors.toList());
 
+        List<Work> updateWorkList = new ArrayList<>();
+        List<Work> deletedWorkList = new ArrayList<>();
+        for (LocalDate currentLocalDate : dateList) {
+            if (userDateMap.containsKey(currentLocalDate) && excelDataMap.containsKey(currentLocalDate)) {
+                // 엑셀 데이터 존재, 기존 사용자 근무 존재 -> 해당 값 업데이트
+                updateWorkList.add(userDateMap.get(currentLocalDate).updateWorkType(excelDataMap.get(currentLocalDate)));
+            } else if (!userDateMap.containsKey(currentLocalDate) && excelDataMap.containsKey(currentLocalDate)) {
+                // 엑셀 데이터 존재, 기존 사용자 근무 존재 x -> 새 엔티티 추가
+                updateWorkList.add(Work.builder()
+                        .workDate(currentLocalDate)
+                        .workType(excelDataMap.get(currentLocalDate))
+                        .calendarGroup(calendarGroup)
+                        .user(loginUser)
+                        .uuid(new RandomUidGenerator().generateUid().getValue())
+                        .build());
+            } else if (userDateMap.containsKey(currentLocalDate) && !excelDataMap.containsKey(currentLocalDate)) {
+                // 엑셀 데이터 존재x, 기존 사용자 근무 존재 -> 해당 값 삭제
+                deletedWorkList.add(userDateMap.get(currentLocalDate));
+            }
+            // 엑셀 데이터 존재 x, 기존 사용자 근무 존재 x -> 아무것도 안한다.
+        }
+        workJpaRepository.deleteAll(deletedWorkList);
+        return workJpaRepository.saveAll(updateWorkList).stream().map(Work::toResponse).collect(Collectors.toList());
     }
 
 
