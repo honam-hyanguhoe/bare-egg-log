@@ -131,7 +131,7 @@ const WorkStaticsPage = () => {
 export default WorkStaticsPage;
 
 const GraphContainer = styled.div`
-  background-color: #f2f4f7;
+  background-color: #222;
   max-height: 100vh;
   min-height: 100vh;
   padding-left: 10px;

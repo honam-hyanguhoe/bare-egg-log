@@ -3,7 +3,7 @@ package com.org.egglog.data.scheduler.di
 import android.app.AlarmManager
 import android.content.Context
 import com.org.egglog.data.scheduler.usecase.SchedulerUseCaseImpl
-import com.org.egglog.domain.scheduler.SchedulerUseCase
+import com.org.egglog.domain.scheduler.usecase.SchedulerUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

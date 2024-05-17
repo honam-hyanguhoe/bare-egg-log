@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -68,6 +70,8 @@ private fun PostSearchScreen(
             .padding(
                 top = 20.heightPercent(context).dp,
             )
+            .systemBarsPadding() // 시스템 바 패딩 추가
+            .imePadding(),
     ) {
         SearchHeader(
             onClickBack = onNavigateToPostListScreen,

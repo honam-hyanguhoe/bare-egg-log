@@ -4,12 +4,16 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Surface
@@ -85,11 +89,6 @@ private fun WritePostScreen(
     onPostClick: () -> Unit,
     viewModel: WritePostViewModel
 ) {
-    Log.e(
-        "WritePostScreen",
-        "현재 입력된 값은 $title $content , 그리고 enabled는 ${title !== "" && content != ""}"
-    )
-    Log.e("WritePostScreen", "현재 isLoading은 $isLoading")
     val focusManager = LocalFocusManager.current
     Surface {
         BoxWithConstraints {
@@ -98,7 +97,9 @@ private fun WritePostScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(color = NaturalWhite)
-                    .padding(bottom = 24.heightPercent(LocalContext.current).dp),
+                    .padding(bottom = 24.heightPercent(LocalContext.current).dp)
+                    .systemBarsPadding() // 시스템 바 패딩 추가
+                    .imePadding(),
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -126,6 +127,7 @@ private fun WritePostScreen(
                         Text(text = "내용", style = Typography.displayLarge)
                         Spacer(modifier = Modifier.height(12.heightPercent(LocalContext.current).dp))
                         MultiInput(
+                            modifier = Modifier.width(320.widthPercent(LocalContext.current).dp),
                             text = content,
                             placeholder = "내용을 입력해주세요",
                             onValueChange = onContentChange,
@@ -135,7 +137,9 @@ private fun WritePostScreen(
                         Spacer(modifier = Modifier.height(24.heightPercent(LocalContext.current).dp))
                         Text(text = "사진 (선택)", style = Typography.displayLarge)
                         Spacer(modifier = Modifier.height(12.heightPercent(LocalContext.current).dp))
-                        ImageUploader(viewModel = viewModel)
+                        Box(Modifier.fillMaxWidth(0.9f)) {
+                            ImageUploader(viewModel = viewModel)
+                        }
                     }
                 }
                 BigButton(

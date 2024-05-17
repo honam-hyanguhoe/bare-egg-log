@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -63,12 +65,14 @@ import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.org.egglog.presentation.theme.NaturalBlack
+import com.org.egglog.presentation.utils.addFocusCleaner
 
 @Composable
 fun PostDetailScreen(
     viewModel: PostDetailViewModel = hiltViewModel(),
     postId: Int,
-    onNavigateToPostListScreen: () -> Unit
+    onNavigateToPostListScreen: () -> Unit,
+    onNavigateToModifyScreen: (Int) -> Unit
 ) {
     val context = LocalContext.current
     val state = viewModel.collectAsState().value
@@ -104,7 +108,7 @@ fun PostDetailScreen(
         commentValue = state.comment,
         onNavigateToPostListScreen = onNavigateToPostListScreen,
         onDeletePost = viewModel::onDeletePost,
-        onClickModify = {}, // 수정 버튼 클릭시
+        onClickModify = onNavigateToModifyScreen, // 수정 버튼 클릭시
         onDeleteComment = viewModel::onDeleteComment,
         onChangeComment = viewModel::onChangeComment,
         onClickRecomment = viewModel::onClickRecomment,
@@ -126,7 +130,7 @@ private fun PostDetailScreen(
     commentValue: String,
     onNavigateToPostListScreen: () -> Unit,
     onDeletePost: () -> Unit,
-    onClickModify: () -> Unit,
+    onClickModify: (Int) -> Unit,
     onDeleteComment: (Long) -> Unit,
     onChangeComment: (String) -> Unit,
     onClickRecomment: (Long) -> Unit,
@@ -135,10 +139,14 @@ private fun PostDetailScreen(
     swipeRefreshState: SwipeRefreshState,
     refreshSomething: () -> Unit
 ) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NaturalWhite),
+            .background(NaturalWhite)
+            .background(NaturalWhite)
+            .systemBarsPadding() // 시스템 바 패딩 추가
+            .imePadding(),
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -147,7 +155,7 @@ private fun PostDetailScreen(
         val keyboardController = LocalSoftwareKeyboardController.current
 
 
-        Column(modifier = Modifier.weight(1f)) {
+        Column(modifier = Modifier.weight(1f) ) {
             // 내 글일 경우만 수정, 삭제 버튼 활성화
             if (userId.toInt() == postDetailInfo?.userId) {
                 Log.e("PostDetail", "${userId.toInt()}, ${postDetailInfo.userId}, ${postId}")
@@ -155,8 +163,7 @@ private fun PostDetailScreen(
                     hasArrow = true,
                     hasMore = true,
                     onClickBack = onNavigateToPostListScreen,
-//                    options = listOf("수정하기", "삭제하기"),
-                    options = listOf("삭제하기"),
+                    options = listOf("수정하기", "삭제하기"),
                     selectedOption = selectedMenuItem,
                     onSelect = {
                         selectedMenuItem = it
@@ -164,7 +171,7 @@ private fun PostDetailScreen(
                             onDeletePost()
                         } else if (it == "수정하기") {
                             // TODO : 게시글 수정 로직 추가
-                            onClickModify()
+                            onClickModify(postId)
                         }
                     }
 

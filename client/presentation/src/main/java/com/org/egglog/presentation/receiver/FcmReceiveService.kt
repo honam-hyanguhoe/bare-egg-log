@@ -12,13 +12,28 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.org.egglog.domain.auth.model.UserFcmTokenParam
+import com.org.egglog.domain.auth.usecase.GetTokenUseCase
+import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
+import com.org.egglog.domain.auth.usecase.GetUserUseCase
+import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
+import com.org.egglog.domain.auth.usecase.UpdateUserFcmTokenUseCase
 import com.org.egglog.presentation.R
 import com.org.egglog.presentation.domain.main.activity.MainActivity
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class FcmReceiveService : FirebaseMessagingService() {
+    @Inject lateinit var updateUserFcmTokenUseCase: UpdateUserFcmTokenUseCase
+    @Inject lateinit var getTokenStoreUseCase: GetTokenUseCase
+    @Inject lateinit var setUserStoreUseCase: SetUserStoreUseCase
     var TAG:String = "FcmReceiveService"
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
@@ -45,8 +60,16 @@ class FcmReceiveService : FirebaseMessagingService() {
         sendRegistrationToServer(token)
     }
 
-    private fun sendRegistrationToServer(token: String) {
-
+    private fun sendRegistrationToServer(deviceToken: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val tokens = getTokenStoreUseCase()
+                val newUser = updateUserFcmTokenUseCase("Bearer ${tokens.first.orEmpty()}", UserFcmTokenParam(deviceToken)).getOrThrow()
+                setUserStoreUseCase(newUser)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error while sending registration to server", e)
+            }
+        }
     }
 
     private fun getBitmapFromUrl(imageUrl: String?): Bitmap? {
@@ -75,7 +98,7 @@ class FcmReceiveService : FirebaseMessagingService() {
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         val channelId = getString(R.string.default_notification_channel_id)
         val channelName: CharSequence = getString(R.string.default_notification_channel_name)
-        val importance = NotificationManager.IMPORTANCE_LOW
+        val importance = NotificationManager.IMPORTANCE_HIGH
 
         val notificationChannel = NotificationChannel(channelId, channelName, importance)
         notificationChannel.enableLights(true)
@@ -85,7 +108,7 @@ class FcmReceiveService : FirebaseMessagingService() {
         notificationManager.createNotificationChannel(notificationChannel)
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.dark)
+            .setSmallIcon(R.drawable.play_store_512)
             .setContentTitle(title)
             .setContentText(messageBody)
             .setAutoCancel(true)
@@ -112,7 +135,7 @@ class FcmReceiveService : FirebaseMessagingService() {
         val channel = NotificationChannel(
             channelId,
             "Channel human readable title",
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_HIGH
         )
         notificationManager.createNotificationChannel(channel)
 

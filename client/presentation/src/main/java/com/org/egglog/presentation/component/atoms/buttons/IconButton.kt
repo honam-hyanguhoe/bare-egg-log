@@ -14,12 +14,13 @@ import androidx.compose.ui.unit.Dp
 import com.org.egglog.presentation.component.atoms.icons.Icon
 
 @Composable
-fun IconButton(size: Dp, imageVector: ImageVector, color: Color, onClick: () -> Unit, enabled: Boolean = false) {
+fun IconButton(size: Dp, imageVector: ImageVector, color: Color, onClick: () -> Unit, enabled: Boolean = false, backgroundColor: Color = Color.Transparent) {
     Surface(
         modifier = Modifier.size(size),
         onClick = onClick,
         shape = CircleShape,
         enabled = enabled,
+        color = backgroundColor,
         contentColor = MaterialTheme.colorScheme.background
     ) {
         Icon(modifier = Modifier.size(size), imageVector = imageVector, color = color)
