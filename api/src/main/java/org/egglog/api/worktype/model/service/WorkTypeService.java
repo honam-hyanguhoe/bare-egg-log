@@ -57,7 +57,7 @@ public class WorkTypeService {
         WorkType workType = workTypeJpaRepository.findWithUserById(workTypeId)
                 .orElseThrow(() -> new WorkTypeException(NO_EXIST_WORKTYPE));
 
-        if ( !(workType.getWorkTag().equals(WorkTag.DELETE)) || !(workType.getWorkTag().equals(WorkTag.ETC)) || (workType.getUser().getId()!=loginUser.getId())) {
+        if ( workType.getWorkTag().equals(WorkTag.DELETE) || !(workType.getWorkTag().equals(WorkTag.ETC)) || (workType.getUser().getId()!=loginUser.getId())) {
             throw new WorkTypeException(ACCESS_DENIED);
         }
         workTypeJpaRepository.save(workType.delete());

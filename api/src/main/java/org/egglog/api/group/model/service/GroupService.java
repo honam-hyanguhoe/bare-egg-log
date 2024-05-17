@@ -30,6 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -330,6 +332,7 @@ public class GroupService {
                 Date now = new Date();
                 String nowDay = dayFormat.format(now);
                 groupDutyRepository.saveDuty(user.getName(),groupId,groupDutyData,nowDay);
+                notificationService.excelDutyUploadNotification(groupId, groupDutyData);
             }catch (Exception e){
                 throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
             }
