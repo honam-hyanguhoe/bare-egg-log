@@ -30,19 +30,17 @@ import com.org.egglog.presentation.theme.*
 fun ExcelCard(color: String, date: String, name: String, onClickCard: () -> Unit) {
     val context = LocalContext.current
 
-    val parts = date.split("-")
-
     val boxColor = when(color) {
         "green" -> Success600
         else -> NaturalWhite
     }
 
     Box(modifier = Modifier
-            .size(140.widthPercent(context).dp)
-            .background(boxColor, RoundedCornerShape(10.dp))
-            .border(1.dp, Success600, RoundedCornerShape(10.dp))
-            .clickable { onClickCard() }
-            .padding(10.dp, 16.dp)
+        .size(140.widthPercent(context).dp)
+        .background(boxColor, RoundedCornerShape(10.dp))
+        .border(1.dp, Success600, RoundedCornerShape(10.dp))
+        .clickable { onClickCard() }
+        .padding(10.dp, 16.dp)
             ) {
         Column(Modifier
                 .fillMaxSize(),
@@ -54,7 +52,7 @@ fun ExcelCard(color: String, date: String, name: String, onClickCard: () -> Unit
                     horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 LocalImageLoader(imageUrl = R.drawable.excel, Modifier.size(36.widthPercent(context).dp))
-                Text("${parts[0]}년\n${parts[1]}월 ${parts[2]}일", color = if(color.equals("green")) NaturalWhite else Success600, style = Typography.displayLarge, textAlign = TextAlign.Right)
+                Text(date, color = if(color.equals("green")) NaturalWhite else Success600, style = Typography.displayLarge, textAlign = TextAlign.Right)
             }
             Text("[작성자] ${name}", color = if(color.equals("green")) NaturalWhite else Success600, style = Typography.displayLarge)
         }

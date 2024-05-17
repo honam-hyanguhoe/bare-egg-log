@@ -434,15 +434,11 @@ fun ScheduleList(
 ) {
     Column() {
         if (currentWorkData != null) {
-            val hour1 = currentWorkData.startTime.substring(0, 2).toInt()
-            val hour2 = currentWorkData.workTime.substring(0, 2).toInt()
-            val endTime = String.format("%02d:00", hour1 + hour2)
-            SmallScheduleCard2(workType = currentWorkData.copy(workTime = endTime))
+            SmallScheduleCard2(workType = currentWorkData)
         }
 
 
         currentPersonalData?.forEach { personalData ->
-            Log.e("MyCalendar", "내 개인 일정 ${personalData}")
             BigScheduleCard(
                 personalData,
                 onClickDelete = { onDeletePersonalSchedule(personalData.eventId) },

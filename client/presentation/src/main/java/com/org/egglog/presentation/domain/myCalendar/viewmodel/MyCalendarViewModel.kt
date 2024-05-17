@@ -171,7 +171,6 @@ class MyCalendarViewModel @Inject constructor(
         val startDate = "${state.currentYear}-${month}-01"
         val endDate = "${state.currentYear}-${month}-${lastDayOfMonth}"
 
-        Log.e("MyCalendar", "$calendarGroupMap")
 
         for ((calendarGroupId, isActive) in calendarGroupMap.entries) {
             if(isActive) {
@@ -182,8 +181,6 @@ class MyCalendarViewModel @Inject constructor(
                     userInfo!!.id,
                     calendarGroupId.toLong()
                 ).getOrThrow()
-
-                Log.e("MyCalendar", "제 개인 일정 $calendarGroupId $monthlyPersonalList")
 
                 val updateMonthlyPersonalList = monthlyPersonalList.map { personalScheduleData ->
                     val updatedEventList = personalScheduleData.eventList.map { event ->
