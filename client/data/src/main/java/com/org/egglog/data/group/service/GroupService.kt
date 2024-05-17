@@ -117,5 +117,13 @@ interface GroupService {
         @Path("groupId") groupId: Long,
     ): CommonResponse<DutyTagResponse?>
 
+    @POST("groups/duty/{groupId}")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun uploadDutyFile(
+        @Header("Authorization") accessToken: String,
+        @Path("groupId") groupId: Long,
+        @Body requestBody: RequestBody
+    ): CommonResponse<String?>
+
 }
 

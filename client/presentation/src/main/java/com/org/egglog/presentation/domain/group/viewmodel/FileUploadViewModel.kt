@@ -3,15 +3,16 @@ package com.org.egglog.presentation.domain.group.viewmodel
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
-import com.org.egglog.domain.group.usecase.getDutyTagUseCase
+import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
+import com.org.egglog.domain.group.model.DutyTag
+import com.org.egglog.domain.group.model.FormattedFile
+import com.org.egglog.domain.group.model.UploadDutyFile
+import com.org.egglog.domain.group.usecase.GetTagUseCase
+import com.org.egglog.domain.group.usecase.UploadDutyFileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +20,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
@@ -34,9 +37,11 @@ import javax.inject.Inject
 @HiltViewModel
 class FileUploadViewModel @Inject constructor(
     private val getUserTokenUseCase: GetTokenUseCase,
-    private val getDutyTagUseCase: getDutyTagUseCase,
+    private val getUserStoreUseCase: GetUserStoreUseCase,
+    private val getTagUseCase: GetTagUseCase,
+    private val uploadDutyFileUseCase: UploadDutyFileUseCase,
     savedStateHandle: SavedStateHandle
-) :ViewModel(), ContainerHost<FileUploadState, FileUploadSideEffect>{
+) : ViewModel(), ContainerHost<FileUploadState, FileUploadSideEffect> {
     override val container: Container<FileUploadState, FileUploadSideEffect> = container(
         initialState = FileUploadState(),
         buildSettings = {
@@ -48,9 +53,9 @@ class FileUploadViewModel @Inject constructor(
         }
     )
 
-//    var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
+    //    var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
     private val _selectedDate = MutableStateFlow<LocalDate?>(null)
-    val selectedDate : StateFlow<LocalDate?> = _selectedDate.asStateFlow()
+    val selectedDate: StateFlow<LocalDate?> = _selectedDate.asStateFlow()
     val groupId = savedStateHandle.get<Long>("groupId")
         ?: throw IllegalStateException("GroupId must be provided")
 
@@ -61,11 +66,10 @@ class FileUploadViewModel @Inject constructor(
     fun initDutyTag() = intent {
         val tokens = getUserTokenUseCase()
 
-        val result = getDutyTagUseCase(
+        val result = getTagUseCase(
             accessToken = "Bearer ${tokens.first}",
             groupId = groupId
         ).getOrNull()
-
 
         Log.d("upload", "init ${result}")
         reduce {
@@ -80,7 +84,8 @@ class FileUploadViewModel @Inject constructor(
             )
         }
     }
-    fun setSelectedDate(selected: LocalDate?) = intent{
+
+    fun setSelectedDate(selected: LocalDate?) = intent {
         _selectedDate.value = selected
         Log.d("upload", "selected $selected")
 
@@ -91,7 +96,7 @@ class FileUploadViewModel @Inject constructor(
         }
     }
 
-    fun onChangeFileDay(value : String) = blockingIntent {
+    fun onChangeFileDay(value: String) = blockingIntent {
         reduce {
             val updateCustomDutyList = state.customDutyList.toMutableMap()
             updateCustomDutyList["DAY"] = value
@@ -103,7 +108,7 @@ class FileUploadViewModel @Inject constructor(
         Log.d("upload", "customDutyList ${state.customDutyList["DAY"]}")
     }
 
-    fun onChangeFileEVE(value : String) = blockingIntent {
+    fun onChangeFileEVE(value: String) = blockingIntent {
         reduce {
             val updateCustomDutyList = state.customDutyList.toMutableMap()
             updateCustomDutyList["EVE"] = value
@@ -113,7 +118,7 @@ class FileUploadViewModel @Inject constructor(
         }
     }
 
-    fun onChangeFileNIGHT(value : String) = blockingIntent {
+    fun onChangeFileNIGHT(value: String) = blockingIntent {
         reduce {
             val updateCustomDutyList = state.customDutyList.toMutableMap()
             updateCustomDutyList["NIGHT"] = value
@@ -123,7 +128,7 @@ class FileUploadViewModel @Inject constructor(
         }
     }
 
-    fun onChangeFileOFF(value : String) = blockingIntent {
+    fun onChangeFileOFF(value: String) = blockingIntent {
         reduce {
             val updateCustomDutyList = state.customDutyList.toMutableMap()
             updateCustomDutyList["OFF"] = value
@@ -134,9 +139,41 @@ class FileUploadViewModel @Inject constructor(
     }
 
     fun uploadFile(context: Context, uri: Uri) = blockingIntent {
-        reduce { state.copy(isLoading = true, uploadSuccess = null, errorMessage = null) }
+        val tokens = getUserTokenUseCase()
 
-        try {
+
+        formatFileToJson(context, uri)
+
+        val result = uploadDutyFileUseCase(
+            accessToken = "Bearer ${tokens.first}",
+            groupId = groupId,
+            dutyFileData = UploadDutyFile(
+                date = state.uploadDutyDate,
+                dutyList = state.dutyJsonData,
+                customWorkTag = DutyTag(
+                    day = state.customDutyList["DAY"] ?: "",
+                    eve = state.customDutyList["EVE"] ?: "",
+                    night = state.customDutyList["NIGHT"] ?: "",
+                    off = state.customDutyList["OFF"] ?: "",
+                ),
+                userName = getUserStoreUseCase()?.userName ?: "",
+                day = LocalDate.now().toString()
+            )
+        )
+
+        if(result.isSuccess){
+            // 근무 업로드 기타사항 안내 모달 띄우기
+            FileUploadSideEffect.Toast("근무가 업로드되었습니다")
+        }else{
+            FileUploadSideEffect.Toast("업로드 실패하였습니다. 다시시도해주세요")
+        }
+    }
+
+    fun formatFileToJson(context: Context, uri: Uri) = blockingIntent {
+        reduce { state.copy(isLoading = true, uploadSuccess = null, errorMessage = null) }
+        val dataToFormattedFile : List<FormattedFile>
+
+            try {
             val jsonResult = withContext(Dispatchers.IO) {
                 val inputStream: InputStream = context.contentResolver.openInputStream(uri)
                     ?: throw Exception("Failed to open input stream from URI")
@@ -147,64 +184,114 @@ class FileUploadViewModel @Inject constructor(
                     val workbook = WorkbookFactory.create(stream)
                     val sheet = workbook.getSheetAt(0)
 
-                    val data = mutableListOf<MutableList<String>>()
-
-                    // Read data rows (from the first row onwards)
-                    for (rowIndex in 1 until sheet.physicalNumberOfRows) {
-                        val row = sheet.getRow(rowIndex)
-                        val rowData = mutableListOf<String>()
-                        for (cellIndex in 0 until row.physicalNumberOfCells) {
-                            val cell = row.getCell(cellIndex)
-                            val cellValue = cell?.toString() ?: ""
-                            // Check if the value is a number and if it can be represented as an integer
-                            val formattedCellValue = if (cellValue.toDoubleOrNull()?.rem(1) == 0.0) {
+                    // day 값
+                    val dayRow = sheet.getRow(0)
+                    val days = mutableListOf<String>()
+                    for (cellIndex in 2 until dayRow.physicalNumberOfCells) {
+                        val cell = dayRow.getCell(cellIndex)
+                        val cellValue = cell?.toString() ?: ""
+                        val formattedCellValue =
+                            if (cellValue.toDoubleOrNull()?.rem(1) == 0.0) {
                                 cellValue.toDouble().toInt().toString()
                             } else {
                                 cellValue
                             }
-                            rowData.add(formattedCellValue)
+                        days.add(formattedCellValue)
+                    }
+
+
+                    val data = mutableListOf<Map<String, Any>>()
+
+                    for (rowIndex in 1 until sheet.physicalNumberOfRows) {
+                        val row = sheet.getRow(rowIndex)
+                        if (row != null) {
+                            val employeeData = mutableMapOf<String, Any>()
+                            val workData = mutableMapOf<String, String>()
+
+                            // 사번
+                            val employeeId = row.getCell(0)?.let { cell ->
+                                val cellValue = cell.toString()
+                                if (cellValue.toDoubleOrNull()?.rem(1) == 0.0) {
+                                    cellValue.toDouble().toInt().toString()
+                                } else {
+                                    cellValue
+                                }
+                            } ?: ""
+                            employeeData["employeeId"] = employeeId
+
+                            // 이름
+                            val employeeName = row.getCell(1)?.toString() ?: ""
+                            employeeData["name"] = employeeName
+
+                            // 근무 정보
+                            for (cellIndex in 2 until row.physicalNumberOfCells) {
+                                val cell = row.getCell(cellIndex)
+                                val cellValue = cell?.toString() ?: ""
+                                val formattedCellValue =
+                                    if (cellValue.toDoubleOrNull()?.rem(1) == 0.0) {
+                                        cellValue.toDouble().toInt().toString()
+                                    } else {
+                                        cellValue
+                                    }
+                                workData[days[cellIndex - 2]] = formattedCellValue
+                            }
+
+                            employeeData["work"] = workData
+                            data.add(employeeData)
                         }
-                        data.add(rowData)
                     }
 
                     workbook.close()
                     Gson().toJson(data)
                 }
-
                 jsonData
+
+                val json = Json { ignoreUnknownKeys = true }
+                dataToFormattedFile = json.decodeFromString<List<FormattedFile>>(jsonData)
             }
-            Log.d("upload", jsonResult)
+            Log.d("upload", dataToFormattedFile.toString())
+
+
+
+
             FileUploadSideEffect.Toast("근무표를 업로드했습니다.")
 
             reduce {
                 state.copy(
                     isLoading = false,
                     uploadSuccess = true,
-                    dutyJsonData = jsonResult
+                    dutyJsonData = dataToFormattedFile
 
-                ) }
+                )
+            }
         } catch (e: Exception) {
             Log.e("upload", "Error uploading file", e)
             FileUploadSideEffect.Toast("근무표 업로드를 실패했습니다.")
-            reduce { state.copy(isLoading = false, uploadSuccess = false, errorMessage = e.message) }
+            reduce {
+                state.copy(
+                    isLoading = false,
+                    uploadSuccess = false,
+                    errorMessage = e.message
+                )
+            }
         }
     }
-
 }
 
 data class FileUploadState(
-    val uploadDutyDate : String = "${LocalDate.now().year}-${LocalDate.now().month}",
+    val uploadDutyDate: String = "${LocalDate.now().year}-${LocalDate.now().month}",
     val customDutyList: Map<String, String> = mapOf<String, String>(
         "DAY" to "",
         "EVE" to "",
         "NIGHT" to "",
         "OFF" to ""
     ),
-    val dutyJsonData: String = "",
+    val dutyJsonData: List<FormattedFile> = emptyList(),
     val isLoading: Boolean = false,
     val uploadSuccess: Boolean? = null,
     val errorMessage: String? = null
 )
-sealed interface FileUploadSideEffect{
+
+sealed interface FileUploadSideEffect {
     class Toast(val message: String) : FileUploadSideEffect
 }
