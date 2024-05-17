@@ -7,6 +7,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -27,6 +28,7 @@ import androidx.wear.compose.material.Text
 import com.org.egglog.presentation.domain.main.AndroidBridge
 import com.org.egglog.presentation.domain.main.viewModel.StaticsViewModel
 import com.org.egglog.presentation.theme.Gray100
+import com.org.egglog.presentation.theme.NaturalBlack
 import com.org.egglog.presentation.utils.heightPercent
 import com.org.egglog.presentation.utils.widthPercent
 import org.orbitmvi.orbit.compose.collectAsState

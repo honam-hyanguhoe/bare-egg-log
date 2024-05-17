@@ -19,3 +19,9 @@ class GetGroupDutyUseCaseImpl @Inject constructor(
         response.dataBody?.toDomainModel()
     }
 }
+
+//override suspend fun invoke(accessToken: String, groupId: Long): Result<DutyTag?> = kotlin.runCatching {
+//    val response = groupService.getDutyTag(accessToken, groupId)
+//
+//    response.dataBody?.toDomainModel()
+//}

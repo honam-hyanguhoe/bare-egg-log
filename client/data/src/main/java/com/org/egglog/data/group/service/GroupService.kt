@@ -1,6 +1,7 @@
 package com.org.egglog.data.group.service
 
 import androidx.room.Delete
+import com.org.egglog.data.group.model.DutyTagResponse
 import com.org.egglog.data.group.model.GroupDutyResponse
 import com.org.egglog.data.group.model.GroupInfoResponse
 import com.org.egglog.data.group.model.GroupResponse
@@ -108,6 +109,21 @@ interface GroupService {
         @Header("Authorization") accessToken: String,
         @Path("group_id") groupId: Long,
     ): CommonResponse<String>
+
+    @GET("groups/duty/work-tag/{groupId}")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun getDutyTag(
+        @Header("Authorization") accessToken: String,
+        @Path("groupId") groupId: Long,
+    ): CommonResponse<DutyTagResponse?>
+
+    @POST("groups/duty/{groupId}")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun uploadDutyFile(
+        @Header("Authorization") accessToken: String,
+        @Path("groupId") groupId: Long,
+        @Body requestBody: RequestBody
+    ): CommonResponse<String?>
 
 }
 
