@@ -70,8 +70,9 @@ public class BoardScheduler {
      * * 그룹아이디 && 병원아이디 == null -> 전체 게시판<br>
      */
 
-//    @Scheduled(cron = "0 0/1 * * * ?")
-    @Scheduled(cron = "0 0 0/1 * * ?")
+
+//    @Scheduled(cron = "0 0 0/1 * * ?")
+    @Scheduled(cron = "0 0/10 * * * ?")
     @Transactional
     public void updateHotBoardScheduledMethod() {
         //<boardId, (조회수 + 좋아요)>
