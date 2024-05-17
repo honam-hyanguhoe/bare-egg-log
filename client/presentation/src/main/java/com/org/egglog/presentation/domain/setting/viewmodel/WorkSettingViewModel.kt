@@ -172,7 +172,6 @@ class WorkSettingViewModel @Inject constructor(
         reduce { state.copy(modifyEnabledAlarm = false) }
         val tokens = getTokenUseCase()
         val selectedAlarm = state.selectedAlarm!!
-        Log.e("ldskjaskl", "${state.alarmTime}")
         updateAlarmUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}", AlarmParam(alarmId = selectedAlarm.alarmId, replayTime = state.replayTime, replayCnt = state.replayCnt, workTypeId = selectedAlarm.workTypeId, alarmTime = state.alarmTime)).getOrThrow()
         postSideEffect(WorkSettingSideEffect.Toast("수정되었습니다."))
         reduce { state.copy(modifyEnabledAlarm = true, replayTime = 5, replayCnt = 1, selectedAlarm = null) }

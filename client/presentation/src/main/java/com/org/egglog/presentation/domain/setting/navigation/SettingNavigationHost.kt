@@ -1,6 +1,8 @@
 package com.org.egglog.presentation.domain.setting.navigation
 
-import android.app.AlarmManager
+import android.os.Build
+import androidx.activity.result.ActivityResultLauncher
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -10,10 +12,12 @@ import com.org.egglog.presentation.domain.setting.screen.AskSettingScreen
 import com.org.egglog.presentation.domain.setting.screen.CalendarAddScreen
 import com.org.egglog.presentation.domain.setting.screen.CalendarSettingScreen
 import com.org.egglog.presentation.domain.setting.screen.MySettingScreen
+import com.org.egglog.presentation.domain.setting.screen.NotificationSettingScreen
 import com.org.egglog.presentation.domain.setting.screen.PrivacyDetailScreen
 import com.org.egglog.presentation.domain.setting.screen.SettingScreen
 import com.org.egglog.presentation.domain.setting.screen.WorkSettingScreen
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun SettingNavigationHost() {
     val navController  = rememberNavController()
@@ -28,6 +32,7 @@ fun SettingNavigationHost() {
                 onNavigateToAgreeDetailScreen = { navController.navigate(route = SettingRoute.AgreeDetailScreen.name) },
                 onNavigateToMySettingScreen = { navController.navigate(route = SettingRoute.MySettingScreen.name) },
                 onNavigateToCalendarSettingScreen = { navController.navigate(route = SettingRoute.CalendarSettingScreen.name) },
+                onNavigateToNotificationSettingScreen = { navController.navigate(route = SettingRoute.NotificationSettingScreen.name) },
                 onNavigateToWorkSettingScreen = { navController.navigate(route = SettingRoute.WorkSettingScreen.name) },
                 onNavigateToAskSettingScreen = { navController.navigate(route = SettingRoute.AskSettingScreen.name) },
             )
@@ -61,6 +66,10 @@ fun SettingNavigationHost() {
 
         composable(route = SettingRoute.AskSettingScreen.name) {
             AskSettingScreen()
+        }
+
+        composable(route = SettingRoute.NotificationSettingScreen.name) {
+            NotificationSettingScreen()
         }
     }
 }

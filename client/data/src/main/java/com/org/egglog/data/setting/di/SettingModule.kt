@@ -6,6 +6,7 @@ import com.org.egglog.data.setting.usecase.GetAlarmListUseCaseImpl
 import com.org.egglog.data.setting.usecase.GetCalendarGroupListUseCaseImpl
 import com.org.egglog.data.setting.usecase.GetCalendarGroupMapStoreUseCaseImpl
 import com.org.egglog.data.setting.usecase.GetCalendarLinkUseCaseImpl
+import com.org.egglog.data.setting.usecase.GetNotificationListUseCaseImpl
 import com.org.egglog.data.setting.usecase.GetWorkTypeListUseCaseImpl
 import com.org.egglog.data.setting.usecase.PostAskUseCaseImpl
 import com.org.egglog.data.setting.usecase.PostCalendarGroupUseCaseImpl
@@ -14,6 +15,7 @@ import com.org.egglog.data.setting.usecase.PostWorkTypeUseCaseImpl
 import com.org.egglog.data.setting.usecase.SetCalendarGroupMapStoreUseCaseImpl
 import com.org.egglog.data.setting.usecase.UpdateAlarmStatusUseCaseImpl
 import com.org.egglog.data.setting.usecase.UpdateAlarmUseCaseImpl
+import com.org.egglog.data.setting.usecase.UpdateNotificationUseCaseImpl
 import com.org.egglog.data.setting.usecase.UpdateWorkTypeUseCaseImpl
 import com.org.egglog.domain.setting.usecase.DeleteCalendarGroupUseCase
 import com.org.egglog.domain.setting.usecase.DeleteWorkTypeUseCase
@@ -21,6 +23,7 @@ import com.org.egglog.domain.setting.usecase.GetAlarmListUseCase
 import com.org.egglog.domain.setting.usecase.GetCalendarGroupListUseCase
 import com.org.egglog.domain.setting.usecase.GetCalendarGroupMapStoreUseCase
 import com.org.egglog.domain.setting.usecase.GetCalendarLinkUseCase
+import com.org.egglog.domain.setting.usecase.GetNotificationListUseCase
 import com.org.egglog.domain.setting.usecase.GetWorkTypeListUseCase
 import com.org.egglog.domain.setting.usecase.PostAskUseCase
 import com.org.egglog.domain.setting.usecase.PostCalendarGroupUseCase
@@ -29,6 +32,7 @@ import com.org.egglog.domain.setting.usecase.PostWorkTypeUseCase
 import com.org.egglog.domain.setting.usecase.SetCalendarGroupMapStoreUseCase
 import com.org.egglog.domain.setting.usecase.UpdateAlarmStatusUseCase
 import com.org.egglog.domain.setting.usecase.UpdateAlarmUseCase
+import com.org.egglog.domain.setting.usecase.UpdateNotificationUseCase
 import com.org.egglog.domain.setting.usecase.UpdateWorkTypeUseCase
 import dagger.Binds
 import dagger.Module
@@ -82,4 +86,10 @@ abstract class SettingModule {
 
     @Binds
     abstract fun bindGetCalendarLinkUseCase(uc: GetCalendarLinkUseCaseImpl): GetCalendarLinkUseCase
+
+    @Binds
+    abstract fun bindGetNotificationListUseCase(uc: GetNotificationListUseCaseImpl): GetNotificationListUseCase
+
+    @Binds
+    abstract fun bindUpdateNotificationUseCase(uc: UpdateNotificationUseCaseImpl): UpdateNotificationUseCase
 }
