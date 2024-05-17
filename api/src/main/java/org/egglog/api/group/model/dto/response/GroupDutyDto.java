@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 public class GroupDutyDto {
-    private String day;
+    private String date;
     private String userName;
-    private GroupDutyDataDto dutyData;
+    private Index index;
 }
