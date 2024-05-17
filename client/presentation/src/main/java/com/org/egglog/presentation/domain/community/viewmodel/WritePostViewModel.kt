@@ -83,6 +83,7 @@ class WritePostViewModel @Inject constructor(
             uploadImages = state.uploadImages.map { bitmap ->
                 bitmapToByteArray(bitmap)
             },
+            tempNickname = "익명의 구운란",
             groupId = groupId,
             hospitalId = hospitalId,
         )
