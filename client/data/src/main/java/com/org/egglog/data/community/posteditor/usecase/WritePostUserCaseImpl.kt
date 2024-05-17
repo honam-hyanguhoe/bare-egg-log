@@ -20,6 +20,7 @@ class WritePostUserCaseImpl @Inject constructor(
         boardTitle: String,
         boardContent: String,
         uploadImages: List<ByteArray>,
+        tempNickname: String,
         groupId: Int?,
         hospitalId: Int?
     ): Result<Boolean> = kotlin.runCatching {
@@ -39,7 +40,7 @@ class WritePostUserCaseImpl @Inject constructor(
             pictureTwo = urls?.getOrNull(1) ?: "",
             pictureThree = urls?.getOrNull(2) ?: "",
             pictureFour = urls?.getOrNull(3) ?: "",
-            tempNickname = "익명의 구운란",
+            tempNickname = tempNickname,
             groupId = groupId,
             hospitalId = hospitalId
         )
