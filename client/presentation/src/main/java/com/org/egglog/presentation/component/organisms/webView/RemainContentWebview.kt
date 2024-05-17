@@ -84,6 +84,7 @@ fun RemainContentWebView(
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
             if (url == "https://www.egg-log.org/remain") {
+                Log.d("remainData", state.remainData)
                 val script =
                     "javascript:receiveDataFromApp('${state.remainData.replace("\"", "\\\"")}')"
                 webView.evaluateJavascript(script) { value ->

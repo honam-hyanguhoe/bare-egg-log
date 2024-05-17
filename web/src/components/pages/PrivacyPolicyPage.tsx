@@ -3,13 +3,12 @@ import styled from "styled-components";
 
 const PageBody = styled.div`
   font-family: "Line-Seed-Sans-App";
-  font-weight: 800;
-  padding: 20px;
+  font-weight: 600;
+  padding: 20px 20px 100px 20px;
   @media (max-width: 768px) {
-    padding: 10px;
+    padding: 10px 10px 150px 10px;
   }
 `;
-
 const PageTitle = styled.p`
   font-size: 2rem;
   font-weight: 800;
