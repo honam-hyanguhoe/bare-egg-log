@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.egglog.api.group.model.dto.response.Index;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GroupDutySaveFormat {
-    private Map<String,List<String>> dutyList;
+    private Map<String,DutyFormat> dutyList;
     //없는 경우 기존 값으로 저장됨
     private CustomWorkTag customWorkTag;
     private String userName;
