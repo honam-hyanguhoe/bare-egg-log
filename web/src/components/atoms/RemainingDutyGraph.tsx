@@ -19,15 +19,15 @@ const RemainingDutyGraph = ({ data }: RemainingDutyGraphProps) => {
   const svgRef = useRef(null);
 
   const [dimensions, setDimensions] = useState({
-    width: window.innerWidth > 500 ? 500 : window.innerWidth * 0.95,
-    height: window.innerWidth > 500 ? 500 : window.innerWidth * 0.95,
+    width: window.innerWidth > 500 ? 500 : window.innerWidth,
+    height: window.innerWidth > 500 ? 500 : window.innerWidth,
   });
 
   useEffect(() => {
     const handleResize = () => {
       setDimensions({
-        width: window.innerWidth > 500 ? 500 : window.innerWidth * 0.95,
-        height: window.innerWidth > 500 ? 500 : window.innerWidth * 0.95,
+        width: window.innerWidth > 500 ? 500 : window.innerWidth,
+        height: window.innerWidth > 500 ? 500 : window.innerWidth,
       });
     };
 

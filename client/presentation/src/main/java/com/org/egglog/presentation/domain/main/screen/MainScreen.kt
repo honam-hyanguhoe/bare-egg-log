@@ -4,6 +4,7 @@ import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,6 +52,7 @@ import com.org.egglog.presentation.domain.setting.viewmodel.SettingSideEffect
 import com.org.egglog.presentation.theme.Gray100
 import com.org.egglog.presentation.theme.NaturalBlack
 import com.org.egglog.presentation.theme.NaturalWhite
+import com.org.egglog.presentation.theme.Success400
 import com.org.egglog.presentation.theme.Typography
 import com.org.egglog.presentation.utils.ArrowLeft
 import com.org.egglog.presentation.utils.ArrowRight
@@ -240,13 +242,18 @@ fun RemainCard(
             modifier = Modifier.padding(start = 10.dp),
             style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
         )
-        RemainContentWebView(
-            width = 320,
-            height = 340,
-            url = "https://www.egg-log.org/remain",
-            data = remainData,
-            selected = selected
-        )
+
+        Column(
+            modifier = Modifier.border(1.dp, Success400)
+        ) {
+            RemainContentWebView(
+                width = 340,
+                height = 340,
+                url = "https://www.egg-log.org/remain",
+                data = remainData,
+                selected = selected
+            )
+        }
     }
 
 }

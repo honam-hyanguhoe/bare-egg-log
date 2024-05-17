@@ -325,12 +325,11 @@ public class GroupService {
     public void addDuty(User user, Long groupId, GroupDutyData groupDutyData) {
         if(groupMemberService.isGroupMember(groupId,user.getId())){
             try {
-                groupDutyData.setUserName(user.getName());
+                //출력을 위한 날짜 데이터
                 SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
                 Date now = new Date();
                 String nowDay = dayFormat.format(now);
-                groupDutyData.setDay(nowDay);
-                groupDutyRepository.saveDuty(groupId,groupDutyData);
+                groupDutyRepository.saveDuty(user.getName(),groupId,groupDutyData,nowDay);
             }catch (Exception e){
                 throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
             }
