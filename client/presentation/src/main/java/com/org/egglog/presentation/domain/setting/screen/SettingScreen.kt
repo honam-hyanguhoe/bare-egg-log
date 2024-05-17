@@ -44,6 +44,7 @@ import com.org.egglog.presentation.domain.auth.activity.LoginActivity
 import com.org.egglog.presentation.domain.community.activity.CommunityActivity
 import com.org.egglog.presentation.domain.group.activity.GroupActivity
 import com.org.egglog.presentation.domain.main.activity.MainActivity
+import com.org.egglog.presentation.domain.myCalendar.activity.MyCalendarActivity
 import com.org.egglog.presentation.domain.setting.viewmodel.SettingSideEffect
 import com.org.egglog.presentation.domain.setting.viewmodel.SettingViewModel
 import com.org.egglog.presentation.utils.getVersionInfo
@@ -96,6 +97,16 @@ fun SettingScreen(
                 context.startActivity(
                     Intent(
                         context, GroupActivity::class.java
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                )
+            }
+
+            SettingSideEffect.NavigateToCalendarSettingScreen -> {
+                context.startActivity(
+                    Intent(
+                        context, MyCalendarActivity::class.java
                     ).apply {
                         flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                     }

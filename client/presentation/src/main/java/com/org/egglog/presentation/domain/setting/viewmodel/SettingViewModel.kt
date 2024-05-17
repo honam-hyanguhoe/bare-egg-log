@@ -17,6 +17,7 @@ import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.PostLogoutUseCase
 import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.UpdateUserJoinUseCase
+import com.org.egglog.presentation.domain.myCalendar.viewmodel.MyCalendarSideEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.Flow
@@ -71,10 +72,10 @@ class SettingViewModel @Inject constructor(
 
     fun onSelectedIdx(selectedIdx: Int) = intent {
         when(selectedIdx) {
-            0 -> postSideEffect(SettingSideEffect.Toast("출시 준비 중입니다."))
+            0 -> postSideEffect(SettingSideEffect.NavigateToCalendarSettingScreen)
             1 -> postSideEffect(SettingSideEffect.NavigateToGroupActivity)
             2 -> postSideEffect(SettingSideEffect.NavigateToMainActivity)
-            3 -> postSideEffect(SettingSideEffect.Toast("출시 준비 중입니다."))
+            3 -> postSideEffect(SettingSideEffect.NavigateToCommunityActivity)
         }
     }
 }
@@ -92,4 +93,6 @@ sealed interface SettingSideEffect {
     data object NavigateToCommunityActivity: SettingSideEffect
     data object NavigateToGroupActivity: SettingSideEffect
     data object NavigateToLoginActivity: SettingSideEffect
+
+    data object NavigateToCalendarSettingScreen : SettingSideEffect
 }

@@ -67,7 +67,7 @@ public class GroupDutyRepository {
                     .dutyList(dutyList)
                     .build();
 
-            log.debug(groupDutySaveFormat.toString());
+            log.debug("path {}/{}/{}/{}","duty",groupId,groupDutyData.getDate(),count);
 
             ApiFuture<WriteResult> apiFuture = firestore
                     .collection("duty")
@@ -139,6 +139,7 @@ public class GroupDutyRepository {
                     GroupDutyDto dutyDto = GroupDutyDto.builder()
                             .date(duty.getDay())
                             .userName(duty.getUserName())
+                            .index(new Index(String.valueOf(groupId),date, doc.getId()))
                             .build();
                     groupDutyList.add(dutyDto);
                 }
