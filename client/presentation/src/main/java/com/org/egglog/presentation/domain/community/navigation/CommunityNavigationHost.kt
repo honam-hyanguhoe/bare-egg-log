@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.org.egglog.presentation.domain.community.screen.ModifyPostScreen
 import com.org.egglog.presentation.domain.community.screen.PostDetailScreen
 import com.org.egglog.presentation.domain.community.screen.PostListScreen
 import com.org.egglog.presentation.domain.community.screen.PostSearchScreen
@@ -81,9 +82,14 @@ fun CommunityNavigationHost() {
                         route = CommunityRoute.PostListScreen.name,
                         builder = {
                             popUpTo(CommunityRoute.PostListScreen.name) {
-                                inclusive = true // 목적지도 포함하여 스택을 비웁니다.
+                                inclusive = true
                             }
                         }
+                    )
+                },
+                onNavigateToModifyScreen = { postId ->
+                    navController.navigate(
+                        route = "${CommunityRoute.ModifyPostScreen.name}/$postId" // postId를 목적지에 전달
                     )
                 }
             )
@@ -106,11 +112,33 @@ fun CommunityNavigationHost() {
                         route = CommunityRoute.PostListScreen.name,
                         builder = {
                             popUpTo(CommunityRoute.PostListScreen.name) {
-                                inclusive = true // 목적지도 포함하여 스택을 비웁니다.
+                                inclusive = true
                             }
                         }
                     )
-                })
+                }
+            )
+        }
+
+        composable(
+            route = "${CommunityRoute.ModifyPostScreen.name}/{postId}",
+            arguments = listOf(navArgument("postId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val postId = backStackEntry.arguments?.getInt("postId")
+            ModifyPostScreen(
+                postId = postId!!,
+                onNavigateToDetailScreen = { postId ->
+                    navController.navigate(
+                        route = "${CommunityRoute.PostDetailScreen.name}/$postId",
+                        builder = {
+                            popUpTo(CommunityRoute.PostDetailScreen.name) {
+                                inclusive = true
+                            }
+                        }
+                    )
+                }
+            )
+
         }
     }
 }

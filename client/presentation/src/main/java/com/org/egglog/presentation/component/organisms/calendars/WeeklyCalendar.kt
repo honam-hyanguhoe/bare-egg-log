@@ -65,7 +65,6 @@ fun WeeklyCalendar(
     width: Int = 320,
     contentsColor: Color = Gray100,
     containerColor: Color = Gray100,
-
     ) {
 
     Column(
@@ -75,8 +74,8 @@ fun WeeklyCalendar(
     ) {
         if (type.equals("group")) {
             Row {
-                CalendarHeader(calendarUiModel, {onPrevClick(startDate)}, onNextClick)
-                Spacer(modifier = Modifier. height(6.dp))
+                CalendarHeader(calendarUiModel, { onPrevClick(startDate) }, onNextClick)
+                Spacer(modifier = Modifier.height(6.dp))
             }
         }
 
@@ -156,7 +155,7 @@ fun CalendarHeader(
             modifier = Modifier.align(Alignment.CenterVertically)
         )
         Row() {
-            IconButton(onClick = { onPrevClick(data.selectedDate.date)}) {
+            IconButton(onClick = { onPrevClick(data.selectedDate.date) }) {
                 Icon(
                     imageVector = Icons.Filled.KeyboardArrowLeft,
                     contentDescription = "Previous",
@@ -192,7 +191,7 @@ fun Content(
     ) {
         data.visibleDates.forEachIndexed() { index, date ->
             DateItem(
-                type, date, onDateClick, labels?.get(index) ?: "", backgroundColor = backgroundColor
+                type, date, onDateClick, labels[index] ?: "", backgroundColor = backgroundColor
             )
         }
     }
@@ -207,32 +206,29 @@ fun DateItem(
     label: String? = null,
     backgroundColor: Color = NaturalWhite
 ) {
-    Column() {
+    Column {
         Card(
             modifier = Modifier
                 .padding(vertical = 4.dp, horizontal = 2.dp)
-                .run {
-                    if (type.equals("group")) {
-                        clickable { // making the element clickable, by adding 'clickable' modifier
-                            if (onClick != null) {
-                                onClick(date)
-                            }
+                .then(
+                    if (type == "group") {
+                        Modifier.clickable {
+                            onClick?.invoke(date)
                         }
                     } else {
-                        this
+                        Modifier
                     }
-                }, shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(
-                // background colors of the selected date
-                // and the non-selected date are different
+                ),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(
                 containerColor = if (date.isSelected) {
-                    Warning300
+                    if (type == "main") backgroundColor else Warning300
                 } else {
                     backgroundColor
                 }
-            ), border = if (date.isToday) {
-                BorderStroke(
-                    width = 2.dp, color = Warning300
-                )
+            ),
+            border = if (date.isToday) {
+                BorderStroke(2.dp, Warning300)
             } else {
                 null
             }
@@ -245,20 +241,30 @@ fun DateItem(
             ) {
                 Text(
                     text = date.day.uppercase(),
-                    color = if (date.day.equals("일")) Color(0xFFF97066) else if (date.isSelected) NaturalWhite else NaturalBlack,
+                    color = when {
+                        date.day == "일" -> Color(0xFFF97066)
+                        date.isSelected -> NaturalWhite
+                        else -> NaturalBlack
+                    },
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     style = Typography.labelMedium.copy(fontWeight = FontWeight.SemiBold)
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = date.date.dayOfMonth.toString(),
-                    color = if (date.isSelected) NaturalWhite else NaturalBlack,
+                    color = if (date.isSelected) {
+                        if (type == "main") NaturalBlack else NaturalWhite
+                    } else {
+                        NaturalBlack
+                    },
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     style = Typography.displayMedium
                 )
             }
         }
-        if (type != "group") Labels(text = label ?: "None")
+        if (type != "group") {
+            Labels(text = label ?: "None")
+        }
     }
 }
 

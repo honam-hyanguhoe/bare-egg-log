@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.NotificationAdd
 import androidx.compose.material.icons.filled.NotificationsNone
 import androidx.compose.material.icons.filled.PersonOutline
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Settings
@@ -68,6 +69,7 @@ val Logout = Icons.Default.Logout
 val Upload = Icons.Default.Upload
 val AddBox = Icons.Default.AddBox
 val Add = Icons.Default.Add
+val Remove = Icons.Default.Remove
 val CommentBorder = Icons.Default.ChatBubbleOutline
 val Agree = Icons.Default.Verified
 val Link = Icons.Default.Link

@@ -1,7 +1,6 @@
 package com.org.egglog.presentation.domain.setting.screen
 
 import android.app.Activity
-import android.app.AlarmManager
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -17,6 +16,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.org.egglog.domain.setting.model.Alarm
 import com.org.egglog.domain.setting.model.WorkType
 import com.org.egglog.presentation.component.atoms.cards.BannerCard
 import com.org.egglog.presentation.component.molecules.headers.BasicHeader
@@ -65,7 +65,21 @@ fun WorkSettingScreen(
         onSelected = viewModel::onSelected,
         selectedWorkType = state.selectedWorkType,
         deleteSelectedWorkType = viewModel::deleteSelectedWorkType,
-        setAlarm = viewModel::setAlarm
+
+        setAlarm = viewModel::setAlarm,
+        alarmList = state.alarmList,
+        getAlarmListInit = viewModel::getAlarmListInit,
+        onClickToggle = viewModel::onClickToggle,
+        toggleEnabled = state.toggleEnabled,
+        showModifyBottomSheetAlarm = state.showModifyBottomSheetAlarm,
+        modifyEnabledAlarm = state.modifyEnabledAlarm,
+        setShowModifyBottomSheetAlarm = viewModel::setShowModifyBottomSheetAlarm,
+        setSelectedAlarm = viewModel::setSelectedAlarm,
+        deleteSelectedAlarm = viewModel::deleteSelectedAlarm,
+        onReplayCntChange = viewModel::onReplayCntChange,
+        onReplayTimeChange = viewModel::onReplayTimeChange,
+        onClickModifyAlarm = viewModel::onClickModifyAlarm,
+        onAlarmTimeChange = viewModel::onAlarmTimeChange
     )
 }
 
@@ -91,13 +105,28 @@ fun WorkSettingScreen(
     onSelected: (String, WorkType) -> Unit,
     selectedWorkType: WorkType?,
     deleteSelectedWorkType: () -> Unit,
-    setAlarm: () -> Unit
+
+    setAlarm: () -> Unit,
+    alarmList: List<Alarm>,
+    getAlarmListInit: () -> Unit,
+    onClickToggle: (Alarm) -> Unit,
+    toggleEnabled: Boolean,
+    showModifyBottomSheetAlarm: Boolean,
+    modifyEnabledAlarm: Boolean,
+    setShowModifyBottomSheetAlarm: (Boolean) -> Unit,
+    setSelectedAlarm: (Alarm) -> Unit,
+    deleteSelectedAlarm: () -> Unit,
+    onReplayCntChange: (Int) -> Unit,
+    onReplayTimeChange: (Int) -> Unit,
+    onClickModifyAlarm: () -> Unit,
+    onAlarmTimeChange: (LocalTime) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
-    LaunchedEffect(addEnabled, deleteEnabled, modifyEnabled) {
+    LaunchedEffect(addEnabled, deleteEnabled, modifyEnabled, toggleEnabled, modifyEnabledAlarm) {
         getWorkListInit()
+        getAlarmListInit()
     }
 
     Column(
@@ -142,7 +171,18 @@ fun WorkSettingScreen(
                 ) },
             secendContent = {
                 AlarmManager(
-                    setAlarm = setAlarm
+                    setAlarm = setAlarm,
+                    alarmList = alarmList,
+                    onClickToggle = onClickToggle,
+                    showModifyBottomSheetAlarm = showModifyBottomSheetAlarm,
+                    modifyEnabledAlarm = modifyEnabledAlarm,
+                    setShowModifyBottomSheetAlarm = setShowModifyBottomSheetAlarm,
+                    setSelectedAlarm = setSelectedAlarm,
+                    deleteSelectedAlarm = deleteSelectedAlarm,
+                    onReplayCntChange = onReplayCntChange,
+                    onReplayTimeChange = onReplayTimeChange,
+                    onClickModifyAlarm = onClickModifyAlarm,
+                    onAlarmTimeChange = onAlarmTimeChange
                 )
             }
         )
