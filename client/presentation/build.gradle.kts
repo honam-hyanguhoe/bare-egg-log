@@ -131,6 +131,7 @@ dependencies {
     implementation("org.apache.poi:poi-ooxml:$poiVersion")
     // refresh
     implementation(libs.accompanist.swiperefresh)
+    implementation(libs.accompanist.permissions)
 
 
     implementation(project(":domain"))
