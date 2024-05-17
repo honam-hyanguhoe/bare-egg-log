@@ -154,7 +154,6 @@ fun RemainContentWebView(
     Card(
         modifier = Modifier
             .height(height.heightPercent(context).dp)
-            .border(1.dp, Color.Black)
             .fillMaxWidth()
             .background(color = Gray100, shape = RoundedCornerShape(20.dp)),
     ) {
@@ -162,7 +161,6 @@ fun RemainContentWebView(
             factory = { webView },
             modifier = Modifier
                 .fillMaxSize()
-                .border(1.dp, NaturalBlack)
         )
     }
 }

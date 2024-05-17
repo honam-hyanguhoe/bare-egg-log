@@ -18,6 +18,7 @@ interface RemainingDutyGraphProps {
 const RemainingDutyGraph = ({ data }: RemainingDutyGraphProps) => {
   const svgRef = useRef(null);
 
+  console.log("data " + data);
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth > 500 ? 500 : window.innerWidth,
     height: window.innerWidth > 500 ? 500 : window.innerWidth,
@@ -90,36 +91,62 @@ const RemainingDutyGraph = ({ data }: RemainingDutyGraphProps) => {
       .attr("ry", 20);
 
     mapNodes
-      .append("text")
-      .attr("class", "nodeDuty")
+      .append("foreignObject")
       .attr(
-        "x",
+        "width",
         (d) =>
-          ((d as d3.HierarchyRectangularNode<TreeNode>).x1 -
-            (d as d3.HierarchyRectangularNode<TreeNode>).x0) /
-          2
-      )
-      .attr(
-        "y",
-        (d) =>
-          ((d as d3.HierarchyRectangularNode<TreeNode>).y1 -
-            (d as d3.HierarchyRectangularNode<TreeNode>).y0) /
-          2
-      )
-      .text((d) => d.data.name)
-      .attr("text-anchor", "middle")
-      .attr("dominant-baseline", "middle")
-      .style("fill", "#f9f9f9")
-      .style("font-family", "Line-Seed-Sans-App")
-      .style("font-weight", "700")
-      .style("font-size", (d) => {
-        const rectWidth =
           (d as d3.HierarchyRectangularNode<TreeNode>).x1 -
-          (d as d3.HierarchyRectangularNode<TreeNode>).x0;
-        const rectHeight =
+          (d as d3.HierarchyRectangularNode<TreeNode>).x0
+      )
+      .attr(
+        "height",
+        (d) =>
           (d as d3.HierarchyRectangularNode<TreeNode>).y1 -
-          (d as d3.HierarchyRectangularNode<TreeNode>).y0;
-        return `${Math.min(rectWidth, rectHeight) / 5}px`; // 폰트 크기 산정 방식 조정
+          (d as d3.HierarchyRectangularNode<TreeNode>).y0
+      )
+      .append("xhtml:div")
+      .attr("class", "nodeContainer")
+      .style("width", "100%")
+      .style("height", "100%")
+      .style("display", "flex")
+      .style("flex-direction", "column")
+      .style("justify-content", "center")
+      .style("align-items", "center")
+      .each(function (d) {
+        d3.select(this)
+          .append("div")
+          .attr("class", "nodeDuty")
+          .style("color", "#f9f9f9")
+          .style("font-family", "Line-Seed-Sans-App")
+          .style("font-weight", "700")
+          .style("font-size", () => {
+            const rectWidth =
+              (d as d3.HierarchyRectangularNode<TreeNode>).x1 -
+              (d as d3.HierarchyRectangularNode<TreeNode>).x0;
+            const rectHeight =
+              (d as d3.HierarchyRectangularNode<TreeNode>).y1 -
+              (d as d3.HierarchyRectangularNode<TreeNode>).y0;
+            return `${Math.min(rectWidth, rectHeight) / 5}px`;
+          })
+          .style("text-align", "center")
+          .text(d.data.name);
+        d3.select(this)
+          .append("div")
+          .attr("class", "nodeDuty")
+          .style("color", "#f9f9f9")
+          .style("font-family", "Line-Seed-Sans-App")
+          .style("font-weight", "700")
+          .style("font-size", (d) => {
+            const rectWidth =
+              (d as d3.HierarchyRectangularNode<TreeNode>).x1 -
+              (d as d3.HierarchyRectangularNode<TreeNode>).x0;
+            const rectHeight =
+              (d as d3.HierarchyRectangularNode<TreeNode>).y1 -
+              (d as d3.HierarchyRectangularNode<TreeNode>).y0;
+            return `${Math.min(rectWidth, rectHeight) / 8}px`; // 폰트 크기 산정 방식 조정
+          })
+          .style("text-align", "center")
+          .text(d.data.value ? `+${d.data.value}` : `+0`);
       });
   }, [data, dimensions]);
 

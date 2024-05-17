@@ -89,10 +89,18 @@ class FileUploadViewModel @Inject constructor(
         _selectedDate.value = selected
         Log.d("upload", "selected $selected")
 
-        reduce {
-            state.copy(
-                uploadDutyDate = "${selected?.year}-${selected?.month}"
-            )
+        if(selected?.monthValue!! < 10){
+            reduce {
+                state.copy(
+                    uploadDutyDate = "${selected?.year}-0${selected?.monthValue}"
+                )
+            }
+        }else{
+            reduce {
+                state.copy(
+                    uploadDutyDate = "${selected?.year}-${selected?.monthValue}"
+                )
+            }
         }
     }
 
@@ -138,41 +146,40 @@ class FileUploadViewModel @Inject constructor(
         }
     }
 
-    fun uploadFile(context: Context, uri: Uri) = blockingIntent {
+    fun uploadFile(context: Context, uri: Uri, groupName : String) = blockingIntent {
+        Log.d("upload", groupName)
         val tokens = getUserTokenUseCase()
-
 
         formatFileToJson(context, uri)
 
         val result = uploadDutyFileUseCase(
             accessToken = "Bearer ${tokens.first}",
             groupId = groupId,
+            groupName = groupName,
             dutyFileData = UploadDutyFile(
                 date = state.uploadDutyDate,
                 dutyList = state.dutyJsonData,
                 customWorkTag = DutyTag(
-                    day = state.customDutyList["DAY"] ?: "",
-                    eve = state.customDutyList["EVE"] ?: "",
-                    night = state.customDutyList["NIGHT"] ?: "",
-                    off = state.customDutyList["OFF"] ?: "",
+                    day = state.customDutyList["DAY"]!!,
+                    eve = state.customDutyList["EVE"]!!,
+                    night = state.customDutyList["NIGHT"]!!,
+                    off = state.customDutyList["OFF"]!!,
                 ),
                 day = LocalDate.now().toString()
             )
         )
 
-        if(result.isSuccess){
-            // 근무 업로드 기타사항 안내 모달 띄우기
-            FileUploadSideEffect.Toast("근무가 업로드되었습니다")
-        }else{
-            FileUploadSideEffect.Toast("업로드 실패하였습니다. 다시시도해주세요")
+
+        if (result.isSuccess) {
+            Log.d("upload", result.getOrNull().toString())
         }
     }
 
     fun formatFileToJson(context: Context, uri: Uri) = blockingIntent {
         reduce { state.copy(isLoading = true, uploadSuccess = null, errorMessage = null) }
-        val dataToFormattedFile : List<FormattedFile>
+        val dataToFormattedFile: List<FormattedFile>
 
-            try {
+        try {
             val jsonResult = withContext(Dispatchers.IO) {
                 val inputStream: InputStream = context.contentResolver.openInputStream(uri)
                     ?: throw Exception("Failed to open input stream from URI")
@@ -278,7 +285,7 @@ class FileUploadViewModel @Inject constructor(
 }
 
 data class FileUploadState(
-    val uploadDutyDate: String = "${LocalDate.now().year}-${LocalDate.now().month}",
+    val uploadDutyDate: String = "${LocalDate.now().year}-${LocalDate.now().monthValue}",
     val customDutyList: Map<String, String> = mapOf<String, String>(
         "DAY" to "",
         "EVE" to "",
