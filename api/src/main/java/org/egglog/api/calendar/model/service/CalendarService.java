@@ -20,6 +20,7 @@ import net.fortuna.ical4j.util.RandomUidGenerator;
 import net.fortuna.ical4j.util.UidGenerator;
 import org.egglog.api.calendar.exception.CalendarErrorCode;
 import org.egglog.api.calendar.exception.CalendarException;
+import org.egglog.api.global.util.FirebaseProperties;
 import org.egglog.api.user.model.entity.User;
 import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
@@ -57,6 +58,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CalendarService {
     private final Bucket bucket;
+    private final FirebaseProperties firebaseProperties;
 
     private final EventRepository eventRepository;
 

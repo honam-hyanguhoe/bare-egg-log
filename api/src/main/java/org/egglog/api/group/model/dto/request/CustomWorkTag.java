@@ -29,4 +29,7 @@ public class CustomWorkTag {
         this.off="";
         this.night="";
     }
+    public boolean isEmpty(){
+        return this.day==""&&this.eve==""&&this.night==""&&this.off=="";
+    }
 }
