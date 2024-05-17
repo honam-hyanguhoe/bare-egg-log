@@ -72,7 +72,7 @@ class SettingViewModel @Inject constructor(
 
     fun onSelectedIdx(selectedIdx: Int) = intent {
         when(selectedIdx) {
-            0 -> postSideEffect(SettingSideEffect.NavigateToCalendarSettingScreen)
+            0 -> postSideEffect(SettingSideEffect.NavigateToMyCalendarActivity)
             1 -> postSideEffect(SettingSideEffect.NavigateToGroupActivity)
             2 -> postSideEffect(SettingSideEffect.NavigateToMainActivity)
             3 -> postSideEffect(SettingSideEffect.NavigateToCommunityActivity)
@@ -94,5 +94,5 @@ sealed interface SettingSideEffect {
     data object NavigateToGroupActivity: SettingSideEffect
     data object NavigateToLoginActivity: SettingSideEffect
 
-    data object NavigateToCalendarSettingScreen : SettingSideEffect
+    data object NavigateToMyCalendarActivity : SettingSideEffect
 }
