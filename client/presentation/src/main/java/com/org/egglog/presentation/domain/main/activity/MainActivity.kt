@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
@@ -16,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
+import com.org.egglog.presentation.domain.main.navigation.MainNavigationHost
 import com.org.egglog.presentation.domain.main.screen.MainScreen
 import com.org.egglog.presentation.domain.main.viewModel.MainViewModel
 import com.org.egglog.presentation.theme.ClientTheme
@@ -27,9 +29,10 @@ class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val deepLinkUri: Uri? = intent?.data
         setContent {
             ClientTheme {
-                MainScreen()
+                MainNavigationHost(deepLinkUri)
             }
         }
 

@@ -2,6 +2,7 @@ package com.org.egglog.presentation.component.molecules.swiper
 
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -43,60 +44,65 @@ fun Swiper(onDelete: () -> Unit, onChangeLeader: () -> Unit, children: @Composab
     val anchors = mapOf(0f to 0, -sizePx to 1)
 
     Box(
-            modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.heightPercent(LocalContext.current).dp)
-                    .swipeable(
-                            state = swipeableState,
-                            orientation = Orientation.Horizontal,
-                            anchors = anchors,
-                            thresholds = { _, _ -> FractionalThreshold(0.5f) },
-                            velocityThreshold = 1000.dp
-                    ),
-            contentAlignment = Alignment.Center
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(75.heightPercent(LocalContext.current).dp)
+            .swipeable(
+                state = swipeableState,
+                orientation = Orientation.Horizontal,
+                anchors = anchors,
+                thresholds = { _, _ -> FractionalThreshold(0.5f) },
+                velocityThreshold = 1000.dp
+            ),
+        contentAlignment = Alignment.Center
     ) {
         // 버튼 컴포즈
         Box(
-                modifier = Modifier
-                        .align(Alignment.CenterEnd)
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
         ) {
             Row() {
                 TextButton(
-                        modifier = Modifier
-                                .width(54.widthPercent(LocalContext.current).dp)
-                                .fillMaxHeight()
-                                .background(Warning300),
-                        onClick = {
-                            coroutineScope.launch {
-                                swipeableState.animateTo(0, tween(600, 0))
-                            }
-                            onChangeLeader()
+                    modifier = Modifier
+                        .width(54.widthPercent(LocalContext.current).dp)
+                        .fillMaxHeight()
+                        .background(Warning300),
+                    onClick = {
+                        coroutineScope.launch {
+                            swipeableState.animateTo(0, tween(600, 0))
                         }
+                        onChangeLeader()
+                    }
                 ) {
-                        Text("모임장\n위임", color = NaturalWhite, textAlign = TextAlign.Center)
+                    Text("모임장\n위임", color = NaturalWhite, textAlign = TextAlign.Center)
                 }
                 TextButton(
-                        modifier = Modifier
-                                .width(54.widthPercent(LocalContext.current).dp)
-                                .fillMaxHeight()
-                                .background(Gray300),
-                        onClick = {
-                            coroutineScope.launch {
-                                swipeableState.animateTo(0, tween(600, 0))
-                            }
-                            onDelete()
-                        }) {
-                    Text("삭제", color= NaturalWhite)
+                    modifier = Modifier
+                        .width(54.widthPercent(LocalContext.current).dp)
+                        .fillMaxHeight()
+                        .background(Gray300),
+                    onClick = {
+                        coroutineScope.launch {
+                            swipeableState.animateTo(0, tween(600, 0))
+                        }
+                        onDelete()
+                    }) {
+                    Text("삭제", color = NaturalWhite)
                 }
             }
         }
 
         // 카드 컴포즈
         Box(modifier = Modifier
-                .offset{IntOffset(swipeableState.offset.value.roundToInt(), 0)}
+            .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
         ) {
-            Box(modifier = Modifier.fillMaxSize().background(NaturalWhite).padding(horizontal = 12.dp, vertical = 4.dp),
-                    contentAlignment = Alignment.CenterStart) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(NaturalWhite)
+                    .padding(horizontal = 12.dp, vertical = 4.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
                 children()
             }
         }

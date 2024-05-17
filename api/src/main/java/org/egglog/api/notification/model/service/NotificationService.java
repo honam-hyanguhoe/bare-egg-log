@@ -58,7 +58,7 @@ public class NotificationService {
     //설정 생성
     @Transactional
     public void makeDefaultNotification(User loginUser){
-        log.debug(" ==== ==== ==== [ 기본 알람 설정 생성 조회 서비스 실행 ] ==== ==== ====");
+        log.debug(" ==== ==== ==== [ 기본 알람 설정 생성 서비스 실행 ] ==== ==== ====");
         List<UserNotification> list = new ArrayList<>();
         for (TopicEnum topicEnum : TopicEnum.values()) {
             list.add(UserNotification.builder()
@@ -155,7 +155,7 @@ public class NotificationService {
                 .topicId(group.getId())
                 .build();
         Notification notification = Notification.builder()
-                .setTitle("[EGGLOG]")
+                .setTitle("피어나! 너 내 동료가 내 도도 동료가 돼라!")
                 .setBody(group.getGroupName()+"의 그룹에 새 멤버가 추가 되었습니다. 축하해주세요!")
                 .build();
         fcmService.sendNotificationToTopic(topic, notification);
@@ -209,7 +209,7 @@ public class NotificationService {
         if (userDeviceToken!=null && memberUserNotification.getStatus()){
             //해당 유저에 알림 발송
             Notification notification = Notification.builder()
-                    .setTitle("[EGGLOG]")
+                    .setTitle("시원 섭섭하네.. ")
                     .setBody(member.getGroup().getGroupName()+" 에서 퇴장 당했습니다.")
                     .build();
             fcmService.sendPersonalNotification(userDeviceToken, notification);
@@ -226,7 +226,7 @@ public class NotificationService {
                     .topicId(boardForm.getGroupId())
                     .build();
             Notification notification = Notification.builder()
-                    .setTitle("[EGGLOG] " + group.getGroupName() + " 커뮤니티에 새 글이 올라왔습니다.")
+                    .setTitle("[새 글 알림]" + group.getGroupName() + " 커뮤니티에 새 글이 올라왔습니다.")
                     .setBody(boardForm.getBoardTitle())
                     .setImage(boardForm.getPictureOne() != null ? boardForm.getPictureOne() : null)
                     .build();
@@ -243,8 +243,8 @@ public class NotificationService {
         String deviceToken = board.getUser().getDeviceToken();
         if (deviceToken!=null&&userNotification.getStatus()){
             Notification notification = Notification.builder()
-                    .setTitle("[EGGLOG]")
-                    .setBody(board.getUser().getName()+"님 의"+board.getTitle()+" 글이 실시간 급상승 게시판에 등록되었습니다. ")
+                    .setTitle("대세는 바로 나! 인기 게시물 선정!")
+                    .setBody(board.getUser().getName()+" 님의 "+board.getTitle()+" 글이 실시간 급상승 게시판에 등록되었습니다. ")
                     .build();
             fcmService.sendPersonalNotification(deviceToken, notification);
         }
@@ -260,7 +260,7 @@ public class NotificationService {
         String deviceToken = board.getUser().getDeviceToken();
         if (deviceToken!=null&&userNotification.getStatus()&&!board.getUser().equals(saveComment.getUser())){
             Notification notification = Notification.builder()
-                    .setTitle("[EGGLOG] 커뮤니티 글에 새 댓글이 달렸습니다.")
+                    .setTitle("띠용! 내 커뮤니티 글에 새 댓글이 달렸습니다.")
                     .setBody(saveComment.getContent())
                     .build();
             fcmService.sendPersonalNotification(deviceToken, notification);
@@ -277,7 +277,7 @@ public class NotificationService {
                     .findByTypeAndUser(TopicEnum.BOARD, cocoment.getUser()).orElseThrow(() -> new NotificationException(NotificationErrorCode.NOTIFICATION_SERVER_ERROR));
             if (cocomentDeviceToken!=null&&cocomentUserNotification.getStatus()){
                 Notification notification = Notification.builder()
-                        .setTitle("[EGGLOG] 내 댓글에 새 대댓글이 달렸습니다.")
+                        .setTitle("띠용! 내 댓글에 새 대댓글이 달렸습니다.")
                         .setBody(saveComment.getContent())
                         .build();
                 fcmService.sendPersonalNotification(cocomentDeviceToken, notification);
@@ -295,10 +295,24 @@ public class NotificationService {
                 () -> new CommentException(CommentErrorCode.NO_EXIST_COMMENT));
         if (deviceToken!=null&&userNotification.getStatus()){
             Notification notification = Notification.builder()
-                    .setTitle("[EGGLOG] 새 인증 정보 알림")
-                    .setBody(hospitalAuth.getHospital() + "의 재직 및 간호 인증이 완료 되었습니다..")
+                    .setTitle("나도 진짜 간호사라구")
+                    .setBody(hospitalAuth.getHospital() + "의 재직 및 간호 인증이 완료 되었습니다.")
                     .build();
             fcmService.sendPersonalNotification(deviceToken, notification);
             }
+    }
+
+    @Transactional
+    public void excelDutyUploadNotification(Group group){
+        //그룹에 엑셀 동기화 파일이 등록되었다면 푸시알림 발송
+        FCMTopic topic = FCMTopic.builder()
+                .topic(TopicEnum.GROUP)
+                .topicId(group.getId())
+                .build();
+        Notification notification = Notification.builder()
+                .setTitle("개이득주의! 새 근무 파일이 날라왔어요")
+                .setBody(group.getGroupName()+" 그룹에 "+"월 근무표가 업로드 되었습니다.")
+                .build();
+        fcmService.sendNotificationToTopic(topic, notification);
     }
 }

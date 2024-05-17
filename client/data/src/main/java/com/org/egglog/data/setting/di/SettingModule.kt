@@ -5,6 +5,7 @@ import com.org.egglog.data.setting.usecase.DeleteWorkTypeUseCaseImpl
 import com.org.egglog.data.setting.usecase.GetAlarmListUseCaseImpl
 import com.org.egglog.data.setting.usecase.GetCalendarGroupListUseCaseImpl
 import com.org.egglog.data.setting.usecase.GetCalendarGroupMapStoreUseCaseImpl
+import com.org.egglog.data.setting.usecase.GetCalendarLinkUseCaseImpl
 import com.org.egglog.data.setting.usecase.GetWorkTypeListUseCaseImpl
 import com.org.egglog.data.setting.usecase.PostAskUseCaseImpl
 import com.org.egglog.data.setting.usecase.PostCalendarGroupUseCaseImpl
@@ -19,6 +20,7 @@ import com.org.egglog.domain.setting.usecase.DeleteWorkTypeUseCase
 import com.org.egglog.domain.setting.usecase.GetAlarmListUseCase
 import com.org.egglog.domain.setting.usecase.GetCalendarGroupListUseCase
 import com.org.egglog.domain.setting.usecase.GetCalendarGroupMapStoreUseCase
+import com.org.egglog.domain.setting.usecase.GetCalendarLinkUseCase
 import com.org.egglog.domain.setting.usecase.GetWorkTypeListUseCase
 import com.org.egglog.domain.setting.usecase.PostAskUseCase
 import com.org.egglog.domain.setting.usecase.PostCalendarGroupUseCase
@@ -77,4 +79,7 @@ abstract class SettingModule {
 
     @Binds
     abstract fun bindUpdateAlarmUseCase(uc: UpdateAlarmUseCaseImpl): UpdateAlarmUseCase
+
+    @Binds
+    abstract fun bindGetCalendarLinkUseCase(uc: GetCalendarLinkUseCaseImpl): GetCalendarLinkUseCase
 }

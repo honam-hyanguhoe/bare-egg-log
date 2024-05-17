@@ -3,6 +3,7 @@ package com.org.egglog.presentation.component.organisms.calendars
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -60,8 +62,11 @@ fun WeeklyCalendar(
     onNextClick: (LocalDate) -> Unit,
     labels: List<String>,
     backgroundColor: Color = NaturalWhite,
-    width: Int = 320
-) {
+    width: Int = 320,
+    contentsColor: Color = Gray100,
+    containerColor: Color = Gray100,
+
+    ) {
 
     Column(
         Modifier
@@ -70,23 +75,27 @@ fun WeeklyCalendar(
     ) {
         if (type.equals("group")) {
             Row {
-                CalendarHeader(calendarUiModel, { onPrevClick(startDate) }, onNextClick)
-                Spacer(modifier = Modifier.height(6.dp))
+                CalendarHeader(calendarUiModel, {onPrevClick(startDate)}, onNextClick)
+                Spacer(modifier = Modifier. height(6.dp))
             }
         }
 
         if (type.equals("main")) {
             Column {
                 MainCalendarHeader(
-                    calendarUiModel,
-                    startDate,
-                    { onPrevClick(startDate) },
-                    onNextClick
+                    calendarUiModel, startDate, { onPrevClick(startDate) }, onNextClick
                 )
                 Spacer(modifier = Modifier.height(15.dp))
             }
         }
-        Content(type, calendarUiModel, onDateClick, labels = labels, backgroundColor = Gray100)
+        Content(
+            type,
+            calendarUiModel,
+            onDateClick,
+            labels = labels,
+            backgroundColor = contentsColor,
+            containerColor = containerColor
+        )
     }
 }
 
@@ -113,8 +122,7 @@ fun MainCalendarHeader(
         Row(
             modifier = Modifier
         ) {
-            CustomIconButton(
-                size = 30.dp,
+            CustomIconButton(size = 30.dp,
                 imageVector = ArrowLeft,
                 color = NaturalBlack,
                 onClick = {
@@ -123,8 +131,7 @@ fun MainCalendarHeader(
                         onPrevClick(startDate)
                     }
                 })
-            CustomIconButton(
-                size = 30.dp,
+            CustomIconButton(size = 30.dp,
                 imageVector = ArrowRight,
                 color = NaturalBlack,
                 onClick = { if (onNextClick != null) onNextClick(data.endDate.date) })
@@ -139,26 +146,24 @@ fun CalendarHeader(
     onNextClick: (LocalDate) -> Unit,
 ) {
     Row(
-        Modifier
-            .fillMaxWidth(),
+        Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             text = data.selectedDate.date.format(DateTimeFormatter.ofPattern("yyyy.MM")),
-            style = Typography.bodyLarge.copy(fontSize = 18.sp),
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
+            style = Typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+            modifier = Modifier.align(Alignment.CenterVertically)
         )
         Row() {
-            IconButton(onClick = { onPrevClick }) {
+            IconButton(onClick = { onPrevClick(data.selectedDate.date)}) {
                 Icon(
                     imageVector = Icons.Filled.KeyboardArrowLeft,
                     contentDescription = "Previous",
                     Modifier.size(20.dp)
                 )
             }
-            IconButton(onClick = { if (onNextClick != null) onNextClick(data.endDate.date) }) {
+            IconButton(onClick = { onNextClick(data.endDate.date) }) {
                 Icon(
                     imageVector = Icons.Filled.KeyboardArrowRight,
                     contentDescription = "Next",
@@ -175,21 +180,19 @@ fun Content(
     data: WeeklyUiModel,
     onDateClick: ((WeeklyUiModel.Date) -> Unit)? = null,
     labels: List<String>,
-    backgroundColor: Color
+    backgroundColor: Color,
+    containerColor: Color = Gray100,
 ) {
     Log.d("weekly", "data ${data}")
     Row(
         modifier = Modifier
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .background(color = containerColor), horizontalArrangement = Arrangement.SpaceBetween
     ) {
         data.visibleDates.forEachIndexed() { index, date ->
             DateItem(
-                type,
-                date,
-                onDateClick,
-                labels?.get(index) ?: "",
-                backgroundColor = backgroundColor
+                type, date, onDateClick, labels?.get(index) ?: "", backgroundColor = backgroundColor
             )
         }
     }
@@ -218,9 +221,7 @@ fun DateItem(
                     } else {
                         this
                     }
-                },
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(
+                }, shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(
                 // background colors of the selected date
                 // and the non-selected date are different
                 containerColor = if (date.isSelected) {
@@ -228,11 +229,9 @@ fun DateItem(
                 } else {
                     backgroundColor
                 }
-            ),
-            border = if (date.isToday) {
+            ), border = if (date.isToday) {
                 BorderStroke(
-                    width = 2.dp,
-                    color = Warning300
+                    width = 2.dp, color = Warning300
                 )
             } else {
                 null

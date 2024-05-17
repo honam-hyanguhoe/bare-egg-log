@@ -30,6 +30,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -135,6 +136,14 @@ public class AlarmService {
         if (!alarm.getUser().equals(loginUser)) throw new UserException(UserErrorCode.ACCESS_DENIED);
 
         alarmRepository.delete(alarm);
+    }
+
+
+    @Transactional
+    public void makeDefaultAlarm(List<WorkType> defaultWorkTypes) {
+        alarmRepository.saveAll(defaultWorkTypes.stream()
+                .map(WorkType::makeDefaultAlarm)
+                .collect(Collectors.toList()));
     }
 
 }

@@ -26,6 +26,9 @@ import com.org.egglog.domain.setting.usecase.GetCalendarGroupListUseCase
 import com.org.egglog.domain.setting.usecase.GetCalendarGroupMapStoreUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.annotation.OrbitExperimental
@@ -59,6 +62,9 @@ class MyCalendarViewModel @Inject constructor(
     private var accessToken: String? = null
     private var userInfo: UserDetail? = null
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
     override val container: Container<MyCalenderState, MyCalendarSideEffect> = container(
         initialState = MyCalenderState(),
         buildSettings = {
@@ -88,6 +94,15 @@ class MyCalendarViewModel @Inject constructor(
 
     }
 
+    fun refreshSomething() = intent {
+        _isLoading.value = true
+        delay(1000L)
+        _isLoading.value = false
+
+        getWorkList()
+        getPersonalList()
+    }
+
     fun getWorkTypeList() = intent {
         val workTypeList = getWorkTypeListUseCase("Bearer $accessToken").getOrThrow()
 
@@ -109,6 +124,10 @@ class MyCalendarViewModel @Inject constructor(
     }
 
     private fun getWorkList() = intent {
+        reduce {
+            state.copy(monthlyWorkList = listOf())
+        }
+
         val calendar = Calendar.getInstance()
 
         calendar.set(Calendar.YEAR, state.currentYear)
@@ -134,6 +153,10 @@ class MyCalendarViewModel @Inject constructor(
     }
 
     private fun getPersonalList() = intent {
+        reduce {
+            state.copy(monthlyPersonalList = listOf())
+        }
+
         val calendarGroupMap = getCalendarGroupMapStoreUseCase()
 
         val calendar = Calendar.getInstance()
@@ -148,8 +171,9 @@ class MyCalendarViewModel @Inject constructor(
         val startDate = "${state.currentYear}-${month}-01"
         val endDate = "${state.currentYear}-${month}-${lastDayOfMonth}"
 
+        Log.e("MyCalendar", "$calendarGroupMap")
+
         for ((calendarGroupId, isActive) in calendarGroupMap.entries) {
-            Log.e("Mycalendar", "캘린더그룹 ${calendarGroupId}의 활성화 상태는 $isActive")
             if(isActive) {
                 val monthlyPersonalList = getPersonalScheduleUseCase(
                     "Bearer $accessToken",
@@ -159,15 +183,13 @@ class MyCalendarViewModel @Inject constructor(
                     calendarGroupId.toLong()
                 ).getOrThrow()
 
-                Log.e("MyCalendar", "내 캘린더 그룹 개인 일정 ${monthlyPersonalList}")
+                Log.e("MyCalendar", "제 개인 일정 $calendarGroupId $monthlyPersonalList")
 
                 reduce{
                     state.copy(monthlyPersonalList = state.monthlyPersonalList.plus(monthlyPersonalList))
                 }
             }
         }
-        Log.e("MyCalendar", "개인 일정 추가 됐나요? ${state.monthlyPersonalList}")
-
         updateCurrentEventData()
     }
 
