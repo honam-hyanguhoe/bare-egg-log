@@ -350,7 +350,7 @@ public class BoardService {
         BoardModifyOutputSpec boardOutputSpec = null;
 
         try {
-            board.setTitle(boardUpdateForm.getBoardContent());
+            board.setTitle(boardUpdateForm.getBoardTitle());
             board.setContent(boardUpdateForm.getBoardContent());
             board.setPictureOne(boardUpdateForm.getPictureOne());
             board.setPictureTwo(boardUpdateForm.getPictureTwo());
