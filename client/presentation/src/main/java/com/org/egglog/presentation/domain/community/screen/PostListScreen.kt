@@ -60,6 +60,7 @@ import com.org.egglog.presentation.domain.group.activity.GroupActivity
 import com.org.egglog.presentation.domain.main.activity.MainActivity
 import com.org.egglog.presentation.domain.myCalendar.activity.MyCalendarActivity
 import com.org.egglog.presentation.domain.setting.activity.SettingActivity
+import com.org.egglog.presentation.theme.BlueGray900
 import com.org.egglog.presentation.theme.Error200
 import com.org.egglog.presentation.theme.NaturalBlack
 import com.org.egglog.presentation.theme.NaturalWhite
@@ -377,7 +378,7 @@ fun CustomFloatingActionButton(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(0.9f)
-            .padding(top = 0.dp, start = 10.dp, end = 10.dp, bottom = 10.dp),
+            .padding(top = 0.dp, start = 10.dp, end = 10.dp, bottom = 50.dp),
         contentAlignment = Alignment.BottomEnd
     ) {
         FloatingActionButton(
@@ -393,7 +394,7 @@ fun CustomFloatingActionButton(
             modifier = Modifier
                 .padding(5.dp),
             shape = FloatingActionButtonDefaults.largeShape,
-            containerColor = NaturalBlack,
+            containerColor = BlueGray900,
             contentColor = NaturalWhite,
             elevation = FloatingActionButtonDefaults.elevation(),
             interactionSource = fabInteractionSource
