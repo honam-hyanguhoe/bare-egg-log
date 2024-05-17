@@ -146,6 +146,7 @@ fun GroupDetailScreen(
 
     GroupDetailScreen(groupId = groupId,
         groupName = groupDetailState.groupInfo.groupName,
+        userName = groupDetailState.userName,
         isAdmin = groupDetailState.groupInfo.isAdmin,
         memberCount = (groupDetailState.groupInfo.groupMembers?.size?.plus(1)) ?: 1,
         adminName = groupDetailState.groupInfo.admin?.userName ?: "",
@@ -201,6 +202,7 @@ fun GroupDetailScreen(
 
 @Composable
 private fun GroupDetailScreen(
+    userName: String,
     groupId: Long,
     groupName: String,
     isAdmin: Boolean = false,
@@ -327,6 +329,7 @@ private fun GroupDetailScreen(
         item {
             Spacer(modifier = Modifier.height(5.dp))
             MembersCard(
+                userName = userName,
                 selected = selected,
                 selectedDuty = selectedDuty,
                 selectedMembers = selectedMembers,
@@ -346,7 +349,8 @@ private fun GroupDetailScreen(
 
     when {
         openDialogExit.value -> {
-            Dialog(onDismissRequest = { openDialogExit.value = false },
+            Dialog(
+                onDismissRequest = { openDialogExit.value = false },
                 onConfirmation = {
                     exitGroup()
                     openDialogExit.value = false
@@ -358,7 +362,8 @@ private fun GroupDetailScreen(
         }
 
         openDialogBoss.value -> {
-            Dialog(onDismissRequest = { openDialogBoss.value = false },
+            Dialog(
+                onDismissRequest = { openDialogBoss.value = false },
                 onConfirmation = { openDialogBoss.value = false },
                 dialogTitle = "그룹장은 탈퇴할 수 없습니다.",
                 dialogText = "새 그룹장을 선택 후 다시 시도해주세요."
@@ -483,7 +488,9 @@ fun UploadFileBottomSheetContent(
                     )
                 )
                 Text(
-                    text = "DAY,EVE,NIGHT,OFF 이외의 근무는 제외됩니다.", style = Typography.displayMedium, textAlign = TextAlign.Start
+                    text = "DAY,EVE,NIGHT,OFF 이외의 근무는 제외됩니다.",
+                    style = Typography.displayMedium,
+                    textAlign = TextAlign.Start
                 )
                 Row(
                     modifier = Modifier
@@ -869,6 +876,7 @@ fun DutyCard(
 
 @Composable
 private fun MembersCard(
+    userName: String = "",
     selected: MutableState<String>,
     selectedDuty: List<Member>,
     toggleMemberSelection: KFunction1<Member, Unit>,
@@ -924,11 +932,13 @@ private fun MembersCard(
                         rowItems.forEach { member ->
                             GroupProfileButton(
                                 onClick = {
-                                    toggleMemberSelection(member)
+                                    if (userName != member.userName) {
+                                        toggleMemberSelection(member)
+                                    }
                                 },
                                 userInfo = member,
                                 isSelected = selectedMembers.contains(member),
-                                isMine = false,
+                                isMine = userName == member.userName
                             )
                         }
                         if (rowItems.size < 5) {
