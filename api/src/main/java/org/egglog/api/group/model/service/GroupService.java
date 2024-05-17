@@ -21,6 +21,7 @@ import org.egglog.api.notification.model.service.FCMService;
 import org.egglog.api.notification.model.service.NotificationService;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.worktype.model.entity.WorkTag;
+import org.egglog.api.worktype.model.entity.WorkType;
 import org.egglog.utility.utils.RandomStringUtils;
 import org.egglog.utility.utils.SuccessType;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -367,6 +369,11 @@ public class GroupService {
         } else {
             throw new GroupException(GroupErrorCode.GROUP_ROLE_NOT_MATCH);
         }
+    }
+
+    public Map<LocalDate, WorkType> getUserExcelData(Long groupId, LocalDate targetMonth, Long index, User loginUser){
+        //todo 검증 로직은 sync 로직에서 수행함. groupId 가 현재 User가 속한 그룹인지 등.
+        return Map.of(LocalDate.now(), WorkType.builder().build());
     }
 
 }

@@ -185,8 +185,19 @@ class MyCalendarViewModel @Inject constructor(
 
                 Log.e("MyCalendar", "제 개인 일정 $calendarGroupId $monthlyPersonalList")
 
+                val updateMonthlyPersonalList = monthlyPersonalList.map { personalScheduleData ->
+                    val updatedEventList = personalScheduleData.eventList.map { event ->
+                        if (event.calendarGroupId != userInfo!!.workGroupId) {
+                            event.copy(eventContent = "[구독 캘린더] ${event.eventContent ?: "내용 없음"}") // Modify eventContent as needed
+                        } else {
+                            event
+                        }
+                    }
+                    personalScheduleData.copy(eventList = updatedEventList)
+                }
+
                 reduce{
-                    state.copy(monthlyPersonalList = state.monthlyPersonalList.plus(monthlyPersonalList))
+                    state.copy(monthlyPersonalList = state.monthlyPersonalList.plus(updateMonthlyPersonalList))
                 }
             }
         }

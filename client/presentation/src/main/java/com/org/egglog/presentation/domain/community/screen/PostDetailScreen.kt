@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -63,6 +65,7 @@ import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.org.egglog.presentation.theme.NaturalBlack
+import com.org.egglog.presentation.utils.addFocusCleaner
 
 @Composable
 fun PostDetailScreen(
@@ -136,10 +139,14 @@ private fun PostDetailScreen(
     swipeRefreshState: SwipeRefreshState,
     refreshSomething: () -> Unit
 ) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NaturalWhite),
+            .background(NaturalWhite)
+            .background(NaturalWhite)
+            .systemBarsPadding() // 시스템 바 패딩 추가
+            .imePadding(),
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -148,7 +155,7 @@ private fun PostDetailScreen(
         val keyboardController = LocalSoftwareKeyboardController.current
 
 
-        Column(modifier = Modifier.weight(1f)) {
+        Column(modifier = Modifier.weight(1f) ) {
             // 내 글일 경우만 수정, 삭제 버튼 활성화
             if (userId.toInt() == postDetailInfo?.userId) {
                 Log.e("PostDetail", "${userId.toInt()}, ${postDetailInfo.userId}, ${postId}")
