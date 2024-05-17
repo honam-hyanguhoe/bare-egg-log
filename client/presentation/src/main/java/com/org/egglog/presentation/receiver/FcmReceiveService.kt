@@ -75,7 +75,7 @@ class FcmReceiveService : FirebaseMessagingService() {
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         val channelId = getString(R.string.default_notification_channel_id)
         val channelName: CharSequence = getString(R.string.default_notification_channel_name)
-        val importance = NotificationManager.IMPORTANCE_LOW
+        val importance = NotificationManager.IMPORTANCE_HIGH
 
         val notificationChannel = NotificationChannel(channelId, channelName, importance)
         notificationChannel.enableLights(true)
@@ -112,7 +112,7 @@ class FcmReceiveService : FirebaseMessagingService() {
         val channel = NotificationChannel(
             channelId,
             "Channel human readable title",
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_HIGH
         )
         notificationManager.createNotificationChannel(channel)
 

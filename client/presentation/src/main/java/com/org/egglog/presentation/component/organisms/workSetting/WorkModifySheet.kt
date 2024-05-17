@@ -56,7 +56,6 @@ fun WorkModifySheet(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 12.widthPercent(context).dp)
-            .padding(bottom = 62.dp)
             .addFocusCleaner(focusManager)
     ) {
         if(selectedWorkType?.workTag == "ETC") {
