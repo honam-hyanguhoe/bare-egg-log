@@ -18,7 +18,7 @@ import java.util.Map;
  */
 @Data
 public class DutyFormat {
-    private String employeedId;
+    private String employeeId;
     private String name;
     private Map<String, String> work;
 }

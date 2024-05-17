@@ -51,8 +51,8 @@ public class GroupDutyRepository {
         List<DutyFormat> dutyFormatList = groupDutyData.getDutyList();
         Map<String, DutyFormat> dutyList = new HashMap<>();
         for(DutyFormat dutyFormat : dutyFormatList){
-            if(dutyFormat.getEmployeedId()!=null){
-                dutyList.put(dutyFormat.getEmployeedId(), dutyFormat);
+            if(dutyFormat.getEmployeeId()!=null){
+                dutyList.put(dutyFormat.getEmployeeId(), dutyFormat);
             }
         }
 
