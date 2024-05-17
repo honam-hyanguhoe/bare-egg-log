@@ -65,7 +65,7 @@ public class Alarm {
     }
 
     public Alarm modify(LocalTime editAlarmTime, Integer editReplayCnt, Integer editReplayTime, WorkType editWorkTypeId){
-        this.alarmTime = editAlarmTime == null ? this.alarmTime : alarmTime;
+        this.alarmTime = editAlarmTime == null ? this.alarmTime : editAlarmTime;
         this.replayCnt = editReplayCnt == null ? this.replayCnt : editReplayCnt;
         this.replayTime = editReplayTime == null ? this.replayTime : editReplayTime;
         this.workType = editWorkTypeId == null ? this.workType : editWorkTypeId;
