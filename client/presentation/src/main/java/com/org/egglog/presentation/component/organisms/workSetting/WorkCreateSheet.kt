@@ -53,7 +53,6 @@ fun WorkCreateSheet(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 12.widthPercent(context).dp)
-            .padding(bottom = 62.dp)
     ) {
         Text(text = "제목", style = Typography.bodyLarge)
         Spacer(modifier = Modifier.height(16.heightPercent(LocalContext.current).dp))

@@ -1,4 +1,4 @@
-package com.org.egglog.domain.scheduler
+package com.org.egglog.domain.scheduler.model
 
 object AlarmConst {
     const val REQUEST_CODE = "request_code"

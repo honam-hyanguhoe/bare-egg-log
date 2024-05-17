@@ -30,6 +30,8 @@ import org.egglog.api.work.repository.jpa.WorkJpaRepository;
 import org.egglog.api.worktype.model.entity.WorkTag;
 import org.egglog.api.worktype.model.entity.WorkType;
 import org.egglog.api.worktype.repository.jpa.WorkTypeJpaRepository;
+import org.egglog.utility.utils.MonthUtils;
+import org.egglog.utility.utils.MonthUtils.Month;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,10 +41,7 @@ import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.IsoFields;
 import java.time.temporal.TemporalAdjusters;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -91,6 +90,16 @@ public class WorkService {
                 .map(Work::toResponse)
                 .collect(Collectors.toList());
     }
+//    public List<WorkType> groupDutyDateToRequest(GroupDutyDataDto groupDutyDataDto, User loginUser){
+//        CreateWorkListRequest request = new CreateWorkListRequest();
+//        List<CreateWorkRequest> workRequests = new ArrayList<>();
+//
+//        request.setCalendarGroupId(loginUser.getWorkGroupId());
+//        //사번으로 근무 정보 가져옴
+//        List<String> dutyList=groupDutyDataDto.getDutyList().get(loginUser.getEmpNo());
+//        //
+//        return request;
+//    }
 
 
     @Transactional
@@ -128,7 +137,9 @@ public class WorkService {
                 .stream()
                 .map(Work::toResponse)
                 .collect(Collectors.toList());
+
     }
+
 
     @Transactional
     public List<WorkResponse> updateWork(User loginUser, EditAndDeleteWorkListRequest request){

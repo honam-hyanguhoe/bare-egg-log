@@ -12,7 +12,7 @@ import org.springframework.data.redis.core.index.Indexed;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@RedisHash(value = "realTimeBoard")
+@RedisHash(value = "realTimeBoard", timeToLive = -1)
 public class RealTimeBoard {
     @Id
     @EqualsAndHashCode.Include

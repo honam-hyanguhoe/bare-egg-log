@@ -1,4 +1,4 @@
-package com.org.egglog.domain.scheduler
+package com.org.egglog.domain.scheduler.usecase
 
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -8,9 +8,9 @@ interface SchedulerUseCase {
         key: Int,
         curRepeatCount: Int,
         repeatCount: Int,
-        time: LocalTime,
         minutesToAdd: Long,
-        targetDateTime: LocalDateTime
+        targetDateTime: LocalDateTime,
+        stopByUser: Boolean
     )
 
     fun cancelAllAlarms(key: Int)
