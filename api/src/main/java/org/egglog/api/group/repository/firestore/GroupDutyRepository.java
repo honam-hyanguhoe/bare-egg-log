@@ -4,6 +4,8 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.egglog.api.group.exception.GroupErrorCode;
+import org.egglog.api.group.exception.GroupException;
 import org.egglog.api.group.model.dto.request.CustomWorkTag;
 import org.egglog.api.group.model.dto.request.DutyFormat;
 import org.egglog.api.group.model.dto.request.GroupDutyData;
@@ -71,12 +73,21 @@ public class GroupDutyRepository {
             if(count==null){
                 count = 0L;
             }
+            String group = String.valueOf(groupId);
+            String date = groupDutyData.getDate();
+            String countStr = String.valueOf(count);
+
+            log.debug("{} {} {}",group==null,date==null,countStr==null);
+            if(group==null || date == null || countStr ==null){
+                log.warn("null 등장 ~~~~~~~~~~~~~~~~~~~~");
+                throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
+            }
 
             ApiFuture<WriteResult> apiFuture = firestore
                     .collection("duty")
-                    .document(String.valueOf(groupId))
-                    .collection(groupDutyData.getDate())
-                    .document(String.valueOf(count))
+                    .document(group)
+                    .collection(date)
+                    .document(countStr)
                     .set(groupDutySaveFormat);
 
             // 쿼리 실행 결과를 기다림
