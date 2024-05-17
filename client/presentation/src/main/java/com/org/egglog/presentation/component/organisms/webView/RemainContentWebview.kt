@@ -10,9 +10,12 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,6 +29,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -49,9 +53,9 @@ fun RemainContentWebView(
     height: Int = 270,
     url: String = "https://www.egg-log.org/",
     selected: MutableState<String>?,
-    data : String = "",
-    type : String = "remain",
-    viewModel : StaticsViewModel = hiltViewModel()
+    data: String = "",
+    type: String = "remain",
+    viewModel: StaticsViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val state = viewModel.collectAsState().value
@@ -74,13 +78,14 @@ fun RemainContentWebView(
             }
         }
     }
-
+    webView.setBackgroundColor(Color(0xFFF2F4F7).toArgb())
     webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
     webView.webViewClient = object : WebViewClient() {
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
             if (url == "https://www.egg-log.org/remain") {
-                val script = "javascript:receiveDataFromApp('${state.remainData.replace("\"", "\\\"")}')"
+                val script =
+                    "javascript:receiveDataFromApp('${state.remainData.replace("\"", "\\\"")}')"
                 webView.evaluateJavascript(script) { value ->
                     Log.d("WebView", "??? $value")
                 }
@@ -97,7 +102,7 @@ fun RemainContentWebView(
     }
 
     LaunchedEffect(key1 = url) {
-       Log.d("webview", "초기로딩")
+        Log.d("webview", "초기로딩")
         webView.loadUrl(url)
     }
 
@@ -110,10 +115,14 @@ fun RemainContentWebView(
     }
 
 
-    
+
+
     if (type == "remain") {
         val radioList = arrayListOf("Week", "Month")
-        Row(Modifier.fillMaxWidth().padding(top = 10.dp, start = 10.dp)) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp, start = 10.dp)) {
             radioList.mapIndexed { index, text ->
                 if (selected != null) {
                     RadioLabelButton(
@@ -144,15 +153,16 @@ fun RemainContentWebView(
 
     Card(
         modifier = Modifier
-            .fillMaxHeight()
-            .width(width.widthPercent(context).dp)
-            .background(color = Gray100, shape = RoundedCornerShape(20.dp))
+            .height(height.heightPercent(context).dp)
+            .border(1.dp, Color.Black)
+            .fillMaxWidth()
+            .background(color = Gray100, shape = RoundedCornerShape(20.dp)),
     ) {
         AndroidView(
             factory = { webView },
             modifier = Modifier
-                .height(height.heightPercent(context).dp)
-                .width(width.widthPercent(context).dp)
+                .fillMaxSize()
+                .border(1.dp, NaturalBlack)
         )
     }
 }
@@ -171,7 +181,6 @@ class NoScrollWebView(context: Context) : WebView(context) {
     override fun setBackgroundColor(color: Int) {
         super.setBackgroundColor(color)
     }
-
 }
 
 //            webViewClient = object : WebViewClient() {

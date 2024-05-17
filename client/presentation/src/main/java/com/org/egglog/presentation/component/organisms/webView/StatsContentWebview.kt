@@ -19,6 +19,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -65,6 +67,7 @@ fun StatsContentWebView(
         }
     }
 
+    webView.setBackgroundColor(Color(0xFFF2F4F7).toArgb())
     webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
     webView.webViewClient = object : WebViewClient() {
         override fun onPageFinished(view: WebView?, url: String?) {
@@ -80,9 +83,7 @@ fun StatsContentWebView(
     }
 
     DisposableEffect(Unit) {
-//        webView.addJavascriptInterface(AndroidBridge(context, webView), "AndroidBridge")
         onDispose {
-//            webView.removeJavascriptInterface("AndroidBridge")
             webView.destroy()
         }
     }
@@ -111,16 +112,7 @@ fun StatsContentWebView(
             modifier = Modifier
                 .height(height.heightPercent(context).dp)
                 .width(width.widthPercent(context).dp)
+                .background(Gray100)
         )
     }
-
-//    Button(onClick = {
-//        Log.d("web-stats", "버튼 기기 ${state.statsData}")
-//        val script = "javascript:receiveStatsFromApp('${state.statsData.replace("\"", "\\\"")}')"
-//        webView.evaluateJavascript(script) { value ->
-//            Log.d("web-stats", "버튼 돌아와 $value")
-//        }
-//    }) {
-//        Text(text = "hi")
-//    }
 }
