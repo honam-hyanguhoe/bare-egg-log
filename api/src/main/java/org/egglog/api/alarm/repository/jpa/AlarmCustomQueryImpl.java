@@ -20,14 +20,14 @@ public class AlarmCustomQueryImpl implements AlarmCustomQuery {
 
     @Override
     public Optional<List<Alarm>> findAlarmListByUserId(Long userId) {
-        return Optional.of(jpaQueryFactory
+        return Optional.ofNullable(jpaQueryFactory
                 .selectFrom(alarm)
                 .leftJoin(alarm.workType, workType).fetchJoin()
                 .where(alarm.user.id.eq(userId))
                 .fetch());
     }
     public Optional<Alarm> findWithUserAndWorkTypeById(Long alarmId) {
-        return Optional.of(jpaQueryFactory
+        return Optional.ofNullable(jpaQueryFactory
                 .selectFrom(alarm)
                 .leftJoin(alarm.workType, workType).fetchJoin()
                 .leftJoin(alarm.user, user).fetchJoin()
@@ -35,7 +35,7 @@ public class AlarmCustomQueryImpl implements AlarmCustomQuery {
                 .fetchOne());
     }
     public Optional<Alarm> findWithUserById(Long alarmId) {
-        return Optional.of(jpaQueryFactory
+        return Optional.ofNullable(jpaQueryFactory
                 .selectFrom(alarm)
                 .leftJoin(alarm.user, user).fetchJoin()
                 .where(alarm.id.eq(alarmId))
@@ -51,7 +51,7 @@ public class AlarmCustomQueryImpl implements AlarmCustomQuery {
 
     @Override
     public Optional<Alarm> findByWorkTypeId(Long workTypeId) {
-        return Optional.of(jpaQueryFactory
+        return Optional.ofNullable(jpaQueryFactory
                 .selectFrom(alarm)
                 .where(alarm.workType.id.eq(workTypeId))
                 .fetchOne());
