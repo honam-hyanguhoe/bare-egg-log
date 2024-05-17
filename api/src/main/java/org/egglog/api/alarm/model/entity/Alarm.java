@@ -71,4 +71,5 @@ public class Alarm {
         this.workType = editWorkTypeId == null ? this.workType : editWorkTypeId;
         return this;
     }
+
 }
