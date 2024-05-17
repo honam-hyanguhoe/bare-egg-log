@@ -71,8 +71,8 @@ public class BoardScheduler {
      */
 
 
-//    @Scheduled(cron = "0 0 0/1 * * ?")
-    @Scheduled(cron = "0 0/10 * * * ?")
+//    @Scheduled(cron = "0 0 0/1 * * ?")    //1시간마다
+    @Scheduled(cron = "0 0/10 * * * ?") //10분마다
     @Transactional
     public void updateHotBoardScheduledMethod() {
         //<boardId, (조회수 + 좋아요)>

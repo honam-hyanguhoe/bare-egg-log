@@ -231,6 +231,8 @@ public class BoardService {
      */
     @Transactional
     public void registerBoard(BoardForm boardForm, User user) {
+        log.info("Board 익명 닉네임: {}", boardForm.getTempNickname());
+
         Board board = Board.builder()
                 .title(boardForm.getBoardTitle())
                 .content(boardForm.getBoardContent())

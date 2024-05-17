@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -28,6 +29,7 @@ import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetValue
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -80,6 +82,7 @@ import com.org.egglog.presentation.domain.myCalendar.viewmodel.MyCalendarSideEff
 import com.org.egglog.presentation.domain.myCalendar.viewmodel.MyCalendarViewModel
 import com.org.egglog.presentation.domain.setting.activity.SettingActivity
 import com.org.egglog.presentation.domain.setting.navigation.SettingRoute
+import com.org.egglog.presentation.theme.Black
 import com.org.egglog.presentation.theme.Error200
 import com.org.egglog.presentation.theme.Gray300
 import com.org.egglog.presentation.theme.Gray400
@@ -255,126 +258,129 @@ fun MyCalendarScreen(
 
     val (isVisible, setVisible) = remember { mutableStateOf(false) }
 
-    Column(
-        Modifier
-            .fillMaxSize()
-            .background(NaturalWhite)
-    ) {
-        SwipeRefresh(
-            state = swipeRefreshState,
-            onRefresh = refreshSomething,
-            indicator = { state, refreshTrigger ->
-                SwipeRefreshIndicator(
-                    state = state,
-                    refreshTriggerDistance = refreshTrigger,
-                    backgroundColor = NaturalBlack,
-                    contentColor = NaturalWhite
-                )
-            }
+    Surface(Modifier.systemBarsPadding().background(Black)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(NaturalWhite),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            LazyColumn(
-                Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.9f)
-                    .padding(
-                        start = 10.widthPercent(context).dp,
-                        top = 10.heightPercent(context).dp,
-                        end = 10.widthPercent(context).dp
+            SwipeRefresh(
+                state = swipeRefreshState,
+                onRefresh = refreshSomething,
+                indicator = { state, refreshTrigger ->
+                    SwipeRefreshIndicator(
+                        state = state,
+                        refreshTriggerDistance = refreshTrigger,
+                        backgroundColor = NaturalBlack,
+                        contentColor = NaturalWhite
                     )
+                }
             ) {
+                LazyColumn(
+                    Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.9f)
+                        .padding(
+                            start = 10.widthPercent(context).dp,
+                            top = 10.heightPercent(context).dp,
+                            end = 10.widthPercent(context).dp
+                        )
+                ) {
 
-                item {
-                    MonthlyCalendar(
-                        currentYear = currentYear,
-                        currentMonth = currentMonth,
-                        onDateClicked = onDateClicked,
-                        onPrevMonthClick = onPrevMonthClick,
-                        onNextMonthClick = onNextMonthClick,
-                        selectedDate = selectedDate,
-                        tempWorkList = tempWorkList,
-                        monthlyWorkList = monthlyWorkList,
-                        monthlyPersonalList = monthlyPersonalList
-                    )
+                    item {
+                        MonthlyCalendar(
+                            currentYear = currentYear,
+                            currentMonth = currentMonth,
+                            onDateClicked = onDateClicked,
+                            onPrevMonthClick = onPrevMonthClick,
+                            onNextMonthClick = onNextMonthClick,
+                            selectedDate = selectedDate,
+                            tempWorkList = tempWorkList,
+                            monthlyWorkList = monthlyWorkList,
+                            monthlyPersonalList = monthlyPersonalList
+                        )
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
-                    ScheduleListHeader(currentYear, currentMonth, selectedDate, onClickExcelSync)
+                        ScheduleListHeader(currentYear, currentMonth, selectedDate, onClickExcelSync)
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
-                    ScheduleList(
-                        currentWorkData,
-                        currentPersonalData,
-                        onDeletePersonalSchedule,
-                        isPersonalBottomSheet,
-                        onClickModify
-                    )
+                        ScheduleList(
+                            currentWorkData,
+                            currentPersonalData,
+                            onDeletePersonalSchedule,
+                            isPersonalBottomSheet,
+                            onClickModify
+                        )
+
+                    }
 
                 }
-
             }
+
+            BottomNavigator(selectedItem = selectedIdx, onItemSelected = onSelectedIdx)
         }
 
-        BottomNavigator(selectedItem = selectedIdx, onItemSelected = onSelectedIdx)
-    }
-
-    FloatingButton(
-        onClick = { setVisible(!isVisible) },
-        onWorkClick = {
-            isWorkBottomSheet.value = true
-            getWorkTypeList()
-            setVisible(!isVisible)
-        },
-        onPersonalClick = {
-            isPersonalBottomSheet.value = true
-            setVisible(!isVisible)
-        },
-        onSettingClick = {
-            onClickCalendarSetting()
-            setVisible(!isVisible)
-        },
-        horizontalPadding = 10.dp,
-        verticalPadding = 90.heightPercent(context).dp,
-        isVisible = isVisible
-    )
-
-    if (isWorkBottomSheet.value) {
-        InteractiveBottomSheet(
-            380.heightPercent(context).dp,
-            10.dp,
-            workTypeList,
-            isWorkBottomSheet,
-            onWorkLabelClick,
-            onCancelWorkSchedule,
-            onSubmitWorkSchedule,
-            onNavigateToWorkSettingScreen = onNavigateToWorkSettingScreen
+        FloatingButton(
+            onClick = { setVisible(!isVisible) },
+            onWorkClick = {
+                isWorkBottomSheet.value = true
+                getWorkTypeList()
+                setVisible(!isVisible)
+            },
+            onPersonalClick = {
+                isPersonalBottomSheet.value = true
+                setVisible(!isVisible)
+            },
+            onSettingClick = {
+                onClickCalendarSetting()
+                setVisible(!isVisible)
+            },
+            horizontalPadding = 10.dp,
+            verticalPadding = 90.heightPercent(context).dp,
+            isVisible = isVisible
         )
-    }
 
-    if (isPersonalBottomSheet.value) {
-        BottomSheet(
-            height = 650.heightPercent(context).dp,
-            showBottomSheet = isPersonalBottomSheet.value,
-            onDismiss = {
-                isPersonalBottomSheet.value = false
-                onChangeScheduleTitle("")
-                onChangeScheduleContent("")
-                onChangeStartTime(LocalDateTime.now())
-                onChangeEndTime(LocalDateTime.now())
-            }) {
-            PersonalScheduleForm(
-                scheduleTitle,
-                scheduleContent,
-                onChangeScheduleTitle = onChangeScheduleTitle,
-                onChangeScheduleContent = onChangeScheduleContent,
-                onChangeStartTime = onChangeStartTime,
-                onChangeEndTime = onChangeEndTime,
-                isPersonalBottomSheet = isPersonalBottomSheet,
-                onSubmitPersonalSchedule = onSubmitPersonalSchedule,
-                isModifyState = isModifyState,
-                currentEventId = currentEventId,
-                onModifyPersonalSchedule = onModifyPersonalSchedule
+        if (isWorkBottomSheet.value) {
+            InteractiveBottomSheet(
+                380.heightPercent(context).dp,
+                10.dp,
+                workTypeList,
+                isWorkBottomSheet,
+                onWorkLabelClick,
+                onCancelWorkSchedule,
+                onSubmitWorkSchedule,
+                onNavigateToWorkSettingScreen = onNavigateToWorkSettingScreen
             )
+        }
+
+        if (isPersonalBottomSheet.value) {
+            BottomSheet(
+                height = 650.heightPercent(context).dp,
+                showBottomSheet = isPersonalBottomSheet.value,
+                onDismiss = {
+                    isPersonalBottomSheet.value = false
+                    onChangeScheduleTitle("")
+                    onChangeScheduleContent("")
+                    onChangeStartTime(LocalDateTime.now())
+                    onChangeEndTime(LocalDateTime.now())
+                }) {
+                PersonalScheduleForm(
+                    scheduleTitle,
+                    scheduleContent,
+                    onChangeScheduleTitle = onChangeScheduleTitle,
+                    onChangeScheduleContent = onChangeScheduleContent,
+                    onChangeStartTime = onChangeStartTime,
+                    onChangeEndTime = onChangeEndTime,
+                    isPersonalBottomSheet = isPersonalBottomSheet,
+                    onSubmitPersonalSchedule = onSubmitPersonalSchedule,
+                    isModifyState = isModifyState,
+                    currentEventId = currentEventId,
+                    onModifyPersonalSchedule = onModifyPersonalSchedule
+                )
+            }
         }
     }
 }
