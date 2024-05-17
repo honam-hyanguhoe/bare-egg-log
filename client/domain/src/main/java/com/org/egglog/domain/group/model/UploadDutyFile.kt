@@ -7,6 +7,5 @@ data class UploadDutyFile(
     val date: String,
     val dutyList: List<FormattedFile>,
     val customWorkTag: DutyTag,
-    val userName: String,
     val day: String
 )

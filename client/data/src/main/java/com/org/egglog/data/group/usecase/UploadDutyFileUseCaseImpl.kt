@@ -14,24 +14,6 @@ class UploadDutyFileUseCaseImpl @Inject constructor(
     private val groupService: GroupService
 ) : UploadDutyFileUseCase {
 
-    //    override suspend fun invoke(
-//        accessToken: String,
-//        groupId: Long,
-//        dutyFileData: UploadDutyFile
-//    ): Result<String> = kotlin.runCatching{
-//
-//        val requestParam = UploadDutyFileParam(
-//            date= dutyFileData.date,
-//            dutyList = dutyFileData.dutyList,
-//            customWorkTag = dutyFileData.customWorkTag,
-//            userName = dutyFileData.userName,
-//            day = dutyFileData.day
-//        )
-//
-//        val response = groupService.uploadDutyFile(accessToken, groupId, requestParam.toRequestBody())
-//
-//        response.dataBody.toString()
-//    }
     override suspend fun invoke(
         accessToken: String,
         groupId: Long,
@@ -42,7 +24,6 @@ class UploadDutyFileUseCaseImpl @Inject constructor(
             date= dutyFileData.date,
             dutyList = dutyFileData.dutyList,
             customWorkTag = dutyFileData.customWorkTag,
-            userName = dutyFileData.userName,
             day = dutyFileData.day
         )
 

@@ -13,7 +13,6 @@ class UploadDutyFileParam(
     val date: String,
     val dutyList: List<FormattedFile>,
     val customWorkTag: DutyTag,
-    val userName: String,
     val day: String
 ) {
     fun toRequestBody(): RequestBody {
@@ -21,6 +20,8 @@ class UploadDutyFileParam(
     }
 
     override fun toString(): String {
-        return "UploadDutyFileParam(date='$date', dutyList=$dutyList, customWorkTag=$customWorkTag, userName='$userName', day='$day')"
+        return "UploadDutyFileParam(date='$date', dutyList=$dutyList, customWorkTag=$customWorkTag, day='$day')"
     }
+
+
 }

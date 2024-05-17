@@ -156,7 +156,6 @@ class FileUploadViewModel @Inject constructor(
                     night = state.customDutyList["NIGHT"] ?: "",
                     off = state.customDutyList["OFF"] ?: "",
                 ),
-                userName = getUserStoreUseCase()?.userName ?: "",
                 day = LocalDate.now().toString()
             )
         )
