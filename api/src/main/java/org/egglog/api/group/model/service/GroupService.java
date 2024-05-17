@@ -364,7 +364,8 @@ public class GroupService {
     public CustomWorkTag getGroupWorkTags(User user, Long groupId) {
         if(groupMemberService.isGroupMember(groupId, user.getId())){
             try {
-                return groupDutyRepository.getGroupWorkTag(groupId);
+                CustomWorkTag customWorkTag = groupDutyRepository.getGroupWorkTag(groupId);
+                return customWorkTag==null? new CustomWorkTag() : customWorkTag;
             } catch (Exception e){
                 throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
             }

@@ -1,6 +1,7 @@
 package org.egglog.api.group.model.dto.request;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -28,8 +29,5 @@ public class CustomWorkTag {
         this.eve="";
         this.off="";
         this.night="";
-    }
-    public boolean isEmpty(){
-        return this.day==""&&this.eve==""&&this.night==""&&this.off=="";
     }
 }
