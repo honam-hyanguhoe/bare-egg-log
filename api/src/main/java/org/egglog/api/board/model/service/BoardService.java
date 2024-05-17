@@ -307,10 +307,17 @@ public class BoardService {
         }
 
         try {
+            //댓글 삭제
             Optional<List<Comment>> commentListByBoardId = commentRepository.getCommentListByBoardId(boardId);
             if (commentListByBoardId.isPresent()) {
                 commentRepository.deleteAll(commentListByBoardId.get());
             }
+            //좋아요 삭제
+            Optional<List<BoardLike>> boardLikeListByBoardId = boardLikeRepository.getBoardLikeListByBoardId(boardId);
+            if (boardLikeListByBoardId.isPresent()) {
+                boardLikeRepository.deleteAll(boardLikeListByBoardId.get());
+            }
+            //게시물 삭제
             boardRepository.delete(board); //삭제
 
             //금일 조회수 삭제
