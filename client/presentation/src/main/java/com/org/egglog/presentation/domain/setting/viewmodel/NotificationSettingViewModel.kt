@@ -53,25 +53,37 @@ class NotificationSettingViewModel @Inject constructor(
             if (!notification.status) {
                 reduce { state.copy(totalStatus = false) }
                 break
+            } else {
+                reduce { state.copy(totalStatus = true) }
             }
         }
         reduce {
-            state.copy(notificationList = list.map { it.copy() })
+            state.copy(notificationList = list)
         }
     }
 
-    @OptIn(OrbitExperimental::class)
-    fun onToggleChange(notificationId: Long, enabled: Boolean) = blockingIntent {
+    fun onToggleAllChange() = intent {
         reduce { state.copy(toggleEnabled = false) }
         val tokens = getTokenUseCase()
-        val newList = updateNotificationUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}", notificationListParam = NotificationListParam(listOf(NotificationParam(notificationId = notificationId, status = enabled)))).getOrThrow()
+        updateNotificationUseCase(
+            accessToken = "Bearer ${tokens.first.orEmpty()}",
+            notificationListParam = NotificationListParam(
+                state.notificationList?.map { NotificationParam(it.notificationId, !state.totalStatus) } ?: emptyList()
+            )).getOrThrow()
+        reduce { state.copy(toggleEnabled = true) }
+    }
+
+    fun onToggleChange(notificationId: Long, enabled: Boolean) = intent {
+        reduce { state.copy(toggleEnabled = false) }
+        val tokens = getTokenUseCase()
+        updateNotificationUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}", notificationListParam = NotificationListParam(listOf(NotificationParam(notificationId = notificationId, status = enabled)))).getOrThrow()
         reduce { state.copy(toggleEnabled = true) }
     }
 }
 
 @Immutable
 data class NotificationSettingState(
-    val toggleEnabled: Boolean = false,
+    val toggleEnabled: Boolean = true,
     val totalStatus: Boolean = true,
     val notificationList: List<Notification>? = emptyList()
 )
