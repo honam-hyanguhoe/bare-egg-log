@@ -69,7 +69,7 @@ public class GroupDutyRepository {
             String date = groupDutyData.getDate();
 
             log.debug("{} {}",group==null,date==null);
-            if(group==null || date == null){
+            if(group==null || date == null || group == "" || date == ""){
                 log.warn("null 등장 ~~~~~~~~~~~~~~~~~~~~");
                 throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
             }
