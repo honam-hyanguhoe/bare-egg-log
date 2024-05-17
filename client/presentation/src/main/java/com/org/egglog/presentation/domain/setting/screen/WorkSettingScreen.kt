@@ -1,7 +1,6 @@
 package com.org.egglog.presentation.domain.setting.screen
 
 import android.app.Activity
-import android.app.AlarmManager
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -73,9 +72,14 @@ fun WorkSettingScreen(
         onClickToggle = viewModel::onClickToggle,
         toggleEnabled = state.toggleEnabled,
         showModifyBottomSheetAlarm = state.showModifyBottomSheetAlarm,
-        selectedAlarm = state.selectedAlarm,
         modifyEnabledAlarm = state.modifyEnabledAlarm,
-        setShowModifyBottomSheetAlarm = viewModel::setShowModifyBottomSheetAlarm
+        setShowModifyBottomSheetAlarm = viewModel::setShowModifyBottomSheetAlarm,
+        setSelectedAlarm = viewModel::setSelectedAlarm,
+        deleteSelectedAlarm = viewModel::deleteSelectedAlarm,
+        onReplayCntChange = viewModel::onReplayCntChange,
+        onReplayTimeChange = viewModel::onReplayTimeChange,
+        onClickModifyAlarm = viewModel::onClickModifyAlarm,
+        onAlarmTimeChange = viewModel::onAlarmTimeChange
     )
 }
 
@@ -108,14 +112,19 @@ fun WorkSettingScreen(
     onClickToggle: (Alarm) -> Unit,
     toggleEnabled: Boolean,
     showModifyBottomSheetAlarm: Boolean,
-    selectedAlarm: Alarm?,
     modifyEnabledAlarm: Boolean,
-    setShowModifyBottomSheetAlarm: (Boolean) -> Unit
+    setShowModifyBottomSheetAlarm: (Boolean) -> Unit,
+    setSelectedAlarm: (Alarm) -> Unit,
+    deleteSelectedAlarm: () -> Unit,
+    onReplayCntChange: (Int) -> Unit,
+    onReplayTimeChange: (Int) -> Unit,
+    onClickModifyAlarm: () -> Unit,
+    onAlarmTimeChange: (LocalTime) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
-    LaunchedEffect(addEnabled, deleteEnabled, modifyEnabled, toggleEnabled) {
+    LaunchedEffect(addEnabled, deleteEnabled, modifyEnabled, toggleEnabled, modifyEnabledAlarm) {
         getWorkListInit()
         getAlarmListInit()
     }
@@ -166,9 +175,14 @@ fun WorkSettingScreen(
                     alarmList = alarmList,
                     onClickToggle = onClickToggle,
                     showModifyBottomSheetAlarm = showModifyBottomSheetAlarm,
-                    selectedAlarm = selectedAlarm,
                     modifyEnabledAlarm = modifyEnabledAlarm,
-                    setShowModifyBottomSheetAlarm = setShowModifyBottomSheetAlarm
+                    setShowModifyBottomSheetAlarm = setShowModifyBottomSheetAlarm,
+                    setSelectedAlarm = setSelectedAlarm,
+                    deleteSelectedAlarm = deleteSelectedAlarm,
+                    onReplayCntChange = onReplayCntChange,
+                    onReplayTimeChange = onReplayTimeChange,
+                    onClickModifyAlarm = onClickModifyAlarm,
+                    onAlarmTimeChange = onAlarmTimeChange
                 )
             }
         )

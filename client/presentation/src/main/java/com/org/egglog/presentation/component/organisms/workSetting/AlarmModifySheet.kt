@@ -40,6 +40,8 @@ import java.time.LocalTime
 @Composable
 fun AlarmModifySheet(
     onAlarmTimeChange: (LocalTime) -> Unit,
+    onReplayCntChange: (Int) -> Unit,
+    onReplayTimeChange: (Int) -> Unit,
     addEnabled: Boolean,
     onClickAdd: () -> Unit
 ) {
@@ -48,7 +50,6 @@ fun AlarmModifySheet(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 12.widthPercent(context).dp)
-            .padding(bottom = 62.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
@@ -64,12 +65,12 @@ fun AlarmModifySheet(
         Spacer(modifier = Modifier.height(16.heightPercent(LocalContext.current).dp))
         Text(text = "간격", style = Typography.bodyLarge)
         Spacer(modifier = Modifier.height(16.heightPercent(LocalContext.current).dp))
-        DialogButton(onChange = { Log.e("test", it.toString()) }, interval = 5, nextText = "분")
+        DialogButton(onChange = onReplayTimeChange, interval = 5, nextText = "분")
 
         Spacer(modifier = Modifier.height(16.heightPercent(LocalContext.current).dp))
         Text(text = "반복 횟수", style = Typography.bodyLarge)
         Spacer(modifier = Modifier.height(16.heightPercent(LocalContext.current).dp))
-        DialogButton(onChange = { Log.e("test", it.toString()) }, interval = 1, nextText = "회")
+        DialogButton(onChange = onReplayCntChange, interval = 1, nextText = "회")
 
         Spacer(modifier = Modifier.weight(1f))
         BigButton(colors = ButtonColors(

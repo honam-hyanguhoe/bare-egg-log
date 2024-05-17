@@ -91,4 +91,11 @@ interface SettingService {
         @Header("Authorization") accessToken: String,
         @Body requestBody: RequestBody
     ): CommonResponse<AlarmUpdateResponse?>
+
+    @PATCH("alarms")
+    @Headers("Content-Type:application/json; charset=UTF8")
+    suspend fun updateAlarm(
+        @Header("Authorization") accessToken: String,
+        @Body requestBody: RequestBody
+    ): CommonResponse<AlarmUpdateResponse?>
 }

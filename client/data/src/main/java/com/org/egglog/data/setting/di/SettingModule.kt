@@ -12,6 +12,7 @@ import com.org.egglog.data.setting.usecase.PostCalendarSyncUseCaseImpl
 import com.org.egglog.data.setting.usecase.PostWorkTypeUseCaseImpl
 import com.org.egglog.data.setting.usecase.SetCalendarGroupMapStoreUseCaseImpl
 import com.org.egglog.data.setting.usecase.UpdateAlarmStatusUseCaseImpl
+import com.org.egglog.data.setting.usecase.UpdateAlarmUseCaseImpl
 import com.org.egglog.data.setting.usecase.UpdateWorkTypeUseCaseImpl
 import com.org.egglog.domain.setting.usecase.DeleteCalendarGroupUseCase
 import com.org.egglog.domain.setting.usecase.DeleteWorkTypeUseCase
@@ -25,6 +26,7 @@ import com.org.egglog.domain.setting.usecase.PostCalendarSyncUseCase
 import com.org.egglog.domain.setting.usecase.PostWorkTypeUseCase
 import com.org.egglog.domain.setting.usecase.SetCalendarGroupMapStoreUseCase
 import com.org.egglog.domain.setting.usecase.UpdateAlarmStatusUseCase
+import com.org.egglog.domain.setting.usecase.UpdateAlarmUseCase
 import com.org.egglog.domain.setting.usecase.UpdateWorkTypeUseCase
 import dagger.Binds
 import dagger.Module
@@ -72,4 +74,7 @@ abstract class SettingModule {
 
     @Binds
     abstract fun bindUpdateAlarmStatusUseCase(uc: UpdateAlarmStatusUseCaseImpl): UpdateAlarmStatusUseCase
+
+    @Binds
+    abstract fun bindUpdateAlarmUseCase(uc: UpdateAlarmUseCaseImpl): UpdateAlarmUseCase
 }

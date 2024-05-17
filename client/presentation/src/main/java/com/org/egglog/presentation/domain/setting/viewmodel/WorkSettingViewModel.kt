@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.scheduler.usecase.SchedulerUseCase
 import com.org.egglog.domain.setting.model.Alarm
+import com.org.egglog.domain.setting.model.AlarmParam
 import com.org.egglog.domain.setting.model.AlarmStatusParam
 import com.org.egglog.domain.setting.model.WorkType
 import com.org.egglog.domain.setting.model.WorkTypeParam
@@ -13,6 +14,7 @@ import com.org.egglog.domain.setting.usecase.GetAlarmListUseCase
 import com.org.egglog.domain.setting.usecase.GetWorkTypeListUseCase
 import com.org.egglog.domain.setting.usecase.PostWorkTypeUseCase
 import com.org.egglog.domain.setting.usecase.UpdateAlarmStatusUseCase
+import com.org.egglog.domain.setting.usecase.UpdateAlarmUseCase
 import com.org.egglog.domain.setting.usecase.UpdateWorkTypeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -24,7 +26,6 @@ import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
-import java.time.LocalDateTime
 import java.time.LocalTime
 import javax.annotation.concurrent.Immutable
 import javax.inject.Inject
@@ -38,6 +39,7 @@ class WorkSettingViewModel @Inject constructor(
     private val deleteWorkTypeUseCase: DeleteWorkTypeUseCase,
     private val getAlarmListUseCase: GetAlarmListUseCase,
     private val updateAlarmStatusUseCase: UpdateAlarmStatusUseCase,
+    private val updateAlarmUseCase: UpdateAlarmUseCase,
     private val schedulerUseCase: SchedulerUseCase
 ): ViewModel(), ContainerHost<WorkSettingState, WorkSettingSideEffect>{
     override val container: Container<WorkSettingState, WorkSettingSideEffect> = container(
@@ -46,7 +48,7 @@ class WorkSettingViewModel @Inject constructor(
             this.exceptionHandler = CoroutineExceptionHandler { _, throwable ->
                 intent {
                     postSideEffect(WorkSettingSideEffect.Toast(message = throwable.message.orEmpty()))
-                    reduce { state.copy(deleteEnabled = true, addEnabled = true, modifyEnabled = true) }
+                    reduce { state.copy(deleteEnabled = true, addEnabled = true, modifyEnabled = true, modifyEnabledAlarm = true, toggleEnabled = true) }
                 }
             }
         }
@@ -141,6 +143,39 @@ class WorkSettingViewModel @Inject constructor(
     fun setShowModifyBottomSheetAlarm(enabled: Boolean) = intent {
         reduce { state.copy(showModifyBottomSheetAlarm = enabled) }
     }
+
+    fun setSelectedAlarm(alarm: Alarm) = intent {
+        reduce { state.copy(selectedAlarm = alarm) }
+    }
+
+    fun deleteSelectedAlarm() = intent {
+        reduce { state.copy(selectedAlarm = null) }
+    }
+
+    @OptIn(OrbitExperimental::class)
+    fun onReplayCntChange(replayCnt: Int) = blockingIntent {
+        reduce { state.copy(replayCnt = replayCnt) }
+    }
+
+    @OptIn(OrbitExperimental::class)
+    fun onReplayTimeChange(replayTime: Int) = blockingIntent {
+        reduce { state.copy(replayTime = replayTime) }
+    }
+
+    @OptIn(OrbitExperimental::class)
+    fun onAlarmTimeChange(alarmTime: LocalTime) = blockingIntent {
+        reduce { state.copy(alarmTime = alarmTime) }
+    }
+
+    fun onClickModifyAlarm() = intent {
+        reduce { state.copy(modifyEnabledAlarm = false) }
+        val tokens = getTokenUseCase()
+        val selectedAlarm = state.selectedAlarm!!
+        Log.e("ldskjaskl", "${state.alarmTime}")
+        updateAlarmUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}", AlarmParam(alarmId = selectedAlarm.alarmId, replayTime = state.replayTime, replayCnt = state.replayCnt, workTypeId = selectedAlarm.workTypeId, alarmTime = state.alarmTime)).getOrThrow()
+        postSideEffect(WorkSettingSideEffect.Toast("수정되었습니다."))
+        reduce { state.copy(modifyEnabledAlarm = true, replayTime = 5, replayCnt = 1, selectedAlarm = null) }
+    }
 }
 
 @Immutable
@@ -162,6 +197,9 @@ data class WorkSettingState(
     val selectedAlarm: Alarm? = null,
     val showModifyBottomSheetAlarm: Boolean = false,
     val modifyEnabledAlarm: Boolean = true,
+    val replayCnt: Int = 1,
+    val replayTime: Int = 5,
+    val alarmTime: LocalTime = LocalTime.now()
 )
 
 sealed interface WorkSettingSideEffect {

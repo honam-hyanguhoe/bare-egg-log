@@ -25,9 +25,14 @@ fun AlarmManager(
     alarmList: List<Alarm>,
     onClickToggle: (Alarm) -> Unit,
     showModifyBottomSheetAlarm: Boolean,
-    selectedAlarm: Alarm?,
     modifyEnabledAlarm: Boolean,
-    setShowModifyBottomSheetAlarm: (Boolean) -> Unit
+    setShowModifyBottomSheetAlarm: (Boolean) -> Unit,
+    setSelectedAlarm: (Alarm) -> Unit,
+    deleteSelectedAlarm: () -> Unit,
+    onReplayCntChange: (Int) -> Unit,
+    onReplayTimeChange: (Int) -> Unit,
+    onClickModifyAlarm: () -> Unit,
+    onAlarmTimeChange: (LocalTime) -> Unit
 ) {
     val context = LocalContext.current
     setAlarm()
@@ -41,7 +46,10 @@ fun AlarmManager(
         alarmList.map {
             AlarmSettingCard(
                 alarm = it,
-                onClickCard = { setShowModifyBottomSheetAlarm(true) },
+                onClickCard = {
+                    setShowModifyBottomSheetAlarm(true)
+                    setSelectedAlarm(it)
+                },
                 setToggle = onClickToggle
             )
         }
@@ -49,14 +57,19 @@ fun AlarmManager(
 
         if(showModifyBottomSheetAlarm) BottomSheet(height = 420.heightPercent(context).dp, showBottomSheet = true, onDismiss = {
             setShowModifyBottomSheetAlarm(false)
-//            onColorChange("")
-//            onTitleChange("")
-//            deleteSelectedWorkType()
+            onReplayTimeChange(5)
+            onReplayCntChange(1)
+            deleteSelectedAlarm()
         }) {
             AlarmModifySheet(
-                onAlarmTimeChange = {},
-                addEnabled = true,
-                onClickAdd = {}
+                onAlarmTimeChange = onAlarmTimeChange,
+                addEnabled = modifyEnabledAlarm,
+                onClickAdd = {
+                    onClickModifyAlarm()
+                    setShowModifyBottomSheetAlarm(false)
+                },
+                onReplayTimeChange = onReplayTimeChange,
+                onReplayCntChange = onReplayCntChange
             )
         }
     }

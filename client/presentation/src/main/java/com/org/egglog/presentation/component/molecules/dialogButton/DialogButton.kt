@@ -35,7 +35,7 @@ fun DialogButton(onChange: (Int) -> Unit, interval: Int, nextText: String = "") 
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(
-            size = 28.widthPercent(context).dp,
+            size = 26.widthPercent(context).dp,
             enabled = true,
             imageVector = Remove,
             color = NaturalWhite,
@@ -51,7 +51,7 @@ fun DialogButton(onChange: (Int) -> Unit, interval: Int, nextText: String = "") 
         Spacer(modifier = Modifier.padding(6.widthPercent(context).dp))
 
         IconButton(
-            size = 28.widthPercent(context).dp,
+            size = 26.widthPercent(context).dp,
             imageVector = Add,
             color = NaturalWhite,
             enabled = true,
