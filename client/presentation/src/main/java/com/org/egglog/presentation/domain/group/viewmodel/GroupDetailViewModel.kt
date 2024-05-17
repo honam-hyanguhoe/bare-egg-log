@@ -341,7 +341,7 @@ class GroupDetailViewModel @Inject constructor(
 //                lastSelectedDate = finalStartDate.plusDays(1)
 //            )
         val   calendarUiModel = dataSource.getData(startDate = finalStartDate, lastSelectedDate = finalStartDate.minusDays(1))
-//        Log.d("weekCal", "cum $calendarUiModel")
+        Log.d("weekCal", "cum $finalStartDate $calendarUiModel ")
 
         reduce {
             state.copy(

@@ -12,6 +12,8 @@ import com.org.egglog.domain.main.usecase.GetWorkStatsUseCase
 import com.org.egglog.presentation.domain.setting.viewmodel.SettingSideEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
@@ -46,20 +48,19 @@ class StaticsViewModel @Inject constructor(
     }
 
     private fun updateData() = intent {
-        val tokenResult = getTokenUseCase().first
-        if (tokenResult != null) {
-            getWorkStatsData("Bearer ${tokenResult}")
-            getRemainData("Bearer ${tokenResult}")
-        } else {
-            Log.e("webview", "Failed to fetch token")
-        }
+        getWorkStatsData()
+        getRemainData()
     }
 
-    private fun getWorkStatsData(accessToken: String) = intent {
+
+    private fun getWorkStatsData() = intent {
+        val tokenResult = getTokenUseCase().first
+
+        Log.d("web-stats", state.month.toString())
         val result = getWorkStatsUseCase(
-            accessToken = accessToken,
-            date = state.date,
-            month = state.month
+            accessToken = "Bearer ${tokenResult}",
+            date = state.date.toString(),
+            month = state.month.toString()
         ).getOrNull()
         if (result != null) {
             Log.d("web-stats", "result ${result}")
@@ -71,9 +72,11 @@ class StaticsViewModel @Inject constructor(
         }
     }
 
-    private fun getRemainData(accessToken: String) = intent {
+    private fun getRemainData() = intent {
+        val tokenResult = getTokenUseCase().first
+
         val result = countRemainingDutyUseCase(
-            accessToken = accessToken,
+            accessToken = "Bearer ${tokenResult}",
             today = state.today,
             dateType = state.dateType
         ).getOrNull()
@@ -85,12 +88,39 @@ class StaticsViewModel @Inject constructor(
             Log.e("ViewModel", "Failed to fetch remaining duty data")
         }
     }
+
     init {
         updateData()
     }
 
+    fun onPrevClick() = intent {
+        reduce {
+            state.copy(
+                month = state.month.minusMonths(1)
+            )
+        }
+
+        getWorkStatsData()
+    }
+
+    fun onNextClick() = intent {
+        if (
+            state.month.monthValue == LocalDate.now().monthValue
+        ){
+            Log.d("web-stats", "no data")
+            StaticSideEffect.Toast("더이상 데이터가 없습니다")
+        }else{
+            reduce {
+                state.copy(
+                    month = state.month.plusMonths(1)
+                )
+            }
+        }
+        getWorkStatsData()
+    }
+
     fun onSelectedIdx(selectedIdx: Int) = intent {
-        when(selectedIdx) {
+        when (selectedIdx) {
             0 -> postSideEffect(StaticSideEffect.NavigateToMyCalendarActivity)
             1 -> postSideEffect(StaticSideEffect.NavigateToGroupActivity)
             3 -> postSideEffect(StaticSideEffect.NavigateToCommunityActivity)
@@ -101,21 +131,21 @@ class StaticsViewModel @Inject constructor(
 
 @Immutable
 data class StaticState(
-    val date: String = LocalDate.now().toString(),
-    val month: String = LocalDate.now().toString(),
+    val date: LocalDate = LocalDate.now(),
+    val month: LocalDate = LocalDate.now(),
     val dateType: String = "WEEK",
-    val today : String = LocalDate.now().toString(),
-    val remainData : String = "있니",
-    val statsData : String = "",
+    val today: String = LocalDate.now().toString(),
+    val remainData: String = "있니",
+    val statsData: String = "",
     val selectedIdx: Int = 2
 )
 
 sealed interface StaticSideEffect {
-    class Toast(val message: String): StaticSideEffect
-    data object NavigateToSettingActivity: StaticSideEffect
-    data object NavigateToCommunityActivity: StaticSideEffect
-    data object NavigateToGroupActivity: StaticSideEffect
+    class Toast(val message: String) : StaticSideEffect
+    data object NavigateToSettingActivity : StaticSideEffect
+    data object NavigateToCommunityActivity : StaticSideEffect
+    data object NavigateToGroupActivity : StaticSideEffect
 
-    data object NavigateToMyCalendarActivity: StaticSideEffect
+    data object NavigateToMyCalendarActivity : StaticSideEffect
 
 }

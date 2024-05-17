@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,7 +30,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.org.egglog.presentation.component.atoms.buttons.CustomIconButton
 import com.org.egglog.presentation.component.molecules.bottomNavigator.BottomNavigator
+import com.org.egglog.presentation.component.molecules.headers.BasicHeader
+import com.org.egglog.presentation.component.molecules.headers.NoticeHeader
 import com.org.egglog.presentation.component.organisms.calendars.WeeklyCalendar
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyUiModel
 import com.org.egglog.presentation.component.organisms.webView.RemainContentWebView
@@ -45,8 +49,11 @@ import com.org.egglog.presentation.domain.myCalendar.activity.MyCalendarActivity
 import com.org.egglog.presentation.domain.setting.activity.SettingActivity
 import com.org.egglog.presentation.domain.setting.viewmodel.SettingSideEffect
 import com.org.egglog.presentation.theme.Gray100
+import com.org.egglog.presentation.theme.NaturalBlack
 import com.org.egglog.presentation.theme.NaturalWhite
 import com.org.egglog.presentation.theme.Typography
+import com.org.egglog.presentation.utils.ArrowLeft
+import com.org.egglog.presentation.utils.ArrowRight
 import com.org.egglog.presentation.utils.widthPercent
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -125,7 +132,9 @@ fun MainScreen(
         remainData = statsState.remainData ?: "",
         statsData = statsState.statsData ?: "",
         selectedIdx = statsState.selectedIdx,
-        onSelectedIdx = staticsViewModel::onSelectedIdx
+        onSelectedIdx = staticsViewModel::onSelectedIdx,
+        onStatsPrevClick = staticsViewModel::onPrevClick,
+        onStatsNextClick = staticsViewModel::onNextClick
     )
 }
 
@@ -140,7 +149,9 @@ private fun MainScreen(
     remainData: String,
     statsData: String,
     selectedIdx: Int,
-    onSelectedIdx: (Int) -> Unit
+    onSelectedIdx: (Int) -> Unit,
+    onStatsPrevClick: () -> Unit,
+    onStatsNextClick: () -> Unit
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -160,6 +171,10 @@ private fun MainScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
+            Spacer(modifier = Modifier.height(15.dp))
+            NoticeHeader(
+                hasLogo = true
+            )
             Spacer(modifier = Modifier.height(30.dp))
             DutyCard(
                 startDate = startDate,
@@ -171,7 +186,7 @@ private fun MainScreen(
             Spacer(modifier = Modifier.height(30.dp))
             RemainCard(selected = selected, remainData = remainData)
             Spacer(modifier = Modifier.height(30.dp))
-            StaticsCard(statsData = statsData)
+            StaticsCard(statsData = statsData, onPrevClick = onStatsPrevClick, onNextClick = onStatsNextClick)
         }
         BottomNavigator(selectedItem = selectedIdx, onItemSelected = { onSelectedIdx(it) })
     }
@@ -219,12 +234,12 @@ fun RemainCard(
             .background(color = Gray100, shape = RoundedCornerShape(20.dp))
             .padding(8.dp, 15.dp, 8.dp, 25.dp)
     ) {
+        Spacer(modifier = Modifier.height(10.dp))
         Text(
             text = "제 근무는 언제 끝나죠?",
             modifier = Modifier.padding(start = 10.dp),
             style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
         )
-
         RemainContentWebView(
             width = 320,
             height = 340,
@@ -238,7 +253,9 @@ fun RemainCard(
 
 @Composable
 fun StaticsCard(
-    statsData: String
+    statsData: String,
+    onPrevClick: () -> Unit,
+    onNextClick: () -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -248,11 +265,36 @@ fun StaticsCard(
             .background(color = Gray100, shape = RoundedCornerShape(20.dp))
             .padding(8.dp, 15.dp, 8.dp, 25.dp),
     ) {
-        Text(
-            text = "내 근무 통계",
-            modifier = Modifier.padding(start = 10.dp),
-            style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
-        )
+        Spacer(modifier = Modifier.height(10.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "내 근무 통계",
+                modifier = Modifier.padding(start = 10.dp),
+                style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
+            )
+            Row(
+                modifier = Modifier
+            ) {
+                CustomIconButton(size = 30.dp,
+                    imageVector = ArrowLeft,
+                    color = NaturalBlack,
+                    onClick = {
+                        onPrevClick()
+                    })
+                CustomIconButton(size = 30.dp,
+                    imageVector = ArrowRight,
+                    color = NaturalBlack,
+                    onClick = { onNextClick() })
+            }
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
         StatsContentWebView(
             width = 320,
             height = 360,
@@ -262,6 +304,7 @@ fun StaticsCard(
             type = "stats"
         )
     }
+    Spacer(modifier = Modifier.height(30.dp))
 }
 
 @Preview
