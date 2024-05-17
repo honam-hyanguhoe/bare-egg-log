@@ -8,17 +8,22 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.org.egglog.presentation.component.atoms.icons.Icon
 import com.org.egglog.presentation.domain.community.viewmodel.WritePostViewModel
+import com.org.egglog.presentation.theme.Error200
 import com.org.egglog.presentation.theme.Gray200
 import com.org.egglog.presentation.theme.NaturalBlack
 import com.org.egglog.presentation.utils.Add
@@ -65,21 +71,29 @@ private fun ImageUploader(
     uploadedImages: List<Bitmap> = listOf()
 ) {
 
-    Row {
-        ImageUploadButton(
-            isClicked = { isClicked() }
-        )
+    LazyRow() {
+        item {
+            ImageUploadButton(
+                isClicked = { isClicked() }
+            )
+        }
 
-        Spacer(modifier = Modifier.width(10.dp))
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            items(uploadedImages) { imageBitmap ->
-                ImageUploadBox(imageBitmap = imageBitmap)
+        item {
+            Spacer(modifier = Modifier.width(10.dp))
+        }
+
+        item {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                uploadedImages.forEach { imageBitmap ->
+                    ImageUploadBox(imageBitmap = imageBitmap)
+                }
             }
         }
     }
 }
+
 
 @Composable
 fun ImageUploadButton(

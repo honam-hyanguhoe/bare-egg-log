@@ -1,5 +1,6 @@
 package com.org.egglog.presentation.domain.community.screen
 
+import android.app.Activity
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -21,18 +22,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.org.egglog.presentation.component.atoms.buttons.BigButton
 import com.org.egglog.presentation.component.atoms.inputs.MultiInput
 import com.org.egglog.presentation.component.atoms.inputs.SingleInput
 import com.org.egglog.presentation.component.molecules.headers.BasicHeader
-import com.org.egglog.presentation.domain.community.viewmodel.PostSideEffect
+import com.org.egglog.presentation.domain.community.viewmodel.ModifyPostSideEffect
+import com.org.egglog.presentation.domain.community.viewmodel.ModifyPostViewModel
 import com.org.egglog.presentation.domain.community.viewmodel.WritePostViewModel
-import com.org.egglog.presentation.theme.ClientTheme
-import com.org.egglog.presentation.theme.Gray200
-import com.org.egglog.presentation.theme.Gray25
 import com.org.egglog.presentation.theme.Gray300
 import com.org.egglog.presentation.theme.NaturalWhite
 import com.org.egglog.presentation.theme.Typography
@@ -42,52 +40,50 @@ import com.org.egglog.presentation.utils.widthPercent
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
-@Composable
-fun WritePostScreen(
-    hospitalId: Int?,
-    groupId: Int?,
-    onNavigateToListScreen: () -> Unit,
-    viewModel: WritePostViewModel = hiltViewModel()
-) {
 
+@Composable
+fun ModifyPostScreen(
+    viewModel: ModifyPostViewModel = hiltViewModel(),
+    postId: Int,
+    onNavigateToDetailScreen: (Int) -> Unit
+) {
     val state = viewModel.collectAsState().value
     val context = LocalContext.current
 
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
-            is PostSideEffect.Toast -> Toast.makeText(
+            is ModifyPostSideEffect.Toast -> Toast.makeText(
                 context,
                 sideEffect.message,
                 Toast.LENGTH_SHORT
             ).show()
-            PostSideEffect.NavigateToListScreen -> onNavigateToListScreen()
         }
     }
 
-    WritePostScreen(
-        isLoading = state.isLoading,
+    ModifyPostScreen(
+        postId = postId,
         title = state.title,
         content = state.content,
         onTitleChange = viewModel::onChangeTitle,
         onContentChange = viewModel::onChangeContent,
-        onCloseClick = onNavigateToListScreen,
         onPostClick = viewModel::onClickPost,
-        viewModel = viewModel
+        onNavigateToDetailScreen = onNavigateToDetailScreen
     )
 }
 
 @Composable
-private fun WritePostScreen(
-    isLoading: Boolean,
+private fun ModifyPostScreen(
+    postId: Int,
     title: String,
     content: String,
     onTitleChange: (String) -> Unit,
     onContentChange: (String) -> Unit,
-    onCloseClick: () -> Unit,
     onPostClick: () -> Unit,
-    viewModel: WritePostViewModel
+    onNavigateToDetailScreen: (Int) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
+
     Surface {
         BoxWithConstraints {
             val screenHeight = maxHeight
@@ -105,7 +101,7 @@ private fun WritePostScreen(
                 ) {
                     BasicHeader(
                         hasLeftClose = true,
-                        onClickClose = onCloseClick,
+                        onClickClose = { (context as? Activity)?.onBackPressed() },
                     )
                     Column(
                         modifier = Modifier.padding(top = 12.heightPercent(LocalContext.current).dp)
@@ -130,12 +126,6 @@ private fun WritePostScreen(
                             focusManager = focusManager,
                             height = 150
                         )
-                        Spacer(modifier = Modifier.height(24.heightPercent(LocalContext.current).dp))
-                        Text(text = "사진 (선택)", style = Typography.displayLarge)
-                        Spacer(modifier = Modifier.height(12.heightPercent(LocalContext.current).dp))
-                        Box(Modifier.fillMaxWidth(0.9f)) {
-                            ImageUploader(viewModel = viewModel)
-                        }
                     }
                 }
                 BigButton(
@@ -146,13 +136,14 @@ private fun WritePostScreen(
                         disabledContentColor = NaturalWhite
                     ), onClick = {
                         onPostClick()
+                        onNavigateToDetailScreen(postId)
                     },
                     enabled = (title != "" && content != "") // title과 content 값이 없으면 disabled
                 ) {
                     Text(
                         style = Typography.bodyLarge,
                         color = NaturalWhite,
-                        text = "작성 완료"
+                        text = "수정 완료"
                     )
                 }
             }
