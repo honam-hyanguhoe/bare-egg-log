@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Surface
@@ -91,7 +93,9 @@ private fun ModifyPostScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(color = NaturalWhite)
-                    .padding(bottom = 24.heightPercent(LocalContext.current).dp),
+                    .padding(bottom = 24.heightPercent(LocalContext.current).dp)
+                    .systemBarsPadding() // 시스템 바 패딩 추가
+                    .imePadding(),
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {

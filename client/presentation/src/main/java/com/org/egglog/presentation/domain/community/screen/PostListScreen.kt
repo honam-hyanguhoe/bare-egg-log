@@ -14,8 +14,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.FloatingActionButton
@@ -160,7 +162,7 @@ private fun PostListScreen(
     categoryList: List<Pair<Int, String>>,
     postListFlow: Flow<PagingData<PostData>>,
     hotPostList: List<HotPostInfo>,
-    onClickPost: (postId: Int) -> Unit ,
+    onClickPost: (postId: Int) -> Unit,
     onClickWriteButton: (hospitalId: Int?, groupId: Int?) -> Unit,
     onSelectCategory: (index: Int) -> Unit,
     onClickSearch: (hospitalId: Int?, groupId: Int?) -> Unit,
@@ -179,6 +181,8 @@ private fun PostListScreen(
         Modifier
             .fillMaxSize()
             .background(NaturalWhite)
+            .systemBarsPadding() // 시스템 바 패딩 추가
+            .imePadding(),
     ) {
         Column(
             Modifier
