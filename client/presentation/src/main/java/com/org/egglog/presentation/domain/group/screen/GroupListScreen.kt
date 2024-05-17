@@ -1,7 +1,9 @@
 package com.org.egglog.presentation.domain.group.screen
 
 import android.content.Intent
+import android.graphics.Rect
 import android.util.Log
+import android.view.ViewTreeObserver
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +15,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
@@ -24,7 +28,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -34,8 +40,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -56,9 +64,11 @@ import com.org.egglog.presentation.domain.community.activity.CommunityActivity
 import com.org.egglog.presentation.domain.group.viewmodel.GroupListSideEffect
 import com.org.egglog.presentation.domain.group.viewmodel.GroupListViewModel
 import com.org.egglog.presentation.domain.main.activity.MainActivity
+import com.org.egglog.presentation.domain.myCalendar.activity.MyCalendarActivity
 import com.org.egglog.presentation.domain.setting.activity.SettingActivity
 import com.org.egglog.presentation.theme.*
 import com.org.egglog.presentation.utils.AddBox
+import com.org.egglog.presentation.utils.addFocusCleaner
 import com.org.egglog.presentation.utils.widthPercent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -112,7 +122,7 @@ fun GroupListScreen(
 
             GroupListSideEffect.NavigateToCalendarScreen -> {
                 context.startActivity(Intent(
-                    context, SettingActivity::class.java
+                    context, MyCalendarActivity::class.java
                 ).apply {
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                 })
@@ -162,12 +172,15 @@ private fun GroupListScreen(
     createGroup: () -> Unit,
     onClickGroup: (groupId: Long) -> Unit
 ) {
+
+//    val focusManager = LocalFocusManager.current
     Column(
         modifier = Modifier
-
             .background(NaturalWhite)
             .fillMaxSize()
-            .systemBarsPadding(),
+            .systemBarsPadding()
+            .imePadding(),
+//            .addFocusCleaner(focusManager),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
@@ -264,7 +277,7 @@ fun BottomSheetContent(
     val focusManager = LocalFocusManager.current
 
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().navigationBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
     ) {
         Column(
@@ -336,6 +349,7 @@ fun BottomSheetContent(
         Spacer(modifier = Modifier.height(10.dp))
     }
 }
+
 
 @Preview
 @Composable

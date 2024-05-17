@@ -101,21 +101,22 @@ fun GroupDetailScreen(
     val showSecondUploadBottomSheet by groupDetailViewModel.showSecondUploadBottomSheet.collectAsState()
     val selectedDate = fileUploadViewModel.selectedDate
 
-    val getFileLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { uri: Uri? ->
-            uri?.let {
-                fileUploadViewModel.uploadFile(context, uri)
-            }
-        }
-    )
+    val getFileLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
+            onResult = { uri: Uri? ->
+                uri?.let {
+                    fileUploadViewModel.uploadFile(
+                        context,
+                        uri,
+                        groupDetailState.groupInfo.groupName
+                    )
+                }
+            })
 
     groupDetailViewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is GroupDetailSideEffect.Toast -> Toast.makeText(
-                context,
-                sideEffect.message,
-                Toast.LENGTH_SHORT
+                context, sideEffect.message, Toast.LENGTH_SHORT
             ).show()
         }
     }
@@ -124,9 +125,7 @@ fun GroupDetailScreen(
     fileUploadViewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is FileUploadSideEffect.Toast -> Toast.makeText(
-                context,
-                sideEffect.message,
-                Toast.LENGTH_SHORT
+                context, sideEffect.message, Toast.LENGTH_SHORT
             ).show()
         }
     }
@@ -145,8 +144,7 @@ fun GroupDetailScreen(
 
 
 
-    GroupDetailScreen(
-        groupId = groupId,
+    GroupDetailScreen(groupId = groupId,
         groupName = groupDetailState.groupInfo.groupName,
         isAdmin = groupDetailState.groupInfo.isAdmin,
         memberCount = (groupDetailState.groupInfo.groupMembers?.size?.plus(1)) ?: 1,
@@ -182,7 +180,7 @@ fun GroupDetailScreen(
         tempGroupName = groupDetailState.tempGroupName,
         tempGroupPassword = groupDetailState.tempGroupPassword,
 
-        selectedWorkDate=  groupDetailState.selectedWorkDate,
+        selectedWorkDate = groupDetailState.selectedWorkDate,
         setSelectedWorkDate = groupDetailViewModel::setSelectedWorkDate,
         getSelectedDateWork = groupDetailViewModel::getSelectedDateWork,
 
@@ -198,8 +196,7 @@ fun GroupDetailScreen(
         onClickCancel = groupDetailViewModel::onClickCancel,
         onClickManageMember = { groupId: Long -> onNavigateToMemberManageScreen(groupId) },
         exitGroup = groupDetailViewModel::exitGroup,
-        onClickFileUploader = { getFileLauncher.launch("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")}
-    )
+        onClickFileUploader = { getFileLauncher.launch("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") })
 }
 
 @Composable
@@ -216,7 +213,7 @@ private fun GroupDetailScreen(
     onNextClick: (LocalDate) -> Unit,
     onDateClick: (WeeklyUiModel.Date) -> Unit,
     selected: MutableState<String>,
-    setSelectedDate : (LocalDate?) -> Unit,
+    setSelectedDate: (LocalDate?) -> Unit,
     selectedDuty: List<Member>,
     copyInvitationLink: (Context) -> Unit,
     toggleMemberSelection: KFunction1<Member, Unit>,
@@ -230,15 +227,15 @@ private fun GroupDetailScreen(
     showSecondUploadBottomSheet: Boolean,
     setShowSecondUploadBottomSheet: (Boolean) -> Unit,
 
-    getSelectedDateWork : () -> Unit,
+    getSelectedDateWork: () -> Unit,
     selectedWorkDate: LocalDate?,
-    setSelectedWorkDate : (LocalDate?) -> Unit,
+    setSelectedWorkDate: (LocalDate?) -> Unit,
     showDateBottomSheet: Boolean,
     setShowDateBottomSheet: (Boolean) -> Unit,
     // 그룹 설정
     tempGroupName: String,
     tempGroupPassword: String,
-    customDutyList : Map<String, String>,
+    customDutyList: Map<String, String>,
     onChangeFileDay: (String) -> Unit,
     onChangeFileEVE: (String) -> Unit,
     onChangeFileNIGHT: (String) -> Unit,
@@ -271,8 +268,7 @@ private fun GroupDetailScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
-            BasicHeader(
-                hasArrow = true,
+            BasicHeader(hasArrow = true,
                 hasMore = true,
                 hasInvitationButton = true,
                 onClickBack = onClickBack,
@@ -308,8 +304,7 @@ private fun GroupDetailScreen(
                             openDialogExit.value = true
                         }
                     }
-                }
-            )
+                })
         }
         item {
             GroupInfoCard(
@@ -340,14 +335,18 @@ private fun GroupDetailScreen(
         }
         item {
             Spacer(modifier = Modifier.height(30.dp))
-            MemberCalendar(myWorkList = myWorkList, groupWorkList = groupWorkList, setShowDateBottomSheet = setShowDateBottomSheet, selectedWorkDate = selectedWorkDate)
+            MemberCalendar(
+                myWorkList = myWorkList,
+                groupWorkList = groupWorkList,
+                setShowDateBottomSheet = setShowDateBottomSheet,
+                selectedWorkDate = selectedWorkDate
+            )
         }
     }
 
     when {
         openDialogExit.value -> {
-            Dialog(
-                onDismissRequest = { openDialogExit.value = false },
+            Dialog(onDismissRequest = { openDialogExit.value = false },
                 onConfirmation = {
                     exitGroup()
                     openDialogExit.value = false
@@ -359,8 +358,7 @@ private fun GroupDetailScreen(
         }
 
         openDialogBoss.value -> {
-            Dialog(
-                onDismissRequest = { openDialogBoss.value = false },
+            Dialog(onDismissRequest = { openDialogBoss.value = false },
                 onConfirmation = { openDialogBoss.value = false },
                 dialogTitle = "그룹장은 탈퇴할 수 없습니다.",
                 dialogText = "새 그룹장을 선택 후 다시 시도해주세요."
@@ -389,22 +387,17 @@ private fun GroupDetailScreen(
     // 근무표 등록 바텀시트
     if (showUploadBottomSheet) {
         BottomSheet(
-            height = 300.dp,
+            height = 350.dp,
             showBottomSheet = showUploadBottomSheet,
             onDismiss = { setShowUploadBottomSheet(false) },
         ) {
-            SelectDateBottomSheetContent(
-                onDateTimeSelected = { date ->
-                    selectedDate = date
-                    setSelectedDate(date)
-//                    Log.d("upload", "selected ${selectedDate}")
-                },
-                onClickCancel = { setShowUploadBottomSheet(false) },
-                onClickNext = {
-                    setShowUploadBottomSheet(false)
-                    setShowSecondUploadBottomSheet(true)
-                }
-            )
+            SelectDateBottomSheetContent(onDateTimeSelected = { date ->
+                selectedDate = date
+                setSelectedDate(date)
+            }, onClickCancel = { setShowUploadBottomSheet(false) }, onClickNext = {
+                setShowUploadBottomSheet(false)
+                setShowSecondUploadBottomSheet(true)
+            })
         }
     }
 
@@ -414,29 +407,24 @@ private fun GroupDetailScreen(
             showBottomSheet = showDateBottomSheet,
             onDismiss = { setShowDateBottomSheet(false) },
         ) {
-            SelectDateBottomSheetContent(
-                onDateTimeSelected = { date ->
-                    selectedDate = date
-                    setSelectedWorkDate(date)
-                },
-                onClickCancel = { setShowDateBottomSheet(false) },
-                onClickNext = {
-                    getSelectedDateWork()
-                    setShowDateBottomSheet(false)
-                },
-                title = "조회할 근무 날짜를 선택하세요",
-                buttonText = "완료"
+            SelectDateBottomSheetContent(onDateTimeSelected = { date ->
+                selectedDate = date
+                setSelectedWorkDate(date)
+            }, onClickCancel = { setShowDateBottomSheet(false) }, onClickNext = {
+                getSelectedDateWork()
+                setShowDateBottomSheet(false)
+            }, title = "조회할 근무 날짜를 선택하세요", buttonText = "완료"
             )
         }
     }
 
     if (showSecondUploadBottomSheet) {
         BottomSheet(
-            height = 450.dp,
+            height = 500.dp,
             showBottomSheet = showBottomSheet,
             onDismiss = { setShowSecondUploadBottomSheet(false) },
         ) {
-            UploadFileBottomSheetContent(
+            UploadFileBottomSheetContent(groupName = groupName,
                 customDutyList = customDutyList,
                 onChangeFileDay = onChangeFileDay,
                 onChangeFileEVE = onChangeFileEVE,
@@ -444,10 +432,15 @@ private fun GroupDetailScreen(
                 onChangeFileOFF = onChangeFileOFF,
                 onClickCancel = { setShowSecondUploadBottomSheet(false) },
                 onClickUploadFile = {
-                    onClickFileUploader()
-                    setShowSecondUploadBottomSheet(false)
-                }
-            )
+
+                    if (customDutyList["DAY"] == "" || customDutyList["EVE"] == "" || customDutyList["NIGHT"] == "" || customDutyList["OFF"] == "") {
+                        Toast.makeText(context, "값을 입력해주세요", Toast.LENGTH_SHORT).show()
+                    } else {
+                        onClickFileUploader()
+                        setShowSecondUploadBottomSheet(false)
+                    }
+
+                })
         }
     }
 
@@ -455,7 +448,8 @@ private fun GroupDetailScreen(
 
 @Composable
 fun UploadFileBottomSheetContent(
-    customDutyList : Map<String, String>,
+    groupName: String,
+    customDutyList: Map<String, String>,
     onChangeFileDay: (String) -> Unit,
     onChangeFileEVE: (String) -> Unit,
     onChangeFileNIGHT: (String) -> Unit,
@@ -469,23 +463,27 @@ fun UploadFileBottomSheetContent(
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding(),
-        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
     ) {
         Column(
             modifier = Modifier
                 .width(320.widthPercent(context).dp)
                 .fillMaxHeight(),
-            horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.SpaceBetween
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Text(
                     text = "근무를 지정할 표기를 작성해주세요", style = Typography.headlineSmall.copy(
                         fontWeight = FontWeight.Bold, textAlign = TextAlign.Start
                     )
+                )
+                Text(
+                    text = "DAY,EVE,NIGHT,OFF 이외의 근무는 제외됩니다.", style = Typography.displayMedium, textAlign = TextAlign.Start
                 )
                 Row(
                     modifier = Modifier
@@ -606,11 +604,11 @@ fun UploadFileBottomSheetContent(
 
 @Composable
 fun SelectDateBottomSheetContent(
-    title : String = "업로드할 근무 날짜를 선택하세요",
+    title: String = "업로드할 근무 날짜를 선택하세요",
     onDateTimeSelected: (LocalDate) -> Unit,
     onClickNext: () -> Unit,
     onClickCancel: () -> Unit,
-    buttonText : String = "다음"
+    buttonText: String = "다음"
 ) {
     val context = LocalContext.current
 
@@ -618,13 +616,15 @@ fun SelectDateBottomSheetContent(
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding(),
-        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
     ) {
         Column(
             modifier = Modifier
                 .width(320.widthPercent(context).dp)
                 .fillMaxHeight(),
-            horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.SpaceBetween
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
                 text = title, style = Typography.headlineSmall.copy(
@@ -693,11 +693,13 @@ fun GroupBottomSheetContent(
 
     Column(
         modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         Column(
             modifier = Modifier.width(320.widthPercent(context).dp),
-            horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Center
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Center
         ) {
             Text(
                 text = "그룹 이름을 입력해주세요", style = Typography.headlineSmall.copy(
@@ -878,7 +880,8 @@ private fun MembersCard(
         modifier = Modifier
             .width(340.widthPercent(context).dp)
             .padding(8.dp, 15.dp, 8.dp, 0.dp),
-        verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.Start
     ) {
         Text(
             text = "함께 일할 동료는 누구일까요?",
@@ -948,7 +951,7 @@ private fun MembersCard(
 private fun MemberCalendar(
     myWorkList: Map<String, Map<String, String>>,
     groupWorkList: Map<String, Map<String, String>>,
-    setShowDateBottomSheet : (Boolean) -> Unit,
+    setShowDateBottomSheet: (Boolean) -> Unit,
     selectedWorkDate: LocalDate?
 ) {
     val currentYear = remember { mutableStateOf(Calendar.getInstance().get(Calendar.YEAR)) }
@@ -965,17 +968,22 @@ private fun MemberCalendar(
             .padding(8.dp, 15.dp, 8.dp, 0.dp)
     ) {
         Row(
-            modifier = Modifier,
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier, verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "${selectedWorkDate!!.year}.${selectedWorkDate.monthValue}", style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
+                text = "${selectedWorkDate!!.year}.${selectedWorkDate.monthValue}",
+                style = Typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
             )
-            
-            CustomIconButton(size = 24.dp, imageVector = ArrowDown, color = NaturalBlack, onClick = { setShowDateBottomSheet(true) })
+
+            CustomIconButton(size = 24.dp,
+                imageVector = ArrowDown,
+                color = NaturalBlack,
+                onClick = { setShowDateBottomSheet(true) })
         }
         Spacer(modifier = Modifier.height(10.dp))
-        GroupCalenar(currentYear = currentYear, currentMonth = currentMonth, myWorkList+groupWorkList)
+        GroupCalenar(
+            currentYear = currentYear, currentMonth = currentMonth, myWorkList + groupWorkList
+        )
     }
 }
 

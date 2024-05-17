@@ -17,16 +17,17 @@ class UploadDutyFileUseCaseImpl @Inject constructor(
     override suspend fun invoke(
         accessToken: String,
         groupId: Long,
+        groupName : String,
         dutyFileData: UploadDutyFile
     ): Result<String> = kotlin.runCatching{
 
         val requestParam = UploadDutyFileParam(
             date= dutyFileData.date,
+            groupName = groupName,
             dutyList = dutyFileData.dutyList,
             customWorkTag = dutyFileData.customWorkTag,
             day = dutyFileData.day
         )
-
         Log.d("upload", requestParam.toString())
         val response = groupService.uploadDutyFile(accessToken, groupId, requestParam.toRequestBody())
 

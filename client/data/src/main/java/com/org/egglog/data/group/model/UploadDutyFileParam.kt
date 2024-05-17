@@ -10,6 +10,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 
 @Serializable
 class UploadDutyFileParam(
+    val groupName : String,
     val date: String,
     val dutyList: List<FormattedFile>,
     val customWorkTag: DutyTag,
@@ -20,8 +21,6 @@ class UploadDutyFileParam(
     }
 
     override fun toString(): String {
-        return "UploadDutyFileParam(date='$date', dutyList=$dutyList, customWorkTag=$customWorkTag, day='$day')"
+        return "UploadDutyFileParam(groupName='$groupName', date='$date', dutyList=$dutyList, customWorkTag=$customWorkTag, day='$day')"
     }
-
-
 }

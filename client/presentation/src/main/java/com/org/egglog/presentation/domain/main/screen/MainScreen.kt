@@ -244,11 +244,11 @@ fun RemainCard(
         )
 
         Column(
-            modifier = Modifier.border(1.dp, Success400)
+            modifier = Modifier
         ) {
             RemainContentWebView(
                 width = 340,
-                height = 340,
+                height = 360,
                 url = "https://www.egg-log.org/remain",
                 data = remainData,
                 selected = selected

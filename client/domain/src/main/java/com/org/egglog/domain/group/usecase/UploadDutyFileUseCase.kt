@@ -7,6 +7,7 @@ interface UploadDutyFileUseCase {
     suspend operator fun invoke(
         accessToken: String,
         groupId : Long,
+        groupName : String,
         dutyFileData : UploadDutyFile
     ): Result<String>
 }

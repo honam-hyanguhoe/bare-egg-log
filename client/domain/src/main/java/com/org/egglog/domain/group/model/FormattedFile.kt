@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class FormattedFile(
     val employeeId: String,
     val name: String,
-    val work: Map<String, String>
+    val work: Map<String, String?>
 )
