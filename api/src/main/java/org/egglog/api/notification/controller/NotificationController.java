@@ -3,6 +3,7 @@ package org.egglog.api.notification.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.notification.model.dto.request.NotificationRequest;
+import org.egglog.api.notification.model.dto.request.NotificationSetListRequest;
 import org.egglog.api.notification.model.dto.response.NotificationResponse;
 import org.egglog.api.notification.model.service.NotificationService;
 import org.egglog.api.user.model.entity.User;
@@ -55,9 +56,9 @@ public class NotificationController {
     @PatchMapping("/update")
     public ResponseEntity<MessageUtils<List<NotificationResponse>>> setNotificationList(
             @AuthenticationPrincipal User loginUser,
-            @RequestBody List<NotificationRequest> requests
+            @RequestBody NotificationSetListRequest requests
     ){
-        return ResponseEntity.ok().body(MessageUtils.success(notificationService.updateNotification(requests, loginUser)));
+        return ResponseEntity.ok().body(MessageUtils.success(notificationService.updateNotification(requests.getNotificationSetList(), loginUser)));
     }
 
 }
