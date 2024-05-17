@@ -18,6 +18,7 @@ import com.org.egglog.presentation.domain.main.viewModel.StaticSideEffect
 import com.org.egglog.presentation.domain.main.viewModel.StaticState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -51,6 +52,16 @@ class GroupListViewModel @Inject constructor(
 
     private val _showBottomSheet = MutableStateFlow(false)
     val showBottomSheet: StateFlow<Boolean> = _showBottomSheet.asStateFlow()
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
+    fun refreshSomething() = intent {
+        _isLoading.value = true
+        delay(1000L)
+        _isLoading.value = false
+
+        getGroupList()
+    }
 
     fun setShowBottomSheet(show: Boolean) {
         _showBottomSheet.value = show

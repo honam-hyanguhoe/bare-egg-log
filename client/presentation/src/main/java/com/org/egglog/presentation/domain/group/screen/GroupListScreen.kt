@@ -50,6 +50,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
+import com.google.accompanist.swiperefresh.SwipeRefreshState
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.org.egglog.domain.group.model.Group
 import com.org.egglog.presentation.component.atoms.buttons.GroupButton
 import com.org.egglog.presentation.component.atoms.buttons.HalfBigButton
@@ -130,17 +134,9 @@ fun GroupListScreen(
         }
     }
 
-//    val pullToRefreshState = rememberPullToRefreshState()
-//    var isRefreshing by remember { mutableStateOf(false) }
-//
-//    val refresh = @androidx.compose.runtime.Composable {
-//        isRefreshing = true
-//        LaunchedEffect(Unit) {
-//            delay(2000)
-//            isRefreshing = false
-//        }
-//    }
 
+    val isLoading by groupListViewModel.isLoading.collectAsState()
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isLoading)
 
     GroupListScreen(
         groupList = groupListState.groupList,
@@ -153,7 +149,9 @@ fun GroupListScreen(
         onGroupNameChange = groupListViewModel::onChangeGroupName,
         onGroupPasswordChange = groupListViewModel::onChangeGroupPassword,
         createGroup = groupListViewModel::createGroup,
-        onClickGroup = { groupId: Long -> onNavigateToGroupDetailScreen(groupId) }
+        onClickGroup = { groupId: Long -> onNavigateToGroupDetailScreen(groupId) },
+        swipeRefreshState = swipeRefreshState,
+        refreshSomething = groupListViewModel::refreshSomething,
     )
 }
 
@@ -170,10 +168,11 @@ private fun GroupListScreen(
     onGroupNameChange: (String) -> Unit,
     onGroupPasswordChange: (String) -> Unit,
     createGroup: () -> Unit,
-    onClickGroup: (groupId: Long) -> Unit
+    onClickGroup: (groupId: Long) -> Unit,
+    swipeRefreshState: SwipeRefreshState,
+    refreshSomething: () -> Unit
 ) {
 
-//    val focusManager = LocalFocusManager.current
     Column(
         modifier = Modifier
             .background(NaturalWhite)
@@ -185,63 +184,79 @@ private fun GroupListScreen(
         verticalArrangement = Arrangement.SpaceBetween
     ) {
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.9f),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+        SwipeRefresh(
+            state = swipeRefreshState,
+            onRefresh = refreshSomething,
+            indicator = { state, refreshTrigger ->
+                SwipeRefreshIndicator(
+                    state = state,
+                    refreshTriggerDistance = refreshTrigger,
+                    backgroundColor = NaturalBlack,
+                    contentColor = NaturalWhite
+                )
+            }
         ) {
-            Spacer(modifier = Modifier.height(5.dp))
-            NoticeHeader(title = "그룹", horizontalPadding = 20, verticalPadding = 10)
-            Spacer(modifier = Modifier.height(5.dp))
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.9f),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(5.dp)
+                verticalArrangement = Arrangement.Top
             ) {
-                items(groupList) { group ->
-                    GroupButton(
-                        onClick = { onClickGroup(group.groupId) },
-                        groupMaster = group.admin,
-                        groupName = group.groupName,
-                        memberCnt = group.memberCount,
-                        groupId = group.groupId,
-                        groupImage = group.groupImage
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
-                item {
-                    MiddleButton(
-                        onClick = {
-                            Log.d("groupList", "클릭")
-                            setShowBottomSheet(true)
-                        }, colors = ButtonColors(
-                            contentColor = Warning25,
-                            containerColor = Warning300,
-                            disabledContentColor = Gray25,
-                            disabledContainerColor = Gray300
+                Spacer(modifier = Modifier.height(5.dp))
+                NoticeHeader(title = "그룹", horizontalPadding = 20, verticalPadding = 10)
+                Spacer(modifier = Modifier.height(5.dp))
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(5.dp)
+                ) {
+                    items(groupList) { group ->
+                        GroupButton(
+                            onClick = { onClickGroup(group.groupId) },
+                            groupMaster = group.admin,
+                            groupName = group.groupName,
+                            memberCnt = group.memberCount,
+                            groupId = group.groupId,
+                            groupImage = group.groupImage
                         )
-                    ) {
-                        Row(
-                            Modifier.fillMaxSize(),
-                            Arrangement.SpaceBetween,
-                            Alignment.CenterVertically
-                        ) {
-                            Text(
-                                style = Typography.displayLarge, text = "그룹을 만들고 동료를 초대해보세요"
-                            )
-                            Icon(
-                                AddBox,
-                                Modifier.size(24.widthPercent(LocalContext.current).dp),
-                                NaturalWhite
-                            )
-                        }
+                        Spacer(modifier = Modifier.height(10.dp))
                     }
-                    Spacer(modifier = Modifier.height(50.dp))
+                    item {
+                        MiddleButton(
+                            onClick = {
+                                Log.d("groupList", "클릭")
+                                setShowBottomSheet(true)
+                            }, colors = ButtonColors(
+                                contentColor = Warning25,
+                                containerColor = Warning300,
+                                disabledContentColor = Gray25,
+                                disabledContainerColor = Gray300
+                            )
+                        ) {
+                            Row(
+                                Modifier.fillMaxSize(),
+                                Arrangement.SpaceBetween,
+                                Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    style = Typography.displayLarge, text = "그룹을 만들고 동료를 초대해보세요"
+                                )
+                                Icon(
+                                    AddBox,
+                                    Modifier.size(24.widthPercent(LocalContext.current).dp),
+                                    NaturalWhite
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(50.dp))
+                    }
                 }
             }
+
         }
+
         BottomNavigator(selectedItem = selectedIdx, onItemSelected = { onSelectedIdx(it) })
     }
 
@@ -277,12 +292,16 @@ fun BottomSheetContent(
     val focusManager = LocalFocusManager.current
 
     Column(
-        modifier = Modifier.fillMaxWidth().navigationBarsPadding(),
-        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         Column(
             modifier = Modifier.width(320.widthPercent(context).dp),
-            horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Center
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Center
         ) {
             Text(
                 text = "그룹 이름을 입력해주세요", style = Typography.headlineSmall.copy(
