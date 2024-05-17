@@ -68,6 +68,11 @@ public class WorkType {
         return this;
     }
 
+    public WorkType delete(){
+        this.workTag = WorkTag.DELETE;
+        return this;
+    }
+
     public Alarm makeDefaultAlarm(){
         return Alarm.builder()
                 .alarmTime(this.startTime.minusHours(1))
