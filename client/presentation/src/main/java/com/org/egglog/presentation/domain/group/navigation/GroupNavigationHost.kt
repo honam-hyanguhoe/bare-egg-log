@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.org.egglog.presentation.domain.group.activity.GroupActivity
 import com.org.egglog.presentation.domain.group.screen.GroupListScreen
 import com.org.egglog.presentation.domain.group.screen.GroupDetailScreen
 import com.org.egglog.presentation.domain.group.screen.InvitationScreen
@@ -22,7 +23,8 @@ import com.org.egglog.presentation.domain.group.screen.MemberManageScreen
 fun GroupNavigationHost(
     deepLinkUri: Uri?,
     groupName: String?,
-    code: String?
+    code: String?,
+    groupId : Long?
 ) {
     val navController = rememberNavController()
     val context = LocalContext.current
@@ -30,11 +32,26 @@ fun GroupNavigationHost(
     LaunchedEffect(deepLinkUri) {
         deepLinkUri?.let {
             Log.d("Invite Link", "gnh $deepLinkUri")
-            if (code != null && groupName != null) {
-                navController.navigate(it.toString())
-            } else {
-                // 그룹 리스트로 이동
-//                navController.navigate()
+            val pathSegments = it.pathSegments
+
+            if(pathSegments[0] == "invite"){
+                if (code != null && groupName != null) {
+                    navController.navigate(it.toString())
+                } else {
+                    navController.navigate(GroupRoute.GroupListScreen.name)
+                }
+            }else if(pathSegments[0] == "groups"){
+                if (pathSegments.size > 1) {
+                    val groupId = pathSegments[1]
+                    Log.d("deep", "groupId $groupId")
+                    navController.navigate(
+                        route = "${GroupRoute.GroupDetailScreen.name}/$groupId"
+                    )
+                } else {
+                    Log.d("deep", "groupList로 이동")
+                    navController.navigate(GroupRoute.GroupListScreen.name)
+                }
+
             }
         }
     }
