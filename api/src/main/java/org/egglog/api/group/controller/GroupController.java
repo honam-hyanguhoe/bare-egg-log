@@ -60,7 +60,7 @@ public class GroupController {
      * @author 김다희
      */
     @GetMapping("/duty")
-    public ResponseEntity<MessageUtils> getDutyDataList(
+    public ResponseEntity<MessageUtils<List<GroupDutyDto>>> getDutyDataList(
             @AuthenticationPrincipal User user,
             @PathParam("date") String date){
         return ResponseEntity.ok().body(MessageUtils.success(groupService.getGroupDutyList(user, date)));

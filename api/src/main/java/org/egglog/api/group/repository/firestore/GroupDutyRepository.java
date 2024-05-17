@@ -38,7 +38,7 @@ public class GroupDutyRepository {
 
         //custom work tag 관련 작업
         //기존 값 유지
-        if(!currentCustomWorkTag.isEmpty()){
+        if(currentCustomWorkTag!=null){
             if(customWorkTag.getDay().isEmpty()) customWorkTag.setDay(currentCustomWorkTag.getDay());
             if(customWorkTag.getEve().isEmpty()) customWorkTag.setEve(currentCustomWorkTag.getEve());
             if(customWorkTag.getNight().isEmpty()) customWorkTag.setNight(currentCustomWorkTag.getNight());
@@ -116,7 +116,7 @@ public class GroupDutyRepository {
             // convert document to POJO
             return document.toObject(CustomWorkTag.class);
         }
-        return new CustomWorkTag();
+        return null;
     }
 
     public List<GroupDutyDto> getDutyListByGroupIdList(List<Long> groupList, String date) throws ExecutionException, InterruptedException {
@@ -137,15 +137,8 @@ public class GroupDutyRepository {
                 GroupDutySaveFormat duty = doc.toObject(GroupDutySaveFormat.class);
                 if(duty != null){
                     GroupDutyDto dutyDto = GroupDutyDto.builder()
-                            .day(duty.getDay())
+                            .date(duty.getDay())
                             .userName(duty.getUserName())
-                            .dutyData(GroupDutyDataDto.builder()
-//                                    .dutyList(duty.getDutyList())
-                                    .customWorkTag(duty.getCustomWorkTag())
-                                    .groupId(String.valueOf(groupId))
-                                    .date(date)
-                                    .index(doc.getId())
-                                    .build())
                             .build();
                     groupDutyList.add(dutyDto);
                 }
