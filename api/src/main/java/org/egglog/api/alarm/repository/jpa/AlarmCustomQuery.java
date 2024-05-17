@@ -9,4 +9,6 @@ public interface AlarmCustomQuery {
     Optional<List<Alarm>> findAlarmListByUserId(Long userId);
     Optional<Alarm> findWithUserAndWorkTypeById(Long userId);
     Optional<Alarm> findWithUserById(Long userId);
+
+    Optional<Alarm> findByWorkTypeId(Long workTypeId);
 }

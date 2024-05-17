@@ -2,6 +2,7 @@ package org.egglog.api.worktype.model.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.egglog.api.alarm.model.entity.Alarm;
 import org.egglog.api.alarm.model.service.AlarmService;
 import org.egglog.api.alarm.repository.jpa.AlarmRepository;
 import org.egglog.api.user.model.entity.User;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.egglog.api.worktype.exception.WorkTypeErrorCode.*;
@@ -62,6 +64,10 @@ public class WorkTypeService {
             throw new WorkTypeException(ACCESS_DENIED);
         }
         workTypeJpaRepository.delete(workType);
+        Optional<Alarm> byWorkTypeId = alarmRepository.findByWorkTypeId(workTypeId);
+        if (byWorkTypeId.isPresent()) {
+            alarmRepository.delete(byWorkTypeId.get());
+        }
     }
 
     @Transactional

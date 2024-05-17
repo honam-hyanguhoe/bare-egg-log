@@ -48,4 +48,12 @@ public class AlarmCustomQueryImpl implements AlarmCustomQuery {
                 .where(alarm.id.eq(alarmId))
                 .fetchOne();
     }
+
+    @Override
+    public Optional<Alarm> findByWorkTypeId(Long workTypeId) {
+        return Optional.of(jpaQueryFactory
+                .selectFrom(alarm)
+                .where(alarm.workType.id.eq(workTypeId))
+                .fetchOne());
+    }
 }
