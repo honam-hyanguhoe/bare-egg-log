@@ -15,7 +15,8 @@ public enum UserErrorCode implements ErrorFormat {
     DELETED_USER("탈퇴한 회원입니다.", BAD_REQUEST),
     INACTIVE_USER("휴먼 회원입니다.", BAD_REQUEST),
     ACCESS_DENIED("권한이 없습니다.", BAD_REQUEST),
-    ALREADY_IN_EMAIL("이미 존재하는 이메일 입니다.", BAD_REQUEST);
+    ALREADY_IN_EMAIL("이미 존재하는 이메일 입니다.", BAD_REQUEST),
+    JOIN_USER("이미 가입한 회원입니다.", BAD_REQUEST);
 
     private final String message;
     private final HttpStatus httpStatus;

@@ -2,6 +2,7 @@ package org.egglog.api.worktype.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.egglog.api.alarm.model.entity.Alarm;
 import org.egglog.api.user.model.entity.User;
 import org.egglog.api.worktype.model.dto.response.WorkTypeResponse;
 
@@ -65,5 +66,16 @@ public class WorkType {
         this.startTime = startTime!=null ? startTime : this.startTime;
         this.workTime = workTime!=null ? workTime : this.workTime;
         return this;
+    }
+
+    public Alarm makeDefaultAlarm(){
+        return Alarm.builder()
+                .alarmTime(this.startTime.minusHours(1))
+                .replayTime(5)
+                .replayCnt(5)
+                .isAlarmOn(false)
+                .workType(this)
+                .user(this.user)
+                .build();
     }
 }
