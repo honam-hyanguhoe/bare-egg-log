@@ -4,5 +4,5 @@ import org.egglog.api.global.util.converter.NormalizeEnumCase;
 
 @NormalizeEnumCase
 public enum WorkTag {
-    DAY, EVE, NIGHT, OFF, ETC
+    DAY, EVE, NIGHT, OFF, ETC, DELETE
 }

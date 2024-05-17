@@ -1,6 +1,7 @@
 package org.egglog.api.group.model.dto.request;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 

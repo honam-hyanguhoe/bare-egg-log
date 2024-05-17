@@ -75,7 +75,7 @@ public class WorkTypeController {
      * @return deleted massage
      * @author 김형민
      */
-    @DeleteMapping("/{workTypeId}")
+    @PatchMapping("/{workTypeId}")
     public ResponseEntity<MessageUtils> deleteWorkType(
             @AuthenticationPrincipal User loginUser,
             @PathVariable Long workTypeId

@@ -1,24 +1,24 @@
-package org.egglog.api.group.model.dto.response;
+package org.egglog.api.group.model.dto.request;
 
 import lombok.Data;
-import lombok.experimental.SuperBuilder;
+
+import java.util.Map;
 
 /**
  * ```
  * ===================[Info]=========================
  * packageName    : org.egglog.api.group.model.dto.request
- * fileName      : GroupDutyDto
+ * fileName      : DutyFormat
  * description    :
  * =================================================
  * ```
  * |DATE|AUTHOR|NOTE|
  * |:---:|:---:|:---:|
- * |2024-05-16|김다희|최초 생성|
+ * |2024-05-17|김다희|최초 생성|
  */
 @Data
-@SuperBuilder
-public class GroupDutyDto {
-    private String date;
-    private String userName;
-    private Index index;
+public class DutyFormat {
+    private String employeeId;
+    private String name;
+    private Map<String, String> work;
 }

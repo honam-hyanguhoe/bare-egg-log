@@ -4,6 +4,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.egglog.api.user.model.entity.QUser;
 import org.egglog.api.worktype.model.entity.QWorkType;
+import org.egglog.api.worktype.model.entity.WorkTag;
 import org.egglog.api.worktype.model.entity.WorkType;
 import org.springframework.stereotype.Repository;
 
@@ -28,16 +29,17 @@ import static org.egglog.api.worktype.model.entity.QWorkType.workType;
 @Repository
 @RequiredArgsConstructor
 public class WorkTypeQueryRepositoryImpl implements WorkTypeQueryRepository {
+
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<WorkType> findListWithUserById(Long workTypeId) {
+    public List<WorkType> findListByUserId(Long userId) {
         return jpaQueryFactory
                 .selectFrom(workType)
-                .leftJoin(workType.user, user).fetchJoin()
-                .where(workType.id.eq(workTypeId))
+                .where(workType.user.id.eq(userId).and(workType.workTag.ne(WorkTag.DELETE)))
                 .fetch();
     }
+
 
     @Override
     public Optional<WorkType> findWithUserById(Long workTypeId) {

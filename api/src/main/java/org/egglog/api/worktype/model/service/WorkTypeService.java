@@ -56,14 +56,11 @@ public class WorkTypeService {
         log.debug(" ==== ==== ==== [ 근무 타입 삭제 서비스 실행 ] ==== ==== ==== ");
         WorkType workType = workTypeJpaRepository.findWithUserById(workTypeId)
                 .orElseThrow(() -> new WorkTypeException(NO_EXIST_WORKTYPE));
-        log.debug(" ==== ==== ==== [ workType.getWorkTag().equals(WorkTag.ETC) : {} ] ==== ==== ==== ", workType.getWorkTag().equals(WorkTag.ETC));
-        log.debug(" ==== ==== ==== [ workType.getWorkTag().name().equals(WorkTag.ETC.name()) : {} ] ==== ==== ==== ", workType.getWorkTag().name().equals(WorkTag.ETC.name()));
-        log.debug(" ==== ==== ==== [ workType.getUser().equals(loginUser)) : {} ] ==== ==== ==== ", workType.getUser().equals(loginUser));
-        log.debug(" ==== ==== ==== [ workType.getUser().getId()==loginUser.getId() : {} ] ==== ==== ==== ", workType.getUser().getId()==loginUser.getId());
-        if (!(workType.getWorkTag().equals(WorkTag.ETC)) || (workType.getUser().getId()!=loginUser.getId())) {
+
+        if ( workType.getWorkTag().equals(WorkTag.DELETE) || !(workType.getWorkTag().equals(WorkTag.ETC)) || (workType.getUser().getId()!=loginUser.getId())) {
             throw new WorkTypeException(ACCESS_DENIED);
         }
-        workTypeJpaRepository.delete(workType);
+        workTypeJpaRepository.save(workType.delete());
         Optional<Alarm> byWorkTypeId = alarmRepository.findByWorkTypeId(workTypeId);
         if (byWorkTypeId.isPresent()) {
             alarmRepository.delete(byWorkTypeId.get());
@@ -73,7 +70,7 @@ public class WorkTypeService {
     @Transactional
     public List<WorkTypeResponse> getWorkTypeList(User loginUser){
         log.debug(" ==== ==== ==== [ 근무 타입 리스트 조회 서비스 실행 ] ==== ==== ====");
-        return workTypeJpaRepository.findWorkTypesByUserId(loginUser.getId())
+        return workTypeJpaRepository.findListByUserId(loginUser.getId())
                 .stream()
                 .map(WorkType::toResponse)
                 .collect(Collectors.toList());

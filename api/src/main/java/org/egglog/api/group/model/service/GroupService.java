@@ -30,6 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -325,12 +327,12 @@ public class GroupService {
     public void addDuty(User user, Long groupId, GroupDutyData groupDutyData) {
         if(groupMemberService.isGroupMember(groupId,user.getId())){
             try {
-                groupDutyData.setUserName(user.getName());
+                //출력을 위한 날짜 데이터
                 SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
                 Date now = new Date();
                 String nowDay = dayFormat.format(now);
-                groupDutyData.setDay(nowDay);
-                groupDutyRepository.saveDuty(groupId,groupDutyData);
+                groupDutyRepository.saveDuty(user.getName(),groupId,groupDutyData,nowDay);
+                notificationService.excelDutyUploadNotification(groupId, groupDutyData);
             }catch (Exception e){
                 throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
             }
@@ -362,7 +364,8 @@ public class GroupService {
     public CustomWorkTag getGroupWorkTags(User user, Long groupId) {
         if(groupMemberService.isGroupMember(groupId, user.getId())){
             try {
-                return groupDutyRepository.getGroupWorkTag(groupId);
+                CustomWorkTag customWorkTag = groupDutyRepository.getGroupWorkTag(groupId);
+                return customWorkTag==null? new CustomWorkTag() : customWorkTag;
             } catch (Exception e){
                 throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
             }

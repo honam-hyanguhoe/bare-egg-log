@@ -5,10 +5,12 @@ import com.google.cloud.firestore.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.group.model.dto.request.CustomWorkTag;
+import org.egglog.api.group.model.dto.request.DutyFormat;
 import org.egglog.api.group.model.dto.request.GroupDutyData;
 import org.egglog.api.group.model.dto.request.GroupDutySaveFormat;
 import org.egglog.api.group.model.dto.response.GroupDutyDataDto;
 import org.egglog.api.group.model.dto.response.GroupDutyDto;
+import org.egglog.api.group.model.dto.response.Index;
 import org.egglog.api.worktype.model.entity.WorkTag;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
@@ -23,33 +25,52 @@ import java.util.stream.Collectors;
 public class GroupDutyRepository {
     private final Firestore firestore;
 
-    public void saveDuty(Long groupId, GroupDutyData groupDutyData) throws ExecutionException, InterruptedException {
+
+    public void saveDuty(String userName, Long groupId, GroupDutyData groupDutyData, String nowDay) throws ExecutionException, InterruptedException {
         CollectionReference collection = firestore.collection("duty")
                 .document(String.valueOf(groupId))
                 .collection(groupDutyData.getDate());
+
         log.debug("====== countQuery start ======");
         Long count = collection.count().get().get().getCount();
         CustomWorkTag customWorkTag = groupDutyData.getCustomWorkTag();
+        CustomWorkTag currentCustomWorkTag = getGroupWorkTag(groupId);
+
         //custom work tag 관련 작업
-        if (customWorkTag.getDay().isEmpty()&&customWorkTag.getEve().isEmpty()&&customWorkTag.getNight().isEmpty()&&customWorkTag.getOff().isEmpty()) {
-            log.debug("getCustomWorkTag");
-            groupDutyData.setCustomWorkTag(getGroupWorkTag(groupId));
-        } else {
-            log.debug("saveCustomWorkTag");
-            saveGroupWorkTag(groupId, groupDutyData.getCustomWorkTag());
+        //기존 값 유지
+        if(currentCustomWorkTag!=null){
+            if(customWorkTag.getDay().isEmpty()) customWorkTag.setDay(currentCustomWorkTag.getDay());
+            if(customWorkTag.getEve().isEmpty()) customWorkTag.setEve(currentCustomWorkTag.getEve());
+            if(customWorkTag.getNight().isEmpty()) customWorkTag.setNight(currentCustomWorkTag.getNight());
+            if(customWorkTag.getOff().isEmpty()) customWorkTag.setOff(currentCustomWorkTag.getOff());
         }
-        log.debug("===== save data =====");
+        saveGroupWorkTag(groupId, customWorkTag);
+        groupDutyData.setCustomWorkTag(customWorkTag);
+
+        //duty list 가공
+        List<DutyFormat> dutyFormatList = groupDutyData.getDutyList();
+        Map<String, DutyFormat> dutyList = new HashMap<>();
+        for(DutyFormat dutyFormat : dutyFormatList){
+            if(dutyFormat.getEmployeeId()!=null){
+                dutyList.put(dutyFormat.getEmployeeId(), dutyFormat);
+            }
+        }
+
 
         //데이터 삽입 쿼리
+        log.debug("===== save data =====");
         try {
             GroupDutySaveFormat groupDutySaveFormat = GroupDutySaveFormat.builder()
-                    .day(groupDutyData.getDay())
-                    .userName(groupDutyData.getUserName())
+                    .day(nowDay)
+                    .userName(userName)
                     .customWorkTag(groupDutyData.getCustomWorkTag())
-                    .dutyList(groupDutyData.toMap())
+                    .dutyList(dutyList)
                     .build();
 
-            log.debug(groupDutySaveFormat.toString());
+            log.debug("path {}/{}/{}/{}","duty",groupId,groupDutyData.getDate(),count);
+            if(count==null){
+                count = 0L;
+            }
 
             ApiFuture<WriteResult> apiFuture = firestore
                     .collection("duty")
@@ -98,7 +119,7 @@ public class GroupDutyRepository {
             // convert document to POJO
             return document.toObject(CustomWorkTag.class);
         }
-        return new CustomWorkTag();
+        return null;
     }
 
     public List<GroupDutyDto> getDutyListByGroupIdList(List<Long> groupList, String date) throws ExecutionException, InterruptedException {
@@ -119,15 +140,9 @@ public class GroupDutyRepository {
                 GroupDutySaveFormat duty = doc.toObject(GroupDutySaveFormat.class);
                 if(duty != null){
                     GroupDutyDto dutyDto = GroupDutyDto.builder()
-                            .day(duty.getDay())
+                            .date(duty.getDay())
                             .userName(duty.getUserName())
-                            .dutyData(GroupDutyDataDto.builder()
-                                    .dutyList(duty.getDutyList())
-                                    .customWorkTag(duty.getCustomWorkTag())
-                                    .groupId(String.valueOf(groupId))
-                                    .date(date)
-                                    .index(doc.getId())
-                                    .build())
+                            .index(new Index(String.valueOf(groupId),date, doc.getId()))
                             .build();
                     groupDutyList.add(dutyDto);
                 }

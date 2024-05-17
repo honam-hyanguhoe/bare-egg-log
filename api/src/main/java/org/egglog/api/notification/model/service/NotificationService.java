@@ -10,6 +10,7 @@ import org.egglog.api.board.model.entity.Board;
 import org.egglog.api.board.model.entity.BoardType;
 import org.egglog.api.board.model.entity.Comment;
 import org.egglog.api.board.repository.jpa.comment.CommentRepository;
+import org.egglog.api.group.model.dto.request.GroupDutyData;
 import org.egglog.api.group.model.dto.response.GroupPreviewDto;
 import org.egglog.api.group.model.entity.Group;
 import org.egglog.api.group.model.entity.GroupMember;
@@ -28,6 +29,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -303,15 +306,17 @@ public class NotificationService {
     }
 
     @Transactional
-    public void excelDutyUploadNotification(Group group){
+    public void excelDutyUploadNotification(Long groupId, GroupDutyData groupData){
+        int month = YearMonth.parse(groupData.getDate(), DateTimeFormatter.ofPattern("yyyy-MM")).getMonthValue();
+        String groupName = groupData.getGroupName();
         //그룹에 엑셀 동기화 파일이 등록되었다면 푸시알림 발송
         FCMTopic topic = FCMTopic.builder()
                 .topic(TopicEnum.GROUP)
-                .topicId(group.getId())
+                .topicId(groupId)
                 .build();
         Notification notification = Notification.builder()
                 .setTitle("개이득주의! 새 근무 파일이 날라왔어요")
-                .setBody(group.getGroupName()+" 그룹에 "+"월 근무표가 업로드 되었습니다.")
+                .setBody(groupName+" 그룹에 "+month+"월 근무표가 업로드 되었습니다.")
                 .build();
         fcmService.sendNotificationToTopic(topic, notification);
     }
