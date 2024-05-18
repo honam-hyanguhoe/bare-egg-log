@@ -182,6 +182,8 @@ class MyCalendarViewModel @Inject constructor(
                     calendarGroupId.toLong()
                 ).getOrThrow()
 
+                Log.e("myCalendar", calendarGroupId)
+
                 val updateMonthlyPersonalList = monthlyPersonalList.map { personalScheduleData ->
                     val updatedEventList = personalScheduleData.eventList.map { event ->
                         if (event.calendarGroupId != userInfo!!.workGroupId) {
