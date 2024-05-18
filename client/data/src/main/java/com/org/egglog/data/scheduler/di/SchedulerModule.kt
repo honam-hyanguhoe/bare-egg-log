@@ -1,6 +1,7 @@
 package com.org.egglog.data.scheduler.di
 
 import android.app.AlarmManager
+import android.app.NotificationManager
 import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.WorkManager
@@ -63,6 +64,12 @@ abstract class SchedulerModule {
         @Singleton
         fun provideAlarmManager(@ApplicationContext context: Context): AlarmManager {
             return context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        }
+
+        @Provides
+        @Singleton
+        fun provideNotificationManager(@ApplicationContext context: Context): NotificationManager {
+            return context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         }
 
         @Provides

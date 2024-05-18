@@ -22,6 +22,7 @@ import com.org.egglog.domain.myCalendar.usecase.GetWorkListUseCase
 import com.org.egglog.domain.myCalendar.usecase.GetWorkTypeListUseCase
 import com.org.egglog.domain.myCalendar.usecase.ModifyPersonalScheduleUseCase
 import com.org.egglog.domain.scheduler.usecase.GetAlarmFindListUseCase
+import com.org.egglog.domain.scheduler.usecase.NotificationUseCase
 import com.org.egglog.domain.scheduler.usecase.SchedulerUseCase
 import com.org.egglog.domain.setting.model.CalendarGroup
 import com.org.egglog.domain.setting.usecase.GetCalendarGroupListUseCase
@@ -61,6 +62,7 @@ class MyCalendarViewModel @Inject constructor(
     private val modifyPersonalScheduleUseCase: ModifyPersonalScheduleUseCase,
     private val getCalendarGroupMapStoreUseCase: GetCalendarGroupMapStoreUseCase,
     private val getAlarmFindListUseCase: GetAlarmFindListUseCase,
+    private val notificationUseCase: NotificationUseCase,
     private val schedulerUseCase: SchedulerUseCase,
     private val getCalendarGroupListUseCase: GetCalendarGroupListUseCase
 ) : ViewModel(), ContainerHost<MyCalenderState, MyCalendarSideEffect> {
@@ -248,6 +250,11 @@ class MyCalendarViewModel @Inject constructor(
         }
     }
 
+    private fun stringToLocalDateTime(dateTimeString: String): LocalDateTime {
+        return LocalDateTime.parse(dateTimeString, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+    }
+
+
     fun onSubmitPersonalSchedule() = intent {
         val response = createPersonalScheduleUseCase(
             "Bearer $accessToken",
@@ -258,12 +265,21 @@ class MyCalendarViewModel @Inject constructor(
             userInfo!!.workGroupId!!
         )
         if (response.isSuccess) {
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            val list = getPersonalScheduleUseCase(
+                "Bearer $accessToken",
+                LocalDate.now().plusDays(0).format(formatter),
+                LocalDate.now().plusDays(1).format(formatter),
+                userInfo!!.id,
+                userInfo!!.workGroupId!!
+            ).getOrThrow()
+            list.map { dateList ->
+                dateList.eventList.map { notificationUseCase.setNotification(it.eventId, stringToLocalDateTime(it.startDate).minusMinutes(30L)) }
+            }
             postSideEffect(MyCalendarSideEffect.Toast("등록되었습니다!"))
         } else {
             postSideEffect(MyCalendarSideEffect.Toast("등록에 실패했습니다\n다시 시도해주세요"))
         }
-
-
 
         getPersonalList()
 
@@ -632,6 +648,7 @@ class MyCalendarViewModel @Inject constructor(
         val response = deletePersonalScheduleUseCase("Bearer $accessToken", eventId)
 
         if (response.isSuccess) {
+            notificationUseCase.cancelAlarm(eventId)
             postSideEffect(MyCalendarSideEffect.Toast("삭제되었습니다"))
             getPersonalList()
         } else {
@@ -667,6 +684,8 @@ class MyCalendarViewModel @Inject constructor(
         )
 
         if (response.isSuccess) {
+            // 오늘 혹은 내일 날짜
+            if(state.startTime.minusMinutes(30L) > LocalDateTime.now() && state.startTime.dayOfMonth < LocalDateTime.now().dayOfMonth + 2) notificationUseCase.setNotification(eventId, state.startTime.minusMinutes(30L))
             postSideEffect(MyCalendarSideEffect.Toast("수정 되었습니다!"))
             getPersonalList()
         } else {
