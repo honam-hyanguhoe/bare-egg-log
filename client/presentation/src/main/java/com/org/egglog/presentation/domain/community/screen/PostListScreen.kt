@@ -280,7 +280,8 @@ private fun PostListScreen(
 
                             if (hotPostList.isNotEmpty()) {
                                 items(count = hotPostList.size,
-                                    key = { index -> "0${hotPostList[index].postId}" }) { index ->
+//                                    key = { index -> "0${hotPostList[index].postId}" }) { index ->
+                                    key = { index -> index }) { index ->
                                     val tempNickname = hotPostList[index].name ?: "익명의 구운란"
                                     HotPostCard(postInfo = hotPostList[index].copy(name = tempNickname),
                                         onClickPost = { postId -> onClickPost(postId) })

@@ -86,6 +86,10 @@ dependencies {
     implementation(libs.room.paging)
     kapt(libs.room.compiler)
 
+    // workmanager
+    implementation(libs.work.runtime.ktx)
+    implementation(libs.hilt.workder)
+
     implementation(project(":presentation"))
     implementation(project(":domain"))
 }

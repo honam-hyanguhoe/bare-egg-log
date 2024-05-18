@@ -78,6 +78,12 @@
 
         <receiver android:name=".receiver.AlarmBroadcastReceiver"/>
         <receiver android:name=".receiver.StopServiceReceiver"/>
+
+        <service android:name=".receiver.NotificationForegroundService"
+            android:foregroundServiceType="mediaPlayback"
+            android:permission="android.permission.FOREGROUND_SERVICE" />
+
+        <receiver android:name=".receiver.NotificationBroadcastReceiver"/>
     </application>
 
 </manifest>

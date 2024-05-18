@@ -9,6 +9,7 @@ import com.org.egglog.data.main.service.WorkService
 import com.org.egglog.data.community.service.CommunityService
 import com.org.egglog.data.group.service.GroupService
 import com.org.egglog.data.myCalendar.service.MyCalendarService
+import com.org.egglog.data.scheduler.service.AlarmService
 import com.org.egglog.data.setting.service.SettingService
 import dagger.Module
 import dagger.Provides
@@ -92,5 +93,10 @@ class RetrofitModule {
     @Provides
     fun provideMyCalendarService(retrofit: Retrofit): MyCalendarService {
         return retrofit.create(MyCalendarService::class.java)
+    }
+
+    @Provides
+    fun provideAlarmService(retrofit: Retrofit): AlarmService {
+        return retrofit.create(AlarmService::class.java)
     }
 }
