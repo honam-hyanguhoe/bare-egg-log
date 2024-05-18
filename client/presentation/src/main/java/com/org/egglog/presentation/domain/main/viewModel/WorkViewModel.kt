@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
 import com.org.egglog.domain.main.usecase.GetWeeklyWorkUseCase
+import com.org.egglog.domain.scheduler.usecase.WorkerUseCase
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyDataSource
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +23,7 @@ class WorkViewModel @Inject constructor(
     private val getWeeklyWorkUseCase: GetWeeklyWorkUseCase,
     private val getTokenUseCase: GetTokenUseCase,
     private val getUserStoreUseCase: GetUserStoreUseCase,
+    private val workerUseCase: WorkerUseCase
 ) : ViewModel(), ContainerHost<WorkState, WorkSideEffect> {
     override val container: Container<WorkState, WorkSideEffect> = container(
         initialState = WorkState(),
@@ -33,6 +35,7 @@ class WorkViewModel @Inject constructor(
         intent {
             onPrevClick(state.startDate)
         }
+        workerUseCase.workerDailyWork()
     }
 
     private suspend fun loadWork(start: String, end: String) = intent {

@@ -35,12 +35,15 @@ class ForegroundService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val key = intent?.getIntExtra(AlarmConst.REQUEST_CODE, 0) ?: 0
-        startForegroundService(key)
+        val hour = intent?.getIntExtra(AlarmConst.INTERVAL_HOUR, 0) ?: 0
+        val min = intent?.getIntExtra(AlarmConst.INTERVAL_MINUTE, 0) ?: 0
+        val time = "${if(hour < 10) "0$hour" else hour}:${if(min < 10) "0$min" else min}"
+        startForegroundService(key, time)
         return START_STICKY
     }
 
     @SuppressLint("LaunchActivityFromNotification")
-    private fun startForegroundService(key: Int) {
+    private fun startForegroundService(key: Int, time: String) {
         val channelId = getString(R.string.default_notification_channel_id)
         val channelName: CharSequence = getString(R.string.default_notification_channel_name)
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -57,9 +60,9 @@ class ForegroundService : Service() {
         val pendingIntent = PendingIntent.getBroadcast(this, key, stopIntent, PendingIntent.FLAG_IMMUTABLE)
 
         val notification = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.dark)
-            .setContentTitle("에그로그 알림")
-            .setContentText("반복 알람 실행 중...")
+            .setSmallIcon(R.drawable.play_store_512)
+            .setContentTitle("[에그로그]")
+            .setContentText(time)
             .setAutoCancel(true)
             .setOngoing(true)
             .setSound(null)
@@ -67,7 +70,7 @@ class ForegroundService : Service() {
             .setContentIntent(pendingIntent)
             .build()
 
-        startForeground(1, notification)
+        startForeground(key, notification)
         startVibrationAndSound()
         stopSelfInOneMinute(key)
     }
@@ -85,7 +88,7 @@ class ForegroundService : Service() {
     private fun stopSelfInOneMinute(key: Int) {
         Handler().postDelayed({
             stopForeground(true)
-            stopSelf()
+            stopSelf(key)
             mediaPlayer?.stop()
             mediaPlayer?.release()
             mediaPlayer = null

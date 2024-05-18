@@ -4,13 +4,24 @@ import android.app.Application
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
+import androidx.work.Configuration
+import com.org.egglog.data.scheduler.usecase.CustomWorkerFactory
 import com.org.egglog.presentation.domain.auth.activity.LoginActivity
-import com.org.egglog.presentation.domain.auth.activity.PlusLoginActivity
 import dagger.hilt.android.HiltAndroidApp
+import javax.inject.Inject
 import kotlin.system.exitProcess
 
 @HiltAndroidApp
-class App : Application() {
+class App : Application(), Configuration.Provider {
+
+    @Inject lateinit var workerFactory: CustomWorkerFactory
+
+    override fun getWorkManagerConfiguration(): Configuration {
+        return Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
+    }
+
     override fun onCreate() {
         super.onCreate()
         Thread.setDefaultUncaughtExceptionHandler { t, e ->
