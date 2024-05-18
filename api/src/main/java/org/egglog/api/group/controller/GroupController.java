@@ -78,6 +78,7 @@ public class GroupController {
             @AuthenticationPrincipal User user,
             @PathVariable("groupId") Long groupId,
             @RequestBody @Valid GroupDutyData groupDutyData){
+        log.debug(groupDutyData.toString());
         groupService.addDuty(user,groupId,groupDutyData);
         return ResponseEntity.ok().body(MessageUtils.success(SuccessType.CREATE));
     }

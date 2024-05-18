@@ -245,8 +245,8 @@ public class WorkService {
     public List<UpComingCountWorkResponse> findUpComingWorkCount(User loginUser, LocalDate today, DateType dateType){
         log.debug(" ==== ==== ==== [ 주, 월 남은 근무 일정 조회 서비스 실행 ] ==== ==== ====");
         if (dateType == DateType.WEEK) {
-            LocalDate startOfWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-            LocalDate endOfWeek = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+            LocalDate startOfWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+            LocalDate endOfWeek = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY));
             return workJpaRepository.findUpComingCountWork(loginUser.getId(), today, startOfWeek, endOfWeek);
         } else if (dateType == DateType.MONTH) {
             LocalDate startOfMonth = today.with(TemporalAdjusters.firstDayOfMonth());

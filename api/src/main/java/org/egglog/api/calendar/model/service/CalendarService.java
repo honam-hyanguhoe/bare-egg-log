@@ -1,7 +1,6 @@
 package org.egglog.api.calendar.model.service;
 
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.fortuna.ical4j.data.CalendarBuilder;
@@ -22,6 +21,7 @@ import org.egglog.api.calendar.exception.CalendarErrorCode;
 import org.egglog.api.calendar.exception.CalendarException;
 import org.egglog.api.global.util.FirebaseProperties;
 import org.egglog.api.user.model.entity.User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -51,13 +51,16 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class CalendarService {
+    @Value("${fcm.bucket-name}") private String bucketName;
     private final Bucket bucket;
+    private final Storage storage;
     private final FirebaseProperties firebaseProperties;
 
     private final EventRepository eventRepository;
@@ -191,23 +194,15 @@ public class CalendarService {
 
     public String getIcsLink(User user) {
         //TODO data query
-        String blobPath = "ics/" + user.getId() + "/calendar.ics";
-//        String blobPath = "ics/" + user.getId() + "/tree.txt";
         try {
             log.debug("test");
-            Blob blob = null;
-            try {
-                blob = bucket.get(blobPath);
-                log.debug(String.valueOf(blob.exists()));
-            }catch (NullPointerException e){
-                log.debug("no bucket");
-                updateIcs(user.getId());
-            }
+            updateIcs(user.getId());
         } catch (Exception e) {
             e.printStackTrace();
             throw new CalendarException(CalendarErrorCode.DATABASE_CONNECTION_FAILED);
         }
-        return blobPath;
+
+        return String.format("https://storage.googleapis.com/%s/ics/%s/calendar.ics", bucketName, String.valueOf(user.getId()));
     }
 
     public void updateIcs(Long userId) {
@@ -228,45 +223,29 @@ public class CalendarService {
             List<Work> workList = workQueryRepositoryImpl.findAllWorkWithWorkTypeByUser(userId);
             //사용자의 모든 개인 일정 가져오기
             List<Event> eventList = eventRepository.findAllByUserId(userId);
-            //일정이 없다면 에러 처리
-            log.debug("no schedules");
-            if(workList.isEmpty()&&eventList.isEmpty()){
-                throw new CalendarException(CalendarErrorCode.SCHEDULE_NOT_FOUND);
-            }
             //Uid 생성기
             //일정을 기록할 캘린더 객체 생성
             log.debug("create..");
-            List<CalendarComponent> calendarWorkComponentList = workList.stream().map(
-                    work -> {
-                        //시작 시간와 근무 이름을 통해 새로운 VEvent 생성
-                        return new VEvent(work.getWorkDate(),work.getWorkType().getTitle())
-                                .withProperty(new TzId("Asia/Seoul"))
-                                .withProperty(new Uid(work.getUuid()))
-                                .<VEvent>getFluentTarget();
-                    }).collect(Collectors.toList());
-            log.debug(calendarWorkComponentList.toString());
-            List<CalendarComponent> calendarEventComponentList = eventList.stream()
-                    .filter(event -> event.getStartDate()!=null) //start date가 존재하는 경우만 처리
-                    .map(event -> {
-                        if(event.getEndDate()==null){ //end date 없는 경우 처리
-                            return new VEvent(event.getStartDate(),event.getEventTitle())
-                                    .withProperty(new TzId("Asia/Seoul"))
-                                    .withProperty(new Uid(event.getUuid()))
-                                    .<VEvent>getFluentTarget();
-                        }else {
-                            return new VEvent(event.getStartDate(), event.getEndDate(), event.getEventTitle())
-                                    .withProperty(new TzId("Asia/Seoul"))
-                                    .withProperty(new Uid(event.getUuid()))
-                                    .getFluentTarget();
-                        }
-                    }).collect(Collectors.toList());
-            log.debug(calendarEventComponentList.toString());
-            //캘린더 객체에 일정 추가
-            ComponentList<CalendarComponent> components = calendar.getComponentList();
-            components.addAll(calendarWorkComponentList);
-            components.addAll(calendarEventComponentList);
-            calendar.setComponentList(components);
-            log.debug("component : {}",components.getAll().toString());
+            for(Work work : workList){
+                calendar.add(new VEvent(work.getWorkDate(),work.getWorkType().getTitle())
+                        .withProperty(new TzId("Asia/Seoul"))
+                        .withProperty(new Uid(work.getUuid()))
+                        .<VEvent>getFluentTarget());
+            }
+            for(Event event:eventList){
+                if(event.getEndDate()==null){ //end date 없는 경우 처리
+                    calendar.add(new VEvent(event.getStartDate(),event.getEventTitle())
+                            .withProperty(new TzId("Asia/Seoul"))
+                            .withProperty(new Uid(event.getUuid()))
+                            .<VEvent>getFluentTarget());
+                }else {
+                    calendar.add(new VEvent(event.getStartDate(), event.getEndDate(), event.getEventTitle())
+                            .withProperty(new TzId("Asia/Seoul"))
+                            .withProperty(new Uid(event.getUuid()))
+                            .getFluentTarget());
+                }
+            }
+            log.debug(calendar.getComponentList().toString());
         }catch (Exception e){
             log.warn(e.getMessage());
             throw new CalendarException(CalendarErrorCode.CREATE_FAIL);
@@ -292,8 +271,11 @@ public class CalendarService {
                 bucket.get(blob).delete();
             }
             // Firebase Storage에 파일 업로드
-            bucket.create(blob, bytes, "text/calendar");
-        } catch (IOException e) {
+            BlobId blobId = BlobId.of(bucketName, blob);
+            BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("text/calendar").build();
+            storage.create(blobInfo, bytes);
+            log.debug("Upload completed successfully.");
+        } catch (Exception e) {
             log.warn("here");
             throw new CalendarException(CalendarErrorCode.DATABASE_CONNECTION_FAILED);
         }
