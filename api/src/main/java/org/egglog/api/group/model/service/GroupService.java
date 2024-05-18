@@ -378,7 +378,7 @@ public class GroupService {
         Firestore db = FirestoreClient.getFirestore();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
         String date = targetMonth.format(formatter);
-        String empNo = loginUser.getEmpNo(); // Assuming User entity has getEmpNo() method
+        String empNo = loginUser.getEmpNo();
 
         // Firestore 경로 설정
         CollectionReference dateCollection = db.collection("duty")
@@ -397,16 +397,25 @@ public class GroupService {
                     Map<String, Object> dutyList = (Map<String, Object>) document.get("dutyList");
                     if (dutyList != null && dutyList.containsKey(empNo)) {
                         Map<String, Object> workTypeData = (Map<String, Object>) dutyList.get(empNo);
-                        WorkType workType = document.toObject(WorkType.class);
 
-                        // 날짜와 WorkType 데이터를 맵에 추가
-                        LocalDate workDate = LocalDate.parse((String) workTypeData.get("date"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                        workTypeMap.put(workDate, workType);
+                        for (Map.Entry<String, Object> entry : workTypeData.entrySet()) {
+                            String day = entry.getKey();
+                            String workTypeStr = (String) entry.getValue();
+
+                            // workTypeStr을 WorkType 객체로 변환
+                            WorkType workType = WorkType.builder().workTag(WorkTag.valueOf(workTypeStr)).build();
+
+                            // LocalDate workDate 생성
+                            LocalDate workDate = LocalDate.of(targetMonth.getYear(), targetMonth.getMonthValue(), Integer.parseInt(day));
+
+                            // workTypeMap에 추가
+                            workTypeMap.put(workDate, workType);
+                        }
                     }
                 }
             }
         } catch (InterruptedException | ExecutionException e) {
-            throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
+            throw new GroupException(GroupErrorCode.TRANSACTION_ERROR, e);
         }
 
         return workTypeMap;
