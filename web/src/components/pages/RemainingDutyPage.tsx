@@ -24,10 +24,10 @@ const initialData: TreeNode = {
   color: "white",
   remain: 0,
   children: [
-    { name: "Day", value: 3, color: "#18C5B5" },
-    { name: "Eve", value: 2, color: "#F4D567" },
-    { name: "Night", value: 1, color: "#485E88" },
-    { name: "Off", value: 4, color: "#9B8AFB" },
+    { name: "Day", value: 0, color: "#18C5B5" },
+    { name: "Eve", value: 0, color: "#F4D567" },
+    { name: "Night", value: 0, color: "#485E88" },
+    { name: "Off", value: 0, color: "#9B8AFB" },
   ],
 };
 
