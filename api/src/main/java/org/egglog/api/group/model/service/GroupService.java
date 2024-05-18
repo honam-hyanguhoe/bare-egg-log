@@ -408,7 +408,7 @@ public class GroupService {
                     log.debug("=== (Map<String, Object>) document.get(\"dutyList\") = {} " , dutyList);
                     if (dutyList != null && dutyList.containsKey(empNo)) {
                         Map<String, Object> workTypeData = (Map<String, Object>) dutyList.get(empNo);
-                        log.debug("=== (Map<String, Object>) dutyList.get(empNo) = {} " , workTypeData);
+//                        log.debug("=== (Map<String, Object>) dutyList.get(empNo) = {} " , workTypeData);
                         for (Map.Entry<String, Object> entry : workTypeData.entrySet()) {
                             String day = entry.getKey();
                             String workTypeStr = (String) entry.getValue();
