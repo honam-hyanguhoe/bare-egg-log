@@ -29,7 +29,13 @@ public class GroupDutyRepository {
 
 
     public void saveDuty(String userName, Long groupId, GroupDutyData groupDutyData, String nowDay) throws ExecutionException, InterruptedException {
+        CollectionReference collection = firestore.collection("duty")
+                .document(String.valueOf(groupId))
+                .collection(groupDutyData.getDate());
+
         log.debug("====== countQuery start ======");
+        Long count = collection.count().get().get().getCount();
+
         CustomWorkTag customWorkTag = groupDutyData.getCustomWorkTag();
         CustomWorkTag currentCustomWorkTag = getGroupWorkTag(groupId);
         log.debug(customWorkTag.toString());
@@ -64,9 +70,11 @@ public class GroupDutyRepository {
                     .dutyList(dutyList)
                     .build();
 
-            log.debug("path {}/{}/{}","duty",groupId,groupDutyData.getDate());
+            log.debug("path {}/{}/{}/{}","duty",groupId,groupDutyData.getDate(),count);
             String group = String.valueOf(groupId);
             String date = groupDutyData.getDate();
+            String countVal = String.valueOf(count);
+
 
             log.debug("{} {}",group==null,date==null);
             if(group==null || date==null || group.isEmpty() || date.isEmpty()){
@@ -85,7 +93,7 @@ public class GroupDutyRepository {
                         .collection("duty")
                         .document(group)
                         .collection(date)
-                        .document()
+                        .document(countVal)
                         .set(groupDutySaveFormat);
 
                 // Firestore 호출 결과 로깅
