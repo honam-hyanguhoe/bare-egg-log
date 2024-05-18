@@ -101,52 +101,29 @@ public class BoardScheduler {
                     .limit(2)
                     .toList();
 
-            // Redis에 저장 (ID 리스트)
-//            redisTemplate.opsForValue().set("hotBoards", hotBoardIds.toString(), 1, TimeUnit.HOURS);
-//            redisTemplate.opsForValue().set("hotBoards", hotBoardIds.toString(), 1, TimeUnit.HOURS);
 
             HashSet<Long> oldHotIds = realTimeBoardRepository.findAll()
                     .stream()
                     .map(RealTimeBoard::getBoardId)
-                    .collect(Collectors.toCollection(HashSet::new));
-            if (hotBoardIds.size()>0){
-                for (Long id = 1L; id <= 2L; id++) {
-                    if (hotBoardIds.size()==1&&id.equals(2L)) break;
+                    .collect(Collectors.toCollection(HashSet::new));//원래 급상승 게시판인 있던 애들 가져온다.
+            realTimeBoardRepository.deleteAll();//그리고 다 지운다.
 
-                    Long hotBoardID = hotBoardIds.get(id.intValue() - 1);
-                    Optional<RealTimeBoard> tempBoard = realTimeBoardRepository.findById(id);
+            for (Long index = 1L; index <= hotBoardIds.size(); index++) {
+                Long hotBoardID = hotBoardIds.get(index.intValue() - 1);
 
-                    if (tempBoard.isPresent()) {
-                        RealTimeBoard realTimeBoard = tempBoard.get();
-                        realTimeBoardRepository.save(realTimeBoard.updateBoardId(hotBoardID));
-                        if (!oldHotIds.contains(hotBoardID)) {
-                            //이전 게시물이 아닐 경우에만 알림 발송
-                            Board board = boardRepository.findWithUserById(hotBoardID).orElseThrow(
-                                    () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD));
-                            notificationService.hotBoardNotification(board);
-                        }
-                    } else {
-                        realTimeBoardRepository.save(RealTimeBoard.builder()
-                                .id(id)
-                                .boardId(hotBoardID)
-                                .build());
-                        //알림 발송
-                        Board board = boardRepository.findWithUserById(hotBoardID).orElseThrow(
-                                () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD));
-                        notificationService.hotBoardNotification(board);
-                    }
+                realTimeBoardRepository.save(RealTimeBoard.builder()
+                        .id(index)
+                        .boardId(hotBoardID)
+                        .build());
+
+                if (!oldHotIds.contains(hotBoardID)){
+                    //원래 급상승 게시판이 아닐 경우에만 알림 발송
+                    Board board = boardRepository.findWithUserById(hotBoardID).orElseThrow(
+                            () -> new BoardException(BoardErrorCode.NO_EXIST_BOARD));
+                    notificationService.hotBoardNotification(board);
                 }
             }
-
-
-
         }
-//        else {  //최근 게시물 2개
-//            List<Long> recentBoardIds = boardRepository.findTop2ByOrderByCreatedAtDesc();
-//            redisTemplate.opsForValue().set("hotBoards", recentBoardIds.toString(), 1, TimeUnit.MINUTES);
-//
-//        }
-
     }
 
     /**
