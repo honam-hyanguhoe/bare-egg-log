@@ -167,15 +167,15 @@ public class WorkService {
                 .collect(Collectors.toMap(Work::getWorkDate, work -> work));
 
 
-        List<Work> updateWorkList = new ArrayList<>();
+        Map<LocalDate, Work> updateWorkMap = new HashMap<>();
         List<Work> deletedWorkList = new ArrayList<>();
         for (LocalDate currentLocalDate : dateList) {
             if (userDateMap.containsKey(currentLocalDate) && excelDataMap.containsKey(currentLocalDate)) {
                 // 엑셀 데이터 존재, 기존 사용자 근무 존재 -> 해당 값 업데이트
-                updateWorkList.add(userDateMap.get(currentLocalDate).updateWorkType(excelDataMap.get(currentLocalDate)));
+                updateWorkMap.put(currentLocalDate, userDateMap.get(currentLocalDate).updateWorkType(excelDataMap.get(currentLocalDate)));
             } else if (!userDateMap.containsKey(currentLocalDate) && excelDataMap.containsKey(currentLocalDate)) {
                 // 엑셀 데이터 존재, 기존 사용자 근무 존재 x -> 새 엔티티 추가
-                updateWorkList.add(Work.builder()
+                updateWorkMap.put(currentLocalDate, Work.builder()
                         .workDate(currentLocalDate)
                         .workType(excelDataMap.get(currentLocalDate))
                         .calendarGroup(calendarGroup)
@@ -189,7 +189,9 @@ public class WorkService {
             // 엑셀 데이터 존재 x, 기존 사용자 근무 존재 x -> 아무것도 안한다.
         }
         workJpaRepository.deleteAll(deletedWorkList);
-        return workJpaRepository.saveAll(updateWorkList).stream().map(Work::toResponse).collect(Collectors.toList());
+        return workJpaRepository
+                .saveAll(new ArrayList<>(updateWorkMap.values()))
+                .stream().map(Work::toResponse).collect(Collectors.toList());
     }
 
 

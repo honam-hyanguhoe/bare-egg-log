@@ -163,7 +163,6 @@ public class GroupDutyRepository {
             log.debug("found!!");
             for(DocumentSnapshot doc : documents){
                 log.debug("processing...");
-                log.debug(doc.toString());
                 GroupDutySaveFormat duty = doc.toObject(GroupDutySaveFormat.class);
                 if(duty != null){
                     GroupDutyDto dutyDto = GroupDutyDto.builder()
