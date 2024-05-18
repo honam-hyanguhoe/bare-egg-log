@@ -1,7 +1,7 @@
 package org.egglog.api.group.model.service;
 
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.Query;
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,10 +32,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor
@@ -376,9 +374,42 @@ public class GroupService {
         }
     }
 
-    public Map<LocalDate, WorkType> getUserExcelData(Long groupId, LocalDate targetMonth, Long index, User loginUser){
-        //todo 검증 로직은 sync 로직에서 수행함. groupId 가 현재 User가 속한 그룹인지 등.
-        return Map.of(LocalDate.now(), WorkType.builder().build());
+    public Map<LocalDate, WorkType> getUserExcelData(Long groupId, LocalDate targetMonth, Long index, User loginUser) {
+        Firestore db = FirestoreClient.getFirestore();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+        String date = targetMonth.format(formatter);
+        String empNo = loginUser.getEmpNo(); // Assuming User entity has getEmpNo() method
+
+        // Firestore 경로 설정
+        CollectionReference dateCollection = db.collection("duty")
+                .document(String.valueOf(groupId))
+                .collection(date);
+
+        ApiFuture<QuerySnapshot> future = dateCollection.get();
+        Map<LocalDate, WorkType> workTypeMap = new HashMap<>();
+
+        try {
+            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+            for (QueryDocumentSnapshot document : documents) {
+                if (document.exists() && document.getId().equals(String.valueOf(index))) {
+                    // dutyList 맵에서 empNo를 키로 사용하여 WorkType 데이터를 가져옴
+                    Map<String, Object> dutyList = (Map<String, Object>) document.get("dutyList");
+                    if (dutyList != null && dutyList.containsKey(empNo)) {
+                        Map<String, Object> workTypeData = (Map<String, Object>) dutyList.get(empNo);
+                        WorkType workType = document.toObject(WorkType.class);
+
+                        // 날짜와 WorkType 데이터를 맵에 추가
+                        LocalDate workDate = LocalDate.parse((String) workTypeData.get("date"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                        workTypeMap.put(workDate, workType);
+                    }
+                }
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
+        }
+
+        return workTypeMap;
     }
 
 }

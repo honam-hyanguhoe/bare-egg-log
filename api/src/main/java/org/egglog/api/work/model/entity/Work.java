@@ -75,9 +75,7 @@ public class Work {
 
     public WorkWithAlarmResponse toResponse(Map<WorkType, Alarm> alarmMap){
         return WorkWithAlarmResponse.builder()
-                .workId(this.id)
-                .workDate(this.workDate)
-                .workType(this.workType.toResponse())
+                .work(this.toResponse())
                 .alarm(alarmMap.get(this.workType).toOutputSpec())
                 .build();
     }

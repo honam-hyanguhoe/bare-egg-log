@@ -24,8 +24,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WorkWithAlarmResponse {
-    private Long workId;
-    private LocalDate workDate;
-    private WorkTypeResponse workType;
+    private WorkResponse work;
     private AlarmOutputSpec alarm;
 }
