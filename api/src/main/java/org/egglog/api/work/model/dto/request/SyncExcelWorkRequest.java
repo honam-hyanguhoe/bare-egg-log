@@ -24,6 +24,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Builder
+@ToString
 public class SyncExcelWorkRequest {
     @NotNull(message = "그룹 ID는 필수 입니다.")
     @Positive(message = "정확한 ID값을 입력 해주세요.")

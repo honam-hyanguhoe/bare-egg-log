@@ -11,4 +11,5 @@ public interface BoardRepository extends JpaRepository<Board, Long>, BoardCustom
     @Query("SELECT b.id FROM Board b ORDER BY b.createdAt DESC")
     List<Long> findTop2ByOrderByCreatedAtDesc();
 
+    void deleteByGroupId(Long groupId);
 }

@@ -28,7 +28,6 @@
         android:usesCleartextTraffic="true"
         android:hardwareAccelerated="true"
         tools:ignore="SelectedPhotoAccess">
-        
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
@@ -39,6 +38,6 @@
                 android:value="androidx.startup"
                 tools:node="remove" />
         </provider>
+        <uses-library android:name="org.apache.http.legacy" android:required="false"/>    
     </application>
-
 </manifest>

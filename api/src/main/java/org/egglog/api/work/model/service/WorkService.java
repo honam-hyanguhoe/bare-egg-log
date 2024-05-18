@@ -9,6 +9,8 @@ import org.egglog.api.calendargroup.exception.CalendarGroupErrorCode;
 import org.egglog.api.calendargroup.exception.CalendarGroupException;
 import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.calendargroup.repository.jpa.CalendarGroupRepository;
+import org.egglog.api.group.model.dto.request.CustomWorkTag;
+import org.egglog.api.group.model.dto.response.UserDutyDataDto;
 import org.egglog.api.group.model.entity.GroupMember;
 import org.egglog.api.group.model.service.GroupService;
 import org.egglog.api.group.repository.jpa.GroupMemberRepository;
@@ -95,6 +97,46 @@ public class WorkService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 사용자의 일정 정보를 workType 객체로 매핑하는 메서드
+     * @param targetMonth
+     * @param userDutyData
+     * @param loginUser
+     * @return
+     */
+    public Map<LocalDate,WorkType> getWorkTypeListByExcelData(LocalDate targetMonth, UserDutyDataDto userDutyData, User loginUser){
+        Map<LocalDate, WorkType> workTypeMap = new HashMap<>();
+        Map<String, String> dutyData = userDutyData.getDutyData();
+
+        //work tag 검색용
+        Map<String, WorkTag> customWorkTag = userDutyData.getCustomWorkTag().toMap();
+
+        // 사용자의 day, eve, night, off WorkType 조회해서 work tag로 인덱싱 가능 하도록 수정
+        List<WorkType> workTypes = workTypeJpaRepository.findMainWorkTypesByUserId(loginUser.getId());
+        Map<WorkTag, WorkType> userWorkTypeMap = new HashMap<>();
+        for(WorkType workType:workTypes){
+            userWorkTypeMap.put(workType.getWorkTag(),workType);
+        }
+
+        // 사용자의 string 근무 정보를 work type으로 변경하여 날짜 정보와 매핑
+        for (Map.Entry<String, String> entry : dutyData.entrySet()) {
+            String day = entry.getKey();
+            String workTypeStr = entry.getValue();
+            log.debug("=== entry.getKey() = {} " , day);
+            log.debug("=== (String) entry.getValue() = {} " , workTypeStr);
+            // workTypeStr을 WorkType 객체로 변환
+            WorkType workType = userWorkTypeMap.get(customWorkTag.get(workTypeStr));
+            log.debug("=== workTypeStr을 WorkType 객체로 변환 workType = {} " , workType);
+            // LocalDate workDate 생성
+            LocalDate workDate = LocalDate.of(targetMonth.getYear(), targetMonth.getMonthValue(), Integer.parseInt(day));
+            log.debug("=== LocalDate workDate 생성 workDate = {} " , workDate);
+            // workTypeMap에 추가
+            workTypeMap.put(workDate, workType);
+        }
+
+        return workTypeMap;
+    }
+
 
     @Transactional
     public List<WorkResponse> syncWork(User loginUser, SyncExcelWorkRequest request){
@@ -105,8 +147,10 @@ public class WorkService {
 
         if (calendarGroup.getUser().getId()!=loginUser.getId()) throw new WorkException(WorkErrorCode.ACCESS_DENIED);
 
-
-        Map<LocalDate, WorkType> excelDataMap = groupService.getUserExcelData(request.getGroupId(), request.getTargetMonth(), request.getIndex(), loginUser);
+        // firestore에서 저장된 근무 정보 반환
+        UserDutyDataDto userDutyData = groupService.getUserExcelData(request.getGroupId(), request.getTargetMonth(), request.getIndex(), loginUser);
+        // 조회한 근무 정보를 workType으로 변환
+        Map<LocalDate, WorkType> excelDataMap = getWorkTypeListByExcelData(request.getTargetMonth(),userDutyData, loginUser);
 
         LocalDate startOfMonth = request.getTargetMonth().withDayOfMonth(1);
         LocalDate endOfMonth = request.getTargetMonth().withDayOfMonth(request.getTargetMonth().lengthOfMonth());
@@ -245,8 +289,8 @@ public class WorkService {
     public List<UpComingCountWorkResponse> findUpComingWorkCount(User loginUser, LocalDate today, DateType dateType){
         log.debug(" ==== ==== ==== [ 주, 월 남은 근무 일정 조회 서비스 실행 ] ==== ==== ====");
         if (dateType == DateType.WEEK) {
-            LocalDate startOfWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-            LocalDate endOfWeek = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+            LocalDate startOfWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+            LocalDate endOfWeek = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY));
             return workJpaRepository.findUpComingCountWork(loginUser.getId(), today, startOfWeek, endOfWeek);
         } else if (dateType == DateType.MONTH) {
             LocalDate startOfMonth = today.with(TemporalAdjusters.firstDayOfMonth());

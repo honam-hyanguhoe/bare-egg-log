@@ -49,4 +49,12 @@ public class WorkTypeQueryRepositoryImpl implements WorkTypeQueryRepository {
                 .where(workType.id.eq(workTypeId))
                 .fetchOne());
     }
+
+    @Override
+    public List<WorkType> findMainWorkTypesByUserId(Long userId) {
+        return jpaQueryFactory
+                .selectFrom(workType)
+                .where(workType.user.id.eq(userId).and(workType.workTag.in(WorkTag.DAY,WorkTag.EVE,WorkTag.NIGHT,WorkTag.OFF)))
+                .fetch();
+    }
 }

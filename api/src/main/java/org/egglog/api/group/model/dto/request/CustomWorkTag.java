@@ -2,8 +2,12 @@ package org.egglog.api.group.model.dto.request;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.egglog.api.worktype.model.entity.WorkTag;
+import org.egglog.api.worktype.model.entity.WorkType;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * ```
@@ -29,5 +33,14 @@ public class CustomWorkTag {
         this.eve="";
         this.off="";
         this.night="";
+    }
+
+    public Map<String, WorkTag> toMap(){
+        Map<String, WorkTag> workTagMap = new HashMap<>();
+        workTagMap.put(this.day, WorkTag.DAY);
+        workTagMap.put(this.eve, WorkTag.EVE);
+        workTagMap.put(this.night, WorkTag.NIGHT);
+        workTagMap.put(this.off, WorkTag.OFF);
+        return workTagMap;
     }
 }

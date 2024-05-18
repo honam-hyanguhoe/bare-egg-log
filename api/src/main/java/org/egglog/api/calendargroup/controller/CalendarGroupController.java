@@ -86,7 +86,7 @@ public class CalendarGroupController {
     }
 
     /**
-     * 캘린더 그룹 삭제
+     * 캘린더 그룹 조회
      * @param request 일정을 조회할 calendarGroupID 리스트(다중선택)
      * @param user 현재 로그인한 유저 JWT
      * @return
