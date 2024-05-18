@@ -1,0 +1,11 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://socon.ch0qyikg8x7u.ap-northeast-2.rds.amazonaws.com:3306/egg_log?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+#    username: 'socon'
+#    password: 'boongbang20240314'
+
