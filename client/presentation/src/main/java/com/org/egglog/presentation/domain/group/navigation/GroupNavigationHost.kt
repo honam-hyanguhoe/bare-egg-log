@@ -52,6 +52,8 @@ fun GroupNavigationHost(
                     navController.navigate(GroupRoute.GroupListScreen.name)
                 }
 
+            }else{
+                navController.navigate(GroupRoute.GroupListScreen.name)
             }
         }
     }

@@ -28,6 +28,7 @@
         android:usesCleartextTraffic="true"
         android:hardwareAccelerated="true"
         tools:ignore="SelectedPhotoAccess">
-    </application>
+
+        <uses-library android:name="org.apache.http.legacy" android:required="false"/>    </application>
 
 </manifest>

@@ -62,6 +62,8 @@ fun MainNavigationHost(deepLinkUri: Uri?) {
                 context.startActivity(intent)
             } else if (pathSegments[0] == "main") {
                 navController.navigate(MainRoute.MainScreen.name)
+            }else{
+                navController.navigate(MainRoute.MainScreen.name)
             }
         }
     }
