@@ -21,7 +21,6 @@ import java.time.LocalTime
 
 @Composable
 fun AlarmManager(
-    setAlarm: () -> Unit,
     alarmList: List<Alarm>,
     onClickToggle: (Alarm) -> Unit,
     showModifyBottomSheetAlarm: Boolean,
@@ -35,7 +34,6 @@ fun AlarmManager(
     onAlarmTimeChange: (LocalTime) -> Unit
 ) {
     val context = LocalContext.current
-    setAlarm()
     Column(
         Modifier
             .padding(horizontal = 8.widthPercent(context).dp)

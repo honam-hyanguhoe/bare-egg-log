@@ -3,6 +3,7 @@ package com.org.egglog.presentation.domain.setting.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
+import com.org.egglog.domain.scheduler.usecase.GetAlarmFindListUseCase
 import com.org.egglog.domain.scheduler.usecase.SchedulerUseCase
 import com.org.egglog.domain.setting.model.Alarm
 import com.org.egglog.domain.setting.model.AlarmParam
@@ -26,7 +27,10 @@ import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import javax.annotation.concurrent.Immutable
 import javax.inject.Inject
 
@@ -40,6 +44,7 @@ class WorkSettingViewModel @Inject constructor(
     private val getAlarmListUseCase: GetAlarmListUseCase,
     private val updateAlarmStatusUseCase: UpdateAlarmStatusUseCase,
     private val updateAlarmUseCase: UpdateAlarmUseCase,
+    private val getAlarmFindListUseCase: GetAlarmFindListUseCase,
     private val schedulerUseCase: SchedulerUseCase
 ): ViewModel(), ContainerHost<WorkSettingState, WorkSettingSideEffect>{
     override val container: Container<WorkSettingState, WorkSettingSideEffect> = container(
@@ -121,13 +126,6 @@ class WorkSettingViewModel @Inject constructor(
         reduce { state.copy(endTime = endTime) }
     }
 
-    /**
-     * 알람
-     */
-    fun setAlarm() = intent {
-//        schedulerUseCase.setAlarm(curRepeatCount = 0, repeatCount = 3, minutesToAdd = 2L, targetDateTime = LocalDateTime.now().plusMinutes(1), key = 1, stopByUser = false)
-    }
-
     fun getAlarmListInit() = intent {
         val tokens = getTokenUseCase()
         val alarmList = getAlarmListUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}").getOrThrow()
@@ -138,7 +136,23 @@ class WorkSettingViewModel @Inject constructor(
         reduce { state.copy(toggleEnabled = false) }
         val tokens = getTokenUseCase()
         updateAlarmStatusUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}", AlarmStatusParam(alarmId = selected.alarmId, isAlarmOn = !selected.isAlarmOn)).getOrThrow()
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val alarmList = getAlarmFindListUseCase(
+            "Bearer ${tokens.first.orEmpty()}",
+            LocalDate.now().format(formatter),
+            LocalDate.now().plusDays(8).format(formatter)
+        ).getOrThrow()
+        alarmList?.workList?.map {
+            val dateTime = stringToNewLocalDateTime("${it.work.workDate}${it.alarm.alarmTime}")
+            if(it.alarm.isAlarmOn && dateTime > LocalDateTime.now()) schedulerUseCase.setAlarm("${dateTime.monthValue - 1}${dateTime.dayOfMonth}".toInt(), 0, it.alarm.alarmReplayCnt, it.alarm.alarmReplayTime.toLong(), dateTime, false)
+            else schedulerUseCase.cancelAllAlarms("${dateTime.monthValue - 1}${dateTime.dayOfMonth}".toInt())
+        }
         reduce { state.copy(toggleEnabled = true) }
+    }
+
+    private fun stringToNewLocalDateTime(dateTimeString: String): LocalDateTime {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-ddHH:mm")
+        return LocalDateTime.parse(dateTimeString, formatter)
     }
 
     fun setShowModifyBottomSheetAlarm(enabled: Boolean) = intent {
@@ -173,6 +187,17 @@ class WorkSettingViewModel @Inject constructor(
         val tokens = getTokenUseCase()
         val selectedAlarm = state.selectedAlarm!!
         updateAlarmUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}", AlarmParam(alarmId = selectedAlarm.alarmId, replayTime = state.replayTime, replayCnt = state.replayCnt, workTypeId = selectedAlarm.workTypeId, alarmTime = state.alarmTime)).getOrThrow()
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val alarmList = getAlarmFindListUseCase(
+            "Bearer ${tokens.first.orEmpty()}",
+            LocalDate.now().format(formatter),
+            LocalDate.now().plusDays(8).format(formatter)
+        ).getOrThrow()
+        alarmList?.workList?.map {
+            val dateTime = stringToNewLocalDateTime("${it.work.workDate}${it.alarm.alarmTime}")
+            if(it.alarm.isAlarmOn && dateTime > LocalDateTime.now()) schedulerUseCase.setAlarm("${dateTime.monthValue - 1}${dateTime.dayOfMonth}".toInt(), 0, it.alarm.alarmReplayCnt, it.alarm.alarmReplayTime.toLong(), dateTime, false)
+            else schedulerUseCase.cancelAllAlarms("${dateTime.monthValue - 1}${dateTime.dayOfMonth}".toInt())
+        }
         postSideEffect(WorkSettingSideEffect.Toast("수정되었습니다."))
         reduce { state.copy(modifyEnabledAlarm = true, replayTime = 5, replayCnt = 1, selectedAlarm = null) }
     }
