@@ -173,7 +173,7 @@ class MyCalendarViewModel @Inject constructor(
 
 
         for ((calendarGroupId, isActive) in calendarGroupMap.entries) {
-            if(isActive) {
+            if (isActive) {
                 val monthlyPersonalList = getPersonalScheduleUseCase(
                     "Bearer $accessToken",
                     startDate,
@@ -193,8 +193,12 @@ class MyCalendarViewModel @Inject constructor(
                     personalScheduleData.copy(eventList = updatedEventList)
                 }
 
-                reduce{
-                    state.copy(monthlyPersonalList = state.monthlyPersonalList.plus(updateMonthlyPersonalList))
+                reduce {
+                    state.copy(
+                        monthlyPersonalList = state.monthlyPersonalList.plus(
+                            updateMonthlyPersonalList
+                        )
+                    )
                 }
             }
         }
@@ -336,7 +340,8 @@ class MyCalendarViewModel @Inject constructor(
             if (state.selectedDate < 10) "0${state.selectedDate}" else "${state.selectedDate}"
 
         val currentPersonalData =
-            state.monthlyPersonalList.filter { it.date.substring(8, 10) == date }.flatMap { it.eventList }
+            state.monthlyPersonalList.filter { it.date.substring(8, 10) == date }
+                .flatMap { it.eventList }
 
         reduce {
             state.copy(
@@ -555,7 +560,8 @@ class MyCalendarViewModel @Inject constructor(
             } else {
                 postSideEffect(MyCalendarSideEffect.Toast("등록에 실패하였습니다. 다시 시도해주세요."))
             }
-        } else if (state.createWorkList.isNotEmpty()) {
+        }
+        if (state.createWorkList.isNotEmpty()) {
             val response = createWorkScheduleUseCase(
                 "Bearer $accessToken",
                 userInfo!!.workGroupId!!,
@@ -627,7 +633,7 @@ class MyCalendarViewModel @Inject constructor(
             userInfo!!.workGroupId!!
         )
 
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             postSideEffect(MyCalendarSideEffect.Toast("수정 되었습니다!"))
             getPersonalList()
         } else {
