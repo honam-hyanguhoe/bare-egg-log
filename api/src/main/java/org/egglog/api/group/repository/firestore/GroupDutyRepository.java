@@ -32,7 +32,7 @@ public class GroupDutyRepository {
         log.debug("====== countQuery start ======");
         CustomWorkTag customWorkTag = groupDutyData.getCustomWorkTag();
         CustomWorkTag currentCustomWorkTag = getGroupWorkTag(groupId);
-
+        log.debug(customWorkTag.toString());
         //custom work tag 관련 작업
         //기존 값 유지
         if(currentCustomWorkTag!=null){
@@ -69,11 +69,12 @@ public class GroupDutyRepository {
             String date = groupDutyData.getDate();
 
             log.debug("{} {}",group==null,date==null);
-            if(group==null || date == null || group == "" || date == ""){
+            if(group==null || date==null || group.isEmpty() || date.isEmpty()){
                 log.warn("null 등장 ~~~~~~~~~~~~~~~~~~~~");
                 throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
             }
 
+            log.debug("upload group duty data....");
             ApiFuture<WriteResult> apiFuture = firestore
                     .collection("duty")
                     .document(group)
@@ -97,12 +98,14 @@ public class GroupDutyRepository {
      * @param groupId
      * @param customWorkTag
      */
-    private void saveGroupWorkTag(Long groupId, CustomWorkTag customWorkTag) {
+    private void saveGroupWorkTag(Long groupId, CustomWorkTag customWorkTag) throws ExecutionException, InterruptedException {
+        log.debug("===== update work tag ====");
         //데이터 삽입 쿼리
         ApiFuture<WriteResult> apiFuture = firestore
                 .collection("work-tag")
                 .document(String.valueOf(groupId))
                 .set(customWorkTag);
+        log.debug(apiFuture.get().getUpdateTime().toString());
     }
 
     /**
@@ -120,8 +123,9 @@ public class GroupDutyRepository {
         if (document.exists()) {
             // convert document to POJO
             return document.toObject(CustomWorkTag.class);
+        }else {
+            return null;
         }
-        return null;
     }
 
     public List<GroupDutyDto> getDutyListByGroupIdList(List<Long> groupList, String date) throws ExecutionException, InterruptedException {

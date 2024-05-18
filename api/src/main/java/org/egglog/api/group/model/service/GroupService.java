@@ -331,7 +331,9 @@ public class GroupService {
                 SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
                 Date now = new Date();
                 String nowDay = dayFormat.format(now);
+                log.debug("save Duty >>>>>");
                 groupDutyRepository.saveDuty(user.getName(),groupId,groupDutyData,nowDay);
+                log.debug("sending notification >>>>>");
                 notificationService.excelDutyUploadNotification(groupId, groupDutyData);
             }catch (Exception e){
                 throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
