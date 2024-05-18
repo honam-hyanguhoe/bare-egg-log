@@ -5,6 +5,8 @@ import com.google.cloud.firestore.Query;
 import com.google.firebase.cloud.FirestoreClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.egglog.api.board.model.entity.Board;
+import org.egglog.api.board.repository.jpa.board.BoardRepository;
 import org.egglog.api.group.exception.GroupErrorCode;
 import org.egglog.api.group.exception.GroupException;
 import org.egglog.api.group.model.dto.request.*;
@@ -44,9 +46,14 @@ public class GroupService {
     private final PasswordEncoder passwordEncoder;
     private final GroupMemberService groupMemberService;
 
+    // 그룹 관련 레포지토리
     private final GroupRepository groupRepository;
     private final GroupDutyRepository groupDutyRepository;
     private final GroupInvitationRepository groupInvitationRepository;
+
+    // 게시판 관련 레포지토리(그룹 삭제를 위함)
+    private final BoardRepository boardRepository;
+
 
     private final FCMService fcmService;
     private final NotificationService notificationService;
@@ -258,6 +265,7 @@ public class GroupService {
             //혼자가 아니라면 탈퇴 권한 없음
             if(count==1){
                 groupMemberService.deleteGroupMember(userInfo);
+                boardRepository.deleteByGroupId(groupId);
                 //더이상 남은 사용자가 없으니 그룹 삭제
                 Group group = groupRepository.findById(groupId).orElseThrow(()->new GroupException(GroupErrorCode.NOT_FOUND));
                 groupRepository.delete(group);
