@@ -61,8 +61,8 @@ class ForegroundService : Service() {
 
         val notification = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.play_store_512)
-            .setContentTitle("[에그로그]")
-            .setContentText(time)
+            .setContentTitle("[에그로그] $time")
+            .setContentText("근무 알람이 도착했습니다!")
             .setAutoCancel(true)
             .setOngoing(true)
             .setSound(null)

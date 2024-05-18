@@ -65,8 +65,6 @@ fun WorkSettingScreen(
         onSelected = viewModel::onSelected,
         selectedWorkType = state.selectedWorkType,
         deleteSelectedWorkType = viewModel::deleteSelectedWorkType,
-
-        setAlarm = viewModel::setAlarm,
         alarmList = state.alarmList,
         getAlarmListInit = viewModel::getAlarmListInit,
         onClickToggle = viewModel::onClickToggle,
@@ -105,8 +103,6 @@ fun WorkSettingScreen(
     onSelected: (String, WorkType) -> Unit,
     selectedWorkType: WorkType?,
     deleteSelectedWorkType: () -> Unit,
-
-    setAlarm: () -> Unit,
     alarmList: List<Alarm>,
     getAlarmListInit: () -> Unit,
     onClickToggle: (Alarm) -> Unit,
@@ -171,7 +167,6 @@ fun WorkSettingScreen(
                 ) },
             secendContent = {
                 AlarmManager(
-                    setAlarm = setAlarm,
                     alarmList = alarmList,
                     onClickToggle = onClickToggle,
                     showModifyBottomSheetAlarm = showModifyBottomSheetAlarm,
