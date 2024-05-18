@@ -2,6 +2,7 @@ package com.org.egglog.presentation.domain.setting.screen
 
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
@@ -58,6 +59,7 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 @Composable
 fun SettingScreen(
     viewModel: SettingViewModel = hiltViewModel(),
+    onNavigateToCertificateBadeScreen : () -> Unit,
     onNavigateToPrivacyDetailScreen: () -> Unit,
     onNavigateToAgreeDetailScreen: () -> Unit,
     onNavigateToCalendarSettingScreen: () -> Unit,
@@ -120,6 +122,7 @@ fun SettingScreen(
     }
 
     SettingScreen(
+        onNavigateToCertificateBadeScreen = onNavigateToCertificateBadeScreen,
         onNavigateToPrivacyDetailScreen = onNavigateToPrivacyDetailScreen,
         onNavigateToAgreeDetailScreen = onNavigateToAgreeDetailScreen,
         onSelectedIdx = viewModel::onSelectedIdx,
@@ -137,6 +140,7 @@ fun SettingScreen(
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun SettingScreen(
+    onNavigateToCertificateBadeScreen : () -> Unit,
     onNavigateToPrivacyDetailScreen: () -> Unit,
     onNavigateToAgreeDetailScreen: () -> Unit,
     onNavigateToMySettingScreen: () -> Unit,
@@ -187,7 +191,10 @@ fun SettingScreen(
                     BasicButton(modifier = Modifier
                         .height(68.heightPercent(context).dp)
                         .fillMaxWidth(0.94f),
-                        onClick = { openDialog.value = true },
+                        onClick = {
+                            Log.d("badge", "페이지 이동")
+                            onNavigateToCertificateBadeScreen()
+                        },
                         shape = RoundedCornerShape(16.widthPercent(context).dp),
                         colors = ButtonColors(
                             containerColor = Warning300,
@@ -223,16 +230,16 @@ fun SettingScreen(
                     Text("Version $version", style = Typography.displayMedium.copy(color = Gray400))
                     Spacer(modifier = Modifier.padding(4.heightPercent(context).dp))
 
-                    when {
-                        openDialog.value -> {
-                            Dialog(
-                                onDismissRequest = { openDialog.value = false },
-                                onConfirmation = { openDialog.value = false },
-                                dialogTitle = "공지",
-                                dialogText = "출시 준비 중입니다",
-                            )
-                        }
-                    }
+//                    when {
+//                        openDialog.value -> {
+//                            Dialog(
+//                                onDismissRequest = { openDialog.value = false },
+//                                onConfirmation = { openDialog.value = false },
+//                                dialogTitle = "공지",
+//                                dialogText = "출시 준비 중입니다",
+//                            )
+//                        }
+//                    }
 
                     when {
                         openLogoutDialog.value -> {

@@ -91,11 +91,14 @@ private fun MemberManageScreen(
                 .width(340.widthPercent(context).dp)
                 .background(NaturalWhite)
         ) {
+
+            Spacer(modifier = Modifier.height(40.dp))
             BasicHeader(
                 hasArrow = true,
                 onClickBack = { onClickBack(groupId) }
             )
             Spacer(modifier = Modifier.height(10.dp))
+
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
