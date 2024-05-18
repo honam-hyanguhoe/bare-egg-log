@@ -242,8 +242,8 @@ fun DateItem(
                 Text(
                     text = date.day.uppercase(),
                     color = when {
-                        date.day == "일" -> Color(0xFFF97066)
-                        date.isSelected -> NaturalWhite
+                        date.day == "일" -> if(type == "main") NaturalBlack else Color(0xFFF97066)
+                        date.isSelected -> if(type == "main") NaturalBlack else NaturalWhite
                         else -> NaturalBlack
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally),

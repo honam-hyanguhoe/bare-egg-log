@@ -41,7 +41,8 @@ fun NoticeHeader(
     selectedOption: String? = null,
     onSelect: (String) -> Unit = {},
     horizontalPadding : Int = 0,
-    verticalPadding : Int = 0
+    verticalPadding : Int = 0,
+    hasNotice : Boolean = true,
 ) {
     Box(
         modifier = Modifier
@@ -53,6 +54,7 @@ fun NoticeHeader(
             modifier = Modifier.fillMaxWidth()
         ){
             NoticeHeaderContents(
+                hasNotice = hasNotice,
                 title = title,
                 hasSearch = hasSearch,
                 hasLogo = hasLogo,
@@ -70,6 +72,7 @@ fun NoticeHeader(
 
 @Composable
 fun NoticeHeaderContents(
+    hasNotice : Boolean,
     title: String,
     hasSearch: Boolean = false,
     hasLogo: Boolean = false,
@@ -132,12 +135,16 @@ fun NoticeHeaderContents(
                     onClick = onClickSearch
                 )
             }
-            CustomIconButton(
-                size = 35.dp,
-                imageVector = Notification,
-                color = NaturalBlack,
-                onClick = onClickNotification
-            )
+            if(hasNotice){
+                CustomIconButton(
+                    size = 35.dp,
+                    imageVector = Notification,
+                    color = NaturalBlack,
+                    onClick = onClickNotification
+                )
+
+            }
+
         }
     }
 }

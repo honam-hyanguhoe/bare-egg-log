@@ -44,6 +44,9 @@ class CertificateBadgeViewModel @Inject constructor(
 
     private val _type = MutableStateFlow<String>("nurse")
     val type : StateFlow<String> = _type.asStateFlow()
+    private val _indicatorValue = MutableStateFlow<Float>(0.5f)
+    val indicatorValue : StateFlow<Float> = _indicatorValue.asStateFlow()
+
     private var accessToken: String? = null
     init {
         intent {
@@ -54,6 +57,10 @@ class CertificateBadgeViewModel @Inject constructor(
 
     fun setType(value: String) {
         _type.value = value
+    }
+
+    fun setIndicatorValue(value: Float) {
+        _indicatorValue.value = value
     }
 
     fun onClickCertification() = intent {
@@ -70,7 +77,6 @@ class CertificateBadgeViewModel @Inject constructor(
         }
     }
     fun handleImageSelection(context: Context, uri: Uri , type: String) = intent {
-
         if(type == "nurse"){
             val resizedImage = resizeImage(context, uri, 800, 600)
             resizedImage?.let {

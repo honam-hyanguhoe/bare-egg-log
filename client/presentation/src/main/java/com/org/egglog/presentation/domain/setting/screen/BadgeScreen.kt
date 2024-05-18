@@ -82,7 +82,7 @@ fun BadgeScreen(
     val certificateBadgeState = certificateBadgeViewModel.collectAsState().value
     val context = LocalContext.current
     val type by certificateBadgeViewModel.type.collectAsState()
-
+    val indicatorValue by certificateBadgeViewModel.indicatorValue.collectAsState()
     certificateBadgeViewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is CertificateBadgeSideEffect.Toast -> Toast.makeText(
@@ -108,7 +108,9 @@ fun BadgeScreen(
         type = type,
         clickedText = if (type == "nurse") "다음" else "완료",
         setType = certificateBadgeViewModel::setType,
-        onClickCertification = certificateBadgeViewModel::onClickCertification
+        onClickCertification = certificateBadgeViewModel::onClickCertification,
+        indicatorValue = indicatorValue,
+        setIndicatorValue = certificateBadgeViewModel::setIndicatorValue
     )
 }
 
@@ -120,7 +122,9 @@ private fun BadgeScreen(
     type: String,
     clickedText: String,
     setType: (String) -> Unit,
-    onClickCertification : () -> Unit
+    onClickCertification: () -> Unit,
+    indicatorValue : Float = 0.5f,
+    setIndicatorValue : (Float) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -139,8 +143,8 @@ private fun BadgeScreen(
                 hasTitle = true,
                 hasArrow = true,
                 hasProgressBar = true,
-                indicatorValue = 0.5f,
-                onClickBack = {},
+                indicatorValue = indicatorValue,
+                onClickBack = {(context as? Activity)?.onBackPressed()},
             )
             Column(
                 Modifier
@@ -188,7 +192,20 @@ private fun BadgeScreen(
                     disabledContentColor = NaturalWhite
                 ),
                 onClick = {
-                    if (type == "nurse") { setType("hospital")  } else { onClickCertification() }
+                    if (type == "nurse") {
+                        if (nurseCertificationImgUrl != null) {
+                            setType("hospital")
+                            setIndicatorValue(1f)
+                        } else {
+                            Toast.makeText(context, "이미지를 등록해주세요",Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        if (hospitalCertificationImgUrl != null) {
+                            onClickCertification()
+                        } else {
+                            Toast.makeText(context, "이미지를 등록해주세요",Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 },
             ) {
                 Text(
