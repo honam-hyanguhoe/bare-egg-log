@@ -13,10 +13,13 @@ import org.egglog.api.group.model.dto.request.GroupDutySaveFormat;
 import org.egglog.api.group.model.dto.response.GroupDutyDataDto;
 import org.egglog.api.group.model.dto.response.GroupDutyDto;
 import org.egglog.api.group.model.dto.response.Index;
+import org.egglog.api.group.model.dto.response.UserDutyDataDto;
 import org.egglog.api.worktype.model.entity.WorkTag;
+import org.egglog.api.worktype.model.entity.WorkType;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -173,5 +176,35 @@ public class GroupDutyRepository {
             }
         }
         return groupDutyList;
+    }
+
+    public UserDutyDataDto getUserDutyData(Index index, String empNo){
+        Map<String,String> userDutyData = new HashMap<>();
+        CustomWorkTag customWorkTag = null;
+        try {
+            DocumentSnapshot document = firestore.collection("duty")
+                    .document(index.getGroupId())
+                    .collection(index.getDate())
+                    .document(index.getIndex())
+                    .get().get();
+
+            if (document.exists()) {
+                log.debug("=== === === === 데이터 가져오기 성공 === === === ===");
+                // dutyList 맵에서 empNo를 키로 사용하여 WorkType 데이터를 가져옴
+                GroupDutySaveFormat dutyData = document.toObject(GroupDutySaveFormat.class);
+                Map<String,DutyFormat> dutyList = dutyData.getDutyList();
+                if (dutyList.containsKey(empNo)) {
+                    userDutyData = dutyList.get(empNo).getWork();
+                    customWorkTag = dutyData.getCustomWorkTag();
+                }else{
+                    log.debug(">>>> 사용자의 데이터가 존재하지않습니다. {}",empNo);
+                }
+            }else {
+                log.debug("해당하는 데이터가 없습니다.");
+            }
+            return new UserDutyDataDto(userDutyData,customWorkTag);
+        } catch (InterruptedException | ExecutionException e) {
+            throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
+        }
     }
 }
