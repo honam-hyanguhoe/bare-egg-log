@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.org.egglog.presentation.domain.setting.screen.AgreeDetailScreen
 import com.org.egglog.presentation.domain.setting.screen.AskSettingScreen
+import com.org.egglog.presentation.domain.setting.screen.BadgeScreen
 import com.org.egglog.presentation.domain.setting.screen.CalendarAddScreen
 import com.org.egglog.presentation.domain.setting.screen.CalendarSettingScreen
 import com.org.egglog.presentation.domain.setting.screen.MySettingScreen
@@ -28,6 +29,7 @@ fun SettingNavigationHost() {
     ) {
         composable(route = SettingRoute.SettingScreen.name) {
             SettingScreen(
+                onNavigateToCertificateBadeScreen = { navController.navigate(route = SettingRoute.CertificateBadgeScreen.name)},
                 onNavigateToPrivacyDetailScreen = { navController.navigate(route = SettingRoute.PrivacyDetailScreen.name) },
                 onNavigateToAgreeDetailScreen = { navController.navigate(route = SettingRoute.AgreeDetailScreen.name) },
                 onNavigateToMySettingScreen = { navController.navigate(route = SettingRoute.MySettingScreen.name) },
@@ -70,6 +72,12 @@ fun SettingNavigationHost() {
 
         composable(route = SettingRoute.NotificationSettingScreen.name) {
             NotificationSettingScreen()
+        }
+
+        composable(route = SettingRoute.CertificateBadgeScreen.name) {
+            BadgeScreen(
+                onNavigateToSettingScreen  = { navController.navigate(SettingRoute.SettingScreen.name)}
+            )
         }
     }
 }

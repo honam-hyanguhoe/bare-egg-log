@@ -37,6 +37,7 @@ fun BasicHeader(
     hasClose: Boolean = false,
     hasInvitationButton: Boolean = false,
     hasProgressBar: Boolean = false,
+    indicatorValue : Float = 0f,
     hasMore: Boolean = false,
     onClickBack: () -> Unit = {},
     onClickLink: () -> Unit = {},
@@ -71,7 +72,7 @@ fun BasicHeader(
             )
             if (hasProgressBar) {
                 Spacer(modifier = Modifier.height(10.dp))
-                LinearIndicator(0f, true)
+                LinearIndicator(indicatorValue, true)
             }
         }
     }
