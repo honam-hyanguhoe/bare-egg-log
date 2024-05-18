@@ -383,11 +383,12 @@ public class GroupService {
     }
 
     public Map<LocalDate, WorkType> getUserExcelData(Long groupId, LocalDate targetMonth, Long index, User loginUser) {
+        log.debug("=== === === === 파이어 베이스에서 근무 데이터 가져오기 시작 === === === ===");
         Firestore db = FirestoreClient.getFirestore();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
         String date = targetMonth.format(formatter);
-        String empNo = loginUser.getEmpNo(); // Assuming User entity has getEmpNo() method
-
+        String empNo = loginUser.getEmpNo();
+        log.debug("=== === === === 경로 설정 시작 === === === ===");
         // Firestore 경로 설정
         CollectionReference dateCollection = db.collection("duty")
                 .document(String.valueOf(groupId))
@@ -395,21 +396,33 @@ public class GroupService {
 
         ApiFuture<QuerySnapshot> future = dateCollection.get();
         Map<LocalDate, WorkType> workTypeMap = new HashMap<>();
-
+        log.debug("=== === === === 데이터 가져오기 성공 === === === ===");
         try {
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-
+            log.debug("=== List<QueryDocumentSnapshot> documents = {} " , documents);
             for (QueryDocumentSnapshot document : documents) {
+                log.debug("=== QueryDocumentSnapshot document = {} " , document);
                 if (document.exists() && document.getId().equals(String.valueOf(index))) {
                     // dutyList 맵에서 empNo를 키로 사용하여 WorkType 데이터를 가져옴
                     Map<String, Object> dutyList = (Map<String, Object>) document.get("dutyList");
+                    log.debug("=== (Map<String, Object>) document.get(\"dutyList\") = {} " , dutyList);
                     if (dutyList != null && dutyList.containsKey(empNo)) {
                         Map<String, Object> workTypeData = (Map<String, Object>) dutyList.get(empNo);
-                        WorkType workType = document.toObject(WorkType.class);
-
-                        // 날짜와 WorkType 데이터를 맵에 추가
-                        LocalDate workDate = LocalDate.parse((String) workTypeData.get("date"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                        workTypeMap.put(workDate, workType);
+                        log.debug("=== (Map<String, Object>) dutyList.get(empNo) = {} " , workTypeData);
+                        for (Map.Entry<String, Object> entry : workTypeData.entrySet()) {
+                            String day = entry.getKey();
+                            String workTypeStr = (String) entry.getValue();
+                            log.debug("=== entry.getKey() = {} " , day);
+                            log.debug("=== (String) entry.getValue() = {} " , workTypeStr);
+                            // workTypeStr을 WorkType 객체로 변환
+                            WorkType workType = WorkType.builder().workTag(WorkTag.valueOf(workTypeStr)).build();
+                            log.debug("=== workTypeStr을 WorkType 객체로 변환 workType = {} " , workType);
+                            // LocalDate workDate 생성
+                            LocalDate workDate = LocalDate.of(targetMonth.getYear(), targetMonth.getMonthValue(), Integer.parseInt(day));
+                            log.debug("=== LocalDate workDate 생성 workDate = {} " , workDate);
+                            // workTypeMap에 추가
+                            workTypeMap.put(workDate, workType);
+                        }
                     }
                 }
             }
