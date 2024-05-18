@@ -316,7 +316,7 @@ fun BottomSheetContent(
                 placeholder = "그룹이름을 입력하세요",
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Done
+                    imeAction = ImeAction.Next
                 ),
             )
             Spacer(modifier = Modifier.height(15.dp))

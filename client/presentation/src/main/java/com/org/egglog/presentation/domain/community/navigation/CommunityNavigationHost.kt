@@ -1,7 +1,10 @@
 package com.org.egglog.presentation.domain.community.navigation
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -12,11 +15,39 @@ import com.org.egglog.presentation.domain.community.screen.PostDetailScreen
 import com.org.egglog.presentation.domain.community.screen.PostListScreen
 import com.org.egglog.presentation.domain.community.screen.PostSearchScreen
 import com.org.egglog.presentation.domain.community.screen.WritePostScreen
+import com.org.egglog.presentation.domain.group.navigation.GroupRoute
 
 @Composable
-fun CommunityNavigationHost() {
+fun CommunityNavigationHost(
+    deepLinkUri: Uri?,
+) {
 
     val navController = rememberNavController()
+    val context = LocalContext.current
+
+    LaunchedEffect(deepLinkUri) {
+        deepLinkUri?.let {
+            Log.d("Invite Link", "gnh $deepLinkUri")
+            val pathSegments = it.pathSegments
+
+            if(pathSegments[0] == "community"){
+                if (pathSegments.size > 1) {
+                    val postId = pathSegments[1]
+                    Log.d("deep", "postId $postId")
+                    navController.navigate(
+                        route = "${CommunityRoute.PostDetailScreen.name}/$postId"
+                    )
+                } else {
+                    Log.d("deep", "전체 리스트로 이동")
+                    navController.navigate(CommunityRoute.PostListScreen.name)
+                }
+            }else {
+                navController.navigate(CommunityRoute.PostListScreen.name)
+            }
+        }
+    }
+
+
     NavHost(
         navController = navController,
         startDestination = CommunityRoute.PostListScreen.name

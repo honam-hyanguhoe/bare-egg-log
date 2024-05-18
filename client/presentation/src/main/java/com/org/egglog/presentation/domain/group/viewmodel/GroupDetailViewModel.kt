@@ -94,30 +94,22 @@ class GroupDetailViewModel @Inject constructor(
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
+
     init {
         loadInit()
     }
 
-//    fun refreshSomething() = intent {
-//        _isLoading.value = true
-//        delay(1000L)
-//        _isLoading.value = false
-//
-//        loadInit()
-//        getGroupDuty()
-//        getMyWork(LocalDate.now())
-//        initSelectedMembers()
-//    }
-//
-
     private fun loadInit() = intent {
         getGroupInfo(groupId = groupId)
         Log.d("weekCal", "init ${state.startDate} ${state.currentWeekDays}")
+
     }
 
     fun initSelectedMembers() = intent {
+        val userName = getUserStoreUseCase()?.userName ?: ""
         reduce {
             state.copy(
+                userName = userName,
                 selectedMembers = emptyList(),
                 groupWorkList = emptyMap(),
             )
@@ -199,6 +191,8 @@ class GroupDetailViewModel @Inject constructor(
                 newMembers = currentMembers
                 newGroupWorkList = currentGroupWorkList
             }
+
+
             reduce {
                 state.copy(selectedMembers = newMembers, groupWorkList = newGroupWorkList)
             }
@@ -570,6 +564,7 @@ class GroupDetailViewModel @Inject constructor(
 
 data class GroupDetailState(
     val dutyType: String = "Day",
+    val userName :String = "",
     val groupInfo: GroupInfo = GroupInfo(
         id = 0,
         isAdmin = false,
