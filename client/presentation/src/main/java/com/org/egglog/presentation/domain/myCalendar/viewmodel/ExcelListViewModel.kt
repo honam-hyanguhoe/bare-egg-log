@@ -52,13 +52,15 @@ class ExcelListViewModel @Inject constructor(
             if (currentMonth < 10) "0${currentMonth}" else "${currentMonth}"
         val date = "${currentYear}-${month}"
         val excelList = getExcelListUseCase("Bearer $accessToken", date).getOrThrow()
+        Log.e("ExcelList", "$excelList")
         reduce { state.copy(excelList = excelList) }
 
     }
 
     fun onConfirm(index: Int) = intent {
         val excelData = state.excelList[index]
-        val response = requestWorkSyncUseCase("Bearer $accessToken", excelData.index.groupId.toLong(), excelData.date, excelData.index.index.toLong())
+        val date = "${excelData.index.date}-01"
+        val response = requestWorkSyncUseCase("Bearer $accessToken", excelData.index.groupId.toLong(), date, excelData.index.index.toLong())
 
         if(response.isSuccess) {
             postSideEffect(ExcelListSideEffect.Toast("동기화 되었습니다"))
