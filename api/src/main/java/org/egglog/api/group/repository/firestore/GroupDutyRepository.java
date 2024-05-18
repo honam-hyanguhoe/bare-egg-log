@@ -74,18 +74,28 @@ public class GroupDutyRepository {
                 throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
             }
 
-            log.debug("upload group duty data....");
-            ApiFuture<WriteResult> apiFuture = firestore
-                    .collection("duty")
-                    .document(group)
-                    .collection(date)
-                    .document()
-                    .set(groupDutySaveFormat);
+            // groupDutySaveFormat이 null인지 체크
+            if (groupDutySaveFormat == null) {
+                log.warn("groupDutySaveFormat is null ~~~~~~~~~~~~~~~~~~~~");
+                throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
+            }
+            log.debug(groupDutySaveFormat.toString());
+            try {
+                ApiFuture<WriteResult> apiFuture = firestore
+                        .collection("duty")
+                        .document(group)
+                        .collection(date)
+                        .document()
+                        .set(groupDutySaveFormat);
 
-            // 쿼리 실행 결과를 기다림
-            WriteResult writeResult = apiFuture.get();
-            log.info("Document successfully written at: {}", writeResult.getUpdateTime());
-
+                // Firestore 호출 결과 로깅
+                WriteResult result = apiFuture.get();
+                log.debug("Document written at: {}", result.getUpdateTime());
+            } catch (Exception e) {
+                log.warn("Firestore operation failed: ", e);
+                e.printStackTrace();
+                throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
+            }
         } catch (Exception e) {
             log.error("Error saving document", e);
         }
