@@ -200,7 +200,7 @@ public class UserService {
         //todo 회원의 그룹 탈퇴
         groupService.deleteUserGroups(loginUser);
         //todo 회원의 캘린더 그룹 삭제
-        calendarGroupService.deleteUserCalendarGroups(loginUser);
+//        calendarGroupService.deleteUserCalendarGroups(loginUser);
 
         return userJpaRepository.save(loginUser.delete())
                 .toResponse();
