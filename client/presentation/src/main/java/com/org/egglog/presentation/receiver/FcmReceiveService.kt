@@ -38,21 +38,13 @@ class FcmReceiveService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         Log.e(TAG, "From: " + remoteMessage.from)
-
-        // Check if message contains a data payload.
         if (remoteMessage.data.isNotEmpty()) {
-            Log.e(TAG, "Message data payload: " + remoteMessage.data)
-            sendNotification(remoteMessage.data["title"], remoteMessage.data["body"], remoteMessage.data["imageUrl"], remoteMessage.data["click_action"])
-            val sp = getSharedPreferences("Messageing", MODE_PRIVATE)
-            val editor = sp.edit()
-            editor.putString("SendMsg", remoteMessage.data["body"]);
-            editor.putBoolean("msgSet", true)
-            editor.apply()
+            Log.e(TAG, "Message data payload: ${remoteMessage.data}")
         }
 
-        if (remoteMessage.notification != null) {
-            Log.e(TAG, "Message Notification Body: " + remoteMessage.notification!!.body)
-            sendNotification(remoteMessage.notification!!.title, remoteMessage.notification!!.body, remoteMessage.notification!!.imageUrl.toString(), remoteMessage.notification!!.clickAction.toString())
+        remoteMessage.notification?.let {
+            Log.e(TAG, "Message Notification Body: ${it.body}")
+            sendNotification(it.title, it.body, it.imageUrl.toString(), it.clickAction)
         }
     }
 
@@ -97,7 +89,7 @@ class FcmReceiveService : FirebaseMessagingService() {
             }
         }
 
-        Log.d("deep", "deep ${clickAction}")
+        Log.d("deep", "deep $clickAction")
         val pendingIntent = PendingIntent.getActivity(
             this, 0 /* Request code */,
             intent, PendingIntent.FLAG_IMMUTABLE
