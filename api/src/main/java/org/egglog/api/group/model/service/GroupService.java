@@ -273,6 +273,7 @@ public class GroupService {
 
 
             }else{
+
                 throw new GroupException(GroupErrorCode.GROUP_ROLE_NOT_MATCH);
             }
         }
@@ -393,4 +394,11 @@ public class GroupService {
         return groupDutyRepository.getUserDutyData(documentIndex,empNo);
     }
 
+    @Transactional
+    public void deleteUserGroups(User loginUser){
+        List<GroupPreviewDto> groupList = groupRepository.findGroupByUserId(loginUser.getId());
+        for (GroupPreviewDto groupPreviewDto : groupList) {
+            exitGroup(groupPreviewDto.getGroupId(), loginUser);
+        }
+    }
 }

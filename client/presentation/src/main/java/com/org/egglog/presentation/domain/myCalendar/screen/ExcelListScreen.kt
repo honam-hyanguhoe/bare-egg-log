@@ -1,5 +1,6 @@
 package com.org.egglog.presentation.domain.myCalendar.screen
 
+import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -30,9 +31,11 @@ import com.org.egglog.presentation.component.atoms.cards.ResultCard
 import com.org.egglog.presentation.component.atoms.dialogs.Dialog
 import com.org.egglog.presentation.component.molecules.cards.ExcelCard
 import com.org.egglog.presentation.component.molecules.headers.BasicHeader
+import com.org.egglog.presentation.domain.myCalendar.activity.MyCalendarActivity
 import com.org.egglog.presentation.domain.myCalendar.viewmodel.ExcelListSideEffect
 import com.org.egglog.presentation.domain.myCalendar.viewmodel.ExcelListViewModel
 import com.org.egglog.presentation.domain.myCalendar.viewmodel.MyCalendarViewModel
+import com.org.egglog.presentation.domain.setting.activity.SettingActivity
 import com.org.egglog.presentation.theme.Black
 import com.org.egglog.presentation.theme.ClientTheme
 import com.org.egglog.presentation.theme.Gray500
@@ -55,6 +58,15 @@ fun ExcelListScreen(
     viewModel.collectSideEffect {
         sideEffect -> when(sideEffect) {
         is ExcelListSideEffect.Toast -> Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
+        ExcelListSideEffect.NavigateToCalendarActivity -> {
+            context.startActivity(
+                Intent(
+                    context, MyCalendarActivity::class.java
+                ).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+            )
+        }
     }
     }
 
@@ -155,9 +167,8 @@ private fun ExcelListScreen(
                     openDialog.value = false
                 },
                 onConfirmation = {
-                    // TODO 동기화 요청 보내기
                     onConfirm(selectedExcelIndex.value)
-                    onNavigateToMyCalendarScreen()
+                    openDialog.value = false
                 },
                 dialogTitle = "동기화 하시겠습니까?",
                 dialogText = "동기화 시 이전에 입력한 근무 데이터는 사라집니다."

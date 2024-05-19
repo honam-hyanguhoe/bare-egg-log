@@ -29,7 +29,7 @@ class MyWorker @AssistedInject constructor(
     private val getTokenUseCase: GetTokenUseCase,
     private val getUserStoreUseCase: GetUserStoreUseCase,
     private val notificationUseCase: NotificationUseCase,
-    private val scheduleUseCase: SchedulerUseCase,
+    private val schedulerUseCase: SchedulerUseCase,
     private val getAlarmFindListUseCase: GetAlarmFindListUseCase,
     private val getAlarmPersonalScheduleUseCase: GetAlarmPersonalScheduleUseCase
 ) : CoroutineWorker(context, workerParams) {
@@ -77,7 +77,9 @@ class MyWorker @AssistedInject constructor(
             LocalDate.now().plusDays(8).format(formatter)
         ).getOrThrow()
         alarmList?.workList?.map {
-            if(it.alarm.isAlarmOn) scheduleUseCase.setAlarm(it.work.workId, 0, it.alarm.alarmReplayCnt, it.alarm.alarmReplayTime.toLong(), stringToNewLocalDateTime("${it.work.workDate}${it.alarm.alarmTime}"), false)
+            val dateTime = stringToNewLocalDateTime("${it.work.workDate}${it.alarm.alarmTime}")
+            if(it.alarm.isAlarmOn && dateTime > LocalDateTime.now()) schedulerUseCase.setAlarm("${dateTime.monthValue - 1}${dateTime.dayOfMonth}".toInt(), 0, it.alarm.alarmReplayCnt, it.alarm.alarmReplayTime.toLong(), dateTime, false)
+            else schedulerUseCase.cancelAllAlarms("${dateTime.monthValue - 1}${dateTime.dayOfMonth}".toInt())
         }
         return "$nextDaySchedule\n$alarmList"
     }
@@ -111,7 +113,7 @@ class MyWorker @AssistedInject constructor(
         private val getTokenUseCase: GetTokenUseCase,
         private val getUserStoreUseCase: GetUserStoreUseCase,
         private val notificationUseCase: NotificationUseCase,
-        private val scheduleUseCase: SchedulerUseCase,
+        private val schedulerUseCase: SchedulerUseCase,
         private val getAlarmFindListUseCase: GetAlarmFindListUseCase,
         private val getAlarmPersonalScheduleUseCase: GetAlarmPersonalScheduleUseCase
     ) : ChildWorkerFactory {
@@ -122,7 +124,7 @@ class MyWorker @AssistedInject constructor(
                 getTokenUseCase,
                 getUserStoreUseCase,
                 notificationUseCase,
-                scheduleUseCase,
+                schedulerUseCase,
                 getAlarmFindListUseCase,
                 getAlarmPersonalScheduleUseCase
             )

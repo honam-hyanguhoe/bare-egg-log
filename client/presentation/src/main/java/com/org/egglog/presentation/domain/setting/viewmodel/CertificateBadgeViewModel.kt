@@ -78,7 +78,7 @@ class CertificateBadgeViewModel @Inject constructor(
     }
     fun handleImageSelection(context: Context, uri: Uri , type: String) = intent {
         if(type == "nurse"){
-            val resizedImage = resizeImage(context, uri, 800, 600)
+            val resizedImage = resizeImage(context, uri, 400, 300)
             resizedImage?.let {
                 reduce {
                     state.copy(
@@ -89,7 +89,7 @@ class CertificateBadgeViewModel @Inject constructor(
                 Log.d("badge", "nurseCertificationImgUrl ${state.nurseCertificationImgUrl}")
             }
         }else if (type == "hospital"){
-            val resizedImage = resizeImage(context, uri, 800, 600)
+            val resizedImage = resizeImage(context, uri, 400, 300)
             resizedImage?.let {
                 reduce {
                     state.copy(

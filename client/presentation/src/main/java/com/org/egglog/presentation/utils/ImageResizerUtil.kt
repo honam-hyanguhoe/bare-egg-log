@@ -8,16 +8,14 @@ import java.io.ByteArrayOutputStream
 
 fun bitmapToByteArray(bitmap: Bitmap?): ByteArray {
     val stream = ByteArrayOutputStream()
-    if (bitmap != null) {
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-    }
+    bitmap?.compress(Bitmap.CompressFormat.JPEG, 80, stream)
     return stream.toByteArray()
 }
 fun resizeImage(
     context: Context,
     imageUri: Uri,
     requestWidth: Int,
-    requestHeight: Int
+    requestHeight: Int,
 ): Bitmap? {
     val options = BitmapFactory.Options().also {
         it.inJustDecodeBounds = true

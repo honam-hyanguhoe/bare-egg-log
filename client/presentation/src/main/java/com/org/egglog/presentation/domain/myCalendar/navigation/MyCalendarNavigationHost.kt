@@ -1,23 +1,50 @@
 package com.org.egglog.presentation.domain.myCalendar.navigation
 
+import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.org.egglog.presentation.domain.community.navigation.CommunityRoute
+import com.org.egglog.presentation.domain.group.navigation.GroupRoute
 import com.org.egglog.presentation.domain.myCalendar.screen.ExcelListScreen
 import com.org.egglog.presentation.domain.myCalendar.screen.MyCalendarScreen
 import com.org.egglog.presentation.domain.setting.navigation.SettingRoute
 import com.org.egglog.presentation.domain.setting.screen.CalendarAddScreen
 import com.org.egglog.presentation.domain.setting.screen.CalendarSettingScreen
 import com.org.egglog.presentation.domain.setting.screen.WorkSettingScreen
+import java.time.LocalDate
 
 @Composable
-fun MyCalendarNavigationHost() {
-
+fun MyCalendarNavigationHost(
+    deepLinkUri: Uri?,
+) {
     val navController = rememberNavController()
+
+    LaunchedEffect(deepLinkUri) {
+        deepLinkUri?.let {
+            val pathSegments = it.pathSegments
+
+            if(pathSegments[0] == "mycalendar"){
+                val currentYear = LocalDate.now().year
+                val currentMonth = LocalDate.now().monthValue
+
+                navController.navigate("${MyCalendarRoute.ExcelListScreen.name}/$currentYear/$currentMonth")
+            }else{
+                navController.navigate(MyCalendarRoute.MyCalendarScreen.name)
+            }
+        }
+    }
+
+
+
+
+
+
     NavHost(
         navController = navController,
         startDestination = MyCalendarRoute.MyCalendarScreen.name
@@ -41,6 +68,7 @@ fun MyCalendarNavigationHost() {
                 }
             )
         }
+
 
         composable(
             route = "${MyCalendarRoute.ExcelListScreen.name}/{currentYear}/{currentMonth}",

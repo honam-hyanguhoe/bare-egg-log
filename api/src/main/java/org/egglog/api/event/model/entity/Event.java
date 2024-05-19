@@ -2,6 +2,7 @@ package org.egglog.api.event.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.egglog.api.calendargroup.model.dto.response.CalendarGroupEventResponse;
 import org.egglog.api.calendargroup.model.entity.CalendarGroup;
 import org.egglog.api.user.model.entity.User;
 
@@ -46,4 +47,15 @@ public class Event {
 
     @Column(name = "event_uuid")
     private String uuid;
+
+    public CalendarGroupEventResponse toCalendarGroupEventResponse(){
+        return CalendarGroupEventResponse.builder()
+                .eventId(this.id)
+                .eventTitle(this.eventTitle)
+                .eventContent(this.eventContent)
+                .startDate(this.startDate)
+                .endDate(this.endDate)
+                .build();
+    }
+
 }

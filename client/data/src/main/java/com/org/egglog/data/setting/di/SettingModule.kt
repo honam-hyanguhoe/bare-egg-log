@@ -1,6 +1,7 @@
 package com.org.egglog.data.setting.di
 
 import com.org.egglog.data.setting.usecase.CertificateBadgeUseCaseImpl
+import com.org.egglog.data.setting.usecase.DeleteCalendarGroupMapStoreUseCaseImpl
 import com.org.egglog.data.setting.usecase.DeleteCalendarGroupUseCaseImpl
 import com.org.egglog.data.setting.usecase.DeleteWorkTypeUseCaseImpl
 import com.org.egglog.data.setting.usecase.GetAlarmListUseCaseImpl
@@ -19,6 +20,7 @@ import com.org.egglog.data.setting.usecase.UpdateAlarmUseCaseImpl
 import com.org.egglog.data.setting.usecase.UpdateNotificationUseCaseImpl
 import com.org.egglog.data.setting.usecase.UpdateWorkTypeUseCaseImpl
 import com.org.egglog.domain.setting.usecase.CertificateBadgeUseCase
+import com.org.egglog.domain.setting.usecase.DeleteCalendarGroupMapStoreUseCase
 import com.org.egglog.domain.setting.usecase.DeleteCalendarGroupUseCase
 import com.org.egglog.domain.setting.usecase.DeleteWorkTypeUseCase
 import com.org.egglog.domain.setting.usecase.GetAlarmListUseCase
@@ -49,6 +51,9 @@ abstract class SettingModule {
 
     @Binds
     abstract fun bindGetCalendarGroupMapStoreUseCase(uc: GetCalendarGroupMapStoreUseCaseImpl): GetCalendarGroupMapStoreUseCase
+
+    @Binds
+    abstract fun bindDeleteCalendarGroupMapStoreUseCase(uc: DeleteCalendarGroupMapStoreUseCaseImpl): DeleteCalendarGroupMapStoreUseCase
 
     @Binds
     abstract fun bindSetCalendarGroupMapStoreUseCase(uc: SetCalendarGroupMapStoreUseCaseImpl): SetCalendarGroupMapStoreUseCase
