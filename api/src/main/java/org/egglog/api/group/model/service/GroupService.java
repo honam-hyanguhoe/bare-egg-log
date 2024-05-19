@@ -5,6 +5,7 @@ import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.egglog.api.board.model.dto.params.BoardListForm;
 import org.egglog.api.board.model.entity.Board;
 import org.egglog.api.board.model.service.BoardService;
 import org.egglog.api.board.repository.jpa.board.BoardRepository;
@@ -271,12 +272,11 @@ public class GroupService {
             Integer count = groupMemberService.countGroupMember(groupId);
             //혼자가 아니라면 탈퇴 권한 없음
             if(count==1){
-                groupMemberService.deleteGroupMember(userInfo);
-                boardRepository.deleteByGroupId(groupId);
                 //더이상 남은 사용자가 없으니 그룹 삭제
                 Group group = groupRepository.findById(groupId).orElseThrow(()->new GroupException(GroupErrorCode.NOT_FOUND));
+                //그룹 게시판 글 삭제 cascade로 삭제
+                groupMemberService.deleteGroupMember(userInfo);
                 groupRepository.delete(group);
-
                 //해당 멤버가 삭제되었다면 해당 유저의 토픽 구독 취소
                 notificationService.exitGroupNotification(user, groupId);
 
