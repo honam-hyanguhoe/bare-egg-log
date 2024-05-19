@@ -288,7 +288,39 @@ public class NotificationService {
             }
         }
     }
+    @Transactional
+    public void iamBossNotification(Group group, User newBoss){
+        log.debug(" ==== ==== ==== [ 재직 인증 승인 알림 서비스 실행 ] ==== ==== ====");
+        String deviceToken = newBoss.getDeviceToken();
+        UserNotification userNotification = notificationRepository.findByTypeAndUser(TopicEnum.GROUP, newBoss).orElseThrow(
+                () -> new CommentException(CommentErrorCode.NO_EXIST_COMMENT));
+        if (deviceToken!=null&&userNotification.getStatus()){
+            Notification notification = Notification.builder()
+                    .setTitle("이제 고생 시작이다..")
+                    .setBody(group.getGroupName()+"의 그룹장이 되셨습니다.")
+                    .build();
+            fcmService.sendPersonalNotification(deviceToken, notification, makeDeepLinkSetting(deepLinkConfig.getGroup(), group.getId()));
+        }
+    }
 
+    @Transactional
+    public void newBossNotification(Group group, Board board, User newBoss){
+        log.debug(" ==== ==== ==== [ 새로운 그룹장 알림 서비스 실행 ] ==== ==== ====");
+        String deviceToken = newBoss.getDeviceToken();
+        UserNotification userNotification = notificationRepository.findByTypeAndUser(TopicEnum.GROUP, newBoss).orElseThrow(
+                () -> new CommentException(CommentErrorCode.NO_EXIST_COMMENT));
+        FCMTopic topic = FCMTopic.builder()
+                .topic(TopicEnum.GROUP)
+                .topicId(group.getId())
+                .build();
+        if (deviceToken!=null&&userNotification.getStatus()){
+            Notification notification = Notification.builder()
+                    .setTitle("NEW BOSS 등장! ")
+                    .setBody(group.getGroupName()+"의 새로운 BOSS "+newBoss.getName()+" 님에게 축하 댓글을 달아주세요!")
+                    .build();
+            fcmService.sendNotificationToTopic(topic, notification, makeDeepLinkSetting(deepLinkConfig.getCommunity(), board.getId()));
+        }
+    }
 
     @Transactional
     public void certHospitalNotification(HospitalAuth hospitalAuth){

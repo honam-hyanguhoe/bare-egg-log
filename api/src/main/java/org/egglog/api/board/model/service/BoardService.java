@@ -613,4 +613,16 @@ public class BoardService {
         boardTypeListOutputSpec.setGroupList(groupByUserId);
         return boardTypeListOutputSpec;
     }
+
+    public Board newBossBoardCreate(Group group, User bossUser){
+        return boardRepository.save(Board.builder()
+                .title("새로운 BOSS "+ bossUser.getName()+ "등장")
+                .content(group.getGroupName()+"을 이끌어 나갈 새 리더 입니다. 축하바랍니다.")
+                .group(group)
+                .isCommented(false)
+                .tempNickname("운영자")
+                .boardType(BoardType.GROUP)
+                .user(bossUser)
+                .build());
+    }
 }

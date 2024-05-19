@@ -6,6 +6,7 @@ import com.google.firebase.cloud.FirestoreClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.board.model.entity.Board;
+import org.egglog.api.board.model.service.BoardService;
 import org.egglog.api.board.repository.jpa.board.BoardRepository;
 import org.egglog.api.group.exception.GroupErrorCode;
 import org.egglog.api.group.exception.GroupException;
@@ -51,7 +52,7 @@ public class GroupService {
 
     // 게시판 관련 레포지토리(그룹 삭제를 위함)
     private final BoardRepository boardRepository;
-
+    private final BoardService boardService;
 
     private final FCMService fcmService;
     private final NotificationService notificationService;
@@ -235,7 +236,8 @@ public class GroupService {
         }
         //새로운 그룹장 생성
         GroupMember newBoss = groupMemberService.getGroupMember(groupId,memberId);
-
+        Group group = newBoss.getGroup();
+        User newBossUser = newBoss.getUser();
         newBoss.setIsAdmin(true);
         boss.setIsAdmin(false);
 
@@ -245,6 +247,13 @@ public class GroupService {
         //변경 정보 DB 반영
         groupMemberService.createGroupMember(newBoss);
         groupMemberService.createGroupMember(boss);
+
+        //새로운 그룹장 축하글 작성
+        Board board = boardService.newBossBoardCreate(group, newBossUser);
+
+        //새로운 그룹장 알림
+        notificationService.iamBossNotification(group, newBossUser);
+        notificationService.newBossNotification(group, board, newBossUser);
     }
 
     /**
