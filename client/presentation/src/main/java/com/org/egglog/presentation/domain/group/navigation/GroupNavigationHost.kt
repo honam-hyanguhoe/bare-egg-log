@@ -65,6 +65,7 @@ fun GroupNavigationHost(
         composable(route = GroupRoute.GroupListScreen.name) {
             GroupListScreen(
                 onNavigateToGroupDetailScreen = { groupId ->
+                    Log.d("navigate", "groupId ${groupId}")
                     navController.navigate(
                         route = "${GroupRoute.GroupDetailScreen.name}/$groupId"
                     )

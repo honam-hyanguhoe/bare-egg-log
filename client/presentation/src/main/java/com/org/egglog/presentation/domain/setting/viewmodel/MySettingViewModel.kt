@@ -14,6 +14,7 @@ import com.org.egglog.domain.auth.usecase.PostLogoutUseCase
 import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.UpdateUserDeleteUseCase
 import com.org.egglog.domain.auth.usecase.UpdateUserModifyUseCase
+import com.org.egglog.domain.setting.usecase.DeleteCalendarGroupMapStoreUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.Flow
@@ -36,6 +37,7 @@ class MySettingViewModel @Inject constructor(
     private val getUserStoreUseCase: GetUserStoreUseCase,
     private val setUserStoreUseCase: SetUserStoreUseCase,
     private val deleteUserStoreUseCase: DeleteUserStoreUseCase,
+    private val deleteCalendarGroupMapStoreUseCase: DeleteCalendarGroupMapStoreUseCase,
     private val updateUserDeleteUseCase: UpdateUserDeleteUseCase,
     private val updateUserModifyUseCase: UpdateUserModifyUseCase,
     private val getAllHospitalUseCase: GetAllHospitalUseCase
@@ -123,6 +125,7 @@ class MySettingViewModel @Inject constructor(
         updateUserDeleteUseCase("Bearer ${tokens.first.orEmpty()}")
         deleteTokenUseCase()
         deleteUserStoreUseCase()
+        deleteCalendarGroupMapStoreUseCase()
         postSideEffect(MySettingSideEffect.Toast("탈퇴가 완료되었습니다."))
         postSideEffect(MySettingSideEffect.NavigateToLoginActivity)
         reduce {

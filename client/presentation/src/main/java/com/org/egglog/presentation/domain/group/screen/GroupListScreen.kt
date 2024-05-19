@@ -91,7 +91,7 @@ fun GroupListScreen(
 
     LaunchedEffect(Unit) {
         Log.d("groupList", "왔니")
-        groupListViewModel.getGroupList()
+//        groupListViewModel.getGroupList()
     }
 
     groupListViewModel.collectSideEffect { sideEffect ->
@@ -179,7 +179,6 @@ private fun GroupListScreen(
             .fillMaxSize()
             .systemBarsPadding()
             .imePadding(),
-//            .addFocusCleaner(focusManager),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
@@ -205,7 +204,7 @@ private fun GroupListScreen(
                 verticalArrangement = Arrangement.Top
             ) {
                 Spacer(modifier = Modifier.height(5.dp))
-                NoticeHeader(title = "그룹", horizontalPadding = 20, verticalPadding = 10)
+                NoticeHeader(title = "그룹", horizontalPadding = 20, verticalPadding = 10, hasNotice = false)
                 Spacer(modifier = Modifier.height(5.dp))
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),

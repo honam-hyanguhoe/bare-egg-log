@@ -8,14 +8,13 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.media.RingtoneManager
+import android.net.Uri
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.org.egglog.domain.auth.model.UserFcmTokenParam
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
-import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
-import com.org.egglog.domain.auth.usecase.GetUserUseCase
 import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.UpdateUserFcmTokenUseCase
 import com.org.egglog.presentation.R
@@ -28,6 +27,7 @@ import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class FcmReceiveService : FirebaseMessagingService() {
@@ -42,7 +42,7 @@ class FcmReceiveService : FirebaseMessagingService() {
         // Check if message contains a data payload.
         if (remoteMessage.data.isNotEmpty()) {
             Log.e(TAG, "Message data payload: " + remoteMessage.data)
-            sendNotification(remoteMessage.data["title"], remoteMessage.data["body"], remoteMessage.data["imageUrl"])
+            sendNotification(remoteMessage.data["title"], remoteMessage.data["body"], remoteMessage.data["imageUrl"], remoteMessage.data["click_action"])
             val sp = getSharedPreferences("Messageing", MODE_PRIVATE)
             val editor = sp.edit()
             editor.putString("SendMsg", remoteMessage.data["body"]);
@@ -52,7 +52,7 @@ class FcmReceiveService : FirebaseMessagingService() {
 
         if (remoteMessage.notification != null) {
             Log.e(TAG, "Message Notification Body: " + remoteMessage.notification!!.body)
-            sendNotification(remoteMessage.notification!!.title, remoteMessage.notification!!.body, remoteMessage.notification!!.imageUrl.toString())
+            sendNotification(remoteMessage.notification!!.title, remoteMessage.notification!!.body, remoteMessage.notification!!.imageUrl.toString(), remoteMessage.notification!!.clickAction.toString())
         }
     }
 
@@ -86,11 +86,18 @@ class FcmReceiveService : FirebaseMessagingService() {
         }
     }
 
-    private fun sendNotification(title: String?, messageBody: String?, imageUrl: String?) {
-        val intent = Intent(this, MainActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        Log.e(TAG, "mesg=${messageBody}")
+    private fun sendNotification(title: String?, messageBody: String?, imageUrl: String?, clickAction:String?) {
+        val intent = if (!clickAction.isNullOrEmpty()) {
+            Intent(Intent.ACTION_VIEW, Uri.parse(clickAction)).apply {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
+        } else {
+            Intent(this, MainActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
+        }
 
+        Log.d("deep", "deep ${clickAction}")
         val pendingIntent = PendingIntent.getActivity(
             this, 0 /* Request code */,
             intent, PendingIntent.FLAG_IMMUTABLE

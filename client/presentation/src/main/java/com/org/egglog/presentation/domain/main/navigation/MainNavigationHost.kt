@@ -17,6 +17,7 @@ import com.org.egglog.presentation.domain.auth.screen.TestScreen
 import com.org.egglog.presentation.domain.community.activity.CommunityActivity
 import com.org.egglog.presentation.domain.group.activity.GroupActivity
 import com.org.egglog.presentation.domain.main.screen.MainScreen
+import com.org.egglog.presentation.domain.myCalendar.activity.MyCalendarActivity
 
 @Composable
 fun MainNavigationHost(deepLinkUri: Uri?) {
@@ -28,6 +29,7 @@ fun MainNavigationHost(deepLinkUri: Uri?) {
             if (pathSegments[0] == "invite") {
                 val code = pathSegments[1]
                 val name = pathSegments[2]
+                Log.d("deep", "nvh $code $name")
                 if (code != null) {
                     val intent = Intent(context, GroupActivity::class.java).apply {
                         data = it
@@ -62,7 +64,13 @@ fun MainNavigationHost(deepLinkUri: Uri?) {
                 context.startActivity(intent)
             } else if (pathSegments[0] == "main") {
                 navController.navigate(MainRoute.MainScreen.name)
-            }else{
+            }else if (pathSegments[0] == "mycalendar") {
+                val intent = Intent(context, MyCalendarActivity::class.java).apply {
+                    data = it
+                }
+                context.startActivity(intent)
+            }
+            else{
                 navController.navigate(MainRoute.MainScreen.name)
             }
         }

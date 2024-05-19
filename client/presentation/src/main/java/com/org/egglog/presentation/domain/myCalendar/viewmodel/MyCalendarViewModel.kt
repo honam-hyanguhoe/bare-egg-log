@@ -260,8 +260,8 @@ class MyCalendarViewModel @Inject constructor(
             "Bearer $accessToken",
             state.scheduleTitle,
             state.scheduleContent,
-            state.startTime!!,
-            state.endTime!!,
+            state.startTime,
+            state.endTime,
             userInfo!!.workGroupId!!
         )
         if (response.isSuccess) {
