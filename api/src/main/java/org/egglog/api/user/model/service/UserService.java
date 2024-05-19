@@ -7,7 +7,9 @@ import org.egglog.api.alarm.model.entity.Alarm;
 import org.egglog.api.alarm.model.service.AlarmService;
 import org.egglog.api.alarm.repository.jpa.AlarmRepository;
 import org.egglog.api.calendargroup.model.entity.CalendarGroup;
+import org.egglog.api.calendargroup.model.service.CalendarGroupService;
 import org.egglog.api.calendargroup.repository.jpa.CalendarGroupRepository;
+import org.egglog.api.group.model.service.GroupService;
 import org.egglog.api.hospital.exception.HospitalErrorCode;
 import org.egglog.api.hospital.exception.HospitalException;
 import org.egglog.api.hospital.model.entity.Hospital;
@@ -45,9 +47,10 @@ public class UserService {
     private final HospitalAuthJpaRepository hospitalAuthJpaRepository;
     private final WorkTypeJpaRepository workTypeJpaRepository;
     private final CalendarGroupRepository calendarGroupRepository;
+    private final GroupService groupService;
     private final NotificationService notificationService;
     private final AlarmService alarmService;
-
+    private final CalendarGroupService calendarGroupService;
     @Transactional(readOnly = true)
     public UserResponse findById(Long id) {
         return userJpaRepository.findByIdWithHospital(id)
@@ -193,6 +196,12 @@ public class UserService {
     @Transactional
     public UserResponse deleteUser(User loginUser) {
         log.debug(" ==== ==== ==== [ 유저 탈퇴 서비스 실행] ==== ==== ====");
+
+        //todo 회원의 그룹 탈퇴
+        groupService.deleteUserGroups(loginUser);
+        //todo 회원의 캘린더 그룹 삭제
+        calendarGroupService.deleteUserCalendarGroups(loginUser);
+
         return userJpaRepository.save(loginUser.delete())
                 .toResponse();
     }

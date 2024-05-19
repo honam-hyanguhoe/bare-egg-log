@@ -105,4 +105,13 @@ public class CalendarGroupService {
     }
 
 
+    @Transactional
+    public void deleteUserCalendarGroups(User loginUser){
+        List<CalendarGroup> listByUserId = calendarGroupRepository.findListByUserId(loginUser.getId());
+        for (CalendarGroup calendarGroup : listByUserId) {
+            long deletedCount = eventRepository.deleteAllByCalendarGroupId(calendarGroup.getId());
+            log.debug(" ==== ==== ==== [ 캘린더 = {} 에 대한 일정 값 삭제 관련 일정 = {} 개 삭제 완료 ] ==== ==== ==== ",calendarGroup.getAlias(), deletedCount);
+            calendarGroupRepository.delete(calendarGroup);
+        }
+    }
 }
