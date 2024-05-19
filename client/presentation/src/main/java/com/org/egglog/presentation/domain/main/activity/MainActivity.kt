@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val deepLinkUri: Uri? = intent?.data
+        Log.d("deep", "main ${deepLinkUri.toString()}")
         setContent {
             ClientTheme {
                 MainNavigationHost(deepLinkUri)
