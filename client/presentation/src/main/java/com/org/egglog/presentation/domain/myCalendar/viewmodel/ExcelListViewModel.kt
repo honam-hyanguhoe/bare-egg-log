@@ -87,9 +87,11 @@ class ExcelListViewModel @Inject constructor(
                 else schedulerUseCase.cancelAllAlarms("${dateTime.monthValue - 1}${dateTime.dayOfMonth}".toInt())
             }
             postSideEffect(ExcelListSideEffect.Toast("동기화 되었습니다"))
+            postSideEffect(ExcelListSideEffect.NavigateToCalendarActivity)
         } else {
             postSideEffect(ExcelListSideEffect.Toast("다시 시도해주세요"))
         }
+
     }
 
 
@@ -105,4 +107,6 @@ data class ExcelListState(
 
 sealed interface ExcelListSideEffect{
     class Toast(val message: String): ExcelListSideEffect
+
+    data object NavigateToCalendarActivity: ExcelListSideEffect
 }

@@ -345,7 +345,7 @@ fun MyCalendarScreen(
 
         if (isWorkBottomSheet.value) {
             InteractiveBottomSheet(
-                380.heightPercent(context).dp,
+                340.heightPercent(context).dp,
                 10.dp,
                 workTypeList,
                 isWorkBottomSheet,
@@ -617,7 +617,7 @@ fun WorkScheduleForm(
         verticalArrangement = Arrangement.Center
     ) {
         // 근무 일정 추가 content
-        Column(modifier = Modifier.height(270.dp)) {
+        Column(modifier = Modifier.height(230.dp)) {
             // 근무 일정 추가 Header
             Row(
                 Modifier.fillMaxWidth(),
