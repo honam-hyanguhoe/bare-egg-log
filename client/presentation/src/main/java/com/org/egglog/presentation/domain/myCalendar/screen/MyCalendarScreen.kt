@@ -440,7 +440,11 @@ fun ScheduleList(
 ) {
     Column() {
         if (currentWorkData != null) {
-            SmallScheduleCard2(workType = currentWorkData)
+            val hour1 = currentWorkData.startTime.substring(0,2).toInt()
+            val hour2 = currentWorkData.workTime.substring(0,2).toInt()
+            val endTime = String.format("%02d:00", hour1 + hour2)
+
+            SmallScheduleCard2(workType = currentWorkData.copy(workTime = endTime))
         }
 
 
