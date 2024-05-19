@@ -79,6 +79,8 @@ public class FCMService {
         AndroidNotification androidNotification = AndroidNotification.builder().setTitle(title).setBody(body).setClickAction(data.get("click_action")).build();
         AndroidConfig androidConfig = AndroidConfig.builder().setNotification(androidNotification).build();
         Notification notification = Notification.builder().setTitle(title).setBody(body).build();
+        data.put("title", title);
+        data.put("body",body);
         Message message = Message.builder()
                 .setNotification(notification)
                 .setAndroidConfig(androidConfig)
@@ -99,6 +101,8 @@ public class FCMService {
         AndroidNotification androidNotification = AndroidNotification.builder().setTitle(title).setBody(body).setClickAction(data.get("click_action")).build();
         AndroidConfig androidConfig = AndroidConfig.builder().setNotification(androidNotification).build();
         Notification notification = Notification.builder().setTitle(title).setBody(body).build();
+        data.put("title", title);
+        data.put("body",body);
         Message message = Message.builder()
                 .setAndroidConfig(androidConfig)
                 .setNotification(notification)
