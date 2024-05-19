@@ -252,14 +252,15 @@ public class NotificationService {
 
         // 2. 대 댓글이라면 부모 ID 작성자에게도 알림을 보낸다.
         Long parentId = saveComment.getParentId();
+        User commentUser = saveComment.getUser();
         if (!parentId.equals(0L)&&!parentId.equals(board.getUser().getId())){//대 댓글이면서 부모 댓글의 아이디가 글 작성자가 아닐때만 발송한다.
-            Comment cocoment = commentRepository.findWithUserById(parentId).orElseThrow(
+            Comment parentComment = commentRepository.findWithUserById(parentId).orElseThrow(
                     () -> new CommentException(CommentErrorCode.NO_EXIST_COMMENT));
-            String cocomentDeviceToken = cocoment.getUser().getDeviceToken();
+            String parentComentDeviceToken = parentComment.getUser().getDeviceToken();
             UserNotification cocomentUserNotification = notificationRepository
-                    .findByTypeAndUser(TopicEnum.BOARD, cocoment.getUser()).orElseThrow(() -> new NotificationException(NotificationErrorCode.NOTIFICATION_SERVER_ERROR));
-            if (cocomentDeviceToken!=null&&cocomentUserNotification.getStatus()){
-                fcmService.sendPersonalNotification(cocomentDeviceToken, "띠용! 내 댓글에 새 대댓글이 달렸습니다.",saveComment.getContent(), makeDeepLinkSetting(deepLinkConfig.getCommunity(), board.getId()));
+                    .findByTypeAndUser(TopicEnum.BOARD, parentComment.getUser()).orElseThrow(() -> new NotificationException(NotificationErrorCode.NOTIFICATION_SERVER_ERROR));
+            if (parentComentDeviceToken!=null&&cocomentUserNotification.getStatus()&&!commentUser.equals(parentComment.getUser())){
+                fcmService.sendPersonalNotification(parentComentDeviceToken, "띠용! 내 댓글에 새 대댓글이 달렸습니다.",saveComment.getContent(), makeDeepLinkSetting(deepLinkConfig.getCommunity(), board.getId()));
             }
         }
     }
