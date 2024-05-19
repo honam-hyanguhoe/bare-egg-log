@@ -222,7 +222,7 @@ public class NotificationService {
                     .topic(TopicEnum.GROUP)
                     .topicId(boardForm.getGroupId())
                     .build();
-            fcmService.sendNotificationToTopic(topic, "[새 글 알림]" + group.getGroupName() + " 커뮤니티에 새 글이 올라왔습니다.", boardForm.getBoardTitle(), makeDeepLinkSetting(deepLinkConfig.getCommunity()));
+            fcmService.sendNotificationToTopic(topic, "[새 글 알림]" + group.getGroupName() + " 커뮤니티에 새 글이 올라왔습니다.", boardForm.getBoardTitle(), makeDeepLinkSetting(deepLinkConfig.getCommunity(), saveBoard.getId()));
         }
     }
 
@@ -317,7 +317,9 @@ public class NotificationService {
     }
 
     private Map<String, String> makeDeepLinkSetting(String deeplink){
-        return Map.of("click_action", deeplink);
+        Map<String, String> map = new HashMap<>();
+        map.put("click_action", deeplink);
+        return map;
     }
     private Map<String, String> makeDeepLinkSetting(String deeplink, Long id){
         Map<String, String> map = new HashMap<>();
