@@ -14,6 +14,7 @@ import com.org.egglog.domain.auth.usecase.GetAllHospitalUseCase
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.UpdateUserJoinUseCase
+import com.org.egglog.domain.setting.usecase.SetCalendarGroupMapStoreUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.Flow
@@ -38,6 +39,7 @@ class PlusLoginViewModel @Inject constructor(
     private val setUserStoreUseCase: SetUserStoreUseCase,
     private val getTokenUseCase: GetTokenUseCase,
     private val updateUserJoinUseCase: UpdateUserJoinUseCase,
+    private val setCalendarGroupMapStoreUseCase: SetCalendarGroupMapStoreUseCase,
     private val getAllHospitalUseCase: GetAllHospitalUseCase
 ): ViewModel(), ContainerHost<PlusLoginState, PlusLoginSideEffect>{
     override val container: Container<PlusLoginState, PlusLoginSideEffect> = container(
@@ -102,6 +104,7 @@ class PlusLoginViewModel @Inject constructor(
         val result = updateUserJoinUseCase(accessToken = "Bearer ${tokens.first.orEmpty()}", addUserParam = AddUserParam(userName = state.name, empNo = state.empNo, hospitalId = state.hospital!!.hospitalId, fcmToken = fcmToken)).getOrThrow()
         if(result != null) {
             setUserStoreUseCase(result)
+            setCalendarGroupMapStoreUseCase(mapOf(result.workGroupId.toString() to true))
             postSideEffect(PlusLoginSideEffect.NavigateToMainActivity)
         } else {
             postSideEffect(PlusLoginSideEffect.Toast("회원가입에 실패했습니다."))
