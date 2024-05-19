@@ -418,9 +418,9 @@ class GroupDetailViewModel @Inject constructor(
     fun copyInvitationLink(context: Context) = intent {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val invitationCode = getInvitationCode()
-
+        val inviteGroupName = state.groupInfo.groupName.replace(" ", "_")
         Log.d("Invite Link", invitationCode)
-        val invitationLink = "egglog://honam.com/invite/${invitationCode}/${state.groupInfo.groupName}"
+        val invitationLink = "egglog://honam.com/invite/${invitationCode}/$inviteGroupName"
         Log.d("Invite Link", "link $invitationLink")
         // 수정 예정
         val clip = ClipData.newPlainText("Invite Link", invitationLink)
