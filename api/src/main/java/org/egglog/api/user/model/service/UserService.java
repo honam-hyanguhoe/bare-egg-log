@@ -196,7 +196,6 @@ public class UserService {
     @Transactional
     public UserResponse deleteUser(User loginUser) {
         log.debug(" ==== ==== ==== [ 유저 탈퇴 서비스 실행] ==== ==== ====");
-
         //todo 회원의 그룹 탈퇴
         groupService.deleteUserGroups(loginUser);
         //todo 회원의 캘린더 그룹 삭제
