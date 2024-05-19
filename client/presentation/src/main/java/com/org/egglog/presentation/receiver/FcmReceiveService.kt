@@ -26,40 +26,38 @@ import kotlinx.coroutines.launch
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.Calendar
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class FcmReceiveService : FirebaseMessagingService() {
-    @Inject
-    lateinit var updateUserFcmTokenUseCase: UpdateUserFcmTokenUseCase
-    @Inject
-    lateinit var getTokenStoreUseCase: GetTokenUseCase
-    @Inject
-    lateinit var setUserStoreUseCase: SetUserStoreUseCase
-    var TAG: String = "FcmReceiveService"
+    @Inject lateinit var updateUserFcmTokenUseCase: UpdateUserFcmTokenUseCase
+    @Inject lateinit var getTokenStoreUseCase: GetTokenUseCase
+    @Inject lateinit var setUserStoreUseCase: SetUserStoreUseCase
+    private var TAG:String = "FcmReceiveService"
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         Log.e(TAG, "From: " + remoteMessage.from)
 
-        Log.d("deep", "remoteMessage ${remoteMessage.notification}")
-        val title = remoteMessage.data["title"] ?: remoteMessage.notification?.title ?: ""
-        val body = remoteMessage.data["body"] ?: remoteMessage.notification?.body ?: ""
-        val imageUrl = remoteMessage.data["imageUrl"] ?: remoteMessage.notification?.imageUrl?.toString() ?: ""
-        val clickAction = remoteMessage.data["click_action"] ?: remoteMessage.notification?.clickAction ?: ""
-
-        sendNotification(title, body, imageUrl, clickAction)
-
         if (remoteMessage.data.isNotEmpty()) {
             Log.e(TAG, "Message data payload: ${remoteMessage.data}")
+            sendNotification(
+                remoteMessage.data["title"],
+                remoteMessage.data["body"],
+                remoteMessage.data["imageUrl"],
+                remoteMessage.data["click_action"]
+            )
+        } else if (remoteMessage.notification != null) {
+            Log.e(TAG, "Message Notification Body: ${remoteMessage.notification?.body}")
+            sendNotification(
+                remoteMessage.notification?.title,
+                remoteMessage.notification?.body,
+                remoteMessage.notification?.imageUrl.toString(),
+                remoteMessage.notification?.clickAction
+            )
         }
 
-        remoteMessage.notification?.let {
-            Log.e(TAG, "Message Notification Body: ${it.body}")
-            sendNotification(it.title, it.body, it.imageUrl.toString(), it.clickAction)
-        }
-
+        Log.e(TAG, remoteMessage.toString())
     }
 
     override fun onNewToken(token: String) {
@@ -70,10 +68,7 @@ class FcmReceiveService : FirebaseMessagingService() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val tokens = getTokenStoreUseCase()
-                val newUser = updateUserFcmTokenUseCase(
-                    "Bearer ${tokens.first.orEmpty()}",
-                    UserFcmTokenParam(deviceToken)
-                ).getOrThrow()
+                val newUser = updateUserFcmTokenUseCase("Bearer ${tokens.first.orEmpty()}", UserFcmTokenParam(deviceToken)).getOrThrow()
                 setUserStoreUseCase(newUser)
             } catch (e: Exception) {
                 Log.e(TAG, "Error while sending registration to server", e)
@@ -95,12 +90,7 @@ class FcmReceiveService : FirebaseMessagingService() {
         }
     }
 
-    private fun sendNotification(
-        title: String?,
-        messageBody: String?,
-        imageUrl: String?,
-        clickAction: String?
-    ) {
+    private fun sendNotification(title: String?, messageBody: String?, imageUrl: String?, clickAction:String?) {
         val intent = if (!clickAction.isNullOrEmpty()) {
             Intent(Intent.ACTION_VIEW, Uri.parse(clickAction)).apply {
                 addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -111,16 +101,9 @@ class FcmReceiveService : FirebaseMessagingService() {
             }
         }
 
-
-
         Log.d("deep", "deep $clickAction")
-        val calendar = Calendar.getInstance()
-        val uniqueId = calendar.get(Calendar.HOUR_OF_DAY) * 10000 +
-                calendar.get(Calendar.MINUTE) * 100 +
-                calendar.get(Calendar.SECOND)
-
         val pendingIntent = PendingIntent.getActivity(
-            this, uniqueId /* Request code */,
+            this, (System.currentTimeMillis()/1000).toInt(),
             intent, PendingIntent.FLAG_IMMUTABLE
         )
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -131,9 +114,6 @@ class FcmReceiveService : FirebaseMessagingService() {
         val notificationChannel = NotificationChannel(channelId, channelName, importance)
         notificationChannel.enableLights(true)
         notificationChannel.lightColor = Color.BLUE
-        notificationChannel.enableVibration(true)
-        notificationChannel.vibrationPattern =
-            longArrayOf(100, 200, 300, 400, 500, 400, 300, 200, 400)
         notificationManager.createNotificationChannel(notificationChannel)
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
@@ -170,8 +150,6 @@ class FcmReceiveService : FirebaseMessagingService() {
 
         // Dismiss notification once the user touches it.
         notificationBuilder.setAutoCancel(true)
-
-
-        notificationManager.notify(uniqueId, notificationBuilder.build())
+        notificationManager.notify((System.currentTimeMillis()/1000).toInt(), notificationBuilder.build())
     }
 }
