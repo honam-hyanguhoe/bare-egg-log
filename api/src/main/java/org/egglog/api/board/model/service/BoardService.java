@@ -262,10 +262,9 @@ public class BoardService {
             // 병원 게시판
             //글 작성자가 해당 병원 게시판에 인증이 되었는지 검증
             Optional<HospitalAuth> byUserAndHospital = hospitalAuthJpaRepository.findByUserAndHospital(user, user.getSelectedHospital());
-            if (byUserAndHospital.isEmpty()) {
+            if (byUserAndHospital.isEmpty() || !byUserAndHospital.get().getAuth()) {
                 throw new BoardException(BoardErrorCode.HOSPITAL_AUTH_ERROR); //해당 병원 인증이 필요합니다.
             }
-
             Hospital hospital = hospitalJpaRepository.findById(boardForm.getHospitalId()).orElseThrow(
                     () -> new HospitalException(HospitalErrorCode.NOT_FOUND)
             );
@@ -612,5 +611,17 @@ public class BoardService {
         List<GroupPreviewDto> groupByUserId = groupRepository.findGroupByUserId(user.getId());
         boardTypeListOutputSpec.setGroupList(groupByUserId);
         return boardTypeListOutputSpec;
+    }
+
+    public Board newBossBoardCreate(Group group, User bossUser){
+        return boardRepository.save(Board.builder()
+                .title("새로운 BOSS "+ bossUser.getName()+ "등장")
+                .content(group.getGroupName()+"을 이끌어 나갈 새 리더 입니다. 축하바랍니다.")
+                .group(group)
+                .isCommented(false)
+                .tempNickname("운영자")
+                .boardType(BoardType.GROUP)
+                .user(bossUser)
+                .build());
     }
 }

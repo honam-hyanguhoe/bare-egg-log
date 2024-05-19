@@ -5,7 +5,9 @@ import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.egglog.api.board.model.dto.params.BoardListForm;
 import org.egglog.api.board.model.entity.Board;
+import org.egglog.api.board.model.service.BoardService;
 import org.egglog.api.board.repository.jpa.board.BoardRepository;
 import org.egglog.api.group.exception.GroupErrorCode;
 import org.egglog.api.group.exception.GroupException;
@@ -51,7 +53,7 @@ public class GroupService {
 
     // 게시판 관련 레포지토리(그룹 삭제를 위함)
     private final BoardRepository boardRepository;
-
+    private final BoardService boardService;
 
     private final FCMService fcmService;
     private final NotificationService notificationService;
@@ -235,7 +237,8 @@ public class GroupService {
         }
         //새로운 그룹장 생성
         GroupMember newBoss = groupMemberService.getGroupMember(groupId,memberId);
-
+        Group group = newBoss.getGroup();
+        User newBossUser = newBoss.getUser();
         newBoss.setIsAdmin(true);
         boss.setIsAdmin(false);
 
@@ -245,6 +248,13 @@ public class GroupService {
         //변경 정보 DB 반영
         groupMemberService.createGroupMember(newBoss);
         groupMemberService.createGroupMember(boss);
+
+        //새로운 그룹장 축하글 작성
+        Board board = boardService.newBossBoardCreate(group, newBossUser);
+
+        //새로운 그룹장 알림
+        notificationService.iamBossNotification(group, newBossUser);
+        notificationService.newBossNotification(group, board, newBossUser);
     }
 
     /**
@@ -262,17 +272,17 @@ public class GroupService {
             Integer count = groupMemberService.countGroupMember(groupId);
             //혼자가 아니라면 탈퇴 권한 없음
             if(count==1){
-                groupMemberService.deleteGroupMember(userInfo);
-                boardRepository.deleteByGroupId(groupId);
                 //더이상 남은 사용자가 없으니 그룹 삭제
                 Group group = groupRepository.findById(groupId).orElseThrow(()->new GroupException(GroupErrorCode.NOT_FOUND));
+                //그룹 게시판 글 삭제 cascade로 삭제
+                groupMemberService.deleteGroupMember(userInfo);
                 groupRepository.delete(group);
-
                 //해당 멤버가 삭제되었다면 해당 유저의 토픽 구독 취소
                 notificationService.exitGroupNotification(user, groupId);
 
 
             }else{
+
                 throw new GroupException(GroupErrorCode.GROUP_ROLE_NOT_MATCH);
             }
         }
@@ -393,4 +403,11 @@ public class GroupService {
         return groupDutyRepository.getUserDutyData(documentIndex,empNo);
     }
 
+    @Transactional
+    public void deleteUserGroups(User loginUser){
+        List<GroupPreviewDto> groupList = groupRepository.findGroupByUserId(loginUser.getId());
+        for (GroupPreviewDto groupPreviewDto : groupList) {
+            exitGroup(groupPreviewDto.getGroupId(), loginUser);
+        }
+    }
 }

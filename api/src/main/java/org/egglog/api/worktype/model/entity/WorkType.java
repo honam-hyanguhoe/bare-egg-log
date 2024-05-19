@@ -15,6 +15,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class WorkType {
 

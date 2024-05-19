@@ -179,7 +179,7 @@ public class GroupDutyRepository {
 
     public UserDutyDataDto getUserDutyData(Index index, String empNo){
         Map<String,String> userDutyData = new HashMap<>();
-        CustomWorkTag customWorkTag = null;
+        CustomWorkTag customWorkTag = new CustomWorkTag();
         try {
             DocumentSnapshot document = firestore.collection("duty")
                     .document(index.getGroupId())

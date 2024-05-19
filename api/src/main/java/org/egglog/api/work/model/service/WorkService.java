@@ -124,14 +124,16 @@ public class WorkService {
             String workTypeStr = entry.getValue();
             log.debug("=== entry.getKey() = {} " , day);
             log.debug("=== (String) entry.getValue() = {} " , workTypeStr);
-            // workTypeStr을 WorkType 객체로 변환
-            WorkType workType = userWorkTypeMap.get(customWorkTag.get(workTypeStr));
-            log.debug("=== workTypeStr을 WorkType 객체로 변환 workType = {} " , workType);
-            // LocalDate workDate 생성
-            LocalDate workDate = LocalDate.of(targetMonth.getYear(), targetMonth.getMonthValue(), Integer.parseInt(day));
-            log.debug("=== LocalDate workDate 생성 workDate = {} " , workDate);
-            // workTypeMap에 추가
-            workTypeMap.put(workDate, workType);
+            if(customWorkTag.containsKey(workTypeStr)) {
+                // workTypeStr을 WorkType 객체로 변환
+                WorkType workType = userWorkTypeMap.get(customWorkTag.get(workTypeStr));
+                log.debug("=== workTypeStr을 WorkType 객체로 변환 workType = {} ", workType);
+                // LocalDate workDate 생성
+                LocalDate workDate = LocalDate.of(targetMonth.getYear(), targetMonth.getMonthValue(), Integer.parseInt(day));
+                log.debug("=== LocalDate workDate 생성 workDate = {} ", workDate);
+                // workTypeMap에 추가
+                workTypeMap.put(workDate, workType);
+            }
         }
 
         return workTypeMap;
@@ -175,6 +177,7 @@ public class WorkService {
                 updateWorkMap.put(currentLocalDate, userDateMap.get(currentLocalDate).updateWorkType(excelDataMap.get(currentLocalDate)));
             } else if (!userDateMap.containsKey(currentLocalDate) && excelDataMap.containsKey(currentLocalDate)) {
                 // 엑셀 데이터 존재, 기존 사용자 근무 존재 x -> 새 엔티티 추가
+                log.debug("{}",excelDataMap.get(currentLocalDate)==null?"no WorkType":excelDataMap.get(currentLocalDate).toString());
                 updateWorkMap.put(currentLocalDate, Work.builder()
                         .workDate(currentLocalDate)
                         .workType(excelDataMap.get(currentLocalDate))

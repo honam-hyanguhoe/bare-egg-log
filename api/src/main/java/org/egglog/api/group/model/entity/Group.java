@@ -2,7 +2,10 @@ package org.egglog.api.group.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.egglog.api.board.model.entity.Board;
 import org.egglog.api.group.model.dto.response.GroupSimpleDto;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -27,6 +30,9 @@ public class Group {
 
     @Column(name = "group_password",nullable = false)
     private String password;
+
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Board> boards;
 
     public GroupSimpleDto toSimpleDto(){
         GroupSimpleDto simpleDto = new GroupSimpleDto();

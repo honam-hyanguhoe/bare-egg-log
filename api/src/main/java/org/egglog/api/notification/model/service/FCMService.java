@@ -1,10 +1,7 @@
 package org.egglog.api.notification.model.service;
 
 
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.Notification;
+import com.google.firebase.messaging.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.notification.exception.NotificationErrorCode;
@@ -58,10 +55,14 @@ public class FCMService {
     }
 
     //토픽 알림
-    public void sendNotificationToTopic(FCMTopic fcmTopic, Notification notification) {
+    public void sendNotificationToTopic(FCMTopic fcmTopic,  String title, String body) {
         //todo : 딥링크 연결시 여기서 설정 또한 작성자는 알림 대상 제외 설정도 필요함 condition에서 설정
+        AndroidNotification androidNotification = AndroidNotification.builder().setTitle(title).setBody(body).build();
+        AndroidConfig androidConfig = AndroidConfig.builder().setNotification(androidNotification).build();
+        Notification notification = Notification.builder().setTitle(title).setBody(body).build();
         Message message = Message.builder()
                 .setNotification(notification)
+                .setAndroidConfig(androidConfig)
                 .setTopic(fcmTopic.getTopic())
                 .build();
         try {
@@ -73,10 +74,14 @@ public class FCMService {
             throw new NotificationException(NotificationErrorCode.NOTIFICATION_SERVER_ERROR);
         }
     }
-    public void sendNotificationToTopic(FCMTopic fcmTopic, Notification notification, Map<String, String> data) {
+    public void sendNotificationToTopic(FCMTopic fcmTopic,  String title, String body, Map<String, String> data) {
         //todo : 딥링크 연결시 여기서 설정 또한 작성자는 알림 대상 제외 설정도 필요함 condition에서 설정
+        AndroidNotification androidNotification = AndroidNotification.builder().setTitle(title).setBody(body).setClickAction(data.get("click_action")).build();
+        AndroidConfig androidConfig = AndroidConfig.builder().setNotification(androidNotification).build();
+        Notification notification = Notification.builder().setTitle(title).setBody(body).build();
         Message message = Message.builder()
                 .setNotification(notification)
+                .setAndroidConfig(androidConfig)
                 .putAllData(data)
                 .setTopic(fcmTopic.getTopic())
                 .build();
@@ -90,9 +95,14 @@ public class FCMService {
         }
     }
     //개인 알림
-    public void sendPersonalNotification(String token, Notification notification) {
+    public void sendPersonalNotification(String token, String title, String body, Map<String, String> data) {
+        AndroidNotification androidNotification = AndroidNotification.builder().setTitle(title).setBody(body).setClickAction(data.get("click_action")).build();
+        AndroidConfig androidConfig = AndroidConfig.builder().setNotification(androidNotification).build();
+        Notification notification = Notification.builder().setTitle(title).setBody(body).build();
         Message message = Message.builder()
+                .setAndroidConfig(androidConfig)
                 .setNotification(notification)
+                .putAllData(data)
                 .setToken(token)
                 .build();
         try {
@@ -104,10 +114,13 @@ public class FCMService {
             throw new NotificationException(NotificationErrorCode.NOTIFICATION_SERVER_ERROR);
         }
     }
-    public void sendPersonalNotification(String token, Notification notification, Map<String, String> data) {
+    public void sendPersonalNotification(String token, String title, String body) {
+        AndroidNotification androidNotification = AndroidNotification.builder().setTitle(title).setBody(body).build();
+        AndroidConfig androidConfig = AndroidConfig.builder().setNotification(androidNotification).build();
+        Notification notification = Notification.builder().setTitle(title).setBody(body).build();
         Message message = Message.builder()
+                .setAndroidConfig(androidConfig)
                 .setNotification(notification)
-                .putAllData(data)
                 .setToken(token)
                 .build();
         try {
