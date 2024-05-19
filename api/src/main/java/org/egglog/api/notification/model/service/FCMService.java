@@ -76,9 +76,10 @@ public class FCMService {
         //todo : 딥링크 연결시 여기서 설정 또한 작성자는 알림 대상 제외 설정도 필요함 condition에서 설정
         AndroidNotification androidNotification = AndroidNotification.builder().setTitle(title).setBody(body).setClickAction(data.get("click_action")).build();
         AndroidConfig androidConfig = AndroidConfig.builder().setNotification(androidNotification).build();
+        data.put("title", title);
+        data.put("body", body);
         Message message = Message.builder()
-                .setAndroidConfig(androidConfig)
-                .putData("click_action",data.get("click_action"))
+                .putAllData(data)
                 .setTopic(fcmTopic.getTopic())
                 .build();
         try {
@@ -94,9 +95,10 @@ public class FCMService {
     public void sendPersonalNotification(String token, String title, String body, Map<String, String> data) {
         AndroidNotification androidNotification = AndroidNotification.builder().setTitle(title).setBody(body).setClickAction(data.get("click_action")).build();
         AndroidConfig androidConfig = AndroidConfig.builder().setNotification(androidNotification).build();
+        data.put("title", title);
+        data.put("body", body);
         Message message = Message.builder()
-                .setAndroidConfig(androidConfig)
-                .putData("click_action",data.get("click_action"))
+                .putAllData(data)
                 .setToken(token)
                 .build();
         try {
