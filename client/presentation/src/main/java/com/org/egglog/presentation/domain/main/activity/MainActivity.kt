@@ -21,7 +21,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val deepLinkUri: Uri? = intent?.data
-        Log.d("deep", "main ${deepLinkUri.toString()}")
+        val deepAction : String? = intent?.action
+
+        if(deepLinkUri != null){
+            Log.d("deep", "deepLinkUri $deepLinkUri")
+        }else if(deepAction != null){
+            Log.d("deep", "deepAction $deepAction")
+        }
         setContent {
             ClientTheme {
                 MainNavigationHost(deepLinkUri)

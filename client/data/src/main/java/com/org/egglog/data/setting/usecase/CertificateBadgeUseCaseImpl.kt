@@ -25,7 +25,7 @@ class CertificateBadgeUseCaseImpl @Inject constructor(
         val uploadImages: List<ByteArray> =
             listOf(nurseCertificationImgUrl, hospitalCertificationImgUrl)
 
-        imageUrls = imageUploadUseCase.uploadImage(uploadImages, "board").getOrNull()
+        imageUrls = imageUploadUseCase.uploadImage(uploadImages, "badge").getOrNull()
         Log.d("badge", "imageUrls $imageUrls")
 
         val requestParam = BadgeRequest(

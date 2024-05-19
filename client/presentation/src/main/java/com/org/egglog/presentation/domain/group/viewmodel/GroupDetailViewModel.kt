@@ -207,7 +207,7 @@ class GroupDetailViewModel @Inject constructor(
         userName: String
     ): Map<String, Map<String, String>> {
         val workMap: Map<String, String> = weeklyWork?.workList?.associate {
-            it.workDate to it.workType.workTag
+            it.workDate to it.workType.title
         }!!
 
         return mapOf(userName to workMap)
@@ -218,7 +218,7 @@ class GroupDetailViewModel @Inject constructor(
         userName: String
     ): Map<String, Map<String, String>> {
         val workMap: Map<String, String> =
-            groupMemberWork.associate { it.workDate to it.workType.workTag }
+            groupMemberWork.associate { it.workDate to it.workType.title }
 
         return mapOf(userName to workMap)
     }
@@ -304,7 +304,7 @@ class GroupDetailViewModel @Inject constructor(
     fun onPrevClick(clickedDate: LocalDate) = intent {
         val finalStartDate = dataSource.getStartOfWeek(clickedDate)
         val calendarUiModel = dataSource.getData(startDate = finalStartDate, lastSelectedDate = finalStartDate)
-
+//        Log.d("test" , "finalStart $finalStartDate")
         reduce {
             state.copy(
                 currentWeekDays = calendarUiModel,

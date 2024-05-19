@@ -73,7 +73,7 @@ class CertificateBadgeViewModel @Inject constructor(
         Log.d("badge", "result $result")
         if (result.isSuccess){
             CertificateBadgeSideEffect.Toast("인증되었습니다")
-//            postSideEffect(CertificateBadgeSideEffect.NavigateToSettingScreen)
+            postSideEffect(CertificateBadgeSideEffect.NavigateToSettingScreen)
         }
     }
     fun handleImageSelection(context: Context, uri: Uri , type: String) = intent {
@@ -86,7 +86,8 @@ class CertificateBadgeViewModel @Inject constructor(
                         nurseCertificationImgUrl = it
                     )
                 }
-                Log.d("badge", "nurseCertificationImgUrl ${state.nurseCertificationImgUrl}")
+
+                Log.d("badge", "nurseCertificationImgUrl ${state.uploadImages} ${state.nurseCertificationImgUrl}")
             }
         }else if (type == "hospital"){
             val resizedImage = resizeImage(context, uri, 400, 300)
@@ -97,7 +98,7 @@ class CertificateBadgeViewModel @Inject constructor(
                     )
                 }
             }
-            Log.d("badge", "hospitalCertificationImgUrl ${state.hospitalCertificationImgUrl}")
+            Log.d("badge", "hospitalCertificationImgUrl ${state.uploadImages} ${state.hospitalCertificationImgUrl}")
         }
     }
 }
