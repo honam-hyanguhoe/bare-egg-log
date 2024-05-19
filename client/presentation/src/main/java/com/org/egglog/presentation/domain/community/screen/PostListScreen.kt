@@ -199,6 +199,7 @@ private fun PostListScreen(
             ) {
                 NoticeHeader(hasSearch = true,
                     hasMenu = true,
+                    hasNotice = false,
                     title = categoryName,
                     selectedOption = selectedMenuItem,
                     options = categoryList.map { it.second },
