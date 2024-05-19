@@ -262,10 +262,9 @@ public class BoardService {
             // 병원 게시판
             //글 작성자가 해당 병원 게시판에 인증이 되었는지 검증
             Optional<HospitalAuth> byUserAndHospital = hospitalAuthJpaRepository.findByUserAndHospital(user, user.getSelectedHospital());
-            if (byUserAndHospital.isEmpty()) {
+            if (byUserAndHospital.isEmpty() || !byUserAndHospital.get().getAuth()) {
                 throw new BoardException(BoardErrorCode.HOSPITAL_AUTH_ERROR); //해당 병원 인증이 필요합니다.
             }
-
             Hospital hospital = hospitalJpaRepository.findById(boardForm.getHospitalId()).orElseThrow(
                     () -> new HospitalException(HospitalErrorCode.NOT_FOUND)
             );
