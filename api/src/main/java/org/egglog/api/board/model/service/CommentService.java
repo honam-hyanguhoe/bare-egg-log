@@ -15,6 +15,8 @@ import org.egglog.api.board.model.entity.Board;
 import org.egglog.api.board.model.entity.Comment;
 import org.egglog.api.board.repository.jpa.board.BoardRepository;
 import org.egglog.api.board.repository.jpa.comment.CommentRepository;
+import org.egglog.api.notification.exception.NotificationErrorCode;
+import org.egglog.api.notification.exception.NotificationException;
 import org.egglog.api.notification.model.service.NotificationService;
 import org.egglog.api.user.model.entity.User;
 import org.springframework.dao.DataAccessException;
@@ -136,7 +138,10 @@ public class CommentService {
             notificationService.registerCommentNotification(board, saveComment);
         } catch (DataAccessException e) {
             throw new CommentException(CommentErrorCode.DATABASE_CONNECTION_FAILED);
-        } catch (Exception e) {
+        } catch (NotificationException e){
+            throw new NotificationException(NotificationErrorCode.NOTIFICATION_SERVER_ERROR);
+        }
+        catch (Exception e) {
             e.printStackTrace();
             throw new CommentException(CommentErrorCode.UNKNOWN_ERROR);
         }

@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum NotificationErrorCode implements ErrorFormat {
-    NOTIFICATION_SERVER_ERROR("미등록 에러가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    NOTIFICATION_SERVER_ERROR("알림 에러.", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String message;
     private final HttpStatus httpStatus;
