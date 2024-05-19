@@ -70,6 +70,7 @@ class PostListViewModel @Inject constructor(
 
         val userInfo = getUserUseCase("Bearer $accessToken").getOrThrow()
 
+        Log.e("PostList", "유저정보는 ${userInfo}")
         Log.e("PostListViewModel", "token은 ${accessToken}")
 
         getHotPostList()
@@ -88,7 +89,7 @@ class PostListViewModel @Inject constructor(
 
         reduce {
             state.copy(
-                isHospitalAuth =  userInfo?.hospitalAuth != null,
+                isHospitalAuth =  userInfo?.hospitalAuth?.auth ?: false,
                 categoryList = if(categoryList.isEmpty()) listOf((0 to "전체")) else categoryList
             )
         }
