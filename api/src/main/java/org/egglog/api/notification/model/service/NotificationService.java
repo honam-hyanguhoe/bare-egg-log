@@ -253,13 +253,14 @@ public class NotificationService {
         // 2. 대 댓글이라면 부모 ID 작성자에게도 알림을 보낸다.
         Long parentId = saveComment.getParentId();
         User commentUser = saveComment.getUser();
-        if (!parentId.equals(0L)&&!parentId.equals(board.getUser().getId())){//대 댓글이면서 부모 댓글의 아이디가 글 작성자가 아닐때만 발송한다.
+        if (!parentId.equals(0L)){//대 댓글일때만 발송 준비
             Comment parentComment = commentRepository.findWithUserById(parentId).orElseThrow(
                     () -> new CommentException(CommentErrorCode.NO_EXIST_COMMENT));
             String parentComentDeviceToken = parentComment.getUser().getDeviceToken();
-            UserNotification cocomentUserNotification = notificationRepository
+            UserNotification parentComentUserNotification = notificationRepository
                     .findByTypeAndUser(TopicEnum.BOARD, parentComment.getUser()).orElseThrow(() -> new NotificationException(NotificationErrorCode.NOTIFICATION_SERVER_ERROR));
-            if (parentComentDeviceToken!=null&&cocomentUserNotification.getStatus()&&!commentUser.equals(parentComment.getUser())){
+            if (parentComentDeviceToken!=null&&parentComentUserNotification.getStatus()&&!commentUser.equals(parentComment.getUser())&&!commentUser.equals(board.getUser())){
+                //부모 댓글 FCM 토큰이 Null 이 아니고, 부모 댓글 알림 설정이 켜져있고, 대댓글 유저가 부모 댓글 유저와 같이 않고, 대댓글 유저가 글 작성 유저와 같지 않으면 FCM 알림을 발송한다.
                 fcmService.sendPersonalNotification(parentComentDeviceToken, "띠용! 내 댓글에 새 대댓글이 달렸습니다.",saveComment.getContent(), makeDeepLinkSetting(deepLinkConfig.getCommunity(), board.getId()));
             }
         }
