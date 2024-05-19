@@ -10,7 +10,6 @@ import com.org.egglog.domain.auth.usecase.DeleteUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.GetAllHospitalUseCase
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
-import com.org.egglog.domain.auth.usecase.PostLogoutUseCase
 import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.UpdateUserDeleteUseCase
 import com.org.egglog.domain.auth.usecase.UpdateUserModifyUseCase
@@ -47,7 +46,11 @@ class MySettingViewModel @Inject constructor(
         buildSettings = {
             this.exceptionHandler = CoroutineExceptionHandler { _, throwable ->
                 intent {
-                    postSideEffect(MySettingSideEffect.Toast(message = throwable.message.orEmpty()))
+                    if(throwable.message?.contains("HTTP 406") == true) {
+                        postSideEffect(MySettingSideEffect.Toast(message = "탈퇴 전 그룹장을 넘겨주세요."))
+                    } else {
+                        postSideEffect(MySettingSideEffect.Toast(message = throwable.message.orEmpty()))
+                    }
                     reduce {
                         state.copy(enabledDelete = true, enabledModify = true)
                     }
@@ -122,7 +125,7 @@ class MySettingViewModel @Inject constructor(
             state.copy(enabledDelete = false)
         }
         val tokens = getTokenUseCase()
-        updateUserDeleteUseCase("Bearer ${tokens.first.orEmpty()}")
+        updateUserDeleteUseCase("Bearer ${tokens.first.orEmpty()}").getOrThrow()
         deleteTokenUseCase()
         deleteUserStoreUseCase()
         deleteCalendarGroupMapStoreUseCase()
