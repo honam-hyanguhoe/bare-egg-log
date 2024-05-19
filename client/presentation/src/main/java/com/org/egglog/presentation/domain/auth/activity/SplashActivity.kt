@@ -17,6 +17,7 @@ import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.auth.usecase.GetUserUseCase
 import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.UpdateUserFcmTokenUseCase
+import com.org.egglog.domain.setting.usecase.SetCalendarGroupMapStoreUseCase
 import com.org.egglog.presentation.domain.auth.screen.SplashScreen
 import com.org.egglog.presentation.theme.ClientTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,6 +33,7 @@ class SplashActivity : AppCompatActivity() {
     @Inject lateinit var postRefreshUseCase: PostRefreshUseCase
     @Inject lateinit var getUserUseCase: GetUserUseCase
     @Inject lateinit var setUserStoreUseCase: SetUserStoreUseCase
+    @Inject lateinit var setCalendarGroupMapStoreUseCase: SetCalendarGroupMapStoreUseCase
     @Inject lateinit var updateUserFcmTokenUseCase: UpdateUserFcmTokenUseCase
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,6 +62,7 @@ class SplashActivity : AppCompatActivity() {
                 Log.e("SplashActivity", "user: " + userDetail.toString())
                 if (userDetail?.selectedHospital == null || userDetail.empNo == null) {
                     setUserStoreUseCase(userDetail)
+                    setCalendarGroupMapStoreUseCase(mapOf(userDetail?.workGroupId.toString() to true))
                     startActivity(
                         Intent(
                             this@SplashActivity, PlusLoginActivity::class.java
@@ -77,7 +80,11 @@ class SplashActivity : AppCompatActivity() {
                     if (userDetail.deviceToken == null || userDetail.deviceToken != fcmToken) {
                         val newUser = updateUserFcmTokenUseCase("Bearer ${tokens.first.orEmpty()}", UserFcmTokenParam(fcmToken)).getOrThrow()
                         setUserStoreUseCase(newUser)
-                    } else setUserStoreUseCase(userDetail)
+                        setCalendarGroupMapStoreUseCase(mapOf(newUser?.workGroupId.toString() to true))
+                    } else {
+                        setUserStoreUseCase(userDetail)
+                        setCalendarGroupMapStoreUseCase(mapOf(userDetail.workGroupId.toString() to true))
+                    }
                     startActivity(
                         Intent(
                             this@SplashActivity, MainActivity::class.java

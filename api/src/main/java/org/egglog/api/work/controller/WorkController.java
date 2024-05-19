@@ -57,6 +57,7 @@ public class WorkController {
             @AuthenticationPrincipal User loginUser,
             @RequestBody @Valid SyncExcelWorkRequest request
     ){
+        log.debug(">>>>> 입력 값 확인 : {}",request.toString());
         return ResponseEntity.ok().body(
                 MessageUtils.success(workService.syncWork(loginUser, request)));
     }

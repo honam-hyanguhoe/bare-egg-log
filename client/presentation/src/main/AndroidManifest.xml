@@ -78,6 +78,7 @@
 
         <receiver android:name=".receiver.AlarmBroadcastReceiver"/>
         <receiver android:name=".receiver.StopServiceReceiver"/>
+        <receiver android:name=".receiver.NotificationBroadcastReceiver"/>
     </application>
 
 </manifest>

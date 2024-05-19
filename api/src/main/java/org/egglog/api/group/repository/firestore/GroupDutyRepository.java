@@ -13,10 +13,13 @@ import org.egglog.api.group.model.dto.request.GroupDutySaveFormat;
 import org.egglog.api.group.model.dto.response.GroupDutyDataDto;
 import org.egglog.api.group.model.dto.response.GroupDutyDto;
 import org.egglog.api.group.model.dto.response.Index;
+import org.egglog.api.group.model.dto.response.UserDutyDataDto;
 import org.egglog.api.worktype.model.entity.WorkTag;
+import org.egglog.api.worktype.model.entity.WorkType;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -29,7 +32,13 @@ public class GroupDutyRepository {
 
 
     public void saveDuty(String userName, Long groupId, GroupDutyData groupDutyData, String nowDay) throws ExecutionException, InterruptedException {
+        CollectionReference collection = firestore.collection("duty")
+                .document(String.valueOf(groupId))
+                .collection(groupDutyData.getDate());
+
         log.debug("====== countQuery start ======");
+        Long count = collection.count().get().get().getCount();
+
         CustomWorkTag customWorkTag = groupDutyData.getCustomWorkTag();
         CustomWorkTag currentCustomWorkTag = getGroupWorkTag(groupId);
         log.debug(customWorkTag.toString());
@@ -64,9 +73,11 @@ public class GroupDutyRepository {
                     .dutyList(dutyList)
                     .build();
 
-            log.debug("path {}/{}/{}","duty",groupId,groupDutyData.getDate());
+            log.debug("path {}/{}/{}/{}","duty",groupId,groupDutyData.getDate(),count);
             String group = String.valueOf(groupId);
             String date = groupDutyData.getDate();
+            String countVal = String.valueOf(count);
+
 
             log.debug("{} {}",group==null,date==null);
             if(group==null || date==null || group.isEmpty() || date.isEmpty()){
@@ -85,7 +96,7 @@ public class GroupDutyRepository {
                         .collection("duty")
                         .document(group)
                         .collection(date)
-                        .document()
+                        .document(countVal)
                         .set(groupDutySaveFormat);
 
                 // Firestore 호출 결과 로깅
@@ -152,7 +163,6 @@ public class GroupDutyRepository {
             log.debug("found!!");
             for(DocumentSnapshot doc : documents){
                 log.debug("processing...");
-                log.debug(doc.toString());
                 GroupDutySaveFormat duty = doc.toObject(GroupDutySaveFormat.class);
                 if(duty != null){
                     GroupDutyDto dutyDto = GroupDutyDto.builder()
@@ -165,5 +175,35 @@ public class GroupDutyRepository {
             }
         }
         return groupDutyList;
+    }
+
+    public UserDutyDataDto getUserDutyData(Index index, String empNo){
+        Map<String,String> userDutyData = new HashMap<>();
+        CustomWorkTag customWorkTag = null;
+        try {
+            DocumentSnapshot document = firestore.collection("duty")
+                    .document(index.getGroupId())
+                    .collection(index.getDate())
+                    .document(index.getIndex())
+                    .get().get();
+
+            if (document.exists()) {
+                log.debug("=== === === === 데이터 가져오기 성공 === === === ===");
+                // dutyList 맵에서 empNo를 키로 사용하여 WorkType 데이터를 가져옴
+                GroupDutySaveFormat dutyData = document.toObject(GroupDutySaveFormat.class);
+                Map<String,DutyFormat> dutyList = dutyData.getDutyList();
+                if (dutyList.containsKey(empNo)) {
+                    userDutyData = dutyList.get(empNo).getWork();
+                    customWorkTag = dutyData.getCustomWorkTag();
+                }else{
+                    log.debug(">>>> 사용자의 데이터가 존재하지않습니다. {}",empNo);
+                }
+            }else {
+                log.debug("해당하는 데이터가 없습니다.");
+            }
+            return new UserDutyDataDto(userDutyData,customWorkTag);
+        } catch (InterruptedException | ExecutionException e) {
+            throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
+        }
     }
 }

@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface WorkTypeQueryRepository {
     List<WorkType> findListByUserId(Long userId);
     Optional<WorkType> findWithUserById(Long workTypeId);
+
+    List<WorkType> findMainWorkTypesByUserId(Long userId);
 }

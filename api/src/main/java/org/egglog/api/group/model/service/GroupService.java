@@ -5,6 +5,8 @@ import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.egglog.api.board.model.entity.Board;
+import org.egglog.api.board.repository.jpa.board.BoardRepository;
 import org.egglog.api.group.exception.GroupErrorCode;
 import org.egglog.api.group.exception.GroupException;
 import org.egglog.api.group.model.dto.request.*;
@@ -42,9 +44,14 @@ public class GroupService {
     private final PasswordEncoder passwordEncoder;
     private final GroupMemberService groupMemberService;
 
+    // 그룹 관련 레포지토리
     private final GroupRepository groupRepository;
     private final GroupDutyRepository groupDutyRepository;
     private final GroupInvitationRepository groupInvitationRepository;
+
+    // 게시판 관련 레포지토리(그룹 삭제를 위함)
+    private final BoardRepository boardRepository;
+
 
     private final FCMService fcmService;
     private final NotificationService notificationService;
@@ -256,6 +263,7 @@ public class GroupService {
             //혼자가 아니라면 탈퇴 권한 없음
             if(count==1){
                 groupMemberService.deleteGroupMember(userInfo);
+                boardRepository.deleteByGroupId(groupId);
                 //더이상 남은 사용자가 없으니 그룹 삭제
                 Group group = groupRepository.findById(groupId).orElseThrow(()->new GroupException(GroupErrorCode.NOT_FOUND));
                 groupRepository.delete(group);
@@ -374,42 +382,15 @@ public class GroupService {
         }
     }
 
-    public Map<LocalDate, WorkType> getUserExcelData(Long groupId, LocalDate targetMonth, Long index, User loginUser) {
-        Firestore db = FirestoreClient.getFirestore();
+    public UserDutyDataDto getUserExcelData(Long groupId, LocalDate targetMonth, Long index, User loginUser) {
+        log.debug("=== === === === 파이어 베이스에서 근무 데이터 가져오기 시작 === === === ===");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
         String date = targetMonth.format(formatter);
-        String empNo = loginUser.getEmpNo(); // Assuming User entity has getEmpNo() method
-
+        String empNo = loginUser.getEmpNo();
+        log.debug("=== === === === 경로 설정 시작 === === === ===");
         // Firestore 경로 설정
-        CollectionReference dateCollection = db.collection("duty")
-                .document(String.valueOf(groupId))
-                .collection(date);
-
-        ApiFuture<QuerySnapshot> future = dateCollection.get();
-        Map<LocalDate, WorkType> workTypeMap = new HashMap<>();
-
-        try {
-            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-
-            for (QueryDocumentSnapshot document : documents) {
-                if (document.exists() && document.getId().equals(String.valueOf(index))) {
-                    // dutyList 맵에서 empNo를 키로 사용하여 WorkType 데이터를 가져옴
-                    Map<String, Object> dutyList = (Map<String, Object>) document.get("dutyList");
-                    if (dutyList != null && dutyList.containsKey(empNo)) {
-                        Map<String, Object> workTypeData = (Map<String, Object>) dutyList.get(empNo);
-                        WorkType workType = document.toObject(WorkType.class);
-
-                        // 날짜와 WorkType 데이터를 맵에 추가
-                        LocalDate workDate = LocalDate.parse((String) workTypeData.get("date"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                        workTypeMap.put(workDate, workType);
-                    }
-                }
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
-        }
-
-        return workTypeMap;
+        Index documentIndex = new Index(String.valueOf(groupId),date,String.valueOf(index));
+        return groupDutyRepository.getUserDutyData(documentIndex,empNo);
     }
 
 }
