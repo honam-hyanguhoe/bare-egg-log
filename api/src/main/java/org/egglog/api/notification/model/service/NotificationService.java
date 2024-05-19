@@ -33,6 +33,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -319,6 +320,8 @@ public class NotificationService {
         return Map.of("click_action", deeplink);
     }
     private Map<String, String> makeDeepLinkSetting(String deeplink, Long id){
-        return Map.of("click_action", deeplink+"/"+id);
+        Map<String, String> map = new HashMap<>();
+        map.put("click_action", deeplink + "/" + id);
+        return map;
     }
 }

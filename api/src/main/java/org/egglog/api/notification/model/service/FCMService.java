@@ -84,12 +84,10 @@ public class FCMService {
                 .build();
 
         data.put("title", title);
-        data.put("body",body);
-        // 불변 맵을 변경 가능한 맵으로 변환
-        Map<String, String> mutableData = new HashMap<>(data);
+        data.put("body", body);
 
         Message message = Message.builder()
-                .putAllData(mutableData)
+                .putAllData(data)
                 .setTopic(fcmTopic.getTopic())
                 .build();
 
@@ -107,13 +105,12 @@ public class FCMService {
         AndroidConfig androidConfig = AndroidConfig.builder()
                 .setNotification(androidNotification)
                 .build();
+
         data.put("title", title);
-        data.put("body",body);
-        // 불변 맵을 변경 가능한 맵으로 변환
-        Map<String, String> mutableData = new HashMap<>(data);
+        data.put("body", body);
 
         Message message = Message.builder()
-                .putAllData(mutableData)
+                .putAllData(data)
                 .setToken(token)
                 .build();
 
