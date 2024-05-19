@@ -103,7 +103,7 @@ public class User implements UserDetails {
     public User delete(){
         this.name = "탈퇴회원";
         this.email = UUID.randomUUID().toString();
-        this.profileImgUrl = null;
+        this.profileImgUrl = "https://firebasestorage.googleapis.com/v0/b/egglog-422207.appspot.com/o/honam%2Feggs%2FEGG.png?alt=media&token=2516bf2a-8043-47ad-bfc4-43eeb1a3a0b8";
         this.deviceToken = null;
         this.empNo = null;
         this.userStatus = UserStatus.DELETED;
