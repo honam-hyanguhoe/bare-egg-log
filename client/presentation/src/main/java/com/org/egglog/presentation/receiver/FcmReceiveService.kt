@@ -42,6 +42,7 @@ class FcmReceiveService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         Log.e(TAG, "From: " + remoteMessage.from)
+
         Log.d("deep", "remoteMessage ${remoteMessage.notification}")
         val title = remoteMessage.data["title"] ?: remoteMessage.notification?.title ?: ""
         val body = remoteMessage.data["body"] ?: remoteMessage.notification?.body ?: ""
@@ -49,6 +50,16 @@ class FcmReceiveService : FirebaseMessagingService() {
         val clickAction = remoteMessage.data["click_action"] ?: remoteMessage.notification?.clickAction ?: ""
 
         sendNotification(title, body, imageUrl, clickAction)
+
+        if (remoteMessage.data.isNotEmpty()) {
+            Log.e(TAG, "Message data payload: ${remoteMessage.data}")
+        }
+
+        remoteMessage.notification?.let {
+            Log.e(TAG, "Message Notification Body: ${it.body}")
+            sendNotification(it.title, it.body, it.imageUrl.toString(), it.clickAction)
+        }
+
     }
 
     override fun onNewToken(token: String) {
@@ -101,11 +112,13 @@ class FcmReceiveService : FirebaseMessagingService() {
         }
 
 
+
         Log.d("deep", "deep $clickAction")
         val calendar = Calendar.getInstance()
         val uniqueId = calendar.get(Calendar.HOUR_OF_DAY) * 10000 +
                 calendar.get(Calendar.MINUTE) * 100 +
                 calendar.get(Calendar.SECOND)
+
         val pendingIntent = PendingIntent.getActivity(
             this, uniqueId /* Request code */,
             intent, PendingIntent.FLAG_IMMUTABLE

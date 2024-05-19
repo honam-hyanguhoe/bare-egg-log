@@ -59,9 +59,7 @@ public class FCMService {
         //todo : 딥링크 연결시 여기서 설정 또한 작성자는 알림 대상 제외 설정도 필요함 condition에서 설정
         AndroidNotification androidNotification = AndroidNotification.builder().setTitle(title).setBody(body).build();
         AndroidConfig androidConfig = AndroidConfig.builder().setNotification(androidNotification).build();
-        Notification notification = Notification.builder().setTitle(title).setBody(body).build();
         Message message = Message.builder()
-                .setNotification(notification)
                 .setAndroidConfig(androidConfig)
                 .setTopic(fcmTopic.getTopic())
                 .build();
@@ -78,10 +76,9 @@ public class FCMService {
         //todo : 딥링크 연결시 여기서 설정 또한 작성자는 알림 대상 제외 설정도 필요함 condition에서 설정
         AndroidNotification androidNotification = AndroidNotification.builder().setTitle(title).setBody(body).setClickAction(data.get("click_action")).build();
         AndroidConfig androidConfig = AndroidConfig.builder().setNotification(androidNotification).build();
-        Notification notification = Notification.builder().setTitle(title).setBody(body).build();
+        data.put("title", title);
+        data.put("body", body);
         Message message = Message.builder()
-                .setNotification(notification)
-                .setAndroidConfig(androidConfig)
                 .putAllData(data)
                 .setTopic(fcmTopic.getTopic())
                 .build();
@@ -98,10 +95,9 @@ public class FCMService {
     public void sendPersonalNotification(String token, String title, String body, Map<String, String> data) {
         AndroidNotification androidNotification = AndroidNotification.builder().setTitle(title).setBody(body).setClickAction(data.get("click_action")).build();
         AndroidConfig androidConfig = AndroidConfig.builder().setNotification(androidNotification).build();
-        Notification notification = Notification.builder().setTitle(title).setBody(body).build();
+        data.put("title", title);
+        data.put("body", body);
         Message message = Message.builder()
-                .setAndroidConfig(androidConfig)
-                .setNotification(notification)
                 .putAllData(data)
                 .setToken(token)
                 .build();
@@ -117,10 +113,8 @@ public class FCMService {
     public void sendPersonalNotification(String token, String title, String body) {
         AndroidNotification androidNotification = AndroidNotification.builder().setTitle(title).setBody(body).build();
         AndroidConfig androidConfig = AndroidConfig.builder().setNotification(androidNotification).build();
-        Notification notification = Notification.builder().setTitle(title).setBody(body).build();
         Message message = Message.builder()
                 .setAndroidConfig(androidConfig)
-                .setNotification(notification)
                 .setToken(token)
                 .build();
         try {
