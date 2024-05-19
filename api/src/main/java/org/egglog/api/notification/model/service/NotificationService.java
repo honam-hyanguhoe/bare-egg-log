@@ -158,11 +158,7 @@ public class NotificationService {
                 .topic(TopicEnum.GROUP)
                 .topicId(group.getId())
                 .build();
-        Notification notification = Notification.builder()
-                .setTitle("피어나! 너 내 동료가 내 도도 동료가 돼라!")
-                .setBody(group.getGroupName()+"의 그룹에 새 멤버가 추가 되었습니다. 축하해주세요!")
-                .build();
-        fcmService.sendNotificationToTopic(topic, notification, makeDeepLinkSetting(deepLinkConfig.getGroup(), group.getId()));
+        fcmService.sendNotificationToTopic(topic, "피어나! 너 내 동료가 내 ㄷ도 동료가 돼라!",group.getGroupName()+"의 그룹에 새 멤버가 추가 되었습니다. 축하해주세요!", makeDeepLinkSetting(deepLinkConfig.getGroup(), group.getId()));
 
         //2. 그룹에 가입되었다면 해당 그룹 토픽 구독
         String loginUserDeviceToken = user.getDeviceToken();
@@ -212,11 +208,7 @@ public class NotificationService {
         fcmService.unsubscribeFromTopic(userDeviceToken, topic);//구독 취소
         if (userDeviceToken!=null && memberUserNotification.getStatus()){
             //해당 유저에 알림 발송
-            Notification notification = Notification.builder()
-                    .setTitle("시원 섭섭하네.. ")
-                    .setBody(member.getGroup().getGroupName()+" 에서 퇴장 당했습니다.")
-                    .build();
-            fcmService.sendPersonalNotification(userDeviceToken, notification, makeDeepLinkSetting(deepLinkConfig.getGroup()));
+            fcmService.sendPersonalNotification(userDeviceToken, "시원 섭섭하네.. ",member.getGroup().getGroupName()+" 에서 퇴장 당했습니다.", makeDeepLinkSetting(deepLinkConfig.getGroup()));
         }
     }
 
@@ -229,12 +221,7 @@ public class NotificationService {
                     .topic(TopicEnum.GROUP)
                     .topicId(boardForm.getGroupId())
                     .build();
-            Notification notification = Notification.builder()
-                    .setTitle("[새 글 알림]" + group.getGroupName() + " 커뮤니티에 새 글이 올라왔습니다.")
-                    .setBody(boardForm.getBoardTitle())
-                    .setImage(boardForm.getPictureOne() != null ? boardForm.getPictureOne() : null)
-                    .build();
-            fcmService.sendNotificationToTopic(topic, notification, makeDeepLinkSetting(deepLinkConfig.getCommunity()));
+            fcmService.sendNotificationToTopic(topic, "[새 글 알림]" + group.getGroupName() + " 커뮤니티에 새 글이 올라왔습니다.", boardForm.getBoardTitle(), makeDeepLinkSetting(deepLinkConfig.getCommunity()));
         }
     }
 
@@ -246,11 +233,7 @@ public class NotificationService {
                 .findByTypeAndUser(TopicEnum.BOARD, board.getUser()).orElseThrow(() -> new NotificationException(NotificationErrorCode.NOTIFICATION_SERVER_ERROR));
         String deviceToken = board.getUser().getDeviceToken();
         if (deviceToken!=null&&userNotification.getStatus()){
-            Notification notification = Notification.builder()
-                    .setTitle("대세는 바로 나! 인기 게시물 선정!")
-                    .setBody(board.getUser().getName()+" 님의 "+board.getTitle()+" 글이 실시간 급상승 게시판에 등록되었습니다. ")
-                    .build();
-            fcmService.sendPersonalNotification(deviceToken, notification, makeDeepLinkSetting(deepLinkConfig.getCommunity(), board.getId()));
+            fcmService.sendPersonalNotification(deviceToken, "대세는 바로 나! 인기 게시물 선정!",board.getUser().getName()+" 님의 "+board.getTitle()+" 글이 실시간 급상승 게시판에 등록되었습니다. ", makeDeepLinkSetting(deepLinkConfig.getCommunity(), board.getId()));
         }
     }
 
@@ -263,11 +246,7 @@ public class NotificationService {
         //1. 해당 글에 댓글이 등록되었다면 글 작성자에게 푸시알림 발송
         String deviceToken = board.getUser().getDeviceToken();
         if (deviceToken!=null&&userNotification.getStatus()&&!board.getUser().equals(saveComment.getUser())){
-            Notification notification = Notification.builder()
-                    .setTitle("띠용! 내 커뮤니티 글에 새 댓글이 달렸습니다.")
-                    .setBody(saveComment.getContent())
-                    .build();
-            fcmService.sendPersonalNotification(deviceToken, notification, makeDeepLinkSetting(deepLinkConfig.getCommunity(), board.getId()));
+            fcmService.sendPersonalNotification(deviceToken, "띠용! 내 커뮤니티 글에 새 댓글이 달렸습니다.", saveComment.getContent(), makeDeepLinkSetting(deepLinkConfig.getCommunity(), board.getId()));
         }
 
 
@@ -280,11 +259,7 @@ public class NotificationService {
             UserNotification cocomentUserNotification = notificationRepository
                     .findByTypeAndUser(TopicEnum.BOARD, cocoment.getUser()).orElseThrow(() -> new NotificationException(NotificationErrorCode.NOTIFICATION_SERVER_ERROR));
             if (cocomentDeviceToken!=null&&cocomentUserNotification.getStatus()){
-                Notification notification = Notification.builder()
-                        .setTitle("띠용! 내 댓글에 새 대댓글이 달렸습니다.")
-                        .setBody(saveComment.getContent())
-                        .build();
-                fcmService.sendPersonalNotification(cocomentDeviceToken, notification, makeDeepLinkSetting(deepLinkConfig.getCommunity(), board.getId()));
+                fcmService.sendPersonalNotification(cocomentDeviceToken, "띠용! 내 댓글에 새 대댓글이 달렸습니다.",saveComment.getContent(), makeDeepLinkSetting(deepLinkConfig.getCommunity(), board.getId()));
             }
         }
     }
@@ -295,11 +270,7 @@ public class NotificationService {
         UserNotification userNotification = notificationRepository.findByTypeAndUser(TopicEnum.GROUP, newBoss).orElseThrow(
                 () -> new CommentException(CommentErrorCode.NO_EXIST_COMMENT));
         if (deviceToken!=null&&userNotification.getStatus()){
-            Notification notification = Notification.builder()
-                    .setTitle("이제 고생 시작이다..")
-                    .setBody(group.getGroupName()+"의 그룹장이 되셨습니다.")
-                    .build();
-            fcmService.sendPersonalNotification(deviceToken, notification, makeDeepLinkSetting(deepLinkConfig.getGroup(), group.getId()));
+            fcmService.sendPersonalNotification(deviceToken, "이제 고생 시작이다..",group.getGroupName()+"의 그룹장이 되셨습니다.", makeDeepLinkSetting(deepLinkConfig.getGroup(), group.getId()));
         }
     }
 
@@ -314,11 +285,7 @@ public class NotificationService {
                 .topicId(group.getId())
                 .build();
         if (deviceToken!=null&&userNotification.getStatus()){
-            Notification notification = Notification.builder()
-                    .setTitle("NEW BOSS 등장! ")
-                    .setBody(group.getGroupName()+"의 새로운 BOSS "+newBoss.getName()+" 님에게 축하 댓글을 달아주세요!")
-                    .build();
-            fcmService.sendNotificationToTopic(topic, notification, makeDeepLinkSetting(deepLinkConfig.getCommunity(), board.getId()));
+            fcmService.sendNotificationToTopic(topic, "NEW BOSS 등장! ",group.getGroupName()+"의 새로운 BOSS "+newBoss.getName()+" 님에게 축하 댓글을 달아주세요!", makeDeepLinkSetting(deepLinkConfig.getCommunity(), board.getId()));
         }
     }
 
@@ -330,11 +297,7 @@ public class NotificationService {
         UserNotification userNotification = notificationRepository.findByTypeAndUser(TopicEnum.SYSTEM, user).orElseThrow(
                 () -> new CommentException(CommentErrorCode.NO_EXIST_COMMENT));
         if (deviceToken!=null&&userNotification.getStatus()){
-            Notification notification = Notification.builder()
-                    .setTitle("나도 진짜 간호사라구")
-                    .setBody(hospitalAuth.getHospital() + "의 재직 및 간호 인증이 완료 되었습니다.")
-                    .build();
-            fcmService.sendPersonalNotification(deviceToken, notification, makeDeepLinkSetting(deepLinkConfig.getMain()));
+            fcmService.sendPersonalNotification(deviceToken, "나도 진짜 간호사라구",hospitalAuth.getHospital() + "의 재직 및 간호 인증이 완료 되었습니다.", makeDeepLinkSetting(deepLinkConfig.getMain()));
             }
     }
 
@@ -347,11 +310,7 @@ public class NotificationService {
                 .topic(TopicEnum.GROUP)
                 .topicId(groupId)
                 .build();
-        Notification notification = Notification.builder()
-                .setTitle("개이득주의! 새 근무 파일이 날라왔어요")
-                .setBody(groupName+" 그룹에 "+month+"월 근무표가 업로드 되었습니다.")
-                .build();
-        fcmService.sendNotificationToTopic(topic, notification, makeDeepLinkSetting(deepLinkConfig.getCalendar()));
+        fcmService.sendNotificationToTopic(topic, "개이득주의! 새 근무 파일이 날라왔어요",groupName+" 그룹에 "+month+"월 근무표가 업로드 되었습니다.", makeDeepLinkSetting(deepLinkConfig.getCalendar()));
     }
 
     private Map<String, String> makeDeepLinkSetting(String deeplink){
