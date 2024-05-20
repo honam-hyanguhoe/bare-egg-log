@@ -541,6 +541,7 @@ class GroupDetailViewModel @Inject constructor(
             }
             Log.d("memberManageScreen", "groupMembers ${state.groupInfo}")
             postSideEffect(GroupDetailSideEffect.Toast("모임장이 변경되었습니다."))
+            postSideEffect(GroupDetailSideEffect.NavigateToGroupListScreen)
         }else{
             postSideEffect(GroupDetailSideEffect.Toast("모임장 위임에 실패하였습니다."))
         }
@@ -611,4 +612,6 @@ data class GroupDetailState(
 
 sealed interface GroupDetailSideEffect {
     class Toast(val message: String) : GroupDetailSideEffect
+
+    object NavigateToGroupListScreen : GroupDetailSideEffect
 }

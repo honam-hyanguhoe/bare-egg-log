@@ -1,6 +1,7 @@
 package com.org.egglog.presentation.domain.group.screen
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -69,6 +70,7 @@ import com.org.egglog.presentation.component.organisms.calendars.GroupCalenar
 import com.org.egglog.presentation.component.organisms.calendars.WeeklyCalendar
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyUiModel
 import com.org.egglog.presentation.component.organisms.dialogs.WebViewDialog
+import com.org.egglog.presentation.domain.group.activity.GroupActivity
 import com.org.egglog.presentation.domain.group.viewmodel.FileUploadSideEffect
 import com.org.egglog.presentation.domain.group.viewmodel.FileUploadViewModel
 import com.org.egglog.presentation.domain.group.viewmodel.GroupDetailSideEffect
@@ -118,6 +120,15 @@ fun GroupDetailScreen(
             is GroupDetailSideEffect.Toast -> Toast.makeText(
                 context, sideEffect.message, Toast.LENGTH_SHORT
             ).show()
+
+            GroupDetailSideEffect.NavigateToGroupListScreen-> {
+                context.startActivity(
+                    Intent(
+                    context, GroupActivity::class.java
+                ).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                })
+            }
         }
     }
 
