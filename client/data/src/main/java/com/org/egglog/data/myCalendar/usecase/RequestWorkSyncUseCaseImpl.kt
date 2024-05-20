@@ -22,9 +22,10 @@ class RequestWorkSyncUseCaseImpl @Inject constructor(
         val response = myCalendarService.requestWorkSync(accessToken, requestBody)
 
         if(response.dataHeader.successCode == 0) {
-            Log.e("ExcelList", "$response")
+            Log.e("ExcelList", "연동 결과 $response")
             true
         } else {
+            Log.e("ExcelList", "${response.dataHeader.resultMessage}")
             throw Exception("근무 동기화 에러 발생! ${response.dataHeader.resultCode}: ${response.dataHeader.resultMessage}")
         }
     }

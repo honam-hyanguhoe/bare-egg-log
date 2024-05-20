@@ -1,7 +1,6 @@
 package com.org.egglog.domain.scheduler.usecase
 
 import java.time.LocalDateTime
-import java.time.LocalTime
 
 interface SchedulerUseCase {
     fun setAlarm(

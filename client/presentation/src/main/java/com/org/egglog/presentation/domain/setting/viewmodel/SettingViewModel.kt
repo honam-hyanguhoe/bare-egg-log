@@ -17,6 +17,7 @@ import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.PostLogoutUseCase
 import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.UpdateUserJoinUseCase
+import com.org.egglog.domain.setting.usecase.DeleteCalendarGroupMapStoreUseCase
 import com.org.egglog.presentation.domain.myCalendar.viewmodel.MyCalendarSideEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -40,7 +41,8 @@ class SettingViewModel @Inject constructor(
     private val getTokenUseCase: GetTokenUseCase,
     private val postLogoutUseCase: PostLogoutUseCase,
     private val deleteTokenUseCase: DeleteTokenUseCase,
-    private val deleteUserStoreUseCase: DeleteUserStoreUseCase
+    private val deleteUserStoreUseCase: DeleteUserStoreUseCase,
+    private val deleteCalendarGroupMapStoreUseCase: DeleteCalendarGroupMapStoreUseCase
 ): ViewModel(), ContainerHost<SettingState, SettingSideEffect>{
     override val container: Container<SettingState, SettingSideEffect> = container(
         initialState = SettingState(),
@@ -64,6 +66,7 @@ class SettingViewModel @Inject constructor(
         postLogoutUseCase("Bearer ${tokens.first.orEmpty()}")
         deleteTokenUseCase()
         deleteUserStoreUseCase()
+        deleteCalendarGroupMapStoreUseCase()
         postSideEffect(SettingSideEffect.NavigateToLoginActivity)
         reduce {
             state.copy(logoutEnabled = true)

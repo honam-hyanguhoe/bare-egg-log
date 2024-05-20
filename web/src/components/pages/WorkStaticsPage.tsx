@@ -14,10 +14,10 @@ const monthlyData = [
     weeks: [
       {
         data: {
-          DAY: 7,
-          EVE: 6,
-          NIGHT: 5,
-          OFF: 4,
+          DAY: 0,
+          EVE: 0,
+          NIGHT: 0,
+          OFF: 0,
         },
         week: "1",
       },
@@ -32,9 +32,9 @@ const monthlyData = [
       },
       {
         data: {
-          DAY: 3,
-          EVE: 4,
-          NIGHT: 5,
+          DAY: 0,
+          EVE: 0,
+          NIGHT: 0,
           OFF: 0,
         },
         week: "3",
@@ -42,8 +42,8 @@ const monthlyData = [
       {
         data: {
           DAY: 0,
-          EVE: 3,
-          NIGHT: 4,
+          EVE: 0,
+          NIGHT: 0,
           OFF: 0,
         },
         week: "4",
@@ -59,8 +59,8 @@ declare global {
 }
 const WorkStaticsPage = () => {
   const initialData: DataItem[] = [
-    { name: "5월 1주", values: [1, 3, 4, 5] },
-    { name: "5월 2주", values: [4, 3, 2, 1] },
+    { name: "5월 1주", values: [0, 0, 0, 0] },
+    { name: "5월 2주", values: [0, 0, 0, 0] },
     { name: "5월 3주", values: [0, 0, 0, 0] },
     { name: "5월 4주", values: [0, 0, 0, 0] },
     { name: "6월 1주", values: [0, 0, 0, 0] },

@@ -100,5 +100,5 @@ interface MyCalendarService {
     suspend fun requestWorkSync(
         @Header("Authorization") accessToken: String,
         @Body requestBody: RequestBody
-    ): CommonResponse<Unit?>
+    ): CommonResponse<List<WorkListResponse>>
 }

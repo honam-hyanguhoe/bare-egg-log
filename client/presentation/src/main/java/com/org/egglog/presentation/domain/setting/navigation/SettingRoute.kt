@@ -10,5 +10,6 @@ sealed class SettingRoute(val name: String) {
     data object CalendarAddScreen: SettingRoute("CalendarAddScreen")
     data object WorkSettingScreen: SettingRoute("WorkSettingScreen")
     data object AskSettingScreen: SettingRoute("AskSettingScreen")
+    data object CertificateBadgeScreen: SettingRoute("CertificateBadgeScreen")
 
 }

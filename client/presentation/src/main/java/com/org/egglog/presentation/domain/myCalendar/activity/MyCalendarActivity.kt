@@ -1,5 +1,6 @@
 package com.org.egglog.presentation.domain.myCalendar.activity
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
@@ -12,9 +13,10 @@ class MyCalendarActivity:  AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val deepLinkUri: Uri? = intent?.data
         setContent {
             ClientTheme {
-                MyCalendarNavigationHost()
+                MyCalendarNavigationHost(deepLinkUri = deepLinkUri)
             }
         }
     }

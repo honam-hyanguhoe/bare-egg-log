@@ -110,6 +110,10 @@ dependencies {
     // ui controller
     implementation(libs.accompanist.insets)
 
+    // workmanager
+    implementation(libs.work.runtime.ktx)
+    implementation(libs.hilt.workder)
+
     implementation(project(":domain"))
     implementation(project(":data"))
     implementation(project(":presentation"))

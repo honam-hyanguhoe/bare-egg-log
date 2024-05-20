@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -63,6 +65,9 @@ public class FirebaseConfig {
     public Bucket bucket() {
         return StorageClient.getInstance().bucket();
     }
+
+    @Bean
+    public Storage storage() {return StorageClient.getInstance().bucket().getStorage();}
 
     @Bean
     public FirebaseMessaging firebaseMessaging() {

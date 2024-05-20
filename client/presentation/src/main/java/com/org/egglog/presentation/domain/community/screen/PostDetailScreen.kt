@@ -76,6 +76,7 @@ fun PostDetailScreen(
 ) {
     val context = LocalContext.current
     val state = viewModel.collectAsState().value
+    Log.d("deep", "postId $postId")
     viewModel.collectSideEffect { sideEffect ->
         when (sideEffect) {
             is PostDetailSideEffect.Toast -> Toast.makeText(

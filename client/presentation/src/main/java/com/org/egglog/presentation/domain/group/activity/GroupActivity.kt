@@ -17,11 +17,16 @@ class GroupActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val deepLinkUri: Uri? = intent?.data
+
+        Log.d("deep", "group Activity ${deepLinkUri.toString()}")
+
         val code = intent?.getStringExtra("code")
         val name = intent?.getStringExtra("name")
+        val groupId = intent?.getStringExtra("groupId")
+
         setContent{
             ClientTheme {
-                GroupNavigationHost(deepLinkUri = deepLinkUri, code = code ?: "", groupName = name ?: "")
+                GroupNavigationHost(deepLinkUri = deepLinkUri, code = code ?: "", groupName = name ?: "", groupId = groupId?.toLong() ?: 0)
             }
         }
     }

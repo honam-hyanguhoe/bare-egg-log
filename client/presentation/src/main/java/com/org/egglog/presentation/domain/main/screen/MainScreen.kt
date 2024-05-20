@@ -175,7 +175,8 @@ private fun MainScreen(
         ) {
             Spacer(modifier = Modifier.height(15.dp))
             NoticeHeader(
-                hasLogo = true
+                hasLogo = true,
+                hasNotice = false
             )
             Spacer(modifier = Modifier.height(30.dp))
             DutyCard(

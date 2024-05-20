@@ -23,6 +23,7 @@ import com.org.egglog.domain.auth.usecase.GetUserUseCase
 import com.org.egglog.domain.auth.usecase.SetTokenUseCase
 import com.org.egglog.domain.auth.usecase.SetUserStoreUseCase
 import com.org.egglog.domain.auth.usecase.UpdateUserFcmTokenUseCase
+import com.org.egglog.domain.setting.usecase.SetCalendarGroupMapStoreUseCase
 import com.org.egglog.presentation.domain.auth.extend.authenticateToken
 import com.org.egglog.presentation.domain.auth.extend.loginWithKakao
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,6 +44,7 @@ class LoginViewModel @Inject constructor(
     private val setTokenUseCase: SetTokenUseCase,
     private val getUserUseCase: GetUserUseCase,
     private val setUserStoreUseCase: SetUserStoreUseCase,
+    private val setCalendarGroupMapStoreUseCase: SetCalendarGroupMapStoreUseCase,
     private val updateUserFcmTokenUseCase: UpdateUserFcmTokenUseCase
 ): ViewModel(), ContainerHost<LoginState, LoginSideEffect> {
     override val container: Container<LoginState, LoginSideEffect> = container(
@@ -50,6 +52,11 @@ class LoginViewModel @Inject constructor(
         buildSettings = {
             this.exceptionHandler = CoroutineExceptionHandler { _, throwable ->
                 intent {
+                    if(throwable.message?.contains("418") == true) {
+                        postSideEffect(LoginSideEffect.Toast(message = "추가정보가 부족합니다."))
+                    } else {
+                        postSideEffect(LoginSideEffect.Toast(message = throwable.message.orEmpty()))
+                    }
                     postSideEffect(LoginSideEffect.Toast(message = throwable.message.orEmpty()))
                     reduce {
                         state.copy(enabled = true)
@@ -135,6 +142,7 @@ class LoginViewModel @Inject constructor(
             Log.e("LoginVM", "user: " + userDetail.toString())
             if(userDetail?.selectedHospital == null || userDetail.empNo == null) {
                 setUserStoreUseCase(userDetail)
+                setCalendarGroupMapStoreUseCase(mapOf(userDetail?.workGroupId.toString() to true))
                 postSideEffect(LoginSideEffect.NavigateToPlusLoginActivity)
             } else {
                 val fcmToken = try {
@@ -146,7 +154,11 @@ class LoginViewModel @Inject constructor(
                 if(userDetail.deviceToken == null || userDetail.deviceToken != fcmToken) {
                     val newUser = updateUserFcmTokenUseCase("Bearer ${tokens.accessToken}", UserFcmTokenParam(fcmToken)).getOrThrow()
                     setUserStoreUseCase(newUser)
-                } else setUserStoreUseCase(userDetail)
+                    setCalendarGroupMapStoreUseCase(mapOf(newUser?.workGroupId.toString() to true))
+                } else {
+                    setUserStoreUseCase(userDetail)
+                    setCalendarGroupMapStoreUseCase(mapOf(userDetail.workGroupId.toString() to true))
+                }
                 postSideEffect(LoginSideEffect.NavigateToMainActivity)
             }
             reduce {
