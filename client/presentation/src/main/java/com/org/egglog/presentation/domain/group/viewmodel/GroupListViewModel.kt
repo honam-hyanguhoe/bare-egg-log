@@ -55,6 +55,9 @@ class GroupListViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
+    init {
+        getGroupList()
+    }
     fun refreshSomething() = intent {
         _isLoading.value = true
         delay(1000L)
@@ -72,15 +75,19 @@ class GroupListViewModel @Inject constructor(
         val tokens = getTokenUseCase()
 
         Log.d("write group", "${tokens.first}")
-        Log.d("write group", "등록 ${state.groupName}, ${state.groupPassword}, ${state.groupImage}")
-
+        Log.d("write group", "등록 ${state.groupName}, ${state.groupPassword}")
+        val groupImageNumber =  (state.groupImage) % 3 + 1
+        Log.d("test", groupImageNumber.toString() )
         val result = createGroupUseCase(
             accessToken = "Bearer ${tokens.first}",
             groupName = state.groupName,
             groupPassword = state.groupPassword,
-            groupImage = state.groupImage
+            groupImage = groupImageNumber
         )
-        val groupImageNumber =  (state.groupImage ) % 3 + 1
+
+        Log.d("test", "result $result")
+
+
         val newGroup = Group(
             groupId = state.groupId + 1,
             groupName = state.groupName,

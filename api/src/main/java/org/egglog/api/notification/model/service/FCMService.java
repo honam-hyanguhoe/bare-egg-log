@@ -1,10 +1,6 @@
 package org.egglog.api.notification.model.service;
 
-
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.Notification;
+import com.google.firebase.messaging.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.egglog.api.notification.exception.NotificationErrorCode;
@@ -13,6 +9,8 @@ import org.egglog.api.notification.model.entity.FCMTopic;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * ```
@@ -32,7 +30,6 @@ import java.util.Arrays;
 public class FCMService {
 
     private final FirebaseMessaging firebaseMessaging;
-
 
     //토픽 구독
     public void subscribeToTopic(String token, FCMTopic fcmTopic) {
@@ -57,36 +54,95 @@ public class FCMService {
     }
 
     //토픽 알림
-    public void sendNotificationToTopic(FCMTopic fcmTopic, Notification notification) {
-        //todo : 딥링크 연결시 여기서 설정 또한 작성자는 알림 대상 제외 설정도 필요함 condition에서 설정
+    public void sendNotificationToTopic(FCMTopic fcmTopic, String title, String body) {
+        AndroidNotification androidNotification = AndroidNotification.builder()
+                .setTitle(title)
+                .setBody(body)
+                .build();
+
+        AndroidConfig androidConfig = AndroidConfig.builder()
+                .setNotification(androidNotification)
+                .build();
+
         Message message = Message.builder()
-                .setNotification(notification)
+                .setAndroidConfig(androidConfig)
                 .setTopic(fcmTopic.getTopic())
                 .build();
-        try {
-            log.debug("[FCM 서비스 실행] \n  {} 토픽 구독자 알림 발송", fcmTopic.getTopic());
-            String response = firebaseMessaging.send(message);
-            log.debug("[FCM 서비스 실행] \n  {} 토픽 구독자 알림 발송 성공", response);
-        } catch (FirebaseMessagingException e) {
-            log.error("[토픽 구독자 알림 발송 에러 발생] : {}", e.getMessage(), e);
-            throw new NotificationException(NotificationErrorCode.NOTIFICATION_SERVER_ERROR);
-        }
+
+        sendMessage(message, fcmTopic.getTopic());
+    }
+
+    public void sendNotificationToTopic(FCMTopic fcmTopic, String title, String body, Map<String, String> data) {
+        AndroidNotification androidNotification = AndroidNotification.builder()
+                .setTitle(title)
+                .setBody(body)
+                .setClickAction(data.get("click_action"))
+                .build();
+
+        AndroidConfig androidConfig = AndroidConfig.builder()
+                .setNotification(androidNotification)
+                .build();
+
+        data.put("title", title);
+        data.put("body", body);
+
+        Message message = Message.builder()
+                .putAllData(data)
+                .setTopic(fcmTopic.getTopic())
+                .build();
+
+        sendMessage(message, fcmTopic.getTopic());
     }
 
     //개인 알림
-    public void sendPersonalNotification(String token, Notification notification) {
+    public void sendPersonalNotification(String token, String title, String body, Map<String, String> data) {
+        AndroidNotification androidNotification = AndroidNotification.builder()
+                .setTitle(title)
+                .setBody(body)
+                .setClickAction(data.get("click_action"))
+                .build();
+
+        AndroidConfig androidConfig = AndroidConfig.builder()
+                .setNotification(androidNotification)
+                .build();
+
+        data.put("title", title);
+        data.put("body", body);
+
         Message message = Message.builder()
-                .setNotification(notification)
+                .putAllData(data)
                 .setToken(token)
                 .build();
+
+        sendMessage(message, token);
+    }
+
+    public void sendPersonalNotification(String token, String title, String body) {
+        AndroidNotification androidNotification = AndroidNotification.builder()
+                .setTitle(title)
+                .setBody(body)
+                .build();
+
+        AndroidConfig androidConfig = AndroidConfig.builder()
+                .setNotification(androidNotification)
+                .build();
+
+        Message message = Message.builder()
+                .setAndroidConfig(androidConfig)
+                .setToken(token)
+                .build();
+
+        sendMessage(message, token);
+    }
+
+    private void sendMessage(Message message, String target) {
         try {
-            log.debug("[FCM 서비스 실행] \n  {} 토큰에게 알림 발송", token);
+            log.debug("[FCM 서비스 실행] \n {} 에게 알림 발송", target);
             String response = firebaseMessaging.send(message);
-            log.debug("[FCM 서비스 실행] \n  {} 알림 발송 성공", response);
+            log.debug("[FCM 서비스 실행] \n {} 알림 발송 성공", response);
         } catch (FirebaseMessagingException e) {
-            log.error("[특정 토큰 알림 발송 에러 발생] : {}", e.getMessage(), e);
+            log.error("[알림 발송 에러 발생] : {}", e.getMessage(), e);
             throw new NotificationException(NotificationErrorCode.NOTIFICATION_SERVER_ERROR);
         }
     }
-
 }

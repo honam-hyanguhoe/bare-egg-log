@@ -129,9 +129,16 @@ dependencies {
 
     implementation("org.apache.poi:poi:$poiVersion")
     implementation("org.apache.poi:poi-ooxml:$poiVersion")
+
     // refresh
     implementation(libs.accompanist.swiperefresh)
+
+    // permission
     implementation(libs.accompanist.permissions)
+
+    // workmanager
+    implementation(libs.work.runtime.ktx)
+    implementation(libs.hilt.workder)
 
 
     implementation(project(":domain"))

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.org.egglog.domain.auth.usecase.GetTokenUseCase
 import com.org.egglog.domain.auth.usecase.GetUserStoreUseCase
 import com.org.egglog.domain.main.usecase.GetWeeklyWorkUseCase
+import com.org.egglog.domain.scheduler.usecase.WorkerUseCase
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyDataSource
 import com.org.egglog.presentation.component.organisms.calendars.weeklyData.WeeklyUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,6 +14,7 @@ import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -22,6 +24,7 @@ class WorkViewModel @Inject constructor(
     private val getWeeklyWorkUseCase: GetWeeklyWorkUseCase,
     private val getTokenUseCase: GetTokenUseCase,
     private val getUserStoreUseCase: GetUserStoreUseCase,
+    private val workerUseCase: WorkerUseCase
 ) : ViewModel(), ContainerHost<WorkState, WorkSideEffect> {
     override val container: Container<WorkState, WorkSideEffect> = container(
         initialState = WorkState(),
@@ -33,6 +36,7 @@ class WorkViewModel @Inject constructor(
         intent {
             onPrevClick(state.startDate)
         }
+        workerUseCase.workerDailyWork()
     }
 
     private suspend fun loadWork(start: String, end: String) = intent {
@@ -40,7 +44,7 @@ class WorkViewModel @Inject constructor(
         val tokens = getTokenUseCase()
         val user = getUserStoreUseCase()
 
-        Log.d("token", "${tokens.first}")
+//        Log.d("test", "start $start end $end")
         val response = getWeeklyWorkUseCase(
             accessToken = "Bearer ${tokens.first}",
             calendarGroupId = user?.workGroupId ?: 0,
@@ -48,7 +52,7 @@ class WorkViewModel @Inject constructor(
             endDate = end
         )
         val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        Log.d("temp", "-- $response  $start $end")
+        Log.d("temp", "getWeeklyWork $response")
         val tempLabels = mutableListOf<String>()
 
         val weeklyWork = response.getOrNull()
@@ -63,7 +67,7 @@ class WorkViewModel @Inject constructor(
 
                 Log.d("temp", workForDate.toString())
                 if (workForDate != null) {
-                    tempLabels.add(workForDate.workType!!.workTag)
+                    tempLabels.add(workForDate.workType.title)
                 } else {
                     tempLabels.add("NONE")
                 }
@@ -84,11 +88,12 @@ class WorkViewModel @Inject constructor(
 
     fun onPrevClick(clickedDate: LocalDate) = intent {
         val finalStartDate = dataSource.getStartOfWeek(clickedDate)
+
         val calendarUiModel =
             dataSource.getData(startDate = finalStartDate, lastSelectedDate = finalStartDate)
 
-        Log.d("weekly", "onPrevClick  ${clickedDate} --- ${finalStartDate}")
-        Log.d("weekly", "onPrevClick ${calendarUiModel}")
+        Log.d("test", "onPrevClick  ${clickedDate} --- ${finalStartDate}")
+        Log.d("test", "onPrevClick ${calendarUiModel}")
 
         loadWork(calendarUiModel.startDate.date.toString(), finalStartDate.plusDays(6).toString())
 
@@ -99,8 +104,8 @@ class WorkViewModel @Inject constructor(
                 endDate = finalStartDate
             )
         }
-        Log.d("weekly", "${state.currentWeekDays}")
-        Log.d("weekly", " ${state.startDate} ---- ${state.endDate}")
+        Log.d("test", "current ${state.currentWeekDays}")
+        Log.d("test", "start ${state.startDate} ---- ${state.endDate}")
     }
 
     fun onNextClick(localDate: LocalDate) = intent {
@@ -126,7 +131,7 @@ data class WorkState(
         LocalDate.now(),
         LocalDate.now()
     ),
-    val startDate: LocalDate = LocalDate.now(),
+    val startDate: LocalDate = LocalDate.now().plusDays(1),
     val endDate: LocalDate = LocalDate.now(),
     val labels: List<String> = listOf("NONE", "NONE", "NONE", "NONE", "NONE", "NONE", "NONE"),
 )

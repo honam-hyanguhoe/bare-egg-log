@@ -108,7 +108,7 @@ class WritePostViewModel @Inject constructor(
         Log.e("WritePostViewModel", "현재 선택한 사진 개수는 ${state.uploadImages.size}개 입니다")
         if (state.uploadImages.size < 4) {
             Log.e("커뮤니티", "이미지 uri $uri")
-            val resizedImage = resizeImage(context, uri, 800, 600)
+            val resizedImage = resizeImage(context, uri, 400, 300)
             Log.e("커뮤니티", "$resizedImage")
             resizedImage?.let {
                 reduce {

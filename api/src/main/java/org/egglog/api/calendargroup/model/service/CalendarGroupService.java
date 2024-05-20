@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -59,13 +60,10 @@ public class CalendarGroupService {
     @Transactional
     public void deleteCalendarGroup(Long calendarGroupId, User loginUser) {
         log.debug(" ==== ==== ==== [ 캘린더 그룹 삭제 서비스 실행 ] ==== ==== ====");
-        log.debug(" ==== ==== ==== [ calendarGroupId = {} loginUser.getWorkGroupId() = {} ] ==== ==== ==== ",calendarGroupId, loginUser.getWorkGroupId());
-        log.debug(" ==== ==== ==== [ loginUser.getWorkGroupId() == calendarGroupId = {}  ==== ==== ==== ", loginUser.getWorkGroupId() == calendarGroupId);
-        log.debug(" ==== ==== ==== [ loginUser.getWorkGroupId().equal(calendarGroupId) = {}  ==== ==== ==== ", loginUser.getWorkGroupId().equals(calendarGroupId));
         if (loginUser.getWorkGroupId().equals(calendarGroupId)) throw new CalendarGroupException(CalendarGroupErrorCode.NOT_CONTROL_WORKGROUP);
         CalendarGroup calendarGroup = calendarGroupRepository.findCalendarGroupWithUserById(calendarGroupId)
                 .orElseThrow(() -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP));
-        if (calendarGroup.getUser().equals(loginUser)) throw new UserException(UserErrorCode.ACCESS_DENIED);
+        if (!calendarGroup.getUser().equals(loginUser)) throw new UserException(UserErrorCode.ACCESS_DENIED);
         long deletedCount = eventRepository.deleteAllByCalendarGroupId(calendarGroupId);
         log.debug(" ==== ==== ==== [ 캘린더 ID = {} 에 대한 값 삭제 관련 일정 = {} 개 삭제 완료 ] ==== ==== ==== ",calendarGroupId, deletedCount);
         calendarGroupRepository.delete(calendarGroup);
@@ -84,42 +82,37 @@ public class CalendarGroupService {
         List<Long> calendarGroupIds = calendarGroupListRequest.getCalendarGroupList();      //캘린더그룹 아이디
 
         List<CalendarGroupEventListResponse> calendarGroupEventListResponseList = new ArrayList<>();
-        List<CalendarGroupEventResponse> calendarGroupEventResponseList = new ArrayList<>();
+        Map<Long, CalendarGroup> userCalendarGroupMap = calendarGroupRepository.findListByUserId(user.getId())
+                .stream()
+                .collect(Collectors.toMap(CalendarGroup::getId, calendarGroup -> calendarGroup));
 
-        for (Long calendarGroupId : calendarGroupIds) {
-            CalendarGroup calendarGroup = calendarGroupRepository.findById(calendarGroupId).orElseThrow(
-                    () -> new CalendarGroupException(CalendarGroupErrorCode.NOT_FOUND_CALENDAR_GROUP)
-            );
-            //로그인한 사용자가 캘린더 그룹에 속한 사용자가 아닐 경우
-            if (!calendarGroup.getUser().getId().equals(user.getId())) {
-                throw new CalendarGroupException(CalendarGroupErrorCode.NOT_SAME_CALENDAR_GROUP_USER);
-            }
+        for (Long requestId : calendarGroupIds) {
+            if (!userCalendarGroupMap.containsKey(requestId)) throw new UserException(UserErrorCode.ACCESS_DENIED);
+            CalendarGroup calendarGroup = userCalendarGroupMap.get(requestId);
+
             //캘린더그룹에 속한 일정들
-            Optional<List<Event>> eventsByCalendarGroupId = eventRepository.findEventsByCalendarGroupId(calendarGroupId);
-
-            if (eventsByCalendarGroupId.isPresent()) {
-                for (Event event : eventsByCalendarGroupId.get()) {
-                    CalendarGroupEventResponse calendarGroupEventResponse = CalendarGroupEventResponse.builder()
-                            .eventId(event.getId())
-                            .eventTitle(event.getEventTitle())
-                            .eventContent(event.getEventContent())
-                            .startDate(event.getStartDate())
-                            .endDate(event.getEndDate())
-                            .build();
-
-                    calendarGroupEventResponseList.add(calendarGroupEventResponse);
-                }
-
-                CalendarGroupEventListResponse calendarGroupEventListResponse1 = CalendarGroupEventListResponse.builder()
-                        .calendarGroupId(calendarGroupId)
-                        .calendarGroupEventResponseList(calendarGroupEventResponseList)
-                        .build();
-
-                calendarGroupEventListResponseList.add(calendarGroupEventListResponse1);
-            }
+            calendarGroupEventListResponseList.add(
+                    CalendarGroupEventListResponse.builder()
+                            .calendarGroupId(calendarGroup.getId())
+                            .calendarGroupEventResponseList(eventRepository.findEventsByCalendarGroupId(calendarGroup.getId()).get()
+                                    .stream()
+                                    .map(Event::toCalendarGroupEventResponse)
+                                    .collect(Collectors.toList()))
+                            .build()
+            );
         }
         return calendarGroupEventListResponseList;
     }
 
 
+    @Transactional
+    public void deleteUserCalendarGroups(User loginUser){
+        List<CalendarGroup> listByUserId = calendarGroupRepository.findListByUserId(loginUser.getId());
+        for (CalendarGroup calendarGroup : listByUserId) {
+            if (calendarGroup.getId().equals(loginUser.getWorkGroupId())) continue;
+            long deletedCount = eventRepository.deleteAllByCalendarGroupId(calendarGroup.getId());
+            log.debug(" ==== ==== ==== [ 캘린더 = {} 에 대한 일정 값 삭제 관련 일정 = {} 개 삭제 완료 ] ==== ==== ==== ",calendarGroup.getAlias(), deletedCount);
+            calendarGroupRepository.delete(calendarGroup);
+        }
+    }
 }

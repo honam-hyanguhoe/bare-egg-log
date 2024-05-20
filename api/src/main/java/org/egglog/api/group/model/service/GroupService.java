@@ -1,10 +1,14 @@
 package org.egglog.api.group.model.service;
 
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.Query;
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.egglog.api.board.model.dto.params.BoardListForm;
+import org.egglog.api.board.model.entity.Board;
+import org.egglog.api.board.model.service.BoardService;
+import org.egglog.api.board.repository.jpa.board.BoardRepository;
 import org.egglog.api.group.exception.GroupErrorCode;
 import org.egglog.api.group.exception.GroupException;
 import org.egglog.api.group.model.dto.request.*;
@@ -32,10 +36,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor
@@ -44,9 +46,14 @@ public class GroupService {
     private final PasswordEncoder passwordEncoder;
     private final GroupMemberService groupMemberService;
 
+    // 그룹 관련 레포지토리
     private final GroupRepository groupRepository;
     private final GroupDutyRepository groupDutyRepository;
     private final GroupInvitationRepository groupInvitationRepository;
+
+    // 게시판 관련 레포지토리(그룹 삭제를 위함)
+    private final BoardRepository boardRepository;
+    private final BoardService boardService;
 
     private final FCMService fcmService;
     private final NotificationService notificationService;
@@ -230,7 +237,8 @@ public class GroupService {
         }
         //새로운 그룹장 생성
         GroupMember newBoss = groupMemberService.getGroupMember(groupId,memberId);
-
+        Group group = newBoss.getGroup();
+        User newBossUser = newBoss.getUser();
         newBoss.setIsAdmin(true);
         boss.setIsAdmin(false);
 
@@ -240,6 +248,13 @@ public class GroupService {
         //변경 정보 DB 반영
         groupMemberService.createGroupMember(newBoss);
         groupMemberService.createGroupMember(boss);
+
+        //새로운 그룹장 축하글 작성
+        Board board = boardService.newBossBoardCreate(group, newBossUser);
+
+        //새로운 그룹장 알림
+        notificationService.iamBossNotification(group, newBossUser);
+        notificationService.newBossNotification(group, board, newBossUser);
     }
 
     /**
@@ -257,16 +272,17 @@ public class GroupService {
             Integer count = groupMemberService.countGroupMember(groupId);
             //혼자가 아니라면 탈퇴 권한 없음
             if(count==1){
-                groupMemberService.deleteGroupMember(userInfo);
                 //더이상 남은 사용자가 없으니 그룹 삭제
                 Group group = groupRepository.findById(groupId).orElseThrow(()->new GroupException(GroupErrorCode.NOT_FOUND));
+                //그룹 게시판 글 삭제 cascade로 삭제
+                groupMemberService.deleteGroupMember(userInfo);
                 groupRepository.delete(group);
-
                 //해당 멤버가 삭제되었다면 해당 유저의 토픽 구독 취소
                 notificationService.exitGroupNotification(user, groupId);
 
 
             }else{
+
                 throw new GroupException(GroupErrorCode.GROUP_ROLE_NOT_MATCH);
             }
         }
@@ -331,7 +347,9 @@ public class GroupService {
                 SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
                 Date now = new Date();
                 String nowDay = dayFormat.format(now);
+                log.debug("save Duty >>>>>");
                 groupDutyRepository.saveDuty(user.getName(),groupId,groupDutyData,nowDay);
+                log.debug("sending notification >>>>>");
                 notificationService.excelDutyUploadNotification(groupId, groupDutyData);
             }catch (Exception e){
                 throw new GroupException(GroupErrorCode.TRANSACTION_ERROR);
@@ -374,9 +392,22 @@ public class GroupService {
         }
     }
 
-    public Map<LocalDate, WorkType> getUserExcelData(Long groupId, LocalDate targetMonth, Long index, User loginUser){
-        //todo 검증 로직은 sync 로직에서 수행함. groupId 가 현재 User가 속한 그룹인지 등.
-        return Map.of(LocalDate.now(), WorkType.builder().build());
+    public UserDutyDataDto getUserExcelData(Long groupId, LocalDate targetMonth, Long index, User loginUser) {
+        log.debug("=== === === === 파이어 베이스에서 근무 데이터 가져오기 시작 === === === ===");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+        String date = targetMonth.format(formatter);
+        String empNo = loginUser.getEmpNo();
+        log.debug("=== === === === 경로 설정 시작 === === === ===");
+        // Firestore 경로 설정
+        Index documentIndex = new Index(String.valueOf(groupId),date,String.valueOf(index));
+        return groupDutyRepository.getUserDutyData(documentIndex,empNo);
     }
 
+    @Transactional
+    public void deleteUserGroups(User loginUser){
+        List<GroupPreviewDto> groupList = groupRepository.findGroupByUserId(loginUser.getId());
+        for (GroupPreviewDto groupPreviewDto : groupList) {
+            exitGroup(groupPreviewDto.getGroupId(), loginUser);
+        }
+    }
 }
