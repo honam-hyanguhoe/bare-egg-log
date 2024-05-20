@@ -110,7 +110,11 @@ private fun MemberManageScreen(
                         ProfileItem(profile = Profile(userId= member.userId!!, name = member.userName, hospital = member.hospitalName), type = "basic")
                     }
                 }
+                item {
+                    Spacer(modifier = Modifier.height(150.dp))
+                }
             }
+
         }
 
     }
