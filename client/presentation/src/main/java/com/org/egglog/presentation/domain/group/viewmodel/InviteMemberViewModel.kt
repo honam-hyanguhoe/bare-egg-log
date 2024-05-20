@@ -73,11 +73,26 @@ class InviteMemberViewModel @Inject constructor(
         )
 
         if(result.isSuccess){
+            postSideEffect(
+                InviteMemberSideEffect.NavigateToGroupListScreen
+            )
+            postSideEffect(
+                InviteMemberSideEffect.Toast("그룹에 가입되었습니다.")
+            )
             reduce {
                 state.copy(
                     invitePassword = ""
                 )
             }
+            Log.d("invite", "success")
+        }else{
+            postSideEffect(InviteMemberSideEffect.Toast("그룹에 가입하지 못했습니다"))
+            reduce {
+                state.copy(
+                    invitePassword = ""
+                )
+            }
+            Log.d("invite", "fail")
         }
     }
 }
@@ -88,4 +103,7 @@ data class InviteMemberState(
 )
 sealed interface InviteMemberSideEffect{
     class Toast(val message: String) : InviteMemberSideEffect
+
+    object NavigateToGroupListScreen : InviteMemberSideEffect
 }
+

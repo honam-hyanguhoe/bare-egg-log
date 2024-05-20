@@ -1,5 +1,6 @@
 package com.org.egglog.presentation.domain.group.screen
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,10 +31,13 @@ import com.org.egglog.presentation.R
 import com.org.egglog.presentation.component.atoms.buttons.BigButton
 import com.org.egglog.presentation.component.atoms.imageLoader.LocalImageLoader
 import com.org.egglog.presentation.component.atoms.inputs.PassInput
+import com.org.egglog.presentation.domain.group.activity.GroupActivity
 import com.org.egglog.presentation.domain.group.viewmodel.GroupDetailSideEffect
 import com.org.egglog.presentation.domain.group.viewmodel.GroupDetailViewModel
+import com.org.egglog.presentation.domain.group.viewmodel.GroupListSideEffect
 import com.org.egglog.presentation.domain.group.viewmodel.InviteMemberSideEffect
 import com.org.egglog.presentation.domain.group.viewmodel.InviteMemberViewModel
+import com.org.egglog.presentation.domain.setting.activity.SettingActivity
 import com.org.egglog.presentation.theme.Gray300
 import com.org.egglog.presentation.theme.NaturalBlack
 import com.org.egglog.presentation.theme.NaturalWhite
@@ -65,6 +69,16 @@ fun InvitationScreen(
                 sideEffect.message,
                 Toast.LENGTH_SHORT
             ).show()
+
+
+            InviteMemberSideEffect.NavigateToGroupListScreen -> {
+                context.startActivity(
+                    Intent(
+                        context, GroupActivity::class.java
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    })
+            }
         }
     }
 
@@ -85,9 +99,9 @@ private fun InvitationScreen(
     groupName: String,
     groupPassword: String = "",
     onGroupPasswordChange: (String) -> Unit,
-    onJoinGroup : () -> Unit,
+    onJoinGroup: () -> Unit,
     onNavigateToGroupListScreen: () -> Unit,
-    ) {
+) {
     val context = LocalContext.current
 
     Column(
@@ -148,7 +162,6 @@ private fun InvitationScreen(
                     disabledContentColor = NaturalWhite
                 ), onClick = {
                     onJoinGroup()
-                    onNavigateToGroupListScreen()
                 }) {
                     Text(text = "그룹 참여하기", color = NaturalWhite)
                 }
