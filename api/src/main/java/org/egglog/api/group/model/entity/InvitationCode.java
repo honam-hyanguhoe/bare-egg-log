@@ -2,7 +2,7 @@ package org.egglog.api.group.model.entity;
 
 import lombok.Builder;
 import lombok.Data;
-import org.apache.commons.lang3.RandomStringUtils;
+import org.egglog.utility.utils.RandomStringUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
@@ -17,11 +17,13 @@ public class InvitationCode{
     private String code;
     @Indexed
     private Long groupId;
-    public static InvitationCode create(final Long groupId)  {
-        String code = RandomStringUtils.randomAlphanumeric(INVITE_CODE_LENGTH);
+    private String password;
+    public static InvitationCode create(final Long groupId, final String password)  {
+        String code = RandomStringUtils.generateRandomMixChar(10);
         return InvitationCode.builder()
                 .code(code)
                 .groupId(groupId)
+                .password(password)
                 .build();
     }
 

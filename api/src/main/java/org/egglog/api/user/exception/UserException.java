@@ -1,12 +1,11 @@
 package org.egglog.api.user.exception;
 
 import lombok.Getter;
+import org.egglog.utility.exception.BaseException;
 
 @Getter
-public class UserException extends RuntimeException{
-    private final UserErrorCode errorCode;
+public class UserException extends BaseException {
     public UserException(UserErrorCode errorCode){
-        super(errorCode.getMessage());
-        this.errorCode = errorCode;
+        super(errorCode);
     }
 }

@@ -13,13 +13,24 @@ java {
 
 repositories {
     mavenCentral()
+    maven {
+        credentials(PasswordCredentials) {
+            username = "${nexusUsername}"
+            password = "${nexusPassword}"
+        }
+        url "${nexusUrl}/egg-log-group/"
+        allowInsecureProtocol true
+        // 가능한 경우 allowInsecureProtocol 제거하고 HTTPS 사용
+    }
 }
+
 
 ext {
     set('springCloudVersion', "2023.0.1")
 }
 
 dependencies {
+    implementation 'org.egg-log:utility:1.0.5'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
@@ -27,8 +38,8 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.2'
     implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
 
-
     implementation 'com.google.firebase:firebase-admin:9.2.0'
+//    implementation group: 'org.springframework.cloud', name: 'spring-cloud-gcp-starter-data-firestore', version: '1.2.8.RELEASE'
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -46,11 +57,40 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+
+    // Querydsl 추가
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+    // https://mvnrepository.com/artifact/org.mnode.ical4j/ical4j
+    implementation group: 'org.mnode.ical4j', name: 'ical4j', version: '4.0.0-rc5'
+    // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
+    testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.6'
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.6'
+
+    // webflux 추가
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // http://localhost:8080/swagger-ui/index.html
+    // https://github.com/springdoc/springdoc-openapi
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+    // https://springdoc.org/#javadoc-support
+    annotationProcessor 'com.github.therapi:therapi-runtime-javadoc-scribe:0.15.0'
+    implementation 'com.github.therapi:therapi-runtime-javadoc:0.15.0'
+
+    // Reflections 라이브러리
+    implementation 'org.reflections:reflections:0.9.12'
+
+    //micrometer 추가
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
 }
 
 
 configurations.all {
-    exclude group : "commons-logging", module: "commons-logging"
+    exclude group: "commons-logging", module: "commons-logging"
 }
 
 

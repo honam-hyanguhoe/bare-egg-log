@@ -36,3 +36,11 @@ out/
 ### VS Code ###
 .vscode/
 application.yml
+gradle.properties
+./lib/
+*.hprof
+!**/node_modules/
+
+*.jks
+*.cer
+*.pem

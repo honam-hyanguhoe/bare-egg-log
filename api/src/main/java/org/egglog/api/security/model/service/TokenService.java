@@ -1,83 +1,81 @@
 package org.egglog.api.security.model.service;
 
-
-import com.nursetest.app.security.exception.JwtErrorCode;
-import com.nursetest.app.security.exception.JwtException;
-import com.nursetest.app.security.model.dto.response.GeneratedToken;
-import com.nursetest.app.security.model.entity.Token;
-import com.nursetest.app.security.repository.RefreshTokenRepository;
-import com.nursetest.app.security.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.egglog.api.security.exception.JwtErrorCode;
+import org.egglog.api.security.exception.JwtException;
+import org.egglog.api.security.model.dto.response.TokenResponse;
+import org.egglog.api.security.model.entity.Token;
+import org.egglog.api.security.repository.redis.RefreshTokenRepository;
+import org.egglog.api.security.repository.redis.UnsafeTokenRepository;
+import org.egglog.api.security.util.JwtUtils;
+import org.egglog.api.user.exception.UserErrorCode;
+import org.egglog.api.user.exception.UserException;
+import org.egglog.api.user.model.entity.User;
+import org.egglog.api.user.repository.jpa.UserJpaRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import static com.nursetest.app.security.exception.JwtErrorCode.NOT_EXISTS_TOKEN;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TokenService {
 
-    private final RefreshTokenRepository repository;
-    private final JwtUtil jwtUtil;
-
-    /**
-     * 토큰 생성
-     */
-    @Transactional
-    public GeneratedToken generatedToken(Long userId, String role){
-        String accessToken = jwtUtil.generateAccessToken(userId, role);
-        String refreshToken = jwtUtil.generateRefreshToken(userId, role);
-        //레디스 저장
-        repository.save(new Token(userId, accessToken, refreshToken));
-        return GeneratedToken.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+    private final JwtUtils jwtUtils;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final UnsafeTokenRepository unsafeTokenRepository;
+    private final UserJpaRepository userJpaRepository;
+    public TokenResponse generatedToken(Long id, String role){
+        log.debug(" ==== ==== ==== [토큰 생성 서비스 실행] ==== ==== ====");
+        String accessToken = jwtUtils.generateAccessToken(id, role);
+        String refreshToken = jwtUtils.generateRefreshToken(id, role);
+        return refreshTokenRepository.save(new Token(id, accessToken, refreshToken)).toResponse();
     }
 
-    /**
-     * @param userId
-     */
-    @Transactional
-    public void removeToken(Long userId){
-        Token token = repository.findById(userId)
-                .orElseThrow(()-> new JwtException(NOT_EXISTS_TOKEN));
-        //todo : 로그아웃 시 처리 해야하는 레디스에 저장된 user 정보 예) 알람 등
-
-        repository.delete(token);
+    public void RemoveToken(Long id){
+        Token token = refreshTokenRepository.findById(id).orElseThrow(() -> new JwtException(JwtErrorCode.INVALID_REFRESH_TOKEN));
+        refreshTokenRepository.delete(token);
     }
 
-    /**
-     * 엑세스토큰을 받아서 재 발행 해주는 역할입니다.
-     * @Refresh Token Rotation : access token, refresh Token 재 발행
-     * @return newAccessToken
-     */
-    @Transactional
-    public GeneratedToken republishToken(String refreshToken){
-//        refreshToken 검증
-        if (jwtUtil.validateRefreshToken(refreshToken)){
-//          1. 정상유저(A)의 Refresh Token에서 User의 정보(email or PK)를 꺼낸다.
-            Long userId = jwtUtil.getUserIdByRefreshToken(refreshToken);
-//          2. user email or PK 를 통해 Redis를 조회한다.
-            Token token = repository.findById(userId).orElseThrow(() -> new JwtException(NOT_EXISTS_TOKEN));
-//          3. 정상적으로 조회된다면 해당 user의 refresh token(value)를 가져올 수 잇다.
-//          4. Redis에서 조회한 refresh token과 클라이어트가 보낸 refresh Token을 비교한다.
-            if (refreshToken.equals(token.getRefreshToken())){
-//              5. 두 토큰 값이 매칭되면 정상 유저로 간주하고, access token과 refresh token을 모두 재발급한다.
-                GeneratedToken newToken = generatedToken(userId, jwtUtil.getUserRoleByRefreshToken(refreshToken));
-//              6. Redis에 저장된 user email의 매핑 값을(새 refresh token)으로 갱신한다.
-                removeToken(userId);
-                repository.save(new Token(userId, newToken.getAccessToken(), newToken.getRefreshToken()));
-                return newToken;
+    public TokenResponse republishToken(String refreshTokenRequest){
+        log.debug(" ==== ==== ==== [토큰 재발행 서비스 실행] ==== ==== ====");
+        if(jwtUtils.validateRefreshToken(refreshTokenRequest)){
+            //여기 까지 들어온 토큰은 검증이 됨 (몇번이고 발행한 토큰 = 여러명이 같은 ID에 대한 토큰을 가지고 있을 수 있음)
+            log.debug("refresh 토큰 검증 완료");
+            Long id = jwtUtils.getUserIdByRefreshToken(refreshTokenRequest);
+            log.debug("id={}",id);
+            String role = jwtUtils.getUserRoleByRefreshToken(refreshTokenRequest);
+            log.debug("role={}",role);
+            //해당 리프레쉬 토큰으로 발행된 토큰 쌍을 가져온다.(엑세스 토큰이 리프레쉬 될때, 항상 토큰 쌍이 재발행 된다)
+            Token token = refreshTokenRepository.findById(id).orElseThrow(() -> new JwtException(JwtErrorCode.INVALID_REFRESH_TOKEN));
+
+            //해당 토큰이 블랙리스트에 존재한다면
+            if (unsafeTokenRepository.findById(token.getAccessToken()).isPresent()){
+                log.debug("해당 refresh 토큰이 블랙리스트에 있습니다.");
+                // 같은 ID에 대한 토큰이 두명 이상 가지고 있을 수 있다. -> 토큰 탈취 가능성 있다.
+                refreshTokenRepository.delete(token); //토큰 지우고
+                User user = userJpaRepository.findById(id).orElseThrow(() -> new JwtException(JwtErrorCode.INVALID_REFRESH_TOKEN));
+                userJpaRepository.save(user.doLogout()); //로그아웃 처리후
+                throw new JwtException(JwtErrorCode.INVALID_REFRESH_TOKEN); //로그인 재요청
+            }
+            if(refreshTokenRequest.equals(token.getRefreshToken())){
+                //마지막으로 발행된 리프레쉬 토큰과 요청이 들어온 리프레쉬토큰이 같다면 -> 정상적으로 재발행한다.
+                log.debug("리프레쉬 토큰 발행 성공");
+                refreshTokenRepository.delete(token);
+                return generatedToken(id, role);
             }else {
-                //사용자가 아닌 다른 사람에 의해 토큰이 변경됨
-                removeToken(userId);
-                //todo : 두 토큰 다 블랙리스트 처리 들어가야함.-> 이후 재 로그인
-
-                throw new JwtException(JwtErrorCode.INVALID_TOKEN);
+                //마지막으로 발행된 리프레쉬 토큰과 요청 리프레쉬 토큰이 다르다면 -> 같은 ID에 대한 토큰이 두명 이상 가지고 있는 것이다.
+                //마지막으로 발행된 토큰 쌍을 블랙리스트에 넣고, 현재 요청들어온 리프레쉬 토큰은 재 발행을 해주지 않는다.
+                log.debug("토큰 탈취 의혹 발생 해당 토큰을 폐기합니다. 재 로그인 해주세요.");
+                RemoveToken(id);//현재 토큰의 유저 ID 토큰은 모두 지운다.
+                unsafeTokenRepository.save(token.toUnSafeToken());
+                User user = userJpaRepository.findById(id).orElseThrow(() -> new JwtException(JwtErrorCode.INVALID_REFRESH_TOKEN));
+                userJpaRepository.save(user.doLogout()); //로그아웃 처리후
+                throw new JwtException(JwtErrorCode.INVALID_REFRESH_TOKEN);//로그인 재 요청
             }
         }
-        throw new JwtException(JwtErrorCode.INVALID_TOKEN);
+        throw new JwtException(JwtErrorCode.INVALID_REFRESH_TOKEN);
     }
 
 }
+
+

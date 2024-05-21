@@ -1,34 +1,56 @@
 package org.egglog.api.security.model.entity;
 
-
-import com.nursetest.app.user.model.entity.enums.AuthProvider;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import org.egglog.api.user.model.entity.User;
+import org.egglog.api.user.model.entity.enums.AuthProvider;
+import org.egglog.api.user.model.entity.enums.UserRole;
+import org.egglog.api.user.model.entity.enums.UserStatus;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.nursetest.app.user.model.entity.enums.AuthProvider.*;
+import static org.egglog.api.user.model.entity.enums.AuthProvider.*;
 
 @Getter
 @ToString
 @Builder
 public class OAuthAttribute {
 
-    private Map<String, Object> attributes; // Oauth2 서버에서 오는 유저 정보
+    private Map<String, Object> attributes;
     private String nameAttributesKey;
     private String name;
     private String email;
     private String profileImgUrl;
     private AuthProvider provider;
 
+    public User toUser(){
+        return User.builder()
+                .name(this.name)
+                .email(this.email)
+                .profileImgUrl(this.profileImgUrl)
+                .provider(this.provider)
+                .userStatus(UserStatus.ACTIVE)
+                .userRole(UserRole.GENERAL_USER)
+                .build();
+    }
     public static OAuthAttribute of(String authProvider, Map<String, Object> attributes){
         if ("kakao".equals(authProvider)){
             return ofKakao("id", attributes);
         }else if ("google".equals(authProvider)){
             return ofGoogle("sub", attributes);
         }else if ("naver".equals(authProvider)){
+            return ofNaver("id",attributes);
+        }
+        return null;
+    }
+    public static OAuthAttribute of(AuthProvider provider, Map<String, Object> attributes){
+        if (AuthProvider.KAKAO.equals(provider)){
+            return ofKakao("id", attributes);
+        }else if (AuthProvider.GOOGLE.equals(provider)){
+            return ofGoogle("sub", attributes);
+        }else if (AuthProvider.NAVER.equals(provider)){
             return ofNaver("id",attributes);
         }
         return null;
@@ -61,7 +83,6 @@ public class OAuthAttribute {
     private static OAuthAttribute ofKakao(String userNameAttributeName, Map<String, Object> attributes) {
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> kakaoProfile = (Map<String, Object>) kakaoAccount.get("profile");
-
         return OAuthAttribute.builder()
                 .name(String.valueOf(kakaoProfile.get("nickname")))
                 .email(String.valueOf(kakaoAccount.get("email")))
@@ -79,7 +100,6 @@ public class OAuthAttribute {
         map.put("provider", provider);
         map.put("email", email);
         map.put("picture", profileImgUrl);
-
         return map;
     }
 

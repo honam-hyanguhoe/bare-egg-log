@@ -1,0 +1,23 @@
+[2024-05-10 10:57:03:4237][restartedMain] INFO  org.egglog.api.ApiApplication - Starting ApiApplication using Java 17.0.10 with PID 19380 (C:\ssafy-monu\egglog\api\build\classes\java\main started by SSAFY in C:\ssafy-monu\egglog\api)
+[2024-05-10 10:57:03:4238][restartedMain] INFO  org.egglog.api.ApiApplication - The following 1 profile is active: "dev"
+[2024-05-10 10:57:04:5804][restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8010"]
+[2024-05-10 10:57:04:5805][restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+[2024-05-10 10:57:04:5805][restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.19]
+[2024-05-10 10:57:04:5855][restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+[2024-05-10 10:57:05:6266][restartedMain] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+[2024-05-10 10:57:05:6299][restartedMain] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+[2024-05-10 10:57:05:6318][restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+[2024-05-10 10:57:05:6470][restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+[2024-05-10 10:57:05:6568][restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@43078f5
+[2024-05-10 10:57:05:6568][restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+[2024-05-10 10:57:06:7298][restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+[2024-05-10 10:57:09:10127][restartedMain] INFO  o.s.s.w.DefaultSecurityFilterChain - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@6e5ef8f6, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@2dad3ce5, org.springframework.security.web.context.SecurityContextHolderFilter@2ef45475, org.springframework.security.web.header.HeaderWriterFilter@729009cc, org.springframework.web.filter.CorsFilter@4e5b3fb4, org.springframework.security.web.authentication.logout.LogoutFilter@2ea9d509, org.egglog.api.security.handler.ExceptionHandlerFilter$$SpringCGLIB$$0@31f959a3, org.egglog.api.security.filter.JwtFilter@1fcbd1b5, org.egglog.api.security.filter.JoinExceptionFilter@43eb045b, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@5e8465fe, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@525a0c94, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@49ed67c7, org.springframework.security.web.access.ExceptionTranslationFilter@346df114, org.springframework.security.web.access.intercept.AuthorizationFilter@1929b28a]
+[2024-05-10 10:57:12:13171][restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8010"]
+[2024-05-10 10:57:14:15771][restartedMain] INFO  org.egglog.api.ApiApplication - Started ApiApplication in 15.569 seconds (process running for 16.321)
+[2024-05-10 10:57:19:20562][http-nio-8010-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+[2024-05-10 10:57:19:20600][http-nio-8010-exec-1] INFO  o.e.api.logging.LogTestController - 인포 로그 발생 : 운영에 참고할만한 사항, 중요한 비즈니스 프로세스가 완료되었습니다.
+[2024-05-10 10:57:21:22714][http-nio-8010-exec-3] INFO  o.e.api.logging.LogTestController - 인포 로그 발생 : 운영에 참고할만한 사항, 중요한 비즈니스 프로세스가 완료되었습니다.
+[2024-05-10 11:38:02:2463578][tomcat-shutdown] INFO  o.a.coyote.http11.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8010"]
+[2024-05-10 11:38:02:2463595][Thread-6] INFO  o.a.coyote.http11.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8010"]
+[2024-05-10 11:38:02:2463733][Thread-6] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+[2024-05-10 11:38:02:2463735][Thread-6] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
